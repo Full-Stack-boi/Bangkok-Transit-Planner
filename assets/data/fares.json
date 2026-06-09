@@ -1,0 +1,40 @@
+{
+  "bts_green": {
+    "description": "BTS Sukhumvit + Silom Line fare table (distance-based)",
+    "currency": "THB",
+    "updated": "2025-11-01",
+    "fare_by_stations": [17, 17, 25, 28, 32, 37, 42, 47, 52, 57, 62, 62, 65, 65, 65, 65, 65, 65, 65, 65]
+  },
+  "bts_gold": {
+    "description": "BTS Gold Line flat fare",
+    "currency": "THB",
+    "updated": "2025-11-01",
+    "fare_by_stations": [16, 16, 16]
+  },
+  "mrt_blue": {
+    "description": "MRT Blue Line fare table (distance-based)",
+    "currency": "THB",
+    "updated": "2026-07-03",
+    "fare_by_stations": [17, 17, 20, 22, 25, 27, 29, 32, 34, 37, 39, 42, 44, 44, 44, 44, 44, 44, 44, 44]
+  },
+  "mrt_purple": {
+    "description": "MRT Purple Line fare table",
+    "currency": "THB",
+    "updated": "2025-12-01",
+    "fare_by_stations": [14, 14, 17, 20, 20, 23, 23, 26, 26, 30, 30, 35, 35, 40, 42, 42],
+    "daily_cap": 40,
+    "daily_cap_student": 30
+  },
+  "mrt_yellow": {
+    "description": "MRT Yellow Line fare table (distance-based)",
+    "currency": "THB",
+    "updated": "2025-01-01",
+    "fare_by_stations": [15, 15, 20, 25, 28, 30, 33, 35, 38, 40, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45]
+  },
+  "arl": {
+    "description": "Airport Rail Link fare table (5 THB per stop from Suvarnabhumi)",
+    "currency": "THB",
+    "updated": "2025-01-01",
+    "fare_by_stations": [15, 15, 20, 25, 30, 35, 40, 45]
+  }
+}

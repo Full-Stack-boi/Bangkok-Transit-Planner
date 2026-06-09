@@ -1,0 +1,103 @@
+[
+  {
+    "id": "BTS_SUKHUMVIT",
+    "name_th": "สายสุขุมวิท",
+    "name_en": "Sukhumvit Line",
+    "operator": "BTS",
+    "color_hex": "#7DC242",
+    "bound_0_label": "ไปคูคต",
+    "bound_1_label": "ไปเคหะฯ",
+    "is_loop": false,
+    "peak_interval_min": 3,
+    "off_peak_interval_min": 6,
+    "station_ids": [
+      "BTS_N24","BTS_N23","BTS_N22","BTS_N21","BTS_N20","BTS_N19","BTS_N18","BTS_N17","BTS_N16","BTS_N15","BTS_N14","BTS_N13","BTS_N12","BTS_N11","BTS_N10","BTS_N9","BTS_N8","BTS_N7","BTS_N5","BTS_N4","BTS_N3","BTS_N2","BTS_N1","BTS_CEN","BTS_E1","BTS_E2","BTS_E3","BTS_E4","BTS_E5","BTS_E6","BTS_E7","BTS_E8","BTS_E9","BTS_E10","BTS_E11","BTS_E12","BTS_E13","BTS_E14","BTS_E15","BTS_E16","BTS_E17","BTS_E18","BTS_E19","BTS_E20","BTS_E21","BTS_E22","BTS_E23"
+    ]
+  },
+  {
+    "id": "BTS_SILOM",
+    "name_th": "สายสีลม",
+    "name_en": "Silom Line",
+    "operator": "BTS",
+    "color_hex": "#006838",
+    "bound_0_label": "ไปสนามกีฬาแห่งชาติ",
+    "bound_1_label": "ไปบางหว้า",
+    "is_loop": false,
+    "peak_interval_min": 3,
+    "off_peak_interval_min": 6,
+    "station_ids": [
+      "BTS_W1","BTS_CEN","BTS_S1","BTS_S2","BTS_S3","BTS_S4","BTS_S5","BTS_S6","BTS_S7","BTS_S8","BTS_S9","BTS_S10","BTS_S11","BTS_S12"
+    ]
+  },
+  {
+    "id": "BTS_GOLD",
+    "name_th": "สายสีทอง",
+    "name_en": "Gold Line",
+    "operator": "BTS",
+    "color_hex": "#C4A84E",
+    "bound_0_label": "ไปกรุงธนบุรี",
+    "bound_1_label": "ไปคลองสาน",
+    "is_loop": false,
+    "peak_interval_min": 5,
+    "off_peak_interval_min": 10,
+    "station_ids": ["BTS_G1","BTS_G2","BTS_G3"]
+  },
+  {
+    "id": "MRT_BLUE",
+    "name_th": "สายสีน้ำเงิน",
+    "name_en": "Blue Line",
+    "operator": "MRT",
+    "color_hex": "#1E3A8A",
+    "bound_0_label": "วงกลม (ตามเข็ม)",
+    "bound_1_label": "วงกลม (ทวนเข็ม)",
+    "is_loop": true,
+    "peak_interval_min": 4,
+    "off_peak_interval_min": 7,
+    "station_ids": [
+      "MRT_BL01","MRT_BL02","MRT_BL03","MRT_BL04","MRT_BL05","MRT_BL06","MRT_BL07","MRT_BL08","MRT_BL09","MRT_BL10","MRT_BL11","MRT_BL12","MRT_BL13","MRT_BL14","MRT_BL15","MRT_BL16","MRT_BL17","MRT_BL18","MRT_BL19","MRT_BL20","MRT_BL21","MRT_BL22","MRT_BL23","MRT_BL24","MRT_BL25","MRT_BL26","MRT_BL27","MRT_BL28","MRT_BL29","MRT_BL30","MRT_BL31","MRT_BL32","MRT_BL33","MRT_BL34","MRT_BL35","MRT_BL36","MRT_BL37","MRT_BL38"
+    ]
+  },
+  {
+    "id": "MRT_PURPLE",
+    "name_th": "สายสีม่วง",
+    "name_en": "Purple Line",
+    "operator": "MRT",
+    "color_hex": "#6B21A8",
+    "bound_0_label": "ไปคลองบางไผ่",
+    "bound_1_label": "ไปเตาปูน",
+    "is_loop": false,
+    "peak_interval_min": 5,
+    "off_peak_interval_min": 8,
+    "station_ids": [
+      "MRT_PP01","MRT_PP02","MRT_PP03","MRT_PP04","MRT_PP05","MRT_PP06","MRT_PP07","MRT_PP08","MRT_PP09","MRT_PP10","MRT_PP11","MRT_PP12","MRT_PP13","MRT_PP14","MRT_PP15","MRT_PP16"
+    ]
+  },
+  {
+    "id": "MRT_YELLOW",
+    "name_th": "สายสีเหลือง",
+    "name_en": "Yellow Line",
+    "operator": "MRT",
+    "color_hex": "#FBBF24",
+    "bound_0_label": "ไปลาดพร้าว",
+    "bound_1_label": "ไปสำโรง",
+    "is_loop": false,
+    "peak_interval_min": 5,
+    "off_peak_interval_min": 8,
+    "station_ids": [
+      "MRT_YL01","MRT_YL02","MRT_YL03","MRT_YL04","MRT_YL05","MRT_YL06","MRT_YL07","MRT_YL08","MRT_YL09","MRT_YL10","MRT_YL11","MRT_YL12","MRT_YL13","MRT_YL14","MRT_YL15","MRT_YL16","MRT_YL17","MRT_YL18","MRT_YL19","MRT_YL20","MRT_YL21","MRT_YL22","MRT_YL23"
+    ]
+  },
+  {
+    "id": "ARL",
+    "name_th": "แอร์พอร์ต เรล ลิงก์",
+    "name_en": "Airport Rail Link",
+    "operator": "ARL",
+    "color_hex": "#DC2626",
+    "bound_0_label": "ไปสุวรรณภูมิ",
+    "bound_1_label": "ไปพญาไท",
+    "is_loop": false,
+    "peak_interval_min": 12,
+    "off_peak_interval_min": 15,
+    "station_ids": ["ARL_A8","ARL_A7","ARL_A6","ARL_A5","ARL_A4","ARL_A3","ARL_A2","ARL_A1"]
+  }
+]
