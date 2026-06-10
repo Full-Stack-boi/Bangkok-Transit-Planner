@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/transit_colors.dart';
 import '../../models/route_result.dart';
+import '../../models/crowd_report.dart';
+import '../../providers/providers.dart';
 import '../search/search_view_model.dart';
 
 /// Bottom sheet showing detailed route result
@@ -60,7 +62,7 @@ class RouteResultSheet extends ConsumerWidget {
                 final segment = entry.value;
                 return Column(
                   children: [
-                    _buildSegmentCard(context, segment, theme),
+                    _buildSegmentCard(context, ref, segment, theme),
                     if (i < result.segments.length - 1 &&
                         i < result.transfers.length)
                       _buildTransferIndicator(
@@ -147,10 +149,16 @@ class RouteResultSheet extends ConsumerWidget {
 
   Widget _buildSegmentCard(
     BuildContext context,
+    WidgetRef ref,
     RouteSegment segment,
     ThemeData theme,
   ) {
     final lineColor = TransitColors.getLineColor(segment.lineId);
+    final crowdService = ref.watch(crowdServiceProvider);
+    final scheduleService = ref.watch(scheduleServiceProvider);
+
+    final crowdInfo = crowdService.getCrowdInfo(segment.fromStation.id);
+    final minutesUntilNext = scheduleService.getMinutesUntilNextTrain(segment.lineId);
 
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 4),
@@ -200,6 +208,65 @@ class RouteResultSheet extends ConsumerWidget {
               color: lineColor,
               isFirst: true,
               theme: theme,
+            ),
+
+            // Next Train & Crowd Info
+            Padding(
+              padding: const EdgeInsets.only(left: 36, top: 4, bottom: 8),
+              child: Wrap(
+                spacing: 16,
+                runSpacing: 4,
+                children: [
+                  // Next Train
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.access_time_rounded,
+                        size: 14,
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        minutesUntilNext == null
+                            ? 'หมดระยะบริการ'
+                            : (minutesUntilNext == 0 ? 'รถกำลังเข้าสถานี' : 'ขบวนถัดไป: ~$minutesUntilNext นาที'),
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: minutesUntilNext == 0
+                              ? Colors.amber.shade700
+                              : theme.colorScheme.onSurface.withValues(alpha: 0.8),
+                          fontWeight: minutesUntilNext == 0 ? FontWeight.bold : null,
+                        ),
+                      ),
+                    ],
+                  ),
+                  // Crowd Level
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.people_outline_rounded,
+                        size: 14,
+                        color: crowdInfo.level == CrowdLevel.high
+                            ? Colors.red
+                            : (crowdInfo.level == CrowdLevel.medium ? Colors.orange : Colors.green),
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        'คนรอ: ${crowdInfo.levelTextTh} (~${crowdInfo.presenceCount} คน)',
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: crowdInfo.level == CrowdLevel.high
+                              ? Colors.red.shade400
+                              : (crowdInfo.level == CrowdLevel.medium
+                                  ? Colors.orange.shade400
+                                  : Colors.green.shade400),
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
 
             // Intermediate stations (collapsed)
