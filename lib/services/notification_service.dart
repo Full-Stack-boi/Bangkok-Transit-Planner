@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 /// Service to handle local push notifications (e.g. proximity geofence alerts)
@@ -42,6 +43,8 @@ class NotificationService {
       importance: Importance.max,
       priority: Priority.high,
       showWhen: true,
+      color: Color(0xFF4F46E5), // Brand indigo color to style accent and headers
+      colorized: true,          // Allow system tinting of the notification card when supported
     );
 
     const NotificationDetails platformChannelSpecifics = NotificationDetails(
