@@ -24,6 +24,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   Station? _selectedStation;
   Position? _userPosition;
   bool _isLocating = false;
+  double _currentZoom = 12.0;
 
   @override
   void initState() {
@@ -112,51 +113,92 @@ class _MapScreenState extends ConsumerState<MapScreen> {
       final lineColor = TransitColors.getLineColor(station.lineId);
       final isInterchange = station.interchange.isNotEmpty;
 
-      markers.add(
-        Marker(
-          point: LatLng(station.lat, station.lng),
-          width: isInterchange ? 32 : 24,
-          height: isInterchange ? 32 : 24,
-          child: GestureDetector(
-            onTap: () {
-              setState(() => _selectedStation = station);
-            },
+      // LEVEL OF DETAIL (LOD) OPTIMIZATION:
+      if (_currentZoom < 11.8) {
+        // Zoom level < 11.8 (Zoomed out): Only show interchange stations as tiny dots
+        if (!isInterchange) continue;
+        markers.add(
+          Marker(
+            point: LatLng(station.lat, station.lng),
+            width: 8,
+            height: 8,
             child: Container(
               decoration: BoxDecoration(
-                color: theme.brightness == Brightness.dark ? const Color(0xFF1E293B) : Colors.white,
+                color: lineColor,
                 shape: BoxShape.circle,
-                border: Border.all(
-                  color: lineColor,
-                  width: isInterchange ? 4.0 : 3.0,
-                ),
-                boxShadow: const [
-                  BoxShadow(
-                    color: Colors.black26,
-                    blurRadius: 4,
-                    offset: Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: Center(
-                child: isInterchange
-                    ? Icon(
-                        Icons.swap_horiz_rounded,
-                        size: 14,
-                        color: theme.brightness == Brightness.dark ? Colors.white : Colors.black,
-                      )
-                    : Container(
-                        width: 6,
-                        height: 6,
-                        decoration: BoxDecoration(
-                          color: lineColor,
-                          shape: BoxShape.circle,
-                        ),
-                      ),
               ),
             ),
           ),
-        ),
-      );
+        );
+      } else if (_currentZoom < 13.2) {
+        // Zoom level 11.8 - 13.2 (Medium zoom): Show all stations as simple colored circles
+        markers.add(
+          Marker(
+            point: LatLng(station.lat, station.lng),
+            width: 12,
+            height: 12,
+            child: GestureDetector(
+              onTap: () {
+                setState(() => _selectedStation = station);
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  color: lineColor,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.white, width: 1.5),
+                ),
+              ),
+            ),
+          ),
+        );
+      } else {
+        // Zoom level >= 13.2 (Detailed zoom): Show full custom-designed interactive markers
+        markers.add(
+          Marker(
+            point: LatLng(station.lat, station.lng),
+            width: isInterchange ? 32 : 24,
+            height: isInterchange ? 32 : 24,
+            child: GestureDetector(
+              onTap: () {
+                setState(() => _selectedStation = station);
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  color: theme.brightness == Brightness.dark ? const Color(0xFF1E293B) : Colors.white,
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: lineColor,
+                    width: isInterchange ? 4.0 : 3.0,
+                  ),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Colors.black26,
+                      blurRadius: 4,
+                      offset: Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Center(
+                  child: isInterchange
+                      ? Icon(
+                          Icons.swap_horiz_rounded,
+                          size: 14,
+                          color: theme.brightness == Brightness.dark ? Colors.white : Colors.black,
+                        )
+                      : Container(
+                          width: 6,
+                          height: 6,
+                          decoration: BoxDecoration(
+                            color: lineColor,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                ),
+              ),
+            ),
+          ),
+        );
+      }
     }
 
     // User location marker
@@ -220,8 +262,30 @@ class _MapScreenState extends ConsumerState<MapScreen> {
             options: MapOptions(
               initialCenter: const LatLng(13.7563, 100.5018),
               initialZoom: 12.0,
-              minZoom: 10.0,
-              maxZoom: 17.0,
+              minZoom: 10.5,
+              maxZoom: 16.0,
+              cameraConstraint: CameraConstraint.contain(
+                bounds: LatLngBounds(
+                  const LatLng(13.48, 100.32),
+                  const LatLng(14.00, 100.82),
+                ),
+              ),
+              onPositionChanged: (position, hasGesture) {
+                if (position.zoom != null) {
+                  final zoom = position.zoom!;
+                  bool shouldRebuild = false;
+                  if ((_currentZoom < 11.8 && zoom >= 11.8) ||
+                      (_currentZoom >= 11.8 && zoom < 11.8) ||
+                      (_currentZoom < 13.2 && zoom >= 13.2) ||
+                      (_currentZoom >= 13.2 && zoom < 13.2)) {
+                    shouldRebuild = true;
+                  }
+                  _currentZoom = zoom;
+                  if (shouldRebuild && mounted) {
+                    setState(() {});
+                  }
+                }
+              },
               onTap: (position, point) {
                 // Dismiss details card when tapping on empty map space
                 if (_selectedStation != null) {
@@ -232,10 +296,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
             children: [
               TileLayer(
                 urlTemplate: theme.brightness == Brightness.dark
-                    ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-                    : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
+                    ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png'
+                    : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png',
                 userAgentPackageName: 'com.bkktransit.bkk_transit_planner',
-                retinaMode: RetinaMode.isHighDensity(context),
               ),
               PolylineLayer(polylines: polylines),
               MarkerLayer(markers: markers),
