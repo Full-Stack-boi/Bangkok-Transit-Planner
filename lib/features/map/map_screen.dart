@@ -231,6 +231,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                     ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
                     : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
                 userAgentPackageName: 'com.bkktransit.bkk_transit_planner',
+                retinaMode: RetinaMode.isHighDensity(context),
               ),
               PolylineLayer(polylines: polylines),
               MarkerLayer(markers: markers),
