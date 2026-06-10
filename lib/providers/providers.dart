@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../repositories/transit_repository.dart';
 import '../services/fare_service.dart';
 import '../services/schedule_service.dart';
+import '../services/crowd_service.dart';
 
 // ─── Repository Providers ───
 
@@ -17,6 +18,10 @@ final fareServiceProvider = Provider<FareService>((ref) {
 
 final scheduleServiceProvider = Provider<ScheduleService>((ref) {
   return ScheduleService();
+});
+
+final crowdServiceProvider = Provider<CrowdService>((ref) {
+  return CrowdService();
 });
 
 // ─── Initialization Provider ───
