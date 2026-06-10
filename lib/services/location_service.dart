@@ -49,11 +49,12 @@ class LocationService {
       }
 
       // Fetch fresh coordinates if no last known position is cached
-      print('Fetching fresh GPS coordinates...');
+      print('Fetching fresh GPS coordinates with forceLocationManager: true...');
       return await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(
+        locationSettings: AndroidSettings(
           accuracy: LocationAccuracy.medium,
-          timeLimit: Duration(seconds: 5),
+          timeLimit: const Duration(seconds: 5),
+          forceLocationManager: true,
         ),
       );
     } catch (e) {
