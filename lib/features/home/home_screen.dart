@@ -59,33 +59,64 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       final position = await locationService.getCurrentPosition();
       if (position == null) return;
 
-      // Find nearby station within 200m
-      final nearbyStation = locationService.findNearbyStation(
+      // Find the closest station in Bangkok (within 100km)
+      final closestStation = locationService.findNearbyStation(
         position,
         transitRepo.stations,
-        thresholdMeters: 200.0,
+        thresholdMeters: 100000.0, // 100 km
       );
 
-      if (nearbyStation != null) {
-        // Passive report presence
-        await crowdRepo.reportPresence(
-          stationId: nearbyStation.id,
-          accuracy: position.accuracy,
+      if (closestStation != null) {
+        final distMeters = locationService.calculateDistance(
+          position.latitude,
+          position.longitude,
+          closestStation.lat,
+          closestStation.lng,
         );
 
-        // Send local push notification
         final t = ref.read(translationsProvider);
         final localeCode = ref.read(localeProvider);
-        final stationName = localeCode == 'th' ? nearbyStation.nameTh : nearbyStation.nameEn;
+        final stationName = localeCode == 'th' ? closestStation.nameTh : closestStation.nameEn;
 
-        final title = t.get('nearby_alert_title');
-        final body = t.get('nearby_alert_body').replaceAll('{stationName}', stationName);
+        if (distMeters <= 200.0) {
+          // Passive report presence inside geofence (200m)
+          await crowdRepo.reportPresence(
+            stationId: closestStation.id,
+            accuracy: position.accuracy,
+          );
 
-        await ref.read(notificationServiceProvider).showNotification(
-          id: 1001,
-          title: title,
-          body: body,
-        );
+          // Send local push notification for geofence entry
+          final title = t.get('nearby_alert_title');
+          final body = t.get('nearby_alert_body').replaceAll('{stationName}', stationName);
+
+          await ref.read(notificationServiceProvider).showNotification(
+            id: 1001,
+            title: title,
+            body: body,
+          );
+        } else {
+          // If further away, notify the user about the nearest station and its distance
+          final title = localeCode == 'th' ? 'สถานีรถไฟฟ้าใกล้คุณที่สุด' : 'Your Nearest Station';
+          
+          final String distanceText;
+          if (distMeters >= 1000.0) {
+            final km = (distMeters / 1000.0).toStringAsFixed(1);
+            distanceText = localeCode == 'th' ? '$km กม.' : '$km km';
+          } else {
+            final m = distMeters.round();
+            distanceText = localeCode == 'th' ? '$m เมตร' : '$m m';
+          }
+
+          final body = localeCode == 'th'
+              ? 'สถานี $stationName อยู่ใกล้คุณที่สุด (ห่างออกไป $distanceText)'
+              : '$stationName station is closest to you ($distanceText away)';
+
+          await ref.read(notificationServiceProvider).showNotification(
+            id: 1002,
+            title: title,
+            body: body,
+          );
+        }
       }
     } catch (e) {
       print('Failed to perform passive GPS proximity check: $e');
