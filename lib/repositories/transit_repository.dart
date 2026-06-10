@@ -83,10 +83,21 @@ class TransitRepository {
     // Add transfer edges for interchange stations
     for (final station in _stations!) {
       for (final interchangeId in station.interchange) {
+        final target = getStation(interchangeId);
+        double walkMin = 5.0;
+        if (target != null && target.nameEn == station.nameEn) {
+          if (station.id.startsWith('BTS_CEN') ||
+              station.id.startsWith('MRT_BL01') ||
+              station.id.startsWith('MRT_BL33')) {
+            walkMin = 1.0; // Same station platform transfer (Siam or Tha Phra)
+          } else {
+            walkMin = 2.0; // Same-name adjacent station connection (e.g. Phaya Thai BTS/ARL, Lat Phrao Blue/Yellow)
+          }
+        }
         _graph!.addTransferEdge(
           station.id,
           interchangeId,
-          walkingMinutes: 5.0,
+          walkingMinutes: walkMin,
         );
       }
     }

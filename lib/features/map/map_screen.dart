@@ -113,92 +113,52 @@ class _MapScreenState extends ConsumerState<MapScreen> {
       final lineColor = TransitColors.getLineColor(station.lineId);
       final isInterchange = station.interchange.isNotEmpty;
 
-      // LEVEL OF DETAIL (LOD) OPTIMIZATION:
-      if (_currentZoom < 11.8) {
-        // Zoom level < 11.8 (Zoomed out): Only show interchange stations as tiny dots
-        if (!isInterchange) continue;
-        markers.add(
-          Marker(
-            point: LatLng(station.lat, station.lng),
-            width: 8,
-            height: 8,
+      // Always show full custom-designed interactive markers
+      markers.add(
+        Marker(
+          point: LatLng(station.lat, station.lng),
+          width: isInterchange ? 32 : 24,
+          height: isInterchange ? 32 : 24,
+          child: GestureDetector(
+            onTap: () {
+              setState(() => _selectedStation = station);
+            },
             child: Container(
               decoration: BoxDecoration(
-                color: lineColor,
+                color: theme.brightness == Brightness.dark ? const Color(0xFF1E293B) : Colors.white,
                 shape: BoxShape.circle,
-              ),
-            ),
-          ),
-        );
-      } else if (_currentZoom < 13.2) {
-        // Zoom level 11.8 - 13.2 (Medium zoom): Show all stations as simple colored circles
-        markers.add(
-          Marker(
-            point: LatLng(station.lat, station.lng),
-            width: 12,
-            height: 12,
-            child: GestureDetector(
-              onTap: () {
-                setState(() => _selectedStation = station);
-              },
-              child: Container(
-                decoration: BoxDecoration(
+                border: Border.all(
                   color: lineColor,
-                  shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white, width: 1.5),
+                  width: isInterchange ? 4.0 : 3.0,
                 ),
-              ),
-            ),
-          ),
-        );
-      } else {
-        // Zoom level >= 13.2 (Detailed zoom): Show full custom-designed interactive markers
-        markers.add(
-          Marker(
-            point: LatLng(station.lat, station.lng),
-            width: isInterchange ? 32 : 24,
-            height: isInterchange ? 32 : 24,
-            child: GestureDetector(
-              onTap: () {
-                setState(() => _selectedStation = station);
-              },
-              child: Container(
-                decoration: BoxDecoration(
-                  color: theme.brightness == Brightness.dark ? const Color(0xFF1E293B) : Colors.white,
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: lineColor,
-                    width: isInterchange ? 4.0 : 3.0,
+                boxShadow: const [
+                  BoxShadow(
+                    color: Colors.black26,
+                    blurRadius: 4,
+                    offset: Offset(0, 2),
                   ),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Colors.black26,
-                      blurRadius: 4,
-                      offset: Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: Center(
-                  child: isInterchange
-                      ? Icon(
-                          Icons.swap_horiz_rounded,
-                          size: 14,
-                          color: theme.brightness == Brightness.dark ? Colors.white : Colors.black,
-                        )
-                      : Container(
-                          width: 6,
-                          height: 6,
-                          decoration: BoxDecoration(
-                            color: lineColor,
-                            shape: BoxShape.circle,
-                          ),
+                ],
+              ),
+              child: Center(
+                child: isInterchange
+                    ? Icon(
+                        Icons.swap_horiz_rounded,
+                        size: 14,
+                        color: theme.brightness == Brightness.dark ? Colors.white : Colors.black,
+                      )
+                    : Container(
+                        width: 6,
+                        height: 6,
+                        decoration: BoxDecoration(
+                          color: lineColor,
+                          shape: BoxShape.circle,
                         ),
-                ),
+                      ),
               ),
             ),
           ),
-        );
-      }
+        ),
+      );
     }
 
     // User location marker
@@ -272,18 +232,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
               ),
               onPositionChanged: (position, hasGesture) {
                 if (position.zoom != null) {
-                  final zoom = position.zoom!;
-                  bool shouldRebuild = false;
-                  if ((_currentZoom < 11.8 && zoom >= 11.8) ||
-                      (_currentZoom >= 11.8 && zoom < 11.8) ||
-                      (_currentZoom < 13.2 && zoom >= 13.2) ||
-                      (_currentZoom >= 13.2 && zoom < 13.2)) {
-                    shouldRebuild = true;
-                  }
-                  _currentZoom = zoom;
-                  if (shouldRebuild && mounted) {
-                    setState(() {});
-                  }
+                  _currentZoom = position.zoom!;
                 }
               },
               onTap: (position, point) {
@@ -333,6 +282,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     AppLocalizations t,
     String localeCode,
   ) {
+    final transitRepo = ref.read(transitRepositoryProvider);
     final lineColor = TransitColors.getLineColor(station.lineId);
     final scheduleService = ref.watch(scheduleServiceProvider);
     final crowdService = ref.watch(crowdServiceProvider);
@@ -344,6 +294,27 @@ class _MapScreenState extends ConsumerState<MapScreen> {
 
     final stationName = localeCode == 'th' ? station.nameTh : station.nameEn;
     final stationSubName = localeCode == 'th' ? station.nameEn : station.nameTh;
+
+    // Find all stations in the same interchange hub
+    final hubStations = <Station>[station];
+    for (final interchangeId in station.interchange) {
+      final s = transitRepo.getStation(interchangeId);
+      if (s != null && !hubStations.contains(s)) {
+        hubStations.add(s);
+      }
+    }
+    hubStations.sort((a, b) {
+      // Prioritize BTS over MRT over ARL
+      int getPriority(String lineId) {
+        if (lineId.startsWith('BTS')) return 0;
+        if (lineId.startsWith('MRT')) return 1;
+        return 2;
+      }
+      final pA = getPriority(a.lineId);
+      final pB = getPriority(b.lineId);
+      if (pA != pB) return pA.compareTo(pB);
+      return a.id.compareTo(b.id);
+    });
 
     final String trainStatusText;
     if (minutesUntilNext == null) {
@@ -432,6 +403,59 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                 ),
               ],
             ),
+            if (hubStations.length > 1) ...[
+              const SizedBox(height: 12),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: hubStations.map((hubStation) {
+                    final hubLine = transitRepo.getLine(hubStation.lineId);
+                    final hubLineColor = TransitColors.getLineColor(hubStation.lineId);
+                    final isSelected = hubStation.id == station.id;
+                    final hubLineName = hubLine != null
+                        ? (localeCode == 'th' ? hubLine.nameTh : hubLine.nameEn)
+                        : hubStation.lineId;
+                    
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 8.0),
+                      child: ChoiceChip(
+                        label: Text(
+                          '${hubStation.code} - $hubLineName',
+                          style: TextStyle(
+                            color: isSelected 
+                                ? Colors.white 
+                                : hubLineColor,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                          ),
+                        ),
+                        selected: isSelected,
+                        selectedColor: hubLineColor,
+                        backgroundColor: theme.brightness == Brightness.dark
+                            ? const Color(0xFF1E293B)
+                            : Colors.grey.shade100,
+                        checkmarkColor: Colors.white,
+                        showCheckmark: false,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                          side: BorderSide(
+                            color: hubLineColor,
+                            width: 1.5,
+                          ),
+                        ),
+                        onSelected: (selected) {
+                          if (selected) {
+                            setState(() {
+                              _selectedStation = hubStation;
+                            });
+                          }
+                        },
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+            ],
             const Divider(height: 16),
 
             // Next Train & Crowd Info

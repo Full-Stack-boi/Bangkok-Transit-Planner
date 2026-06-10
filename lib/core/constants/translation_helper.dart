@@ -74,6 +74,7 @@ class AppLocalizations {
       'cancel_btn': 'ยกเลิก',
       'save_btn': 'บันทึก',
       'interchange_walk': 'เปลี่ยนสาย · เดิน ~{time} นาที',
+      'interchange_levels': 'เปลี่ยนชานชาลาต่างระดับชั้น · เดิน ~{time} นาที',
       'fare_title': 'ค่าโดยสาร',
       'total': 'รวม',
     },
@@ -147,6 +148,7 @@ class AppLocalizations {
       'cancel_btn': 'Cancel',
       'save_btn': 'Save',
       'interchange_walk': 'Transfer · Walk ~{time} min',
+      'interchange_levels': 'Transfer platforms (different levels) · Walk ~{time} min',
       'fare_title': 'Fare',
       'total': 'Total',
     }

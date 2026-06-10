@@ -71,6 +71,8 @@ class RouteResultSheet extends ConsumerWidget {
                       _buildTransferIndicator(
                         context,
                         result.transfers[i],
+                        segment,
+                        result.segments[i + 1],
                         theme,
                         t,
                         localeCode,
@@ -106,20 +108,26 @@ class RouteResultSheet extends ConsumerWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            _buildInfoChip(
-              icon: Icons.timer_outlined,
-              label: '~${result.totalMinutes.toInt()} ${t.get('minutes_unit')}',
-              theme: theme,
+            Flexible(
+              child: _buildInfoChip(
+                icon: Icons.timer_outlined,
+                label: '~${result.totalMinutes.toInt()} ${t.get('minutes_unit')}',
+                theme: theme,
+              ),
             ),
-            _buildInfoChip(
-              icon: Icons.payments_outlined,
-              label: '${result.totalFareThb} ${t.get('currency_unit')}',
-              theme: theme,
+            Flexible(
+              child: _buildInfoChip(
+                icon: Icons.payments_outlined,
+                label: '${result.totalFareThb} ${t.get('currency_unit')}',
+                theme: theme,
+              ),
             ),
-            _buildInfoChip(
-              icon: Icons.swap_horiz_rounded,
-              label: '${result.transferCount} ${t.get('transfers_count')}',
-              theme: theme,
+            Flexible(
+              child: _buildInfoChip(
+                icon: Icons.swap_horiz_rounded,
+                label: '${result.transferCount} ${t.get('transfers_count')}',
+                theme: theme,
+              ),
             ),
           ],
         ),
@@ -240,7 +248,7 @@ class RouteResultSheet extends ConsumerWidget {
     required ThemeData theme,
   }) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
         color: theme.cardColor,
         borderRadius: BorderRadius.circular(12),
@@ -251,7 +259,14 @@ class RouteResultSheet extends ConsumerWidget {
         children: [
           Icon(icon, size: 18, color: theme.colorScheme.primary),
           const SizedBox(width: 6),
-          Text(label, style: theme.textTheme.labelLarge),
+          Flexible(
+            child: Text(
+              label,
+              style: theme.textTheme.labelLarge,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+            ),
+          ),
         ],
       ),
     );
@@ -516,11 +531,19 @@ class RouteResultSheet extends ConsumerWidget {
   Widget _buildTransferIndicator(
     BuildContext context,
     TransferStep transfer,
+    RouteSegment prevSegment,
+    RouteSegment nextSegment,
     ThemeData theme,
     AppLocalizations t,
     String localeCode,
   ) {
-    final text = t.get('interchange_walk').replaceAll('{time}', '${transfer.walkingMinutes.toInt()}');
+    final text = _getTransferInstruction(
+      transfer: transfer,
+      prevSegment: prevSegment,
+      nextSegment: nextSegment,
+      localeCode: localeCode,
+      t: t,
+    );
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8),
@@ -552,6 +575,140 @@ class RouteResultSheet extends ConsumerWidget {
         ],
       ),
     );
+  }
+
+  String _getTransferInstruction({
+    required TransferStep transfer,
+    required RouteSegment prevSegment,
+    required RouteSegment nextSegment,
+    required String localeCode,
+    required AppLocalizations t,
+  }) {
+    final fromId = transfer.fromStation.id;
+    final toId = transfer.toStation.id;
+
+    // ─── Case 1: Tha Phra (MRT Blue Line Self-Interchange) ───
+    if ((fromId == 'MRT_BL01' && toId == 'MRT_BL33') || (fromId == 'MRT_BL33' && toId == 'MRT_BL01')) {
+      final toUpper = toId == 'MRT_BL01';
+      if (localeCode == 'th') {
+        return toUpper
+            ? 'ขึ้นบันไดเลื่อนไปชานชาลาชั้น 4 (สายวงกลม ไปทางจรัญฯ/เตาปูน) · เดิน ~1 นาที'
+            : 'ลงบันไดเลื่อนไปชานชาลาชั้น 3 (สายกิ่ง ไปทางบางหว้า/หลักสอง) · เดิน ~1 นาที';
+      } else {
+        return toUpper
+            ? 'Go up to Level 4 platform (Circle Line towards Charan / Tao Poon) · Walk ~1 min'
+            : 'Go down to Level 3 platform (Branch Line towards Bang Wa / Lak Song) · Walk ~1 min';
+      }
+    }
+
+    // ─── Case 2: Siam (BTS Sukhumvit <-> Silom) ───
+    if ((fromId == 'BTS_CEN' && toId == 'BTS_CEN_SILOM') || (fromId == 'BTS_CEN_SILOM' && toId == 'BTS_CEN')) {
+      int arrivalFloor = 3;
+      final prevDir = prevSegment.direction;
+      if (prevSegment.lineId == 'BTS_SUKHUMVIT') {
+        if (prevDir.contains('เคหะ') || prevDir.contains('Kheha')) {
+          arrivalFloor = 4;
+        } else {
+          arrivalFloor = 3;
+        }
+      } else if (prevSegment.lineId == 'BTS_SILOM') {
+        if (prevDir.contains('บางหว้า') || prevDir.contains('Bang Wa')) {
+          arrivalFloor = 4;
+        } else {
+          arrivalFloor = 3;
+        }
+      }
+
+      int departureFloor = 3;
+      final nextDir = nextSegment.direction;
+      if (nextSegment.lineId == 'BTS_SUKHUMVIT') {
+        if (nextDir.contains('เคหะ') || nextDir.contains('Kheha')) {
+          departureFloor = 4;
+        } else {
+          departureFloor = 3;
+        }
+      } else if (nextSegment.lineId == 'BTS_SILOM') {
+        if (nextDir.contains('บางหว้า') || nextDir.contains('Bang Wa')) {
+          departureFloor = 4;
+        } else {
+          departureFloor = 3;
+        }
+      }
+
+      if (arrivalFloor == departureFloor) {
+        if (localeCode == 'th') {
+          return 'เดินสลับฝั่งชานชาลาที่ชั้นเดียวกัน (ชั้น $arrivalFloor) · เดิน ~1 นาที';
+        } else {
+          return 'Cross-platform transfer on the same level (Level $arrivalFloor) · Walk ~1 min';
+        }
+      } else {
+        if (departureFloor == 3) {
+          if (localeCode == 'th') {
+            return 'ขึ้นบันไดเลื่อนขึ้นไปชานชาลาชั้น 3 · เดิน ~1 นาที';
+          } else {
+            return 'Go up to Level 3 platform · Walk ~1 min';
+          }
+        } else {
+          if (localeCode == 'th') {
+            return 'ลงบันไดเลื่อนลงไปชานชาลาชั้น 4 · เดิน ~1 นาที';
+          } else {
+            return 'Go down to Level 4 platform · Walk ~1 min';
+          }
+        }
+      }
+    }
+
+    // ─── Case 3: Other Same-Name Interchanges ───
+    if (transfer.fromStation.nameEn == transfer.toStation.nameEn) {
+      final toLine = transfer.toLineId;
+
+      // Lat Phrao (Blue <-> Yellow)
+      if (transfer.fromStation.nameEn.contains('Lat Phrao')) {
+        if (toLine == 'MRT_YELLOW') {
+          if (localeCode == 'th') {
+            return 'ขึ้นบันไดเลื่อนขึ้นไปชานชาลารถไฟฟ้ายกระดับสายสีเหลือง · เดิน ~2 นาที';
+          } else {
+            return 'Go up to the elevated Yellow Line platform · Walk ~2 min';
+          }
+        } else {
+          if (localeCode == 'th') {
+            return 'ลงบันไดเลื่อนลงไปสถานีรถไฟฟ้าใต้ดินสายสีน้ำเงิน · เดิน ~2 นาที';
+          } else {
+            return 'Go down to the underground Blue Line platform · Walk ~2 min';
+          }
+        }
+      }
+
+      // Phaya Thai (BTS <-> ARL)
+      if (transfer.fromStation.nameEn.contains('Phaya Thai')) {
+        if (localeCode == 'th') {
+          return 'เดินผ่านทางเชื่อมเพื่อเปลี่ยนชานชาลาต่างระดับ · เดิน ~2 นาที';
+        } else {
+          return 'Walk via connection link to the other station level · Walk ~2 min';
+        }
+      }
+
+      // Samrong (BTS <-> Yellow)
+      if (transfer.fromStation.nameEn.contains('Samrong')) {
+        if (localeCode == 'th') {
+          return 'เดินผ่านทางเชื่อมสกายวอล์คเปลี่ยนชานชาลายกระดับ · เดิน ~2 นาที';
+        } else {
+          return 'Walk via skywalk connection link to the other line · Walk ~2 min';
+        }
+      }
+
+      // Hua Mak (ARL <-> Yellow)
+      if (transfer.fromStation.nameEn.contains('Hua Mak')) {
+        if (localeCode == 'th') {
+          return 'เดินผ่านทางเชื่อมสกายวอล์คเพื่อเปลี่ยนสาย · เดิน ~2 นาที';
+        } else {
+          return 'Walk via skywalk transfer bridge to the other line · Walk ~2 min';
+        }
+      }
+    }
+
+    // ─── Case 4: Default Walk ───
+    return t.get('interchange_walk').replaceAll('{time}', '${transfer.walkingMinutes.toInt()}');
   }
 
   Widget _buildFareBreakdown(

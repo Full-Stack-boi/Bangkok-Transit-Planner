@@ -50,7 +50,7 @@
     "color_hex": "#1E3A8A",
     "bound_0_label": "วงกลม (ตามเข็ม)",
     "bound_1_label": "วงกลม (ทวนเข็ม)",
-    "is_loop": true,
+    "is_loop": false,
     "peak_interval_min": 4,
     "off_peak_interval_min": 7,
     "station_ids": [
