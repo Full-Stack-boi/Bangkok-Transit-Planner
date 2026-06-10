@@ -4,6 +4,8 @@ import '../../core/theme/transit_colors.dart';
 import '../../models/station.dart';
 import 'search_view_model.dart';
 import '../route_result/route_result_sheet.dart';
+import '../../providers/providers.dart';
+import '../../core/constants/translation_helper.dart';
 
 /// Search screen — main screen for route planning
 class SearchScreen extends ConsumerStatefulWidget {
@@ -28,10 +30,12 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     final state = ref.watch(searchViewModelProvider);
     final vm = ref.read(searchViewModelProvider.notifier);
     final theme = Theme.of(context);
+    final t = ref.watch(translationsProvider);
+    final localeCode = ref.watch(localeProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('BKK Transit'),
+        title: Text(t.get('app_title')),
         actions: [
           if (state.origin != null || state.destination != null)
             IconButton(
@@ -46,7 +50,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       body: Column(
         children: [
           // ─── Origin / Destination Selector ───
-          _buildStationSelector(context, state, vm, theme),
+          _buildStationSelector(context, state, vm, theme, t, localeCode),
 
           // ─── Search Bar ───
           Padding(
@@ -56,8 +60,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               onChanged: (query) => vm.search(query),
               decoration: InputDecoration(
                 hintText: _isSelectingOrigin
-                    ? 'ค้นหาสถานีต้นทาง...'
-                    : 'ค้นหาสถานีปลายทาง...',
+                    ? t.get('origin_hint')
+                    : t.get('dest_hint'),
                 prefixIcon: const Icon(Icons.search),
                 suffixIcon: _searchController.text.isNotEmpty
                     ? IconButton(
@@ -72,7 +76,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
             ),
           ),
 
-          // ─── Route Result Banner ───
+          // ─── Route Calculation Progress Banner ───
           if (state.isCalculating)
             const Padding(
               padding: EdgeInsets.all(16),
@@ -96,21 +100,22 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               ),
             ),
 
-          // ─── Route Result ───
+          // ─── Route Result Summary Banner ───
           if (state.routeResult != null)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: _RouteResultBanner(
                 result: state.routeResult!,
+                t: t,
                 onTap: () => _showRouteDetail(context),
               ),
             ),
 
-          // ─── Search Results ───
+          // ─── Search Results or Quick Actions ───
           Expanded(
             child: state.searchResults.isEmpty && state.query.isEmpty
-                ? _buildQuickActions(context, vm)
-                : _buildSearchResults(state, vm),
+                ? _buildQuickActions(context, t)
+                : _buildSearchResults(state, vm, t, localeCode),
           ),
         ],
       ),
@@ -122,7 +127,17 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     SearchState state,
     SearchViewModel vm,
     ThemeData theme,
+    AppLocalizations t,
+    String localeCode,
   ) {
+    final originLabel = state.origin != null
+        ? (localeCode == 'th' ? state.origin!.nameTh : state.origin!.nameEn)
+        : t.get('origin_hint');
+
+    final destLabel = state.destination != null
+        ? (localeCode == 'th' ? state.destination!.nameTh : state.destination!.nameEn)
+        : t.get('dest_hint');
+
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 8, 16, 0),
       padding: const EdgeInsets.all(16),
@@ -135,12 +150,14 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       ),
       child: Column(
         children: [
-          // Origin
+          // Origin Selection Row
           _buildStationRow(
             icon: Icons.trip_origin,
             iconColor: Colors.green,
-            label: state.origin?.nameTh ?? 'เลือกสถานีต้นทาง',
-            sublabel: state.origin?.nameEn,
+            label: originLabel,
+            sublabel: state.origin != null
+                ? (localeCode == 'th' ? state.origin!.nameEn : state.origin!.nameTh)
+                : null,
             isSelected: _isSelectingOrigin,
             onTap: () => setState(() => _isSelectingOrigin = true),
             lineColor: state.origin != null
@@ -148,7 +165,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                 : null,
           ),
 
-          // Swap button + divider
+          // Swap stations action row
           Row(
             children: [
               const Expanded(child: Divider()),
@@ -165,12 +182,14 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
             ],
           ),
 
-          // Destination
+          // Destination Selection Row
           _buildStationRow(
             icon: Icons.location_on,
             iconColor: Colors.red,
-            label: state.destination?.nameTh ?? 'เลือกสถานีปลายทาง',
-            sublabel: state.destination?.nameEn,
+            label: destLabel,
+            sublabel: state.destination != null
+                ? (localeCode == 'th' ? state.destination!.nameEn : state.destination!.nameTh)
+                : null,
             isSelected: !_isSelectingOrigin,
             onTap: () => setState(() => _isSelectingOrigin = false),
             lineColor: state.destination != null
@@ -222,7 +241,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                   if (sublabel != null)
                     Text(
                       sublabel,
-                      style: theme.textTheme.bodyMedium,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                        fontSize: 12,
+                      ),
                     ),
                 ],
               ),
@@ -242,7 +264,12 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     );
   }
 
-  Widget _buildSearchResults(SearchState state, SearchViewModel vm) {
+  Widget _buildSearchResults(
+    SearchState state,
+    SearchViewModel vm,
+    AppLocalizations t,
+    String localeCode,
+  ) {
     if (state.searchResults.isEmpty && state.query.isNotEmpty) {
       return Center(
         child: Column(
@@ -251,7 +278,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
             Icon(Icons.search_off, size: 64, color: Colors.grey.shade600),
             const SizedBox(height: 16),
             Text(
-              'ไม่พบสถานี "${state.query}"',
+              '${t.get('no_station_found')} "${state.query}"',
               style: Theme.of(context).textTheme.titleMedium,
             ),
           ],
@@ -266,6 +293,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         final station = state.searchResults[index];
         return _StationListTile(
           station: station,
+          localeCode: localeCode,
           onTap: () {
             if (_isSelectingOrigin) {
               vm.setOrigin(station);
@@ -281,7 +309,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     );
   }
 
-  Widget _buildQuickActions(BuildContext context, SearchViewModel vm) {
+  Widget _buildQuickActions(BuildContext context, AppLocalizations t) {
     return Padding(
       padding: const EdgeInsets.all(24),
       child: Column(
@@ -293,12 +321,12 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           ),
           const SizedBox(height: 16),
           Text(
-            'วางแผนการเดินทาง',
+            t.get('search_title'),
             style: Theme.of(context).textTheme.headlineMedium,
           ),
           const SizedBox(height: 8),
           Text(
-            'พิมพ์ชื่อสถานีเพื่อค้นหา\nรองรับ BTS, MRT, Airport Rail Link',
+            t.get('search_desc'),
             style: Theme.of(context).textTheme.bodyMedium,
             textAlign: TextAlign.center,
           ),
@@ -319,14 +347,22 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
 
 class _StationListTile extends StatelessWidget {
   final Station station;
+  final String localeCode;
   final VoidCallback onTap;
 
-  const _StationListTile({required this.station, required this.onTap});
+  const _StationListTile({
+    required this.station,
+    required this.localeCode,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
     final lineColor = TransitColors.getLineColor(station.lineId);
     final theme = Theme.of(context);
+
+    final title = localeCode == 'th' ? station.nameTh : station.nameEn;
+    final subtitle = localeCode == 'th' ? station.nameEn : station.nameTh;
 
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
@@ -350,8 +386,14 @@ class _StationListTile extends StatelessWidget {
             ),
           ),
         ),
-        title: Text(station.nameTh, style: theme.textTheme.titleMedium),
-        subtitle: Text(station.nameEn, style: theme.textTheme.bodyMedium),
+        title: Text(title, style: theme.textTheme.titleMedium),
+        subtitle: Text(
+          subtitle,
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+            fontSize: 12,
+          ),
+        ),
         trailing: Container(
           width: 8,
           height: 8,
@@ -367,9 +409,14 @@ class _StationListTile extends StatelessWidget {
 
 class _RouteResultBanner extends StatelessWidget {
   final dynamic result;
+  final AppLocalizations t;
   final VoidCallback onTap;
 
-  const _RouteResultBanner({required this.result, required this.onTap});
+  const _RouteResultBanner({
+    required this.result,
+    required this.t,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -390,14 +437,14 @@ class _RouteResultBanner extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '~${result.totalMinutes.toInt()} นาที · ${result.totalFareThb} บาท',
+                      '~${result.totalMinutes.toInt()} ${t.get('minutes_unit')} · ${result.totalFareThb} ${t.get('currency_unit')}',
                       style: theme.textTheme.titleMedium?.copyWith(
                         color: theme.colorScheme.primary,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     Text(
-                      '${result.segments.length} สาย · ${result.transferCount} ต่อรถ · ${result.totalStations} สถานี',
+                      '${result.segments.length} ${t.get('lines_count')} · ${result.transferCount} ${t.get('transfers_count')} · ${result.totalStations} ${t.get('stations_count')}',
                       style: theme.textTheme.bodyMedium,
                     ),
                   ],

@@ -5,6 +5,7 @@ import '../search/search_screen.dart';
 import '../map/map_screen.dart';
 import '../favorites/favorites_screen.dart';
 import '../settings/settings_screen.dart';
+import '../../core/constants/translation_helper.dart';
 
 /// Main home screen with bottom navigation
 class HomeScreen extends ConsumerStatefulWidget {
@@ -60,6 +61,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           stationId: nearbyStation.id,
           accuracy: position.accuracy,
         );
+
+        // Send local push notification
+        final t = ref.read(translationsProvider);
+        final localeCode = ref.read(localeProvider);
+        final stationName = localeCode == 'th' ? nearbyStation.nameTh : nearbyStation.nameEn;
+
+        final title = t.get('nearby_alert_title');
+        final body = t.get('nearby_alert_body').replaceAll('{stationName}', stationName);
+
+        await ref.read(notificationServiceProvider).showNotification(
+          id: 1001,
+          title: title,
+          body: body,
+        );
       }
     } catch (e) {
       print('Failed to perform passive GPS proximity check: $e');
@@ -70,6 +85,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget build(BuildContext context) {
     final initState = ref.watch(transitInitProvider);
     final currentIndex = ref.watch(homeTabIndexProvider);
+    final t = ref.watch(translationsProvider);
 
     return Scaffold(
       body: initState.when(
@@ -77,39 +93,39 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           index: currentIndex,
           children: _screens,
         ),
-        loading: () => const _LoadingView(),
-        error: (error, _) => _ErrorView(error: error.toString()),
+        loading: () => _LoadingView(t: t),
+        error: (error, _) => _ErrorView(error: error.toString(), t: t),
       ),
-      bottomNavigationBar: _buildBottomNav(context, currentIndex),
+      bottomNavigationBar: _buildBottomNav(context, currentIndex, t),
     );
   }
 
-  Widget _buildBottomNav(BuildContext context, int currentIndex) {
+  Widget _buildBottomNav(BuildContext context, int currentIndex, AppLocalizations t) {
     return NavigationBar(
       selectedIndex: currentIndex,
       onDestinationSelected: (index) {
         ref.read(homeTabIndexProvider.notifier).state = index;
       },
-      destinations: const [
+      destinations: [
         NavigationDestination(
-          icon: Icon(Icons.search_rounded),
-          selectedIcon: Icon(Icons.search_rounded),
-          label: 'ค้นหา',
+          icon: const Icon(Icons.search_rounded),
+          selectedIcon: const Icon(Icons.search_rounded),
+          label: t.get('search_title'),
         ),
         NavigationDestination(
-          icon: Icon(Icons.map_outlined),
-          selectedIcon: Icon(Icons.map_rounded),
-          label: 'แผนที่',
+          icon: const Icon(Icons.map_outlined),
+          selectedIcon: const Icon(Icons.map_rounded),
+          label: t.get('map_title'),
         ),
         NavigationDestination(
-          icon: Icon(Icons.favorite_outline_rounded),
-          selectedIcon: Icon(Icons.favorite_rounded),
-          label: 'รายการโปรด',
+          icon: const Icon(Icons.favorite_outline_rounded),
+          selectedIcon: const Icon(Icons.favorite_rounded),
+          label: t.get('favorites_title'),
         ),
         NavigationDestination(
-          icon: Icon(Icons.settings_outlined),
-          selectedIcon: Icon(Icons.settings_rounded),
-          label: 'ตั้งค่า',
+          icon: const Icon(Icons.settings_outlined),
+          selectedIcon: const Icon(Icons.settings_rounded),
+          label: t.get('settings_title'),
         ),
       ],
     );
@@ -117,7 +133,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 }
 
 class _LoadingView extends StatelessWidget {
-  const _LoadingView();
+  final AppLocalizations t;
+  const _LoadingView({required this.t});
 
   @override
   Widget build(BuildContext context) {
@@ -132,7 +149,7 @@ class _LoadingView extends StatelessWidget {
           ),
           const SizedBox(height: 24),
           Text(
-            'กำลังโหลดข้อมูลสถานี...',
+            t.get('loading_stations'),
             style: Theme.of(context).textTheme.titleMedium,
           ),
         ],
@@ -143,7 +160,8 @@ class _LoadingView extends StatelessWidget {
 
 class _ErrorView extends StatelessWidget {
   final String error;
-  const _ErrorView({required this.error});
+  final AppLocalizations t;
+  const _ErrorView({required this.error, required this.t});
 
   @override
   Widget build(BuildContext context) {
@@ -156,7 +174,7 @@ class _ErrorView extends StatelessWidget {
             const Icon(Icons.error_outline, size: 64, color: Colors.red),
             const SizedBox(height: 16),
             Text(
-              'เกิดข้อผิดพลาด',
+              t.get('error_occurred') == 'error_occurred' ? 'เกิดข้อผิดพลาด' : t.get('error_occurred'),
               style: Theme.of(context).textTheme.headlineMedium,
             ),
             const SizedBox(height: 8),

@@ -9,6 +9,7 @@ import '../../models/crowd_report.dart';
 import '../../providers/providers.dart';
 import '../../repositories/favorites_repository.dart';
 import '../search/search_view_model.dart';
+import '../../core/constants/translation_helper.dart';
 
 /// Map screen showing an interactive transit map with overlays
 class MapScreen extends ConsumerStatefulWidget {
@@ -192,9 +193,12 @@ class _MapScreenState extends ConsumerState<MapScreen> {
       );
     }
 
+    final t = ref.watch(translationsProvider);
+    final localeCode = ref.watch(localeProvider);
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('แผนที่รถไฟฟ้า'),
+        title: Text(t.get('map_title')),
         actions: [
           IconButton(
             icon: _isLocating
@@ -249,6 +253,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                 _selectedStation!,
                 favoritesRepo,
                 theme,
+                t,
+                localeCode,
               ),
             ),
         ],
@@ -261,6 +267,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     Station station,
     FavoritesRepository favoritesRepo,
     ThemeData theme,
+    AppLocalizations t,
+    String localeCode,
   ) {
     final lineColor = TransitColors.getLineColor(station.lineId);
     final scheduleService = ref.watch(scheduleServiceProvider);
@@ -270,6 +278,31 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     final isFav = favoritesRepo.isFavoriteStation(station.id);
     final crowdInfo = crowdService.getCrowdInfo(station.id);
     final minutesUntilNext = scheduleService.getMinutesUntilNextTrain(station.lineId);
+
+    final stationName = localeCode == 'th' ? station.nameTh : station.nameEn;
+    final stationSubName = localeCode == 'th' ? station.nameEn : station.nameTh;
+
+    final String trainStatusText;
+    if (minutesUntilNext == null) {
+      trainStatusText = t.get('service_ended');
+    } else if (minutesUntilNext == 0) {
+      trainStatusText = t.get('train_arriving');
+    } else {
+      trainStatusText = '${t.get('next_train')}: ~$minutesUntilNext ${t.get('minutes_unit')}';
+    }
+
+    String getCrowdLevelText(CrowdLevel level) {
+      switch (level) {
+        case CrowdLevel.low:
+          return t.get('crowd_low');
+        case CrowdLevel.medium:
+          return t.get('crowd_medium');
+        case CrowdLevel.high:
+          return t.get('crowd_high');
+        case CrowdLevel.unknown:
+          return t.get('crowd_unknown');
+      }
+    }
 
     return Card(
       elevation: 8,
@@ -303,14 +336,17 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        station.nameTh,
+                        stationName,
                         style: theme.textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       Text(
-                        station.nameEn,
-                        style: theme.textTheme.bodyMedium,
+                        stationSubName,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                          fontSize: 12,
+                        ),
                       ),
                     ],
                   ),
@@ -340,24 +376,27 @@ class _MapScreenState extends ConsumerState<MapScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 // Next Train
-                Row(
-                  children: [
-                    Icon(
-                      Icons.access_time_rounded,
-                      size: 16,
-                      color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      minutesUntilNext == null
-                          ? 'หมดระยะบริการ'
-                          : (minutesUntilNext == 0 ? 'รถกำลังเข้าสถานี' : 'ขบวนถัดไป: ~$minutesUntilNext นาที'),
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: minutesUntilNext == 0 ? Colors.amber.shade700 : null,
-                        fontWeight: minutesUntilNext == 0 ? FontWeight.bold : null,
+                Expanded(
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.access_time_rounded,
+                        size: 16,
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                       ),
-                    ),
-                  ],
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          trainStatusText,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: minutesUntilNext == 0 ? Colors.amber.shade700 : null,
+                            fontWeight: minutesUntilNext == 0 ? FontWeight.bold : null,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
 
                 // Crowd Level
@@ -372,7 +411,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                     ),
                     const SizedBox(width: 6),
                     Text(
-                      'คนรอ: ${crowdInfo.levelTextTh} (~${crowdInfo.presenceCount} คน)',
+                      '${t.get('crowd_level')}: ${getCrowdLevelText(crowdInfo.level)} (~${crowdInfo.presenceCount} ${localeCode == 'th' ? 'คน' : 'pax'})',
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: crowdInfo.level == CrowdLevel.high
                             ? Colors.red.shade400
@@ -399,7 +438,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                       setState(() => _selectedStation = null);
                     },
                     icon: const Icon(Icons.trip_origin_rounded, size: 16, color: Colors.green),
-                    label: const Text('ตั้งเป็นต้นทาง'),
+                    label: Text(t.get('set_origin_btn')),
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 10),
                     ),
@@ -414,7 +453,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                       setState(() => _selectedStation = null);
                     },
                     icon: const Icon(Icons.location_on_rounded, size: 16, color: Colors.red),
-                    label: const Text('ตั้งเป็นปลายทาง'),
+                    label: Text(t.get('set_dest_btn')),
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 10),
                     ),

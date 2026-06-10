@@ -5,8 +5,9 @@ import '../../models/crowd_report.dart';
 import '../../providers/providers.dart';
 import '../search/search_view_model.dart';
 import 'favorites_view_model.dart';
+import '../../core/constants/translation_helper.dart';
 
-/// Favorites screen showing favorite stations and saved routes
+/// Favorites screen showing favorite stations and saved routes with language localization
 class FavoritesScreen extends ConsumerStatefulWidget {
   const FavoritesScreen({super.key});
 
@@ -31,21 +32,23 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
     final state = ref.watch(favoritesViewModelProvider);
     final vm = ref.read(favoritesViewModelProvider.notifier);
     final theme = Theme.of(context);
+    final t = ref.watch(translationsProvider);
+    final localeCode = ref.watch(localeProvider);
 
     return DefaultTabController(
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('รายการโปรด'),
+          title: Text(t.get('favorites_title')),
           bottom: TabBar(
-            tabs: const [
+            tabs: [
               Tab(
-                icon: Icon(Icons.favorite_rounded),
-                text: 'สถานีโปรด',
+                icon: const Icon(Icons.favorite_rounded),
+                text: t.get('fav_stations_tab'),
               ),
               Tab(
-                icon: Icon(Icons.route_rounded),
-                text: 'เส้นทางที่บันทึก',
+                icon: const Icon(Icons.route_rounded),
+                text: t.get('fav_routes_tab'),
               ),
             ],
             indicatorColor: theme.colorScheme.primary,
@@ -55,8 +58,8 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
         ),
         body: TabBarView(
           children: [
-            _buildStationsTab(context, state, vm, theme),
-            _buildRoutesTab(context, state, vm, theme),
+            _buildStationsTab(context, state, vm, theme, t, localeCode),
+            _buildRoutesTab(context, state, vm, theme, t, localeCode),
           ],
         ),
       ),
@@ -68,13 +71,15 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
     FavoritesState state,
     FavoritesViewModel vm,
     ThemeData theme,
+    AppLocalizations t,
+    String localeCode,
   ) {
     if (state.favoriteStations.isEmpty) {
       return _buildEmptyState(
         context: context,
         icon: Icons.favorite_outline_rounded,
-        title: 'ยังไม่มีสถานีโปรด',
-        subtitle: 'ค้นหาสถานีและกดรูปหัวใจเพื่อบันทึกสถานีที่ใช้เป็นประจำ',
+        title: t.get('empty_fav_title'),
+        subtitle: t.get('empty_fav_subtitle'),
         theme: theme,
       );
     }
@@ -91,6 +96,30 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
         final lineColor = TransitColors.getLineColor(station.lineId);
         final crowdInfo = crowdService.getCrowdInfo(station.id);
         final minutesUntilNext = scheduleService.getMinutesUntilNextTrain(station.lineId);
+
+        final String stationName = localeCode == 'th' ? station.nameTh : station.nameEn;
+
+        final String trainStatusText;
+        if (minutesUntilNext == null) {
+          trainStatusText = t.get('service_ended');
+        } else if (minutesUntilNext == 0) {
+          trainStatusText = t.get('train_arriving');
+        } else {
+          trainStatusText = '${t.get('next_train')}: ~$minutesUntilNext ${t.get('minutes_unit')}';
+        }
+
+        String getCrowdLevelText(CrowdLevel level) {
+          switch (level) {
+            case CrowdLevel.low:
+              return t.get('crowd_low');
+            case CrowdLevel.medium:
+              return t.get('crowd_medium');
+            case CrowdLevel.high:
+              return t.get('crowd_high');
+            case CrowdLevel.unknown:
+              return t.get('crowd_unknown');
+          }
+        }
 
         return Card(
           margin: const EdgeInsets.only(bottom: 12),
@@ -123,21 +152,29 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            station.nameTh,
+                            stationName,
                             style: theme.textTheme.titleMedium?.copyWith(
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                           Text(
-                            station.nameEn,
-                            style: theme.textTheme.bodyMedium,
+                            localeCode == 'th' ? station.nameEn : station.nameTh,
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                              fontSize: 12,
+                            ),
                           ),
                         ],
                       ),
                     ),
                     IconButton(
                       icon: const Icon(Icons.delete_outline_rounded, color: Colors.redAccent),
-                      onPressed: () => vm.toggleFavoriteStation(station.id),
+                      onPressed: () {
+                        vm.toggleFavoriteStation(station.id);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(t.get('station_removed_fav'))),
+                        );
+                      },
                     ),
                   ],
                 ),
@@ -148,24 +185,27 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     // Next Train
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.access_time_rounded,
-                          size: 14,
-                          color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          minutesUntilNext == null
-                              ? 'หมดระยะบริการ'
-                              : (minutesUntilNext == 0 ? 'รถกำลังเข้าสถานี' : 'ขบวนถัดไป: ~$minutesUntilNext นาที'),
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: minutesUntilNext == 0 ? Colors.amber.shade700 : null,
-                            fontWeight: minutesUntilNext == 0 ? FontWeight.bold : null,
+                    Expanded(
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.access_time_rounded,
+                            size: 14,
+                            color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                           ),
-                        ),
-                      ],
+                          const SizedBox(width: 4),
+                          Expanded(
+                            child: Text(
+                              trainStatusText,
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                color: minutesUntilNext == 0 ? Colors.amber.shade700 : null,
+                                fontWeight: minutesUntilNext == 0 ? FontWeight.bold : null,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
 
                     // Crowd Level
@@ -180,7 +220,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          'คนรอ: ${crowdInfo.levelTextTh} (~${crowdInfo.presenceCount} คน)',
+                          '${t.get('crowd_level')}: ${getCrowdLevelText(crowdInfo.level)} (~${crowdInfo.presenceCount} ${localeCode == 'th' ? 'คน' : 'pax'})',
                           style: theme.textTheme.bodyMedium?.copyWith(
                             color: crowdInfo.level == CrowdLevel.high
                                 ? Colors.red.shade400
@@ -206,7 +246,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
                           ref.read(homeTabIndexProvider.notifier).state = 0; // Switch to Search Screen
                         },
                         icon: const Icon(Icons.trip_origin_rounded, size: 16, color: Colors.green),
-                        label: const Text('ตั้งเป็นต้นทาง'),
+                        label: Text(t.get('set_origin_btn')),
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 8),
                         ),
@@ -220,7 +260,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
                           ref.read(homeTabIndexProvider.notifier).state = 0; // Switch to Search Screen
                         },
                         icon: const Icon(Icons.location_on_rounded, size: 16, color: Colors.red),
-                        label: const Text('ตั้งเป็นปลายทาง'),
+                        label: Text(t.get('set_dest_btn')),
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 8),
                         ),
@@ -241,13 +281,15 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
     FavoritesState state,
     FavoritesViewModel vm,
     ThemeData theme,
+    AppLocalizations t,
+    String localeCode,
   ) {
     if (state.savedRoutes.isEmpty) {
       return _buildEmptyState(
         context: context,
         icon: Icons.alt_route_rounded,
-        title: 'ยังไม่มีเส้นทางที่บันทึก',
-        subtitle: 'คุณสามารถบันทึกเส้นทางที่ใช้ประจำหลังจากคำนวณเส้นทางแล้ว',
+        title: t.get('empty_route_title'),
+        subtitle: t.get('empty_route_subtitle'),
         theme: theme,
       );
     }
@@ -269,6 +311,16 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
         final originStation = transitRepo.getStation(originId);
         final destStation = transitRepo.getStation(destinationId);
 
+        final String routeDisplayName = routeName == 'เส้นทางไม่มีชื่อ' && localeCode == 'en'
+            ? 'Unnamed Route'
+            : routeName;
+        final String originDisplayName = originStation != null
+            ? (localeCode == 'th' ? originStation.nameTh : originStation.nameEn)
+            : originName;
+        final String destDisplayName = destStation != null
+            ? (localeCode == 'th' ? destStation.nameTh : destStation.nameEn)
+            : destinationName;
+
         return Card(
           margin: const EdgeInsets.only(bottom: 12),
           child: ListTile(
@@ -278,7 +330,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
               child: Icon(Icons.route_rounded, color: theme.colorScheme.primary),
             ),
             title: Text(
-              routeName,
+              routeDisplayName,
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -286,7 +338,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
             subtitle: Padding(
               padding: const EdgeInsets.only(top: 4),
               child: Text(
-                '$originName → $destinationName',
+                '$originDisplayName → $destDisplayName',
                 style: theme.textTheme.bodyMedium,
               ),
             ),
@@ -295,7 +347,12 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
               children: [
                 IconButton(
                   icon: const Icon(Icons.delete_outline_rounded, color: Colors.redAccent),
-                  onPressed: () => vm.deleteRoute(originId, destinationId),
+                  onPressed: () {
+                    vm.deleteRoute(originId, destinationId);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(t.get('route_deleted_success'))),
+                    );
+                  },
                 ),
               ],
             ),

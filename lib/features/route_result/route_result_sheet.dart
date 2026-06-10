@@ -6,8 +6,9 @@ import '../../models/crowd_report.dart';
 import '../../providers/providers.dart';
 import '../search/search_view_model.dart';
 import '../favorites/favorites_view_model.dart';
+import '../../core/constants/translation_helper.dart';
 
-/// Bottom sheet showing detailed route result
+/// Bottom sheet showing detailed route result with dynamic localization
 class RouteResultSheet extends ConsumerWidget {
   const RouteResultSheet({super.key});
 
@@ -15,11 +16,13 @@ class RouteResultSheet extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(searchViewModelProvider);
     final result = state.routeResult;
+    final t = ref.watch(translationsProvider);
+    final localeCode = ref.watch(localeProvider);
 
     if (result == null) {
-      return const SizedBox(
+      return SizedBox(
         height: 200,
-        child: Center(child: Text('ไม่มีข้อมูลเส้นทาง')),
+        child: Center(child: Text(t.get('no_route_data'))),
       );
     }
 
@@ -40,7 +43,7 @@ class RouteResultSheet extends ConsumerWidget {
             controller: scrollController,
             padding: const EdgeInsets.all(20),
             children: [
-              // ─── Handle ───
+              // Handle
               Center(
                 child: Container(
                   width: 40,
@@ -53,23 +56,24 @@ class RouteResultSheet extends ConsumerWidget {
               ),
               const SizedBox(height: 16),
 
-              // ─── Header ───
-              _buildHeader(context, ref, result, theme),
+              // Header
+              _buildHeader(context, ref, result, theme, t, localeCode),
               const SizedBox(height: 24),
 
-              // ─── Route Timeline ───
+              // Route Timeline Segments
               ...result.segments.asMap().entries.map((entry) {
                 final i = entry.key;
                 final segment = entry.value;
                 return Column(
                   children: [
-                    _buildSegmentCard(context, ref, segment, theme),
-                    if (i < result.segments.length - 1 &&
-                        i < result.transfers.length)
+                    _buildSegmentCard(context, ref, segment, theme, t, localeCode),
+                    if (i < result.segments.length - 1 && i < result.transfers.length)
                       _buildTransferIndicator(
                         context,
                         result.transfers[i],
                         theme,
+                        t,
+                        localeCode,
                       ),
                   ],
                 );
@@ -77,8 +81,8 @@ class RouteResultSheet extends ConsumerWidget {
 
               const SizedBox(height: 16),
 
-              // ─── Fare Breakdown ───
-              _buildFareBreakdown(context, result, theme),
+              // Fare Breakdown Card
+              _buildFareBreakdown(context, result, theme, t, localeCode),
             ],
           ),
         );
@@ -86,7 +90,17 @@ class RouteResultSheet extends ConsumerWidget {
     );
   }
 
-  Widget _buildHeader(BuildContext context, WidgetRef ref, RouteResult result, ThemeData theme) {
+  Widget _buildHeader(
+    BuildContext context,
+    WidgetRef ref,
+    RouteResult result,
+    ThemeData theme,
+    AppLocalizations t,
+    String localeCode,
+  ) {
+    final originName = localeCode == 'th' ? result.origin.nameTh : result.origin.nameEn;
+    final destName = localeCode == 'th' ? result.destination.nameTh : result.destination.nameEn;
+
     return Column(
       children: [
         Row(
@@ -94,17 +108,17 @@ class RouteResultSheet extends ConsumerWidget {
           children: [
             _buildInfoChip(
               icon: Icons.timer_outlined,
-              label: '~${result.totalMinutes.toInt()} นาที',
+              label: '~${result.totalMinutes.toInt()} ${t.get('minutes_unit')}',
               theme: theme,
             ),
             _buildInfoChip(
               icon: Icons.payments_outlined,
-              label: '${result.totalFareThb} บาท',
+              label: '${result.totalFareThb} ${t.get('currency_unit')}',
               theme: theme,
             ),
             _buildInfoChip(
               icon: Icons.swap_horiz_rounded,
-              label: '${result.transferCount} ต่อรถ',
+              label: '${result.transferCount} ${t.get('transfers_count')}',
               theme: theme,
             ),
           ],
@@ -116,12 +130,14 @@ class RouteResultSheet extends ConsumerWidget {
             const SizedBox(width: 48), // Balanced spacing for bookmark button
             Expanded(
               child: Text(
-                '${result.origin.nameTh} → ${result.destination.nameTh}',
-                style: theme.textTheme.titleLarge,
+                '$originName → $destName',
+                style: theme.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
                 textAlign: TextAlign.center,
               ),
             ),
-            _buildBookmarkButton(context, ref, result, theme),
+            _buildBookmarkButton(context, ref, result, theme, t, localeCode),
           ],
         ),
       ],
@@ -133,6 +149,8 @@ class RouteResultSheet extends ConsumerWidget {
     WidgetRef ref,
     RouteResult result,
     ThemeData theme,
+    AppLocalizations t,
+    String localeCode,
   ) {
     final favoritesRepo = ref.watch(favoritesRepositoryProvider);
     final isSaved = favoritesRepo.isRouteSaved(result.origin.id, result.destination.id);
@@ -148,35 +166,44 @@ class RouteResultSheet extends ConsumerWidget {
           ref.read(favoritesViewModelProvider.notifier).refresh();
           if (context.mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('ลบเส้นทางที่บันทึกแล้ว')),
+              SnackBar(content: Text(t.get('route_deleted_success'))),
             );
           }
         } else {
-          _showSaveRouteDialog(context, ref, result);
+          _showSaveRouteDialog(context, ref, result, t, localeCode);
         }
       },
     );
   }
 
-  Future<void> _showSaveRouteDialog(BuildContext context, WidgetRef ref, RouteResult result) async {
-    final controller = TextEditingController(text: '${result.origin.nameTh} - ${result.destination.nameTh}');
+  Future<void> _showSaveRouteDialog(
+    BuildContext context,
+    WidgetRef ref,
+    RouteResult result,
+    AppLocalizations t,
+    String localeCode,
+  ) async {
+    final originName = localeCode == 'th' ? result.origin.nameTh : result.origin.nameEn;
+    final destName = localeCode == 'th' ? result.destination.nameTh : result.destination.nameEn;
+    
+    final controller = TextEditingController(text: '$originName - $destName');
 
     return showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('บันทึกเส้นทาง'),
+          title: Text(t.get('save_route_btn')),
           content: TextField(
             controller: controller,
-            decoration: const InputDecoration(
-              labelText: 'ชื่อเส้นทาง',
-              hintText: 'เช่น ไปทำงาน, กลับบ้าน',
+            decoration: InputDecoration(
+              labelText: t.get('route_name_label'),
+              hintText: t.get('route_name_hint'),
             ),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('ยกเลิก'),
+              child: Text(t.get('cancel_btn')),
             ),
             ElevatedButton(
               onPressed: () async {
@@ -194,12 +221,12 @@ class RouteResultSheet extends ConsumerWidget {
                   if (context.mounted) {
                     Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('บันทึกเส้นทางเรียบร้อยแล้ว')),
+                      SnackBar(content: Text(t.get('route_saved_success'))),
                     );
                   }
                 }
               },
-              child: const Text('บันทึก'),
+              child: Text(t.get('save_btn')),
             ),
           ],
         );
@@ -235,6 +262,8 @@ class RouteResultSheet extends ConsumerWidget {
     WidgetRef ref,
     RouteSegment segment,
     ThemeData theme,
+    AppLocalizations t,
+    String localeCode,
   ) {
     final lineColor = TransitColors.getLineColor(segment.lineId);
     final crowdService = ref.watch(crowdServiceProvider);
@@ -242,6 +271,50 @@ class RouteResultSheet extends ConsumerWidget {
 
     final crowdInfo = crowdService.getCrowdInfo(segment.fromStation.id);
     final minutesUntilNext = scheduleService.getMinutesUntilNextTrain(segment.lineId);
+
+    // Format localized line name and direction label
+    final String displayLineName = segment.lineName;
+    
+    // Parse simulated direction name
+    String displayDirection = segment.direction;
+    if (localeCode == 'en') {
+      if (segment.direction.contains('ไปคูคต')) displayDirection = 'to Khu Khot';
+      else if (segment.direction.contains('ไปเคหะฯ')) displayDirection = 'to Kheha';
+      else if (segment.direction.contains('ไปสนามกีฬาแห่งชาติ')) displayDirection = 'to National Stadium';
+      else if (segment.direction.contains('ไปบางหว้า')) displayDirection = 'to Bang Wa';
+      else if (segment.direction.contains('ไปกรุงธนบุรี')) displayDirection = 'to Krung Thon Buri';
+      else if (segment.direction.contains('ไปคลองสาน')) displayDirection = 'to Khlong San';
+      else if (segment.direction.contains('วงกลม (ตามเข็ม)')) displayDirection = 'Circle Loop (Clockwise)';
+      else if (segment.direction.contains('วงกลม (ทวนเข็ม)')) displayDirection = 'Circle Loop (Counter-Clockwise)';
+      else if (segment.direction.contains('ไปคลองบางไผ่')) displayDirection = 'to Khlong Bang Phai';
+      else if (segment.direction.contains('ไปเตาปูน')) displayDirection = 'to Tao Poon';
+      else if (segment.direction.contains('ไปลาดพร้าว')) displayDirection = 'to Lat Phrao';
+      else if (segment.direction.contains('ไปสำโรง')) displayDirection = 'to Samrong';
+      else if (segment.direction.contains('ไปสุวรรณภูมิ')) displayDirection = 'to Suvarnabhumi';
+      else if (segment.direction.contains('ไปพญาไท')) displayDirection = 'to Phaya Thai';
+    }
+
+    final String trainStatusText;
+    if (minutesUntilNext == null) {
+      trainStatusText = t.get('service_ended');
+    } else if (minutesUntilNext == 0) {
+      trainStatusText = t.get('train_arriving');
+    } else {
+      trainStatusText = '${t.get('next_train')}: ~$minutesUntilNext ${t.get('minutes_unit')}';
+    }
+
+    String getCrowdLevelText(CrowdLevel level) {
+      switch (level) {
+        case CrowdLevel.low:
+          return t.get('crowd_low');
+        case CrowdLevel.medium:
+          return t.get('crowd_medium');
+        case CrowdLevel.high:
+          return t.get('crowd_high');
+        case CrowdLevel.unknown:
+          return t.get('crowd_unknown');
+      }
+    }
 
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 4),
@@ -260,7 +333,7 @@ class RouteResultSheet extends ConsumerWidget {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
-                    segment.lineName,
+                    displayLineName,
                     style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
@@ -273,7 +346,7 @@ class RouteResultSheet extends ConsumerWidget {
                 const SizedBox(width: 4),
                 Expanded(
                   child: Text(
-                    segment.direction,
+                    displayDirection,
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: lineColor,
                       fontWeight: FontWeight.w600,
@@ -291,6 +364,7 @@ class RouteResultSheet extends ConsumerWidget {
               color: lineColor,
               isFirst: true,
               theme: theme,
+              localeCode: localeCode,
             ),
 
             // Next Train & Crowd Info
@@ -311,9 +385,7 @@ class RouteResultSheet extends ConsumerWidget {
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        minutesUntilNext == null
-                            ? 'หมดระยะบริการ'
-                            : (minutesUntilNext == 0 ? 'รถกำลังเข้าสถานี' : 'ขบวนถัดไป: ~$minutesUntilNext นาที'),
+                        trainStatusText,
                         style: theme.textTheme.bodyMedium?.copyWith(
                           color: minutesUntilNext == 0
                               ? Colors.amber.shade700
@@ -336,7 +408,7 @@ class RouteResultSheet extends ConsumerWidget {
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        'คนรอ: ${crowdInfo.levelTextTh} (~${crowdInfo.presenceCount} คน)',
+                        '${t.get('crowd_level')}: ${getCrowdLevelText(crowdInfo.level)} (~${crowdInfo.presenceCount} ${localeCode == 'th' ? 'คน' : 'pax'})',
                         style: theme.textTheme.bodyMedium?.copyWith(
                           color: crowdInfo.level == CrowdLevel.high
                               ? Colors.red.shade400
@@ -365,7 +437,7 @@ class RouteResultSheet extends ConsumerWidget {
                     ),
                   ),
                   child: Text(
-                    '${segment.stationCount} สถานี · ~${segment.estimatedMinutes.toInt()} นาที',
+                    '${segment.stationCount} ${t.get('stations_count')} · ~${segment.estimatedMinutes.toInt()} ${t.get('minutes_unit')}',
                     style: theme.textTheme.bodyMedium,
                   ),
                 ),
@@ -377,6 +449,7 @@ class RouteResultSheet extends ConsumerWidget {
               color: lineColor,
               isFirst: false,
               theme: theme,
+              localeCode: localeCode,
             ),
           ],
         ),
@@ -389,7 +462,11 @@ class RouteResultSheet extends ConsumerWidget {
     required Color color,
     required bool isFirst,
     required ThemeData theme,
+    required String localeCode,
   }) {
+    final name = localeCode == 'th' ? station.nameTh : station.nameEn;
+    final subName = localeCode == 'th' ? station.nameEn : station.nameTh;
+
     return Row(
       children: [
         Container(
@@ -417,14 +494,17 @@ class RouteResultSheet extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                station.nameTh,
+                name,
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w600,
                 ),
               ),
               Text(
-                '${station.nameEn} (${station.code})',
-                style: theme.textTheme.bodyMedium,
+                '$subName (${station.code})',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                  fontSize: 12,
+                ),
               ),
             ],
           ),
@@ -437,7 +517,11 @@ class RouteResultSheet extends ConsumerWidget {
     BuildContext context,
     TransferStep transfer,
     ThemeData theme,
+    AppLocalizations t,
+    String localeCode,
   ) {
+    final text = t.get('interchange_walk').replaceAll('{time}', '${transfer.walkingMinutes.toInt()}');
+
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -458,7 +542,7 @@ class RouteResultSheet extends ConsumerWidget {
           const SizedBox(width: 8),
           Expanded(
             child: Text(
-              'เปลี่ยนสาย · เดิน ~${transfer.walkingMinutes.toInt()} นาที',
+              text,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.secondary,
                 fontWeight: FontWeight.w500,
@@ -474,6 +558,8 @@ class RouteResultSheet extends ConsumerWidget {
     BuildContext context,
     RouteResult result,
     ThemeData theme,
+    AppLocalizations t,
+    String localeCode,
   ) {
     return Card(
       child: Padding(
@@ -481,7 +567,7 @@ class RouteResultSheet extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('ค่าโดยสาร', style: theme.textTheme.titleMedium),
+            Text(t.get('fare_title'), style: theme.textTheme.titleMedium),
             const SizedBox(height: 8),
             ...result.segments.map((s) {
               final lineColor = TransitColors.getLineColor(s.lineId);
@@ -499,7 +585,7 @@ class RouteResultSheet extends ConsumerWidget {
                     ),
                     const SizedBox(width: 8),
                     Expanded(child: Text(s.lineName)),
-                    Text('${s.fareThb} บาท', style: theme.textTheme.labelLarge),
+                    Text('${s.fareThb} ${t.get('currency_unit')}', style: theme.textTheme.labelLarge),
                   ],
                 ),
               );
@@ -508,9 +594,9 @@ class RouteResultSheet extends ConsumerWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('รวม', style: theme.textTheme.titleMedium),
+                Text(t.get('total'), style: theme.textTheme.titleMedium),
                 Text(
-                  '${result.totalFareThb} บาท',
+                  '${result.totalFareThb} ${t.get('currency_unit')}',
                   style: theme.textTheme.titleMedium?.copyWith(
                     color: theme.colorScheme.primary,
                     fontWeight: FontWeight.bold,
