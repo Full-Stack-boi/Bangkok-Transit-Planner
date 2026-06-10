@@ -95,4 +95,37 @@ class LocationService {
 
     return closestStation;
   }
+
+  /// Find up to N closest stations within a relative distance threshold
+  /// Matches the closest station distance D, and includes others if they are within D + 1000m (minimum radius 2000m)
+  List<MapEntry<Station, double>> findRelativeNearestStations(
+    Position position,
+    List<Station> stations, {
+    int maxCount = 5,
+  }) {
+    if (stations.isEmpty) return [];
+
+    final list = <MapEntry<Station, double>>[];
+    for (final station in stations) {
+      final dist = calculateDistance(position.latitude, position.longitude, station.lat, station.lng);
+      list.add(MapEntry(station, dist));
+    }
+    
+    // Sort all by distance
+    list.sort((a, b) => a.value.compareTo(b.value));
+
+    if (list.isEmpty) return [];
+
+    // The closest distance D
+    final closestDist = list.first.value;
+
+    // Relative distance threshold: D + 1000m, but at least 2000m
+    final double relativeThreshold = closestDist < 1000.0 ? 2000.0 : closestDist + 1000.0;
+
+    // Filter by threshold and take up to maxCount
+    return list
+        .where((entry) => entry.value <= relativeThreshold)
+        .take(maxCount)
+        .toList();
+  }
 }

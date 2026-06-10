@@ -7,6 +7,9 @@ import '../favorites/favorites_screen.dart';
 import '../settings/settings_screen.dart';
 import '../../core/constants/translation_helper.dart';
 import '../../services/location_service.dart';
+import '../../models/station.dart';
+import 'widgets/nearest_stations_sheet.dart';
+import 'widgets/in_app_notification_banner.dart';
 
 /// Main home screen with bottom navigation
 class HomeScreen extends ConsumerStatefulWidget {
@@ -23,6 +26,37 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     FavoritesScreen(),
     SettingsScreen(),
   ];
+
+  bool _showInAppBanner = false;
+  String _bannerTitle = '';
+  String _bannerBody = '';
+  List<MapEntry<Station, double>> _nearestStations = [];
+  double _gpsAccuracy = 10.0;
+
+  void _onBannerTap() {
+    setState(() {
+      _showInAppBanner = false;
+    });
+    _showNearestStationsBottomSheet();
+  }
+
+  void _onBannerDismiss() {
+    setState(() {
+      _showInAppBanner = false;
+    });
+  }
+
+  void _showNearestStationsBottomSheet() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => NearestStationsSheet(
+        nearestEntries: _nearestStations,
+        accuracy: _gpsAccuracy,
+      ),
+    );
+  }
 
   @override
   void initState() {
@@ -59,51 +93,59 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       final position = await locationService.getCurrentPosition();
       if (position == null) return;
 
-      // Find the closest station in Bangkok (within 100km)
-      final closestStation = locationService.findNearbyStation(
+      // Find the relative nearest stations in Bangkok (up to 5 within relative threshold)
+      final nearestEntries = locationService.findRelativeNearestStations(
         position,
         transitRepo.stations,
-        thresholdMeters: 100000.0, // 100 km
+        maxCount: 5,
       );
 
-      if (closestStation != null) {
-        final distMeters = locationService.calculateDistance(
-          position.latitude,
-          position.longitude,
-          closestStation.lat,
-          closestStation.lng,
-        );
-
+      if (nearestEntries.isNotEmpty) {
         final t = ref.read(translationsProvider);
         final localeCode = ref.read(localeProvider);
-        final stationName = localeCode == 'th' ? closestStation.nameTh : closestStation.nameEn;
 
-        // Always report presence passively for the closest station
+        setState(() {
+          _nearestStations = nearestEntries;
+          _gpsAccuracy = position.accuracy;
+          _bannerTitle = t.get('in_app_notif_title');
+          _bannerBody = t.get('in_app_notif_body')
+              .replaceAll('{count}', '${nearestEntries.length}');
+          _showInAppBanner = true;
+        });
+
+        // 1. Always report presence passively for the absolute closest station
+        final closestStation = nearestEntries.first.key;
         await crowdRepo.reportPresence(
           stationId: closestStation.id,
           accuracy: position.accuracy,
         );
 
-        // Calculate distance string
-        final String distanceText;
-        if (distMeters >= 1000.0) {
-          final km = (distMeters / 1000.0).toStringAsFixed(1);
-          distanceText = localeCode == 'th' ? '$km กม.' : '$km km';
-        } else {
-          final m = distMeters.round();
-          distanceText = localeCode == 'th' ? '$m เมตร' : '$m m';
+        // 2. Format a system notification body that lists the stations found
+        final List<String> stationDetailStrings = [];
+        for (int i = 0; i < nearestEntries.length; i++) {
+          final entry = nearestEntries[i];
+          final station = entry.key;
+          final distM = entry.value;
+
+          final name = localeCode == 'th' ? station.nameTh : station.nameEn;
+          final String distanceText;
+          if (distM >= 1000.0) {
+            final km = (distM / 1000.0).toStringAsFixed(1);
+            distanceText = localeCode == 'th' ? '$km กม.' : '$km km';
+          } else {
+            final m = distM.round();
+            distanceText = localeCode == 'th' ? '$m เมตร' : '$m m';
+          }
+          stationDetailStrings.add('${i + 1}. $name ($distanceText)');
         }
 
-        // Send local push notification showing the nearest station and distance
         final title = t.get('nearest_station_title');
-        final body = t.get('nearest_station_body')
-            .replaceAll('{stationName}', stationName)
-            .replaceAll('{distance}', distanceText);
+        final bodyText = stationDetailStrings.join(', ');
 
         await ref.read(notificationServiceProvider).showNotification(
           id: 1001,
           title: title,
-          body: body,
+          body: bodyText,
         );
       }
     } catch (e) {
@@ -175,9 +217,25 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     return Scaffold(
       body: initState.when(
-        data: (_) => IndexedStack(
-          index: currentIndex,
-          children: _screens,
+        data: (_) => Stack(
+          children: [
+            IndexedStack(
+              index: currentIndex,
+              children: _screens,
+            ),
+            if (_showInAppBanner)
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                child: InAppNotificationBanner(
+                  title: _bannerTitle,
+                  body: _bannerBody,
+                  onTap: _onBannerTap,
+                  onDismiss: _onBannerDismiss,
+                ),
+              ),
+          ],
         ),
         loading: () => _LoadingView(t: t),
         error: (error, _) => _ErrorView(error: error.toString(), t: t),
