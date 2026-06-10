@@ -218,7 +218,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
               initialZoom: 12.0,
               minZoom: 10.0,
               maxZoom: 17.0,
-              onTap: (_, __) {
+              onTap: (position, point) {
                 // Dismiss details card when tapping on empty map space
                 if (_selectedStation != null) {
                   setState(() => _selectedStation = null);
