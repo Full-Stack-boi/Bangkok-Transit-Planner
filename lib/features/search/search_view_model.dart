@@ -167,7 +167,7 @@ class SearchViewModel extends StateNotifier<SearchState> {
 
       if (step.lineId == 'TRANSFER') {
         // End current segment
-        if (segmentStart != null && segmentStations.isNotEmpty) {
+        if (segmentStart != null && segmentStations.length > 1) {
           final line = repo.getLine(currentLineId);
           final stationCount = segmentStations.length - 1;
           final bound = line?.getBound(segmentStart.id, segmentStations.last.id) ?? 0;
@@ -189,21 +189,20 @@ class SearchViewModel extends StateNotifier<SearchState> {
         }
 
         // Record transfer
-        if (i + 1 < dijkstraResult.path.length) {
-          final nextStation = repo.getStation(dijkstraResult.path[i + 1].stationId) as Station?;
-          if (nextStation != null && segmentStations.isNotEmpty) {
-            transfers.add(TransferStep(
-              fromStation: segmentStations.last,
-              toStation: nextStation,
-              fromLineId: currentLineId,
-              toLineId: dijkstraResult.path[i + 1].lineId,
-            ));
-          }
+        if (segmentStations.isNotEmpty) {
+          final nextLineId = i + 1 < dijkstraResult.path.length ? dijkstraResult.path[i + 1].lineId : '';
+          transfers.add(TransferStep(
+            fromStation: segmentStations.last,
+            toStation: station,
+            fromLineId: currentLineId,
+            toLineId: nextLineId,
+          ));
         }
 
-        segmentStart = null;
+        segmentStart = station;
         segmentStations.clear();
-        currentLineId = '';
+        segmentStations.add(station);
+        currentLineId = i + 1 < dijkstraResult.path.length ? dijkstraResult.path[i + 1].lineId : '';
         continue;
       }
 
