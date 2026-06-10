@@ -19,7 +19,11 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     // Refresh favorites data whenever the tab is entered
-    ref.read(favoritesViewModelProvider.notifier).refresh();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        ref.read(favoritesViewModelProvider.notifier).refresh();
+      }
+    });
   }
 
   @override
