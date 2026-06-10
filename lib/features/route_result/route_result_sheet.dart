@@ -1,0 +1,376 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../core/theme/transit_colors.dart';
+import '../../models/route_result.dart';
+import '../search/search_view_model.dart';
+
+/// Bottom sheet showing detailed route result
+class RouteResultSheet extends ConsumerWidget {
+  const RouteResultSheet({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(searchViewModelProvider);
+    final result = state.routeResult;
+
+    if (result == null) {
+      return const SizedBox(
+        height: 200,
+        child: Center(child: Text('ไม่มีข้อมูลเส้นทาง')),
+      );
+    }
+
+    final theme = Theme.of(context);
+
+    return DraggableScrollableSheet(
+      initialChildSize: 0.7,
+      minChildSize: 0.4,
+      maxChildSize: 0.95,
+      expand: false,
+      builder: (context, scrollController) {
+        return Container(
+          decoration: BoxDecoration(
+            color: theme.scaffoldBackgroundColor,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          child: ListView(
+            controller: scrollController,
+            padding: const EdgeInsets.all(20),
+            children: [
+              // ─── Handle ───
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.outline,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // ─── Header ───
+              _buildHeader(context, result, theme),
+              const SizedBox(height: 24),
+
+              // ─── Route Timeline ───
+              ...result.segments.asMap().entries.map((entry) {
+                final i = entry.key;
+                final segment = entry.value;
+                return Column(
+                  children: [
+                    _buildSegmentCard(context, segment, theme),
+                    if (i < result.segments.length - 1 &&
+                        i < result.transfers.length)
+                      _buildTransferIndicator(
+                        context,
+                        result.transfers[i],
+                        theme,
+                      ),
+                  ],
+                );
+              }),
+
+              const SizedBox(height: 16),
+
+              // ─── Fare Breakdown ───
+              _buildFareBreakdown(context, result, theme),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildHeader(BuildContext context, RouteResult result, ThemeData theme) {
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            _buildInfoChip(
+              icon: Icons.timer_outlined,
+              label: '~${result.totalMinutes.toInt()} นาที',
+              theme: theme,
+            ),
+            _buildInfoChip(
+              icon: Icons.payments_outlined,
+              label: '${result.totalFareThb} บาท',
+              theme: theme,
+            ),
+            _buildInfoChip(
+              icon: Icons.swap_horiz_rounded,
+              label: '${result.transferCount} ต่อรถ',
+              theme: theme,
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                '${result.origin.nameTh} → ${result.destination.nameTh}',
+                style: theme.textTheme.titleLarge,
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildInfoChip({
+    required IconData icon,
+    required String label,
+    required ThemeData theme,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      decoration: BoxDecoration(
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: theme.colorScheme.outline.withValues(alpha: 0.3)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 18, color: theme.colorScheme.primary),
+          const SizedBox(width: 6),
+          Text(label, style: theme.textTheme.labelLarge),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSegmentCard(
+    BuildContext context,
+    RouteSegment segment,
+    ThemeData theme,
+  ) {
+    final lineColor = TransitColors.getLineColor(segment.lineId);
+
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 4),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Line badge + direction
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: lineColor,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    segment.lineName,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Icon(Icons.arrow_forward, size: 16, color: lineColor),
+                const SizedBox(width: 4),
+                Expanded(
+                  child: Text(
+                    segment.direction,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: lineColor,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 12),
+
+            // From station
+            _buildStationDot(
+              station: segment.fromStation,
+              color: lineColor,
+              isFirst: true,
+              theme: theme,
+            ),
+
+            // Intermediate stations (collapsed)
+            if (segment.stationCount > 1)
+              Padding(
+                padding: const EdgeInsets.only(left: 11),
+                child: Container(
+                  margin: const EdgeInsets.symmetric(vertical: 4),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  decoration: BoxDecoration(
+                    border: Border(
+                      left: BorderSide(color: lineColor, width: 2),
+                    ),
+                  ),
+                  child: Text(
+                    '${segment.stationCount} สถานี · ~${segment.estimatedMinutes.toInt()} นาที',
+                    style: theme.textTheme.bodyMedium,
+                  ),
+                ),
+              ),
+
+            // To station
+            _buildStationDot(
+              station: segment.toStation,
+              color: lineColor,
+              isFirst: false,
+              theme: theme,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStationDot({
+    required dynamic station,
+    required Color color,
+    required bool isFirst,
+    required ThemeData theme,
+  }) {
+    return Row(
+      children: [
+        Container(
+          width: 24,
+          height: 24,
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.2),
+            shape: BoxShape.circle,
+            border: Border.all(color: color, width: 2),
+          ),
+          child: Center(
+            child: Container(
+              width: 8,
+              height: 8,
+              decoration: BoxDecoration(
+                color: color,
+                shape: BoxShape.circle,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                station.nameTh,
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              Text(
+                '${station.nameEn} (${station.code})',
+                style: theme.textTheme.bodyMedium,
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTransferIndicator(
+    BuildContext context,
+    TransferStep transfer,
+    ThemeData theme,
+  ) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.secondary.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: theme.colorScheme.secondary.withValues(alpha: 0.3),
+        ),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            Icons.directions_walk_rounded,
+            color: theme.colorScheme.secondary,
+            size: 20,
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              'เปลี่ยนสาย · เดิน ~${transfer.walkingMinutes.toInt()} นาที',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.secondary,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFareBreakdown(
+    BuildContext context,
+    RouteResult result,
+    ThemeData theme,
+  ) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('ค่าโดยสาร', style: theme.textTheme.titleMedium),
+            const SizedBox(height: 8),
+            ...result.segments.map((s) {
+              final lineColor = TransitColors.getLineColor(s.lineId);
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 8,
+                      height: 8,
+                      decoration: BoxDecoration(
+                        color: lineColor,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(child: Text(s.lineName)),
+                    Text('${s.fareThb} บาท', style: theme.textTheme.labelLarge),
+                  ],
+                ),
+              );
+            }),
+            const Divider(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('รวม', style: theme.textTheme.titleMedium),
+                Text(
+                  '${result.totalFareThb} บาท',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    color: theme.colorScheme.primary,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
