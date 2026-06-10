@@ -208,30 +208,34 @@ class SearchViewModel extends StateNotifier<SearchState> {
       }
 
       if (step.lineId.isNotEmpty && step.lineId != currentLineId) {
-        // Start of a new segment on a different line
-        if (segmentStart != null && segmentStations.length > 1) {
-          final line = repo.getLine(currentLineId);
-          final stationCount = segmentStations.length - 1;
-          final bound = line?.getBound(segmentStart.id, segmentStations.last.id) ?? 0;
+        if (currentLineId.isEmpty) {
+          currentLineId = step.lineId;
+        } else {
+          // Start of a new segment on a different line
+          if (segmentStart != null && segmentStations.length > 1) {
+            final line = repo.getLine(currentLineId);
+            final stationCount = segmentStations.length - 1;
+            final bound = line?.getBound(segmentStart.id, segmentStations.last.id) ?? 0;
 
-          segments.add(RouteSegment(
-            lineId: currentLineId,
-            lineName: line?.nameEn ?? currentLineId,
-            direction: line?.getDirectionLabel(bound) ?? '',
-            boundIndex: bound,
-            fromStation: segmentStart,
-            toStation: segmentStations.last,
-            intermediateStations: segmentStations.length > 2
-                ? segmentStations.sublist(1, segmentStations.length - 1)
-                : [],
-            stationCount: stationCount,
-            estimatedMinutes: stationCount * TransitConstants.avgTimeBetweenStations,
-            fareThb: fareService.calculateFare(currentLineId, stationCount),
-          ));
+            segments.add(RouteSegment(
+              lineId: currentLineId,
+              lineName: line?.nameEn ?? currentLineId,
+              direction: line?.getDirectionLabel(bound) ?? '',
+              boundIndex: bound,
+              fromStation: segmentStart,
+              toStation: segmentStations.last,
+              intermediateStations: segmentStations.length > 2
+                  ? segmentStations.sublist(1, segmentStations.length - 1)
+                  : [],
+              stationCount: stationCount,
+              estimatedMinutes: stationCount * TransitConstants.avgTimeBetweenStations,
+              fareThb: fareService.calculateFare(currentLineId, stationCount),
+            ));
+          }
+          currentLineId = step.lineId;
+          segmentStart = station;
+          segmentStations.clear();
         }
-        currentLineId = step.lineId;
-        segmentStart = station;
-        segmentStations.clear();
       }
 
       if (segmentStart == null) {
