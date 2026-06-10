@@ -217,7 +217,7 @@
     "line_id": "BTS_SUKHUMVIT",
     "lat": 13.8167,
     "lng": 100.5620,
-    "interchange": ["MRT_BL15"],
+    "interchange": ["MRT_BL14"],
     "exit_info": {
       "bound_0": "ไปคูคต",
       "bound_1": "ไปเคหะฯ"
@@ -1085,7 +1085,7 @@
     "line_id": "MRT_BLUE",
     "lat": 13.8114,
     "lng": 100.5642,
-    "interchange": [],
+    "interchange": ["BTS_N9"],
     "exit_info": {
       "bound_0": "วงกลม (ตามเข็ม)",
       "bound_1": "วงกลม (ทวนเข็ม)"
@@ -1099,7 +1099,7 @@
     "line_id": "MRT_BLUE",
     "lat": 13.8049,
     "lng": 100.5747,
-    "interchange": ["BTS_N9", "MRT_YL01"],
+    "interchange": ["MRT_YL01"],
     "exit_info": {
       "bound_0": "วงกลม (ตามเข็ม)",
       "bound_1": "วงกลม (ทวนเข็ม)"
@@ -1181,8 +1181,8 @@
     "name_th": "เพชรบุรี",
     "name_en": "Phetchaburi",
     "line_id": "MRT_BLUE",
-    "lat": 13.7501,
-    "lng": 100.5661,
+    "lat": 13.7496,
+    "lng": 100.5631,
     "interchange": ["ARL_A6"],
     "exit_info": {
       "bound_0": "วงกลม (ตามเข็ม)",
@@ -1797,8 +1797,8 @@
     "name_th": "หัวหมาก",
     "name_en": "Hua Mak",
     "line_id": "MRT_YELLOW",
-    "lat": 13.7480,
-    "lng": 100.6489,
+    "lat": 13.7378,
+    "lng": 100.6448,
     "interchange": ["ARL_A4"],
     "exit_info": {
       "bound_0": "ไปลาดพร้าว",
@@ -1979,8 +1979,8 @@
     "name_th": "พญาไท",
     "name_en": "Phaya Thai",
     "line_id": "ARL",
-    "lat": 13.7554,
-    "lng": 100.5348,
+    "lat": 13.7569,
+    "lng": 100.5338,
     "interchange": ["BTS_N2"],
     "exit_info": {
       "bound_0": "ไปสุวรรณภูมิ",
@@ -1993,8 +1993,8 @@
     "name_th": "ราชปรารภ",
     "name_en": "Ratchaprarop",
     "line_id": "ARL",
-    "lat": 13.7542,
-    "lng": 100.5427,
+    "lat": 13.7551,
+    "lng": 100.5421,
     "interchange": [],
     "exit_info": {
       "bound_0": "ไปสุวรรณภูมิ",
@@ -2007,8 +2007,8 @@
     "name_th": "มักกะสัน",
     "name_en": "Makkasan",
     "line_id": "ARL",
-    "lat": 13.7507,
-    "lng": 100.5574,
+    "lat": 13.7510,
+    "lng": 100.5613,
     "interchange": ["MRT_BL21"],
     "exit_info": {
       "bound_0": "ไปสุวรรณภูมิ",
@@ -2021,8 +2021,8 @@
     "name_th": "รามคำแหง",
     "name_en": "Ramkhamhaeng",
     "line_id": "ARL",
-    "lat": 13.7483,
-    "lng": 100.5936,
+    "lat": 13.7430,
+    "lng": 100.6001,
     "interchange": [],
     "exit_info": {
       "bound_0": "ไปสุวรรณภูมิ",
@@ -2035,8 +2035,8 @@
     "name_th": "หัวหมาก",
     "name_en": "Hua Mak",
     "line_id": "ARL",
-    "lat": 13.7424,
-    "lng": 100.6214,
+    "lat": 13.7380,
+    "lng": 100.6453,
     "interchange": ["MRT_YL11"],
     "exit_info": {
       "bound_0": "ไปสุวรรณภูมิ",
@@ -2049,8 +2049,8 @@
     "name_th": "บ้านทับช้าง",
     "name_en": "Ban Thap Chang",
     "line_id": "ARL",
-    "lat": 13.7314,
-    "lng": 100.6729,
+    "lat": 13.7317,
+    "lng": 100.6750,
     "interchange": [],
     "exit_info": {
       "bound_0": "ไปสุวรรณภูมิ",
@@ -2063,8 +2063,8 @@
     "name_th": "ลาดกระบัง",
     "name_en": "Lat Krabang",
     "line_id": "ARL",
-    "lat": 13.7231,
-    "lng": 100.7335,
+    "lat": 13.7276,
+    "lng": 100.7486,
     "interchange": [],
     "exit_info": {
       "bound_0": "ไปสุวรรณภูมิ",
