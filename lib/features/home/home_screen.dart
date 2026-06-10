@@ -119,34 +119,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           stationId: closestStation.id,
           accuracy: position.accuracy,
         );
-
-        // 2. Format a system notification body that lists the stations found
-        final List<String> stationDetailStrings = [];
-        for (int i = 0; i < nearestEntries.length; i++) {
-          final entry = nearestEntries[i];
-          final station = entry.key;
-          final distM = entry.value;
-
-          final name = localeCode == 'th' ? station.nameTh : station.nameEn;
-          final String distanceText;
-          if (distM >= 1000.0) {
-            final km = (distM / 1000.0).toStringAsFixed(1);
-            distanceText = localeCode == 'th' ? '$km กม.' : '$km km';
-          } else {
-            final m = distM.round();
-            distanceText = localeCode == 'th' ? '$m เมตร' : '$m m';
-          }
-          stationDetailStrings.add('${i + 1}. $name ($distanceText)');
-        }
-
-        final title = t.get('nearest_station_title');
-        final bodyText = stationDetailStrings.join(', ');
-
-        await ref.read(notificationServiceProvider).showNotification(
-          id: 1001,
-          title: title,
-          body: bodyText,
-        );
       }
     } catch (e) {
       print('Failed to perform passive GPS proximity check: $e');
