@@ -30,17 +30,30 @@ class LocationService {
   Future<Position?> getCurrentPosition() async {
     try {
       final isServiceEnabled = await Geolocator.isLocationServiceEnabled();
-      if (!isServiceEnabled) return null;
-
-      final permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
+      if (!isServiceEnabled) {
+        print('GPS Location Services are globally disabled in the device settings.');
         return null;
       }
 
+      final permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
+        print('Location permission check returned denied or deniedForever.');
+        return null;
+      }
+
+      // Try last known position first (instant and highly reliable on emulators)
+      final lastKnown = await Geolocator.getLastKnownPosition();
+      if (lastKnown != null) {
+        print('Using last known position: ${lastKnown.latitude}, ${lastKnown.longitude}');
+        return lastKnown;
+      }
+
+      // Fetch fresh coordinates if no last known position is cached
+      print('Fetching fresh GPS coordinates...');
       return await Geolocator.getCurrentPosition(
         locationSettings: const LocationSettings(
-          accuracy: LocationAccuracy.medium,
-          timeLimit: Duration(seconds: 5),
+          accuracy: LocationAccuracy.high,
+          timeLimit: Duration(seconds: 10),
         ),
       );
     } catch (e) {
