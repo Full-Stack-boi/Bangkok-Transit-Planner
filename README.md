@@ -53,6 +53,17 @@ flutter run
 ## Project Status
 
 - [x] Phase 1 — Foundation (MVVM, data, Dijkstra, theme)
-- [ ] Phase 2 — Core Features (search UI, route display)
-- [ ] Phase 3 — Map & Social (flutter_map, crowd, favorites)
-- [ ] Phase 4 — Polish (notifications, i18n, testing)
+- [x] Phase 2 — Core Features (search UI, route display)
+- [x] Phase 3 — Map & Social (flutter_map, crowd, favorites)
+- [x] Phase 4 — Polish (notifications, i18n, testing)
+
+## Testing
+
+แอปนี้มาพร้อมกับระบบการทดสอบที่ครอบคลุม:
+- 🧪 **Unit Tests** ([router_test.dart](file:///F:/Project/Train/test/router_test.dart)): ทดสอบความถูกต้องของเส้นทาง Dijkstra และการเปลี่ยนสายในโครงข่ายรถไฟฟ้า
+- 📱 **Widget Tests** ([widget_test.dart](file:///F:/Project/Train/test/widget_test.dart)): ทดสอบความสมบูรณ์ในการเรนเดอร์ UI และระบบนำทางสลับแท็บโดยใช้ Mock Providers
+
+รันการทดสอบด้วยคำสั่ง:
+```bash
+flutter test
+```
