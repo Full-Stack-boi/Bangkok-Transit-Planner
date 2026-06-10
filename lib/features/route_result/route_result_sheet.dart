@@ -5,6 +5,7 @@ import '../../models/route_result.dart';
 import '../../models/crowd_report.dart';
 import '../../providers/providers.dart';
 import '../search/search_view_model.dart';
+import '../favorites/favorites_view_model.dart';
 
 /// Bottom sheet showing detailed route result
 class RouteResultSheet extends ConsumerWidget {
@@ -53,7 +54,7 @@ class RouteResultSheet extends ConsumerWidget {
               const SizedBox(height: 16),
 
               // ─── Header ───
-              _buildHeader(context, result, theme),
+              _buildHeader(context, ref, result, theme),
               const SizedBox(height: 24),
 
               // ─── Route Timeline ───
@@ -85,7 +86,7 @@ class RouteResultSheet extends ConsumerWidget {
     );
   }
 
-  Widget _buildHeader(BuildContext context, RouteResult result, ThemeData theme) {
+  Widget _buildHeader(BuildContext context, WidgetRef ref, RouteResult result, ThemeData theme) {
     return Column(
       children: [
         Row(
@@ -110,7 +111,9 @@ class RouteResultSheet extends ConsumerWidget {
         ),
         const SizedBox(height: 12),
         Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            const SizedBox(width: 48), // Balanced spacing for bookmark button
             Expanded(
               child: Text(
                 '${result.origin.nameTh} → ${result.destination.nameTh}',
@@ -118,9 +121,89 @@ class RouteResultSheet extends ConsumerWidget {
                 textAlign: TextAlign.center,
               ),
             ),
+            _buildBookmarkButton(context, ref, result, theme),
           ],
         ),
       ],
+    );
+  }
+
+  Widget _buildBookmarkButton(
+    BuildContext context,
+    WidgetRef ref,
+    RouteResult result,
+    ThemeData theme,
+  ) {
+    final favoritesRepo = ref.watch(favoritesRepositoryProvider);
+    final isSaved = favoritesRepo.isRouteSaved(result.origin.id, result.destination.id);
+
+    return IconButton(
+      icon: Icon(
+        isSaved ? Icons.bookmark_rounded : Icons.bookmark_border_rounded,
+        color: isSaved ? theme.colorScheme.primary : null,
+      ),
+      onPressed: () async {
+        if (isSaved) {
+          await favoritesRepo.deleteRoute(result.origin.id, result.destination.id);
+          ref.read(favoritesViewModelProvider.notifier).refresh();
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('ลบเส้นทางที่บันทึกแล้ว')),
+            );
+          }
+        } else {
+          _showSaveRouteDialog(context, ref, result);
+        }
+      },
+    );
+  }
+
+  Future<void> _showSaveRouteDialog(BuildContext context, WidgetRef ref, RouteResult result) async {
+    final controller = TextEditingController(text: '${result.origin.nameTh} - ${result.destination.nameTh}');
+
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('บันทึกเส้นทาง'),
+          content: TextField(
+            controller: controller,
+            decoration: const InputDecoration(
+              labelText: 'ชื่อเส้นทาง',
+              hintText: 'เช่น ไปทำงาน, กลับบ้าน',
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('ยกเลิก'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                final name = controller.text.trim();
+                if (name.isNotEmpty) {
+                  final favoritesRepo = ref.read(favoritesRepositoryProvider);
+                  await favoritesRepo.saveRoute(
+                    originId: result.origin.id,
+                    destinationId: result.destination.id,
+                    originName: result.origin.nameTh,
+                    destinationName: result.destination.nameTh,
+                    routeName: name,
+                  );
+                  ref.read(favoritesViewModelProvider.notifier).refresh();
+                  if (context.mounted) {
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('บันทึกเส้นทางเรียบร้อยแล้ว')),
+                    );
+                  }
+                }
+              },
+              child: const Text('บันทึก'),
+            ),
+          ],
+        );
+      },
     );
   }
 

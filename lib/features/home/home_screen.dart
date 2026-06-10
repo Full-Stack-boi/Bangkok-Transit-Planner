@@ -15,8 +15,6 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
-  int _currentIndex = 0;
-
   final _screens = const [
     SearchScreen(),
     MapScreen(),
@@ -25,27 +23,72 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    // Start passive GPS check-in after data finishes loading
+    Future.microtask(() => _initGPSProximityCheck());
+  }
+
+  Future<void> _initGPSProximityCheck() async {
+    try {
+      final locationService = ref.read(locationServiceProvider);
+      final crowdRepo = ref.read(crowdRepositoryProvider);
+      final transitRepo = ref.read(transitRepositoryProvider);
+
+      // Check location permission
+      final isGranted = await locationService.isLocationPermissionGranted();
+      if (!isGranted) {
+        // Request permission silently
+        final requested = await locationService.requestLocationPermission();
+        if (!requested) return;
+      }
+
+      // Get current user position
+      final position = await locationService.getCurrentPosition();
+      if (position == null) return;
+
+      // Find nearby station within 200m
+      final nearbyStation = locationService.findNearbyStation(
+        position,
+        transitRepo.stations,
+        thresholdMeters: 200.0,
+      );
+
+      if (nearbyStation != null) {
+        // Passive report presence
+        await crowdRepo.reportPresence(
+          stationId: nearbyStation.id,
+          accuracy: position.accuracy,
+        );
+      }
+    } catch (e) {
+      print('Failed to perform passive GPS proximity check: $e');
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final initState = ref.watch(transitInitProvider);
+    final currentIndex = ref.watch(homeTabIndexProvider);
 
     return Scaffold(
       body: initState.when(
         data: (_) => IndexedStack(
-          index: _currentIndex,
+          index: currentIndex,
           children: _screens,
         ),
         loading: () => const _LoadingView(),
         error: (error, _) => _ErrorView(error: error.toString()),
       ),
-      bottomNavigationBar: _buildBottomNav(context),
+      bottomNavigationBar: _buildBottomNav(context, currentIndex),
     );
   }
 
-  Widget _buildBottomNav(BuildContext context) {
+  Widget _buildBottomNav(BuildContext context, int currentIndex) {
     return NavigationBar(
-      selectedIndex: _currentIndex,
+      selectedIndex: currentIndex,
       onDestinationSelected: (index) {
-        setState(() => _currentIndex = index);
+        ref.read(homeTabIndexProvider.notifier).state = index;
       },
       destinations: const [
         NavigationDestination(
