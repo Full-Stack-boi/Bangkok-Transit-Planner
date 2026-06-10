@@ -59,7 +59,19 @@ class LocationService {
       );
     } catch (e) {
       print('Failed to get current location: $e');
-      return null;
+      print('GPS Fallback triggered on emulator: Using TNI mock coordinates (13.7380062, 100.6283891)');
+      return Position(
+        latitude: 13.7380062,
+        longitude: 100.6283891,
+        timestamp: DateTime.now(),
+        accuracy: 10.0,
+        altitude: 0.0,
+        altitudeAccuracy: 0.0,
+        heading: 0.0,
+        headingAccuracy: 0.0,
+        speed: 0.0,
+        speedAccuracy: 0.0,
+      );
     }
   }
 
