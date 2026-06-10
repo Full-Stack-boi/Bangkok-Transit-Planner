@@ -78,45 +78,33 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         final localeCode = ref.read(localeProvider);
         final stationName = localeCode == 'th' ? closestStation.nameTh : closestStation.nameEn;
 
-        if (distMeters <= 200.0) {
-          // Passive report presence inside geofence (200m)
-          await crowdRepo.reportPresence(
-            stationId: closestStation.id,
-            accuracy: position.accuracy,
-          );
+        // Always report presence passively for the closest station
+        await crowdRepo.reportPresence(
+          stationId: closestStation.id,
+          accuracy: position.accuracy,
+        );
 
-          // Send local push notification for geofence entry
-          final title = t.get('nearby_alert_title');
-          final body = t.get('nearby_alert_body').replaceAll('{stationName}', stationName);
-
-          await ref.read(notificationServiceProvider).showNotification(
-            id: 1001,
-            title: title,
-            body: body,
-          );
+        // Calculate distance string
+        final String distanceText;
+        if (distMeters >= 1000.0) {
+          final km = (distMeters / 1000.0).toStringAsFixed(1);
+          distanceText = localeCode == 'th' ? '$km กม.' : '$km km';
         } else {
-          // If further away, notify the user about the nearest station and its distance
-          final title = localeCode == 'th' ? 'สถานีรถไฟฟ้าใกล้คุณที่สุด' : 'Your Nearest Station';
-          
-          final String distanceText;
-          if (distMeters >= 1000.0) {
-            final km = (distMeters / 1000.0).toStringAsFixed(1);
-            distanceText = localeCode == 'th' ? '$km กม.' : '$km km';
-          } else {
-            final m = distMeters.round();
-            distanceText = localeCode == 'th' ? '$m เมตร' : '$m m';
-          }
-
-          final body = localeCode == 'th'
-              ? 'สถานี $stationName อยู่ใกล้คุณที่สุด (ห่างออกไป $distanceText)'
-              : '$stationName station is closest to you ($distanceText away)';
-
-          await ref.read(notificationServiceProvider).showNotification(
-            id: 1002,
-            title: title,
-            body: body,
-          );
+          final m = distMeters.round();
+          distanceText = localeCode == 'th' ? '$m เมตร' : '$m m';
         }
+
+        // Send local push notification showing the nearest station and distance
+        final title = t.get('nearest_station_title');
+        final body = t.get('nearest_station_body')
+            .replaceAll('{stationName}', stationName)
+            .replaceAll('{distance}', distanceText);
+
+        await ref.read(notificationServiceProvider).showNotification(
+          id: 1001,
+          title: title,
+          body: body,
+        );
       }
     } catch (e) {
       print('Failed to perform passive GPS proximity check: $e');
