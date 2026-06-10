@@ -52,8 +52,8 @@ class LocationService {
       print('Fetching fresh GPS coordinates...');
       return await Geolocator.getCurrentPosition(
         locationSettings: const LocationSettings(
-          accuracy: LocationAccuracy.high,
-          timeLimit: Duration(seconds: 10),
+          accuracy: LocationAccuracy.medium,
+          timeLimit: Duration(seconds: 5),
         ),
       );
     } catch (e) {
