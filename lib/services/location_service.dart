@@ -15,6 +15,17 @@ class LocationService {
     return await Permission.location.isGranted;
   }
 
+  /// Request notification permission (Android 13+)
+  Future<bool> requestNotificationPermission() async {
+    final status = await Permission.notification.request();
+    return status.isGranted;
+  }
+
+  /// Open Android/iOS App settings screen directly
+  Future<bool> openSettings() async {
+    return await openAppSettings();
+  }
+
   /// Get user's current position (returns null if disabled or denied)
   Future<Position?> getCurrentPosition() async {
     try {

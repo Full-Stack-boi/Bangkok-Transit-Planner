@@ -10,6 +10,7 @@ import 'package:bkk_transit_planner/services/dijkstra_planner.dart';
 import 'package:bkk_transit_planner/repositories/transit_repository.dart';
 import 'package:bkk_transit_planner/services/location_service.dart';
 import 'package:bkk_transit_planner/services/notification_service.dart';
+import 'package:geolocator/geolocator.dart';
 
 // ─── หัวข้อการเรียนรู้: Widget Test คืออะไร? ───
 // Widget Test คือการทดสอบองค์ประกอบส่วนติดต่อผู้ใช้ (UI Components/Widgets) ในสภาพแวดล้อมจำลอง
@@ -97,10 +98,19 @@ class MockTransitRepository extends TransitRepository {
 
 class MockLocationService extends LocationService {
   @override
-  Future<bool> isLocationPermissionGranted() async => false;
+  Future<bool> isLocationPermissionGranted() async => true;
 
   @override
-  Future<bool> requestLocationPermission() async => false;
+  Future<bool> requestLocationPermission() async => true;
+
+  @override
+  Future<bool> requestNotificationPermission() async => true;
+
+  @override
+  Future<bool> openSettings() async => true;
+
+  @override
+  Future<Position?> getCurrentPosition() async => null;
 }
 
 class MockNotificationService extends NotificationService {

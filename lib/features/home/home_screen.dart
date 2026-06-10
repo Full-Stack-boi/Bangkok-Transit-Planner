@@ -6,6 +6,7 @@ import '../map/map_screen.dart';
 import '../favorites/favorites_screen.dart';
 import '../settings/settings_screen.dart';
 import '../../core/constants/translation_helper.dart';
+import '../../services/location_service.dart';
 
 /// Main home screen with bottom navigation
 class HomeScreen extends ConsumerStatefulWidget {
@@ -36,12 +37,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       final crowdRepo = ref.read(crowdRepositoryProvider);
       final transitRepo = ref.read(transitRepositoryProvider);
 
+      // Request notification permission silently for Android 13+
+      await locationService.requestNotificationPermission();
+
       // Check location permission
       final isGranted = await locationService.isLocationPermissionGranted();
       if (!isGranted) {
-        // Request permission silently
+        // Request permission
         final requested = await locationService.requestLocationPermission();
-        if (!requested) return;
+        if (!requested) {
+          // Show alert dialog to guide user to open Settings directly
+          if (mounted) {
+            final t = ref.read(translationsProvider);
+            _showPermissionDialog(context, locationService, t);
+          }
+          return;
+        }
       }
 
       // Get current user position
@@ -79,6 +90,62 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     } catch (e) {
       print('Failed to perform passive GPS proximity check: $e');
     }
+  }
+
+  void _showPermissionDialog(
+    BuildContext context,
+    LocationService locationService,
+    AppLocalizations t,
+  ) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        final theme = Theme.of(context);
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: Row(
+            children: [
+              Icon(Icons.location_off_rounded, color: theme.colorScheme.error, size: 28),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  t.localeCode == 'th' ? 'ต้องการสิทธิ์ระบุตำแหน่ง' : 'Location Permission Required',
+                  style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                ),
+              ),
+            ],
+          ),
+          content: Text(
+            t.localeCode == 'th'
+                ? 'แอป BKK Transit ต้องการสิทธิ์ระบุตำแหน่งของคุณ เพื่อตรวจหาและแจ้งเตือนสถานีที่อยู่ใกล้เคียงโดยรอบ กรุณากดเปิดสิทธิ์ในการตั้งค่า'
+                : 'BKK Transit requires location permission to detect and notify you about nearby transit stations. Please enable it in settings.',
+            style: theme.textTheme.bodyMedium,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(
+                t.localeCode == 'th' ? 'ไว้ทีหลัง' : 'Later',
+                style: TextStyle(color: theme.colorScheme.onSurfaceVariant),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                locationService.openSettings();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: theme.colorScheme.primary,
+                foregroundColor: theme.colorScheme.onPrimary,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              ),
+              child: Text(t.localeCode == 'th' ? 'เปิดการตั้งค่า' : 'Open Settings'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
