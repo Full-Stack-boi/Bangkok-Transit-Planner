@@ -26,7 +26,7 @@
     "peak_interval_min": 3,
     "off_peak_interval_min": 6,
     "station_ids": [
-      "BTS_W1","BTS_CEN","BTS_S1","BTS_S2","BTS_S3","BTS_S4","BTS_S5","BTS_S6","BTS_S7","BTS_S8","BTS_S9","BTS_S10","BTS_S11","BTS_S12"
+      "BTS_W1","BTS_CEN_SILOM","BTS_S1","BTS_S2","BTS_S3","BTS_S4","BTS_S5","BTS_S6","BTS_S7","BTS_S8","BTS_S9","BTS_S10","BTS_S11","BTS_S12"
     ]
   },
   {

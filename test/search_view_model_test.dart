@@ -206,5 +206,43 @@ void main() {
       expect(result.segments[1].fromStation.id, equals('BTS_B'));
       expect(result.segments[1].toStation.id, equals('BTS_A'));
     });
+
+    test('Should support selecting recommended and saver route types', () {
+      final repo = MockSearchTransitRepository();
+      final container = ProviderContainer(
+        overrides: [
+          transitRepositoryProvider.overrideWithValue(repo),
+        ],
+      );
+
+      final searchVm = container.read(searchViewModelProvider.notifier);
+      final stationA = repo.getStation('BTS_A')!;
+      final stationD = repo.getStation('MRT_D')!;
+
+      // Act
+      searchVm.setOrigin(stationA);
+      searchVm.setDestination(stationD);
+
+      // Assert initial state
+      var state = container.read(searchViewModelProvider);
+      expect(state.activeRouteType, equals('recommended'));
+      expect(state.routeResult, equals(state.regularRoute));
+
+      // Manually set a mock saver route in state (since mock graph might not trigger the saver route criteria)
+      final dummyRoute = state.regularRoute!;
+      searchVm.state = state.copyWith(saverRoute: dummyRoute);
+
+      // Select saver route
+      searchVm.selectRouteType('saver');
+      state = container.read(searchViewModelProvider);
+      expect(state.activeRouteType, equals('saver'));
+      expect(state.routeResult, equals(dummyRoute));
+
+      // Select recommended route back
+      searchVm.selectRouteType('recommended');
+      state = container.read(searchViewModelProvider);
+      expect(state.activeRouteType, equals('recommended'));
+      expect(state.routeResult, equals(state.regularRoute));
+    });
   });
 }

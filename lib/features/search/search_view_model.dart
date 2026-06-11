@@ -1,7 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:geolocator/geolocator.dart';
 import '../../models/station.dart';
 import '../../models/route_result.dart';
 import '../../models/searchable_item.dart';
+import '../../models/custom_location.dart';
 import '../../providers/providers.dart';
 import '../../services/dijkstra_planner.dart';
 import '../../services/fare_service.dart';
@@ -14,6 +16,9 @@ class SearchState {
   final SearchableItem? origin;
   final SearchableItem? destination;
   final RouteResult? routeResult;
+  final RouteResult? regularRoute;
+  final RouteResult? saverRoute;
+  final String activeRouteType; // 'recommended' or 'saver'
   final bool isCalculating;
   final String? error;
 
@@ -23,6 +28,9 @@ class SearchState {
     this.origin,
     this.destination,
     this.routeResult,
+    this.regularRoute,
+    this.saverRoute,
+    this.activeRouteType = 'recommended',
     this.isCalculating = false,
     this.error,
   });
@@ -33,6 +41,9 @@ class SearchState {
     SearchableItem? origin,
     SearchableItem? destination,
     RouteResult? routeResult,
+    RouteResult? regularRoute,
+    RouteResult? saverRoute,
+    String? activeRouteType,
     bool? isCalculating,
     String? error,
     bool clearOrigin = false,
@@ -46,6 +57,9 @@ class SearchState {
       origin: clearOrigin ? null : (origin ?? this.origin),
       destination: clearDestination ? null : (destination ?? this.destination),
       routeResult: clearRoute ? null : (routeResult ?? this.routeResult),
+      regularRoute: clearRoute ? null : (regularRoute ?? this.regularRoute),
+      saverRoute: clearRoute ? null : (saverRoute ?? this.saverRoute),
+      activeRouteType: activeRouteType ?? this.activeRouteType,
       isCalculating: isCalculating ?? this.isCalculating,
       error: clearError ? null : (error ?? this.error),
     );
@@ -191,8 +205,14 @@ class SearchViewModel extends StateNotifier<SearchState> {
         routeResult = _buildRouteResult(result, origin, destination, repo, fareService);
       }
 
+      // Calculate saver route if available
+      final saverRoute = _findSaverRoute(origin, destination, routeResult, repo, fareService);
+
       state = state.copyWith(
         routeResult: routeResult,
+        regularRoute: routeResult,
+        saverRoute: saverRoute,
+        activeRouteType: 'recommended',
         isCalculating: false,
       );
     } catch (e) {
@@ -201,6 +221,143 @@ class SearchViewModel extends StateNotifier<SearchState> {
         error: 'เกิดข้อผิดพลาด: $e',
       );
     }
+  }
+
+  /// Select active route type ('recommended' or 'saver')
+  void selectRouteType(String type) {
+    if (type == 'recommended') {
+      state = state.copyWith(
+        activeRouteType: 'recommended',
+        routeResult: state.regularRoute,
+      );
+    } else if (type == 'saver') {
+      state = state.copyWith(
+        activeRouteType: 'saver',
+        routeResult: state.saverRoute,
+      );
+    }
+  }
+
+  /// Calculate a cheaper/fewer transfers alternative route (Saver option)
+  RouteResult? _findSaverRoute(
+    SearchableItem origin,
+    SearchableItem destination,
+    RouteResult regularRoute,
+    dynamic repo,
+    FareService fareService,
+  ) {
+    // Only search for saver options if there is an active transit segment
+    if (regularRoute.segments.isEmpty || regularRoute.segments.every((s) => s.lineId == 'WALK')) {
+      return null;
+    }
+
+    final originStationId = origin.nearestStationId ?? origin.id;
+    final destinationStationId = destination.nearestStationId ?? destination.id;
+
+    final destLat = destination.lat;
+    final destLng = destination.lng;
+    final originLat = origin.lat;
+    final originLng = origin.lng;
+
+    final candidateDestStations = <Station>[];
+    for (final station in repo.stations) {
+      if (station.id == destinationStationId) continue;
+      
+      final dist = Geolocator.distanceBetween(destLat, destLng, station.lat, station.lng);
+      // Look for alternative stations within 700 meters
+      if (dist <= 700.0) {
+        candidateDestStations.add(station);
+      }
+    }
+
+    final candidateOriginStations = <Station>[];
+    for (final station in repo.stations) {
+      if (station.id == originStationId) continue;
+      
+      final dist = Geolocator.distanceBetween(originLat, originLng, station.lat, station.lng);
+      // Look for alternative origin stations within 700 meters
+      if (dist <= 700.0) {
+        candidateOriginStations.add(station);
+      }
+    }
+
+    RouteResult? bestSaverRoute;
+
+    void evaluateCandidate(String startId, String endId, double startWalkMin, double endWalkMin) {
+      final dijkstraResult = repo.findRoute(startId, endId);
+      if (dijkstraResult == null) return;
+
+      final tempOrigin = CustomLocation(
+        id: origin.id,
+        nameTh: origin.nameTh,
+        nameEn: origin.nameEn,
+        nearestStationId: startId,
+        walkingMinutes: startWalkMin,
+        lat: originLat,
+        lng: originLng,
+      );
+
+      final tempDest = CustomLocation(
+        id: destination.id,
+        nameTh: destination.nameTh,
+        nameEn: destination.nameEn,
+        nearestStationId: endId,
+        walkingMinutes: endWalkMin,
+        lat: destLat,
+        lng: destLng,
+      );
+
+      final altRoute = _buildRouteResult(dijkstraResult, tempOrigin, tempDest, repo, fareService);
+
+      // Criteria for Saver Route:
+      // 1. Lower fare than recommended route
+      // 2. Or fewer transfers (and total fare is not more than 10 THB higher than regular, to prevent expensive routes)
+      // 3. Must not be excessively slow (<= 15 minutes slower than regular)
+      final isCheaper = altRoute.totalFareThb < regularRoute.totalFareThb;
+      final isFewerTransfers = altRoute.transferCount < regularRoute.transferCount && 
+                               altRoute.totalFareThb <= regularRoute.totalFareThb + 10;
+      final isNotTooSlow = altRoute.totalMinutes <= regularRoute.totalMinutes + 15.0;
+
+      if ((isCheaper || isFewerTransfers) && isNotTooSlow) {
+        final currentBest = bestSaverRoute;
+        if (currentBest == null || 
+            altRoute.totalFareThb < currentBest.totalFareThb ||
+            (altRoute.totalFareThb == currentBest.totalFareThb && altRoute.transferCount < currentBest.transferCount)) {
+          bestSaverRoute = altRoute;
+        }
+      }
+    }
+
+    // 1. Alternative destination stations
+    for (final altDest in candidateDestStations) {
+      final dist = Geolocator.distanceBetween(destLat, destLng, altDest.lat, altDest.lng);
+      final walkMinutes = (dist / 80.0).clamp(1.0, 30.0);
+      final originWalkMin = origin.walkingMinutes ?? 0.0;
+      evaluateCandidate(originStationId, altDest.id, originWalkMin, walkMinutes);
+    }
+
+    // 2. Alternative origin stations
+    for (final altOrigin in candidateOriginStations) {
+      final dist = Geolocator.distanceBetween(originLat, originLng, altOrigin.lat, altOrigin.lng);
+      final walkMinutes = (dist / 80.0).clamp(1.0, 30.0);
+      final destWalkMin = destination.walkingMinutes ?? 0.0;
+      evaluateCandidate(altOrigin.id, destinationStationId, walkMinutes, destWalkMin);
+    }
+
+    // 3. Alternative both origin and destination stations
+    for (final altOrigin in candidateOriginStations) {
+      final distOrigin = Geolocator.distanceBetween(originLat, originLng, altOrigin.lat, altOrigin.lng);
+      final originWalkMin = (distOrigin / 80.0).clamp(1.0, 30.0);
+
+      for (final altDest in candidateDestStations) {
+        final distDest = Geolocator.distanceBetween(destLat, destLng, altDest.lat, altDest.lng);
+        final destWalkMin = (distDest / 80.0).clamp(1.0, 30.0);
+
+        evaluateCandidate(altOrigin.id, altDest.id, originWalkMin, destWalkMin);
+      }
+    }
+
+    return bestSaverRoute;
   }
 
   RouteResult _buildRouteResult(

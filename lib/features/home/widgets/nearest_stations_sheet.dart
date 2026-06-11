@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/transit_colors.dart';
 import '../../../models/station.dart';
 import '../../../providers/providers.dart';
-import '../../../core/constants/translation_helper.dart';
 import '../../search/search_view_model.dart';
 
 /// Bottom sheet displaying nearest stations with distances, line badges,
@@ -76,8 +75,12 @@ class NearestStationsSheet extends ConsumerWidget {
                 final distanceM = entry.value;
 
                 final lineColor = TransitColors.getLineColor(station.lineId);
-                final stationName = localeCode == 'th' ? station.nameTh : station.nameEn;
-                final stationSubName = localeCode == 'th' ? station.nameEn : station.nameTh;
+                final stationName = localeCode == 'th'
+                    ? station.nameTh
+                    : station.nameEn;
+                final stationSubName = localeCode == 'th'
+                    ? station.nameEn
+                    : station.nameTh;
 
                 // Format distance
                 final String distanceText;
@@ -93,7 +96,10 @@ class NearestStationsSheet extends ConsumerWidget {
                   margin: const EdgeInsets.only(bottom: 12),
                   elevation: 2,
                   child: ListTile(
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
                     onTap: () async {
                       // 1. Passive check-in
                       await crowdRepo.reportPresence(
@@ -111,13 +117,17 @@ class NearestStationsSheet extends ConsumerWidget {
                         Navigator.pop(context); // Close bottom sheet
 
                         // 4. Show success banner
-                        final msg = t.get('checkin_success').replaceAll('{stationName}', stationName);
+                        final msg = t
+                            .get('checkin_success')
+                            .replaceAll('{stationName}', stationName);
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(msg),
                             backgroundColor: theme.colorScheme.primary,
                             behavior: SnackBarBehavior.floating,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
                           ),
                         );
                       }
@@ -186,11 +196,19 @@ class NearestStationsSheet extends ConsumerWidget {
                               Wrap(
                                 spacing: 4,
                                 children: station.interchange.map((id) {
-                                  final connStation = transitRepo.getStation(id);
-                                  if (connStation == null) return const SizedBox();
-                                  final connColor = TransitColors.getLineColor(connStation.lineId);
+                                  final connStation = transitRepo.getStation(
+                                    id,
+                                  );
+                                  if (connStation == null)
+                                    return const SizedBox();
+                                  final connColor = TransitColors.getLineColor(
+                                    connStation.lineId,
+                                  );
                                   return Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 6,
+                                      vertical: 2,
+                                    ),
                                     decoration: BoxDecoration(
                                       color: connColor,
                                       borderRadius: BorderRadius.circular(4),
