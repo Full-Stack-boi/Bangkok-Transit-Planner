@@ -77,15 +77,33 @@ class RouteResultSheet extends ConsumerWidget {
                 return Column(
                   children: [
                     _buildSegmentCard(context, ref, segment, theme, t, localeCode),
-                    if (i < result.segments.length - 1 && i < result.transfers.length)
-                      _buildTransferIndicator(
-                        context,
-                        result.transfers[i],
-                        segment,
-                        result.segments[i + 1],
-                        theme,
-                        t,
-                        localeCode,
+                    if (i < result.segments.length - 1)
+                      Builder(
+                        builder: (context) {
+                          final nextSegment = result.segments[i + 1];
+                          TransferStep? matchingTransfer;
+                          for (final transfer in result.transfers) {
+                            if (transfer.fromStation.id == segment.toStation.id &&
+                                transfer.toStation.id == nextSegment.fromStation.id &&
+                                transfer.fromLineId == segment.lineId &&
+                                transfer.toLineId == nextSegment.lineId) {
+                              matchingTransfer = transfer;
+                              break;
+                            }
+                          }
+                          if (matchingTransfer != null) {
+                            return _buildTransferIndicator(
+                              context,
+                              matchingTransfer,
+                              segment,
+                              nextSegment,
+                              theme,
+                              t,
+                              localeCode,
+                            );
+                          }
+                          return const SizedBox.shrink();
+                        },
                       ),
                   ],
                 );
@@ -501,7 +519,7 @@ class RouteResultSheet extends ConsumerWidget {
                   child: Text(
                     displayDirection,
                     style: theme.textTheme.bodyMedium?.copyWith(
-                      color: lineColor,
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.9),
                       fontWeight: FontWeight.w600,
                     ),
                   ),
