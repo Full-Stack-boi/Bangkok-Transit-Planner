@@ -11,6 +11,10 @@ import 'package:bkk_transit_planner/repositories/transit_repository.dart';
 import 'package:bkk_transit_planner/services/location_service.dart';
 import 'package:bkk_transit_planner/services/notification_service.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:bkk_transit_planner/features/search/search_screen.dart';
+import 'package:bkk_transit_planner/features/route_result/route_result_sheet.dart';
+import 'package:bkk_transit_planner/features/search/search_view_model.dart';
+import 'package:bkk_transit_planner/features/map/map_screen.dart';
 
 // ─── หัวข้อการเรียนรู้: Widget Test คืออะไร? ───
 // Widget Test คือการทดสอบองค์ประกอบส่วนติดต่อผู้ใช้ (UI Components/Widgets) ในสภาพแวดล้อมจำลอง
@@ -98,6 +102,16 @@ class MockTransitRepository extends TransitRepository {
     }
     return null;
   }
+
+  @override
+  TransitLine? getLine(String lineId) {
+    return lines.firstWhere((l) => l.id == lineId);
+  }
+
+  @override
+  DijkstraResult? findRoute(String fromId, String toId) {
+    return graph.findShortestPath(fromId, toId);
+  }
 }
 
 class MockLocationService extends LocationService {
@@ -179,6 +193,143 @@ void main() {
       // ตรวจหาคำว่า "ธีม" หรือ "ภาษา" ที่จะโผล่เฉพาะในหน้าตั้งค่าเท่านั้น
       expect(find.text('ธีม'), findsOneWidget);
       expect(find.text('ภาษา'), findsOneWidget);
+    });
+
+    testWidgets('Should show route result banner on map screen and open detail sheet on tap', (WidgetTester tester) async {
+      final repo = MockTransitRepository();
+      final container = ProviderScope(
+        overrides: [
+          transitInitProvider.overrideWith((ref) => Future.value(null)),
+          transitRepositoryProvider.overrideWithValue(repo),
+          locationServiceProvider.overrideWithValue(MockLocationService()),
+          notificationServiceProvider.overrideWithValue(MockNotificationService()),
+        ],
+        child: const BkkTransitApp(),
+      );
+
+      await tester.pumpWidget(container);
+      await tester.pumpAndSettle();
+
+      // Find the search view model and set origin & destination to calculate a route
+      final element = tester.element(find.byType(BkkTransitApp));
+      final ref = ProviderScope.containerOf(element);
+      final searchVm = ref.read(searchViewModelProvider.notifier);
+      final stationA = repo.getStation('BTS_A')!;
+      final stationB = repo.getStation('BTS_B')!;
+
+      searchVm.setOrigin(stationA);
+      searchVm.setDestination(stationB);
+      await tester.pumpAndSettle();
+
+      // Switch to the map tab
+      final navBar = find.byType(NavigationBar);
+      final mapTab = find.descendant(of: navBar, matching: find.text('แผนที่รถไฟฟ้า'));
+      await tester.tap(mapTab);
+      await tester.pumpAndSettle();
+
+      // Verify RouteResultBanner is displayed on MapScreen
+      expect(find.byType(RouteResultBanner), findsOneWidget);
+
+      // Verify that details chip info is shown (e.g. fare or minutes)
+      expect(find.textContaining('นาที'), findsOneWidget);
+
+      // Tap on RouteResultBanner
+      await tester.tap(find.byType(RouteResultBanner));
+      await tester.pumpAndSettle();
+
+      // Verify RouteResultSheet bottom sheet is open
+      expect(find.byType(RouteResultSheet), findsOneWidget);
+    });
+
+    testWidgets('Should save route and restore it correctly on tap', (WidgetTester tester) async {
+      final repo = MockTransitRepository();
+      final container = ProviderScope(
+        overrides: [
+          transitInitProvider.overrideWith((ref) => Future.value(null)),
+          transitRepositoryProvider.overrideWithValue(repo),
+          locationServiceProvider.overrideWithValue(MockLocationService()),
+          notificationServiceProvider.overrideWithValue(MockNotificationService()),
+        ],
+        child: const BkkTransitApp(),
+      );
+
+      await tester.pumpWidget(container);
+      await tester.pumpAndSettle();
+
+      // Find the search view model and set origin & destination to calculate a route
+      final element = tester.element(find.byType(BkkTransitApp));
+      final ref = ProviderScope.containerOf(element);
+      final searchVm = ref.read(searchViewModelProvider.notifier);
+      final stationA = repo.getStation('BTS_A')!;
+      final stationB = repo.getStation('BTS_B')!;
+
+      searchVm.setOrigin(stationA);
+      searchVm.setDestination(stationB);
+      await tester.pumpAndSettle();
+
+      // Switch to the map tab
+      final navBar = find.byType(NavigationBar);
+      final mapTab = find.descendant(of: navBar, matching: find.text('แผนที่รถไฟฟ้า'));
+      await tester.tap(mapTab);
+      await tester.pumpAndSettle();
+
+      // Tap on RouteResultBanner to open bottom sheet
+      await tester.tap(find.byType(RouteResultBanner));
+      await tester.pumpAndSettle();
+
+      // Tap the bookmark button
+      await tester.tap(find.byIcon(Icons.bookmark_border_rounded));
+      await tester.pumpAndSettle();
+
+      // Enter custom route name in dialog
+      await tester.enterText(find.byType(TextField), 'My Test Saved Route');
+      await tester.pumpAndSettle();
+
+      // Tap 'บันทึก' (Save) button in dialog
+      await tester.tap(find.text('บันทึก'));
+      await tester.pumpAndSettle();
+
+      // Verify bottom sheet is still there (dialog closed)
+      expect(find.byType(RouteResultSheet), findsOneWidget);
+
+      // Close the bottom sheet by popping it
+      Navigator.pop(tester.element(find.byType(RouteResultSheet)));
+      await tester.pumpAndSettle();
+
+      // Switch to Favorites tab
+      final favTab = find.descendant(of: navBar, matching: find.text('รายการโปรด'));
+      await tester.tap(favTab);
+      await tester.pumpAndSettle();
+
+      // Tap on Saved Routes tab inside Favorites screen
+      final routesTab = find.descendant(of: find.byType(TabBar), matching: find.byIcon(Icons.route_rounded));
+      await tester.tap(routesTab);
+      await tester.pumpAndSettle();
+
+      // Verify the saved route is listed
+      expect(find.text('My Test Saved Route'), findsOneWidget);
+
+      // Clear search to simulate starting fresh
+      searchVm.clear();
+      await tester.pumpAndSettle();
+
+      // Tap on the saved route card
+      await tester.tap(find.text('My Test Saved Route'));
+      await tester.pumpAndSettle();
+
+      // Should automatically switch back to the Map tab (index 1)
+      expect(find.byType(MapScreen), findsOneWidget);
+
+      // Verify that the route results banner is shown on Map screen
+      expect(find.byType(RouteResultBanner), findsOneWidget);
+
+      // Verify that the search viewModel has origin and destination active and route calculated
+      final state = ref.read(searchViewModelProvider);
+      expect(state.origin, isNotNull);
+      expect(state.destination, isNotNull);
+      expect(state.origin!.id, equals('BTS_A'));
+      expect(state.destination!.id, equals('BTS_B'));
+      expect(state.routeResult, isNotNull);
     });
   });
 }
