@@ -180,9 +180,9 @@ class TransitRepository {
     client.userAgent = 'com.bkktransit.bkk_transit_planner'; // Required by Nominatim Policy
 
     try {
-      // Bounded search within Bangkok area (viewbox=99.0,13.0,101.5,14.5&bounded=1)
+      // Bounded search within Greater Bangkok area (viewbox=100.1,13.4,101.0,14.2&bounded=1)
       final uri = Uri.parse(
-        'https://nominatim.openstreetmap.org/search?q=${Uri.encodeComponent(query)}&format=json&limit=5&countrycodes=th&viewbox=99.0,13.0,101.5,14.5&bounded=1'
+        'https://nominatim.openstreetmap.org/search?q=${Uri.encodeComponent(query)}&format=json&limit=5&countrycodes=th&viewbox=100.1,13.4,101.0,14.2&bounded=1'
       );
 
       final request = await client.getUrl(uri);
@@ -204,22 +204,36 @@ class TransitRepository {
           final parts = displayName.split(',');
           final shortName = parts.isNotEmpty ? parts.first.trim() : displayName;
 
+          // Explicitly exclude Phetchaburi Province to prevent it from being selectable
+          final lowerShort = shortName.toLowerCase();
+          final lowerDisplay = displayName.toLowerCase();
+          if (lowerShort.contains('จังหวัดเพชรบุรี') ||
+              lowerDisplay.contains('จังหวัดเพชรบุรี') ||
+              lowerShort.contains('phetchaburi province') ||
+              lowerDisplay.contains('phetchaburi province') ||
+              (lowerShort == 'phetchaburi' && !lowerDisplay.contains('bangkok') && !lowerDisplay.contains('กรุงเทพ'))) {
+            continue;
+          }
+
           // Find nearest station
           final nearest = _findNearestStation(lat, lon);
           if (nearest != null) {
             final dist = Geolocator.distanceBetween(lat, lon, nearest.lat, nearest.lng);
-            // Walking minutes based on 80 meters/minute, capped between 1 and 30 mins
-            final walkMin = (dist / 80.0).clamp(1.0, 30.0);
+            // Limit results to locations within 10 km of a transit station to filter out far-away provinces
+            if (dist <= 10000.0) {
+              // Walking minutes based on 80 meters/minute, capped between 1 and 30 mins
+              final walkMin = (dist / 80.0).clamp(1.0, 30.0);
 
-            results.add(CustomLocation(
-              id: 'OSM_${item['place_id'] ?? DateTime.now().millisecondsSinceEpoch}',
-              nameTh: shortName,
-              nameEn: shortName,
-              nearestStationId: nearest.id,
-              walkingMinutes: walkMin,
-              lat: lat,
-              lng: lon,
-            ));
+              results.add(CustomLocation(
+                id: 'OSM_${item['place_id'] ?? DateTime.now().millisecondsSinceEpoch}',
+                nameTh: shortName,
+                nameEn: shortName,
+                nearestStationId: nearest.id,
+                walkingMinutes: walkMin,
+                lat: lat,
+                lng: lon,
+              ));
+            }
           }
         }
         return results;
