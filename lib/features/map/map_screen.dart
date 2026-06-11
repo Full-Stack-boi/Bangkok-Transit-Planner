@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:ui' as ui;
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
@@ -285,14 +286,13 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         Marker(
           point: LatLng(routeResult.origin.lat, routeResult.origin.lng),
           width: 40,
-          height: 40,
+          height: 44,
           alignment: Alignment.topCenter,
           child: Tooltip(
             message: routeResult.origin.displayName(isEnglish: localeCode == 'en'),
-            child: Icon(
-              Icons.location_on_rounded,
+            child: CustomMapPin(
               color: Colors.green.shade600,
-              size: 38,
+              icon: Icons.trip_origin_rounded,
             ),
           ),
         ),
@@ -303,14 +303,13 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         Marker(
           point: LatLng(routeResult.destination.lat, routeResult.destination.lng),
           width: 40,
-          height: 40,
+          height: 44,
           alignment: Alignment.topCenter,
           child: Tooltip(
             message: routeResult.destination.displayName(isEnglish: localeCode == 'en'),
-            child: Icon(
-              Icons.location_on_rounded,
+            child: CustomMapPin(
               color: Colors.red.shade600,
-              size: 38,
+              icon: Icons.flag_rounded,
             ),
           ),
         ),
@@ -409,11 +408,11 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         Marker(
           point: LatLng(_customSelectedLocation!.lat, _customSelectedLocation!.lng),
           width: 40,
-          height: 40,
-          child: Icon(
-            Icons.location_on_rounded,
-            color: theme.colorScheme.error,
-            size: 36,
+          height: 44,
+          alignment: Alignment.topCenter,
+          child: CustomMapPin(
+            color: theme.colorScheme.primary,
+            icon: Icons.push_pin_rounded,
           ),
         ),
       );
@@ -949,3 +948,94 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     );
   }
 }
+
+class CustomMapPin extends StatelessWidget {
+  final Color color;
+  final IconData icon;
+
+  const CustomMapPin({
+    super.key,
+    required this.color,
+    required this.icon,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // Pin Bubble
+        Container(
+          width: 34,
+          height: 34,
+          decoration: BoxDecoration(
+            color: color,
+            shape: BoxShape.circle,
+            border: Border.all(color: Colors.white, width: 2.5),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.25),
+                blurRadius: 6,
+                offset: const Offset(0, 3),
+              ),
+            ],
+          ),
+          child: Center(
+            child: Icon(
+              icon,
+              color: Colors.white,
+              size: 16,
+            ),
+          ),
+        ),
+        // Pin Tip (Teardrop pointer)
+        Transform.translate(
+          offset: const Offset(0, -1.5), // overlap slightly to merge borders
+          child: CustomPaint(
+            size: const Size(10, 5),
+            painter: _TrianglePainter(color: color),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _TrianglePainter extends CustomPainter {
+  final Color color;
+
+  _TrianglePainter({required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.fill;
+
+    // Draw triangle pointing down
+    final path = ui.Path()
+      ..moveTo(0, 0)
+      ..lineTo(size.width, 0)
+      ..lineTo(size.width / 2, size.height)
+      ..close();
+
+    // Draw white borders for the triangle to match the bubble border
+    final borderPaint = Paint()
+      ..color = Colors.white
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.5
+      ..strokeCap = StrokeCap.round;
+
+    final borderPath = ui.Path()
+      ..moveTo(0, 0)
+      ..lineTo(size.width / 2, size.height)
+      ..lineTo(size.width, 0);
+
+    canvas.drawPath(path, paint);
+    canvas.drawPath(borderPath, borderPaint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
