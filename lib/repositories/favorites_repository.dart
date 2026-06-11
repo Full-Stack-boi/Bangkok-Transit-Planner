@@ -88,6 +88,10 @@ class FavoritesRepository {
     required String originName,
     required String destinationName,
     required String routeName,
+    double? originLat,
+    double? originLng,
+    double? destinationLat,
+    double? destinationLng,
   }) async {
     await initialize();
     final list = getSavedRoutes();
@@ -102,6 +106,10 @@ class FavoritesRepository {
       'origin_name': originName,
       'destination_name': destinationName,
       'name': routeName,
+      'origin_lat': originLat?.toString() ?? '',
+      'origin_lng': originLng?.toString() ?? '',
+      'destination_lat': destinationLat?.toString() ?? '',
+      'destination_lng': destinationLng?.toString() ?? '',
       'created_at': DateTime.now().toIso8601String(),
     });
 

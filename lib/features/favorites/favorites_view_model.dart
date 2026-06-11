@@ -64,6 +64,10 @@ class FavoritesViewModel extends StateNotifier<FavoritesState> {
     required String originName,
     required String destinationName,
     required String routeName,
+    double? originLat,
+    double? originLng,
+    double? destinationLat,
+    double? destinationLng,
   }) async {
     final repo = _ref.read(favoritesRepositoryProvider);
     await repo.saveRoute(
@@ -72,6 +76,10 @@ class FavoritesViewModel extends StateNotifier<FavoritesState> {
       originName: originName,
       destinationName: destinationName,
       routeName: routeName,
+      originLat: originLat,
+      originLng: originLng,
+      destinationLat: destinationLat,
+      destinationLng: destinationLng,
     );
     refresh();
   }

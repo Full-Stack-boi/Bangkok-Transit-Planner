@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:geolocator/geolocator.dart';
 import '../../core/theme/transit_colors.dart';
 import '../../models/crowd_report.dart';
+import '../../models/searchable_item.dart';
+import '../../models/station.dart';
+import '../../models/custom_location.dart';
 import '../../providers/providers.dart';
 import '../search/search_view_model.dart';
 import 'favorites_view_model.dart';
 import '../../core/constants/translation_helper.dart';
+import '../../repositories/transit_repository.dart';
 
 /// Favorites screen showing favorite stations and saved routes with language localization
 class FavoritesScreen extends ConsumerStatefulWidget {
@@ -276,6 +281,72 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
     );
   }
 
+  SearchableItem? _resolveSearchableItem(
+    String id,
+    String nameTh,
+    String nameEn,
+    String? latStr,
+    String? lngStr,
+    TransitRepository transitRepo,
+  ) {
+    // 1. Check if it's a station
+    final station = transitRepo.getStation(id);
+    if (station != null) return station;
+
+    // 2. Check if it's a landmark
+    for (final l in transitRepo.landmarks) {
+      if (l.id == id) return l;
+    }
+
+    // 3. Check if we have stored coordinates
+    double? lat;
+    double? lng;
+    if (latStr != null && latStr.isNotEmpty && lngStr != null && lngStr.isNotEmpty) {
+      lat = double.tryParse(latStr);
+      lng = double.tryParse(lngStr);
+    }
+
+    // 4. If no stored coordinates, try to parse from ID (for CUSTOM_lat_lng)
+    if (lat == null || lng == null) {
+      if (id.startsWith('CUSTOM_')) {
+        final parts = id.split('_');
+        if (parts.length >= 3) {
+          lat = double.tryParse(parts[1]);
+          lng = double.tryParse(parts[2]);
+        }
+      }
+    }
+
+    // 5. If we resolved coordinates, create a CustomLocation
+    if (lat != null && lng != null) {
+      // Find nearest station
+      Station? nearest;
+      double minDist = double.infinity;
+      for (final s in transitRepo.stations) {
+        final dist = Geolocator.distanceBetween(lat, lng, s.lat, s.lng);
+        if (dist < minDist) {
+          minDist = dist;
+          nearest = s;
+        }
+      }
+      final walkMin = nearest != null
+          ? (minDist / 80.0).clamp(1.0, 30.0)
+          : 5.0;
+
+      return CustomLocation(
+        id: id,
+        nameTh: nameTh,
+        nameEn: nameEn,
+        nearestStationId: nearest?.id ?? '',
+        walkingMinutes: walkMin,
+        lat: lat,
+        lng: lng,
+      );
+    }
+
+    return null;
+  }
+
   Widget _buildRoutesTab(
     BuildContext context,
     FavoritesState state,
@@ -307,18 +378,37 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
         final routeName = route['name'] ?? 'เส้นทางไม่มีชื่อ';
         final originName = route['origin_name'] ?? '';
         final destinationName = route['destination_name'] ?? '';
+        final originLatStr = route['origin_lat'];
+        final originLngStr = route['origin_lng'];
+        final destLatStr = route['destination_lat'];
+        final destLngStr = route['destination_lng'];
 
-        final originStation = transitRepo.getStation(originId);
-        final destStation = transitRepo.getStation(destinationId);
+        final originItem = _resolveSearchableItem(
+          originId,
+          originName,
+          originName,
+          originLatStr,
+          originLngStr,
+          transitRepo,
+        );
+
+        final destItem = _resolveSearchableItem(
+          destinationId,
+          destinationName,
+          destinationName,
+          destLatStr,
+          destLngStr,
+          transitRepo,
+        );
 
         final String routeDisplayName = routeName == 'เส้นทางไม่มีชื่อ' && localeCode == 'en'
             ? 'Unnamed Route'
             : routeName;
-        final String originDisplayName = originStation != null
-            ? (localeCode == 'th' ? originStation.nameTh : originStation.nameEn)
+        final String originDisplayName = originItem != null
+            ? (localeCode == 'th' ? originItem.nameTh : originItem.nameEn)
             : originName;
-        final String destDisplayName = destStation != null
-            ? (localeCode == 'th' ? destStation.nameTh : destStation.nameEn)
+        final String destDisplayName = destItem != null
+            ? (localeCode == 'th' ? destItem.nameTh : destItem.nameEn)
             : destinationName;
 
         return Card(
@@ -357,10 +447,10 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
               ],
             ),
             onTap: () {
-              if (originStation != null && destStation != null) {
-                searchVm.setOrigin(originStation);
-                searchVm.setDestination(destStation);
-                ref.read(homeTabIndexProvider.notifier).state = 0; // Switch to Search Screen
+              if (originItem != null && destItem != null) {
+                searchVm.setOrigin(originItem);
+                searchVm.setDestination(destItem);
+                ref.read(homeTabIndexProvider.notifier).state = 1; // Switch to Map Screen
               }
             },
           ),
