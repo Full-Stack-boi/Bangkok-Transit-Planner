@@ -215,8 +215,8 @@ class NearestStationsSheet extends ConsumerWidget {
                                     ),
                                     child: Text(
                                       connStation.code,
-                                      style: const TextStyle(
-                                        color: Colors.white,
+                                      style: TextStyle(
+                                        color: TransitColors.getLineTextColor(connStation.lineId),
                                         fontSize: 9,
                                         fontWeight: FontWeight.bold,
                                       ),

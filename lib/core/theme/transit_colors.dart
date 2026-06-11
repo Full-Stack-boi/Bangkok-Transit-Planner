@@ -75,4 +75,12 @@ class TransitColors {
         return Colors.grey.shade700;
     }
   }
+
+  /// Get readable text color (white or dark slate) for a given line ID
+  static Color getLineTextColor(String lineId) {
+    if (lineId == 'MRT_YELLOW' || lineId == 'BTS_GOLD') {
+      return const Color(0xFF1E293B); // Dark slate
+    }
+    return Colors.white;
+  }
 }

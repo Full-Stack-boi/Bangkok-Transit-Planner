@@ -505,8 +505,8 @@ class RouteResultSheet extends ConsumerWidget {
                   ),
                   child: Text(
                     displayLineName,
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: TransitColors.getLineTextColor(segment.lineId),
                       fontWeight: FontWeight.bold,
                       fontSize: 12,
                     ),
@@ -641,8 +641,8 @@ class RouteResultSheet extends ConsumerWidget {
       ),
       child: Text(
         lineName,
-        style: const TextStyle(
-          color: Colors.white,
+        style: TextStyle(
+          color: TransitColors.getLineTextColor(lineId),
           fontWeight: FontWeight.bold,
           fontSize: 10,
         ),
@@ -662,8 +662,8 @@ class RouteResultSheet extends ConsumerWidget {
       ),
       child: Text(
         '$name (${station.code})',
-        style: const TextStyle(
-          color: Colors.white,
+        style: TextStyle(
+          color: TransitColors.getLineTextColor(station.lineId),
           fontWeight: FontWeight.bold,
           fontSize: 13,
         ),

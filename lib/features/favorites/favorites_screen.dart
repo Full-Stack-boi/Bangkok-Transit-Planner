@@ -144,8 +144,8 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
                       ),
                       child: Text(
                         station.code,
-                        style: const TextStyle(
-                          color: Colors.white,
+                        style: TextStyle(
+                          color: TransitColors.getLineTextColor(station.lineId),
                           fontWeight: FontWeight.bold,
                           fontSize: 12,
                         ),
