@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/transit_colors.dart';
 import '../../models/route_result.dart';
+
 import '../../models/crowd_report.dart';
 import '../../providers/providers.dart';
 import '../search/search_view_model.dart';
@@ -280,6 +281,10 @@ class RouteResultSheet extends ConsumerWidget {
     AppLocalizations t,
     String localeCode,
   ) {
+    if (segment.lineId == 'WALK') {
+      return _buildWalkSegmentCard(context, segment, theme, t, localeCode);
+    }
+
     final lineColor = TransitColors.getLineColor(segment.lineId);
     final crowdService = ref.watch(crowdServiceProvider);
     final scheduleService = ref.watch(scheduleServiceProvider);
@@ -293,20 +298,35 @@ class RouteResultSheet extends ConsumerWidget {
     // Parse simulated direction name
     String displayDirection = segment.direction;
     if (localeCode == 'en') {
-      if (segment.direction.contains('ไปคูคต')) displayDirection = 'to Khu Khot';
-      else if (segment.direction.contains('ไปเคหะฯ')) displayDirection = 'to Kheha';
-      else if (segment.direction.contains('ไปสนามกีฬาแห่งชาติ')) displayDirection = 'to National Stadium';
-      else if (segment.direction.contains('ไปบางหว้า')) displayDirection = 'to Bang Wa';
-      else if (segment.direction.contains('ไปกรุงธนบุรี')) displayDirection = 'to Krung Thon Buri';
-      else if (segment.direction.contains('ไปคลองสาน')) displayDirection = 'to Khlong San';
-      else if (segment.direction.contains('วงกลม (ตามเข็ม)')) displayDirection = 'Circle Loop (Clockwise)';
-      else if (segment.direction.contains('วงกลม (ทวนเข็ม)')) displayDirection = 'Circle Loop (Counter-Clockwise)';
-      else if (segment.direction.contains('ไปคลองบางไผ่')) displayDirection = 'to Khlong Bang Phai';
-      else if (segment.direction.contains('ไปเตาปูน')) displayDirection = 'to Tao Poon';
-      else if (segment.direction.contains('ไปลาดพร้าว')) displayDirection = 'to Lat Phrao';
-      else if (segment.direction.contains('ไปสำโรง')) displayDirection = 'to Samrong';
-      else if (segment.direction.contains('ไปสุวรรณภูมิ')) displayDirection = 'to Suvarnabhumi';
-      else if (segment.direction.contains('ไปพญาไท')) displayDirection = 'to Phaya Thai';
+      if (segment.direction.contains('ไปคูคต')) {
+        displayDirection = 'to Khu Khot';
+      } else if (segment.direction.contains('ไปเคหะฯ')) {
+        displayDirection = 'to Kheha';
+      } else if (segment.direction.contains('ไปสนามกีฬาแห่งชาติ')) {
+        displayDirection = 'to National Stadium';
+      } else if (segment.direction.contains('ไปบางหว้า')) {
+        displayDirection = 'to Bang Wa';
+      } else if (segment.direction.contains('ไปกรุงธนบุรี')) {
+        displayDirection = 'to Krung Thon Buri';
+      } else if (segment.direction.contains('ไปคลองสาน')) {
+        displayDirection = 'to Khlong San';
+      } else if (segment.direction.contains('วงกลม (ตามเข็ม)')) {
+        displayDirection = 'Circle Loop (Clockwise)';
+      } else if (segment.direction.contains('วงกลม (ทวนเข็ม)')) {
+        displayDirection = 'Circle Loop (Counter-Clockwise)';
+      } else if (segment.direction.contains('ไปคลาดบางไผ่') || segment.direction.contains('ไปคลองบางไผ่')) {
+        displayDirection = 'to Khlong Bang Phai';
+      } else if (segment.direction.contains('ไปเตาปูน')) {
+        displayDirection = 'to Tao Poon';
+      } else if (segment.direction.contains('ไปลาดพร้าว')) {
+        displayDirection = 'to Lat Phrao';
+      } else if (segment.direction.contains('ไปสำโรง')) {
+        displayDirection = 'to Samrong';
+      } else if (segment.direction.contains('ไปสุวรรณภูมิ')) {
+        displayDirection = 'to Suvarnabhumi';
+      } else if (segment.direction.contains('ไปพญาไท')) {
+        displayDirection = 'to Phaya Thai';
+      }
     }
 
     final String trainStatusText;
@@ -465,6 +485,65 @@ class RouteResultSheet extends ConsumerWidget {
               isFirst: false,
               theme: theme,
               localeCode: localeCode,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildWalkSegmentCard(
+    BuildContext context,
+    RouteSegment segment,
+    ThemeData theme,
+    AppLocalizations t,
+    String localeCode,
+  ) {
+    final fromName = segment.fromStation.displayName(isEnglish: localeCode == 'en');
+    final toName = segment.toStation.displayName(isEnglish: localeCode == 'en');
+    final timeStr = '~${segment.estimatedMinutes.toInt()} ${t.get('minutes_unit')}';
+    
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 4),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.secondary.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.directions_walk_rounded,
+                color: theme.colorScheme.secondary,
+                size: 24,
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    localeCode == 'en' ? 'Walk to $toName' : 'เดินเท้าไปยัง $toName',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    localeCode == 'en'
+                        ? 'From $fromName · $timeStr'
+                        : 'จาก $fromName · $timeStr',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         ),

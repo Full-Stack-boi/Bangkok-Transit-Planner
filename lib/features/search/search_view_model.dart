@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../models/station.dart';
 import '../../models/route_result.dart';
+import '../../models/searchable_item.dart';
 import '../../providers/providers.dart';
 import '../../services/dijkstra_planner.dart';
 import '../../services/fare_service.dart';
@@ -9,9 +10,9 @@ import '../../core/constants/transit_constants.dart';
 /// State for search feature
 class SearchState {
   final String query;
-  final List<Station> searchResults;
-  final Station? origin;
-  final Station? destination;
+  final List<SearchableItem> searchResults;
+  final SearchableItem? origin;
+  final SearchableItem? destination;
   final RouteResult? routeResult;
   final bool isCalculating;
   final String? error;
@@ -28,9 +29,9 @@ class SearchState {
 
   SearchState copyWith({
     String? query,
-    List<Station>? searchResults,
-    Station? origin,
-    Station? destination,
+    List<SearchableItem>? searchResults,
+    SearchableItem? origin,
+    SearchableItem? destination,
     RouteResult? routeResult,
     bool? isCalculating,
     String? error,
@@ -57,19 +58,41 @@ class SearchViewModel extends StateNotifier<SearchState> {
 
   SearchViewModel(this._ref) : super(const SearchState());
 
-  /// Search stations by query
-  void search(String query) {
+  /// Search stations and landmarks by query, querying online places if needed
+  Future<void> search(String query) async {
+    state = state.copyWith(query: query, clearError: true);
+
     final repo = _ref.read(transitRepositoryProvider);
-    final results = repo.searchStations(query);
-    state = state.copyWith(
-      query: query,
-      searchResults: results,
-      clearError: true,
-    );
+
+    // 1. Search local places (stations + landmarks) instantly
+    final localResults = repo.searchLocalPlaces(query);
+    state = state.copyWith(searchResults: localResults);
+
+    if (query.trim().length >= 3) {
+      // 2. Fetch online places in background
+      try {
+        final onlineResults = await repo.searchOnlinePlaces(query);
+
+        // Merge without duplicates
+        if (state.query == query) {
+          final merged = [...localResults];
+          for (final online in onlineResults) {
+            if (!merged.any((item) =>
+                item.nameTh.toLowerCase() == online.nameTh.toLowerCase() ||
+                (item.lat == online.lat && item.lng == online.lng))) {
+              merged.add(online);
+            }
+          }
+          state = state.copyWith(searchResults: merged);
+        }
+      } catch (e) {
+        print('Online place search failed: $e');
+      }
+    }
   }
 
-  /// Set origin station
-  void setOrigin(Station station) {
+  /// Set origin station or place
+  void setOrigin(SearchableItem station) {
     state = state.copyWith(
       origin: station,
       clearRoute: true,
@@ -78,8 +101,8 @@ class SearchViewModel extends StateNotifier<SearchState> {
     _tryCalculateRoute();
   }
 
-  /// Set destination station
-  void setDestination(Station station) {
+  /// Set destination station or place
+  void setDestination(SearchableItem station) {
     state = state.copyWith(
       destination: station,
       clearRoute: true,
@@ -112,7 +135,7 @@ class SearchViewModel extends StateNotifier<SearchState> {
 
     if (origin == null || destination == null) return;
     if (origin.id == destination.id) {
-      state = state.copyWith(error: 'ต้นทางและปลายทางเป็นสถานีเดียวกัน');
+      state = state.copyWith(error: 'ต้นทางและปลายทางเป็นสถานที่เดียวกัน');
       return;
     }
 
@@ -121,18 +144,53 @@ class SearchViewModel extends StateNotifier<SearchState> {
     try {
       final repo = _ref.read(transitRepositoryProvider);
       final fareService = _ref.read(fareServiceProvider);
-      final result = repo.findRoute(origin.id, destination.id);
 
-      if (result == null) {
-        state = state.copyWith(
-          isCalculating: false,
-          error: 'ไม่พบเส้นทาง',
+      final originStationId = origin.nearestStationId ?? origin.id;
+      final destinationStationId = destination.nearestStationId ?? destination.id;
+
+      RouteResult routeResult;
+
+      if (originStationId == destinationStationId) {
+        // Direct walk scenario (e.g. between landmarks near same station, or landmark and its station)
+        final walkMinutes = (origin.walkingMinutes ?? 0.0) + (destination.walkingMinutes ?? 0.0);
+        final walkSegment = RouteSegment(
+          lineId: 'WALK',
+          lineName: 'Walk',
+          direction: 'Walk to destination',
+          boundIndex: 0,
+          fromStation: origin,
+          toStation: destination,
+          stationCount: 0,
+          estimatedMinutes: walkMinutes > 0 ? walkMinutes : 5.0,
+          fareThb: 0,
         );
-        return;
+
+        routeResult = RouteResult(
+          origin: origin,
+          destination: destination,
+          segments: [walkSegment],
+          transfers: [],
+          totalMinutes: walkMinutes > 0 ? walkMinutes : 5.0,
+          totalFareThb: 0,
+          totalStations: 0,
+          calculatedAt: DateTime.now(),
+        );
+      } else {
+        // Run Dijkstra on transit stations
+        final result = repo.findRoute(originStationId, destinationStationId);
+
+        if (result == null) {
+          state = state.copyWith(
+            isCalculating: false,
+            error: 'ไม่พบเส้นทาง',
+          );
+          return;
+        }
+
+        // Build RouteResult from DijkstraResult
+        routeResult = _buildRouteResult(result, origin, destination, repo, fareService);
       }
 
-      // Build RouteResult from DijkstraResult
-      final routeResult = _buildRouteResult(result, origin, destination, repo, fareService);
       state = state.copyWith(
         routeResult: routeResult,
         isCalculating: false,
@@ -147,13 +205,31 @@ class SearchViewModel extends StateNotifier<SearchState> {
 
   RouteResult _buildRouteResult(
     DijkstraResult dijkstraResult,
-    Station origin,
-    Station destination,
+    SearchableItem origin,
+    SearchableItem destination,
     dynamic repo,
     FareService fareService,
   ) {
     final segments = <RouteSegment>[];
     final transfers = <TransferStep>[];
+
+    // ─── 1. If Origin requires walking, add initial Walk Segment ───
+    if (origin.nearestStationId != null) {
+      final nearestStation = repo.getStation(origin.nearestStationId!) as Station?;
+      if (nearestStation != null) {
+        segments.add(RouteSegment(
+          lineId: 'WALK',
+          lineName: 'Walk',
+          direction: 'Walk to station',
+          boundIndex: 0,
+          fromStation: origin,
+          toStation: nearestStation,
+          stationCount: 0,
+          estimatedMinutes: origin.walkingMinutes ?? 5.0,
+          fareThb: 0,
+        ));
+      }
+    }
 
     // Group path steps by line
     String currentLineId = '';
@@ -266,8 +342,30 @@ class SearchViewModel extends StateNotifier<SearchState> {
       ));
     }
 
+    // ─── 2. If Destination requires walking, add final Walk Segment ───
+    if (destination.nearestStationId != null) {
+      final nearestStation = repo.getStation(destination.nearestStationId!) as Station?;
+      if (nearestStation != null) {
+        segments.add(RouteSegment(
+          lineId: 'WALK',
+          lineName: 'Walk',
+          direction: 'Walk to destination',
+          boundIndex: 0,
+          fromStation: nearestStation,
+          toStation: destination,
+          stationCount: 0,
+          estimatedMinutes: destination.walkingMinutes ?? 5.0,
+          fareThb: 0,
+        ));
+      }
+    }
+
     final totalFare = segments.fold<int>(0, (sum, s) => sum + s.fareThb);
-    final totalMinutes = dijkstraResult.totalWeight;
+    
+    double totalMinutes = dijkstraResult.totalWeight;
+    if (origin.walkingMinutes != null) totalMinutes += origin.walkingMinutes!;
+    if (destination.walkingMinutes != null) totalMinutes += destination.walkingMinutes!;
+
     final totalStations = dijkstraResult.path.length - 1;
 
     return RouteResult(

@@ -5,6 +5,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/transit_colors.dart';
 import '../../models/station.dart';
+import '../../models/custom_location.dart';
 import '../../models/crowd_report.dart';
 import '../../providers/providers.dart';
 import '../../repositories/favorites_repository.dart';
@@ -22,6 +23,7 @@ class MapScreen extends ConsumerStatefulWidget {
 class _MapScreenState extends ConsumerState<MapScreen> {
   final MapController _mapController = MapController();
   Station? _selectedStation;
+  CustomLocation? _customSelectedLocation;
   Position? _userPosition;
   bool _isLocating = false;
   double _currentZoom = 12.0;
@@ -195,6 +197,22 @@ class _MapScreenState extends ConsumerState<MapScreen> {
       );
     }
 
+    // Custom pinned location marker
+    if (_customSelectedLocation != null) {
+      markers.add(
+        Marker(
+          point: LatLng(_customSelectedLocation!.lat, _customSelectedLocation!.lng),
+          width: 40,
+          height: 40,
+          child: Icon(
+            Icons.location_on_rounded,
+            color: theme.colorScheme.error,
+            size: 36,
+          ),
+        ),
+      );
+    }
+
     final t = ref.watch(translationsProvider);
     final localeCode = ref.watch(localeProvider);
 
@@ -236,9 +254,29 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                 }
               },
               onTap: (position, point) {
-                // Dismiss details card when tapping on empty map space
                 if (_selectedStation != null) {
                   setState(() => _selectedStation = null);
+                }
+                
+                final nearest = _findNearestStation(point, transitRepo.stations);
+                if (nearest != null) {
+                  final dist = Geolocator.distanceBetween(
+                    point.latitude, point.longitude, nearest.lat, nearest.lng
+                  );
+                  final walkMin = (dist / 80.0).clamp(1.0, 30.0);
+
+                  setState(() {
+                    _selectedStation = null;
+                    _customSelectedLocation = CustomLocation(
+                      id: 'CUSTOM_${point.latitude.toStringAsFixed(6)}_${point.longitude.toStringAsFixed(6)}',
+                      nameTh: 'จุดที่เลือก (${point.latitude.toStringAsFixed(4)}, ${point.longitude.toStringAsFixed(4)})',
+                      nameEn: 'Selected Location (${point.latitude.toStringAsFixed(4)}, ${point.longitude.toStringAsFixed(4)})',
+                      nearestStationId: nearest.id,
+                      walkingMinutes: walkMin,
+                      lat: point.latitude,
+                      lng: point.longitude,
+                    );
+                  });
                 }
               },
             ),
@@ -264,6 +302,21 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                 context,
                 _selectedStation!,
                 favoritesRepo,
+                theme,
+                t,
+                localeCode,
+              ),
+            ),
+
+          // ─── Custom Selected Location Details Popup Card ───
+          if (_customSelectedLocation != null)
+            Positioned(
+              left: 16,
+              right: 16,
+              bottom: 16,
+              child: _buildCustomLocationDetailsCard(
+                context,
+                _customSelectedLocation!,
                 theme,
                 t,
                 localeCode,
@@ -538,6 +591,123 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                       searchVm.setDestination(station);
                       ref.read(homeTabIndexProvider.notifier).state = 0; // Switch to Search Screen
                       setState(() => _selectedStation = null);
+                    },
+                    icon: const Icon(Icons.location_on_rounded, size: 16, color: Colors.red),
+                    label: Text(t.get('set_dest_btn')),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Station? _findNearestStation(LatLng point, List<Station> stations) {
+    if (stations.isEmpty) return null;
+    Station? closest;
+    double minDist = double.infinity;
+    for (final s in stations) {
+      final dist = Geolocator.distanceBetween(
+        point.latitude, point.longitude, s.lat, s.lng
+      );
+      if (dist < minDist) {
+        minDist = dist;
+        closest = s;
+      }
+    }
+    return closest;
+  }
+
+  Widget _buildCustomLocationDetailsCard(
+    BuildContext context,
+    CustomLocation location,
+    ThemeData theme,
+    AppLocalizations t,
+    String localeCode,
+  ) {
+    final searchVm = ref.read(searchViewModelProvider.notifier);
+    final transitRepo = ref.read(transitRepositoryProvider);
+    final nearest = transitRepo.getStation(location.nearestStationId);
+    final nearestName = nearest?.displayName(isEnglish: localeCode == 'en') ?? '';
+    final walkMin = location.walkingMinutes.toInt();
+
+    final stationName = localeCode == 'th' ? location.nameTh : location.nameEn;
+
+    return Card(
+      elevation: 8,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  Icons.place_rounded,
+                  color: theme.colorScheme.error,
+                  size: 28,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        stationName,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        localeCode == 'en'
+                            ? 'Near $nearestName station · ~$walkMin min walk'
+                            : 'ใกล้สถานี$nearestName · เดิน ~$walkMin นาที',
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.close_rounded),
+                  onPressed: () {
+                    setState(() => _customSelectedLocation = null);
+                  },
+                ),
+              ],
+            ),
+            const Divider(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () {
+                      searchVm.setOrigin(location);
+                      ref.read(homeTabIndexProvider.notifier).state = 0; // Switch to Search Screen
+                      setState(() => _customSelectedLocation = null);
+                    },
+                    icon: const Icon(Icons.trip_origin_rounded, size: 16, color: Colors.green),
+                    label: Text(t.get('set_origin_btn')),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () {
+                      searchVm.setDestination(location);
+                      ref.read(homeTabIndexProvider.notifier).state = 0; // Switch to Search Screen
+                      setState(() => _customSelectedLocation = null);
                     },
                     icon: const Icon(Icons.location_on_rounded, size: 16, color: Colors.red),
                     label: Text(t.get('set_dest_btn')),
