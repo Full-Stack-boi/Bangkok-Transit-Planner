@@ -46,7 +46,11 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           ? state.origin!.displayName(isEnglish: ref.read(localeProvider) == 'en') 
           : '';
     });
-    _originFocusNode.requestFocus();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_originFocusNode.canRequestFocus && mounted) {
+        _originFocusNode.requestFocus();
+      }
+    });
     _originController.selection = TextSelection(
       baseOffset: 0,
       extentOffset: _originController.text.length,
@@ -63,7 +67,11 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           ? state.destination!.displayName(isEnglish: ref.read(localeProvider) == 'en') 
           : '';
     });
-    _destFocusNode.requestFocus();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_destFocusNode.canRequestFocus && mounted) {
+        _destFocusNode.requestFocus();
+      }
+    });
     _destController.selection = TextSelection(
       baseOffset: 0,
       extentOffset: _destController.text.length,
@@ -408,26 +416,18 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           onTap: () {
             if (_isSelectingOrigin) {
               vm.setOrigin(item);
-              setState(() {
-                _isEditingOrigin = false;
-                final nextState = ref.read(searchViewModelProvider);
-                if (nextState.destination == null) {
-                  _startEditingDest(nextState);
-                } else {
-                  FocusScope.of(context).unfocus();
-                }
-              });
+              _startEditingDest(ref.read(searchViewModelProvider));
             } else {
               vm.setDestination(item);
-              setState(() {
-                _isEditingDest = false;
-                final nextState = ref.read(searchViewModelProvider);
-                if (nextState.origin == null) {
-                  _startEditingOrigin(nextState);
-                } else {
-                  FocusScope.of(context).unfocus();
-                }
-              });
+              final nextState = ref.read(searchViewModelProvider);
+              if (nextState.origin == null) {
+                _startEditingOrigin(nextState);
+              } else {
+                setState(() {
+                  _isEditingDest = false;
+                });
+                FocusScope.of(context).unfocus();
+              }
             }
             vm.search('');
           },
