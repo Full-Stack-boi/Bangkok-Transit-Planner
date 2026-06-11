@@ -311,14 +311,11 @@ class SearchViewModel extends StateNotifier<SearchState> {
 
       // Criteria for Saver Route:
       // 1. Lower fare than recommended route
-      // 2. Or fewer transfers (and total fare is not more than 10 THB higher than regular, to prevent expensive routes)
-      // 3. Must not be excessively slow (<= 15 minutes slower than regular)
+      // 2. Must not be excessively slow (<= 15 minutes slower than regular)
       final isCheaper = altRoute.totalFareThb < regularRoute.totalFareThb;
-      final isFewerTransfers = altRoute.transferCount < regularRoute.transferCount && 
-                               altRoute.totalFareThb <= regularRoute.totalFareThb + 10;
       final isNotTooSlow = altRoute.totalMinutes <= regularRoute.totalMinutes + 15.0;
 
-      if ((isCheaper || isFewerTransfers) && isNotTooSlow) {
+      if (isCheaper && isNotTooSlow) {
         final currentBest = bestSaverRoute;
         if (currentBest == null || 
             altRoute.totalFareThb < currentBest.totalFareThb ||
