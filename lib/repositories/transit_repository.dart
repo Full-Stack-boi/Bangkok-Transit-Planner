@@ -158,13 +158,15 @@ class TransitRepository {
   /// Search stations and local landmarks by query
   List<SearchableItem> searchLocalPlaces(String query) {
     if (query.isEmpty) return [];
-    final q = query.toLowerCase();
+    final q = query.toLowerCase().replaceAll(RegExp(r'\s+'), '');
 
     final matchingStations = searchStations(query);
 
     final matchingLandmarks = (_landmarks ?? []).where((l) {
-      return l.nameTh.toLowerCase().contains(q) ||
-             l.nameEn.toLowerCase().contains(q);
+      final normalizedTh = l.nameTh.toLowerCase().replaceAll(RegExp(r'\s+'), '');
+      final normalizedEn = l.nameEn.toLowerCase().replaceAll(RegExp(r'\s+'), '');
+      return normalizedTh.contains(q) ||
+             normalizedEn.contains(q);
     }).toList();
 
     return [...matchingStations, ...matchingLandmarks];

@@ -399,7 +399,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
 
     return ListView.builder(
       itemCount: state.searchResults.length,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
       itemBuilder: (context, index) {
         final item = state.searchResults[index];
         return _StationListTile(

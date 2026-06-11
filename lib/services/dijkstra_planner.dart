@@ -177,12 +177,17 @@ class TransitGraph {
   /// Search stations by name (Thai or English)
   List<Station> searchStations(String query) {
     if (query.isEmpty) return [];
-    final q = query.toLowerCase();
+    final q = query.toLowerCase().replaceAll(RegExp(r'\s+'), '');
     return _stations.values.where((s) {
-      return s.nameTh.toLowerCase().contains(q) ||
-             s.nameEn.toLowerCase().contains(q) ||
-             s.code.toLowerCase().contains(q) ||
-             s.id.toLowerCase().contains(q);
+      final normalizedTh = s.nameTh.toLowerCase().replaceAll(RegExp(r'\s+'), '');
+      final normalizedEn = s.nameEn.toLowerCase().replaceAll(RegExp(r'\s+'), '');
+      final normalizedCode = s.code.toLowerCase().replaceAll(RegExp(r'\s+'), '');
+      final normalizedId = s.id.toLowerCase().replaceAll(RegExp(r'\s+'), '');
+
+      return normalizedTh.contains(q) ||
+             normalizedEn.contains(q) ||
+             normalizedCode.contains(q) ||
+             normalizedId.contains(q);
     }).toList();
   }
 }

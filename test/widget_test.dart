@@ -80,11 +80,15 @@ class MockTransitRepository extends TransitRepository {
   @override
   List<Station> searchStations(String query) {
     if (query.isEmpty) return _mockStations;
-    return _mockStations.where((s) =>
-      s.nameEn.toLowerCase().contains(query.toLowerCase()) ||
-      s.nameTh.toLowerCase().contains(query.toLowerCase()) ||
-      s.code.toLowerCase().contains(query.toLowerCase())
-    ).toList();
+    final q = query.toLowerCase().replaceAll(RegExp(r'\s+'), '');
+    return _mockStations.where((s) {
+      final normalizedTh = s.nameTh.toLowerCase().replaceAll(RegExp(r'\s+'), '');
+      final normalizedEn = s.nameEn.toLowerCase().replaceAll(RegExp(r'\s+'), '');
+      final normalizedCode = s.code.toLowerCase().replaceAll(RegExp(r'\s+'), '');
+      return normalizedTh.contains(q) ||
+             normalizedEn.contains(q) ||
+             normalizedCode.contains(q);
+    }).toList();
   }
 
   @override
