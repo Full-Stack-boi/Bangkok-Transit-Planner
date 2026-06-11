@@ -1,0 +1,92 @@
+[
+  {
+    "id": "LM_MBK",
+    "name_th": "เอ็มบีเค เซ็นเตอร์ (มาบุญครอง)",
+    "name_en": "MBK Center",
+    "nearest_station_id": "BTS_W1",
+    "walking_minutes": 2.0,
+    "lat": 13.7444,
+    "lng": 100.5299
+  },
+  {
+    "id": "LM_PARAGON",
+    "name_th": "สยามพารากอน",
+    "name_en": "Siam Paragon",
+    "nearest_station_id": "BTS_CEN",
+    "walking_minutes": 1.0,
+    "lat": 13.7461,
+    "lng": 100.5350
+  },
+  {
+    "id": "LM_ICONSIAM",
+    "name_th": "ไอคอนสยาม",
+    "name_en": "ICONSIAM",
+    "nearest_station_id": "BTS_G2",
+    "walking_minutes": 1.0,
+    "lat": 13.7266,
+    "lng": 100.5105
+  },
+  {
+    "id": "LM_CHATUCHAK",
+    "name_th": "ตลาดนัดจตุจักร",
+    "name_en": "Chatuchak Weekend Market",
+    "nearest_station_id": "MRT_BL13",
+    "walking_minutes": 2.0,
+    "lat": 13.7999,
+    "lng": 100.5506
+  },
+  {
+    "id": "LM_CENTRALWORLD",
+    "name_th": "เซ็นทรัลเวิลด์",
+    "name_en": "CentralWorld",
+    "nearest_station_id": "BTS_E1",
+    "walking_minutes": 4.0,
+    "lat": 13.7462,
+    "lng": 100.5401
+  },
+  {
+    "id": "LM_EMQUARTIER",
+    "name_th": "เอ็มควอเทียร์",
+    "name_en": "EmQuartier",
+    "nearest_station_id": "BTS_E5",
+    "walking_minutes": 1.0,
+    "lat": 13.7303,
+    "lng": 100.5694
+  },
+  {
+    "id": "LM_EMSPHERE",
+    "name_th": "เอ็มสเฟียร์",
+    "name_en": "EmSphere",
+    "nearest_station_id": "BTS_E5",
+    "walking_minutes": 3.0,
+    "lat": 13.7315,
+    "lng": 100.5665
+  },
+  {
+    "id": "LM_TERMINAL21",
+    "name_th": "เทอร์มินอล 21 อโศก",
+    "name_en": "Terminal 21 Asok",
+    "nearest_station_id": "BTS_E4",
+    "walking_minutes": 1.0,
+    "lat": 13.7378,
+    "lng": 100.5604
+  },
+  {
+    "id": "LM_YAOWARAT",
+    "name_th": "เยาวราช (ไชน่าทาวน์)",
+    "name_en": "Chinatown (Yaowarat)",
+    "nearest_station_id": "MRT_BL29",
+    "walking_minutes": 3.0,
+    "lat": 13.7412,
+    "lng": 100.5085
+  },
+  {
+    "id": "LM_WAT_PHRA_KAEW",
+    "name_th": "วัดพระแก้ว (พระบรมมหาราชวัง)",
+    "name_en": "Wat Phra Kaew (Grand Palace)",
+    "nearest_station_id": "MRT_BL31",
+    "walking_minutes": 12.0,
+    "lat": 13.7516,
+    "lng": 100.4927
+  }
+]

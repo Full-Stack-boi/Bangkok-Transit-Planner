@@ -1,4 +1,5 @@
 import 'station.dart';
+import 'searchable_item.dart';
 
 /// A single segment of a route (travel on one line)
 class RouteSegment {
@@ -6,8 +7,8 @@ class RouteSegment {
   final String lineName;
   final String direction;    // e.g. "ไปสุวรรณภูมิ"
   final int boundIndex;      // 0 or 1
-  final Station fromStation;
-  final Station toStation;
+  final SearchableItem fromStation;
+  final SearchableItem toStation;
   final List<Station> intermediateStations;
   final int stationCount;
   final double estimatedMinutes;
@@ -49,8 +50,8 @@ class TransferStep {
 
 /// Complete route result from origin to destination
 class RouteResult {
-  final Station origin;
-  final Station destination;
+  final SearchableItem origin;
+  final SearchableItem destination;
   final List<RouteSegment> segments;
   final List<TransferStep> transfers;
   final double totalMinutes;

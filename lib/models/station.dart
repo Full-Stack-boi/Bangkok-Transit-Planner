@@ -1,11 +1,18 @@
+import 'searchable_item.dart';
+
 /// Station model for a transit station
-class Station {
+class Station extends SearchableItem {
+  @override
   final String id;         // e.g. "BTS_N1", "MRT_BL01", "ARL_A1"
   final String code;       // e.g. "N1", "BL01", "A1"
+  @override
   final String nameTh;     // Thai name
+  @override
   final String nameEn;     // English name
   final String lineId;     // e.g. "BTS_SUKHUMVIT"
+  @override
   final double lat;
+  @override
   final double lng;
   final List<String> interchange;  // Other station IDs this connects to
   final Map<String, String> exitInfo;   // bound_0, bound_1 direction labels
@@ -54,6 +61,7 @@ class Station {
       };
 
   /// Display name based on locale
+  @override
   String displayName({bool isEnglish = false}) {
     return isEnglish ? nameEn : nameTh;
   }
