@@ -445,7 +445,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
               initialZoom: 12.0,
               minZoom: 10.5,
               maxZoom: 16.0,
-              cameraConstraint: CameraConstraint.contain(
+              cameraConstraint: CameraConstraint.containCenter(
                 bounds: LatLngBounds(
                   const LatLng(13.48, 100.32),
                   const LatLng(14.00, 100.82),
