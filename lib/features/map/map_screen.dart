@@ -7,6 +7,7 @@ import '../../core/theme/transit_colors.dart';
 import '../../models/station.dart';
 import '../../models/custom_location.dart';
 import '../../models/crowd_report.dart';
+import '../../models/route_result.dart';
 import '../../providers/providers.dart';
 import '../../repositories/favorites_repository.dart';
 import '../search/search_view_model.dart';
@@ -32,12 +33,69 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   void initState() {
     super.initState();
     _fetchUserLocation();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        final routeResult = ref.read(searchViewModelProvider).routeResult;
+        if (routeResult != null) {
+          _fitRouteBounds(routeResult);
+        }
+      }
+    });
   }
 
   @override
   void dispose() {
     _mapController.dispose();
     super.dispose();
+  }
+
+  void _fitRouteBounds(RouteResult routeResult) {
+    final points = <LatLng>[];
+    points.add(LatLng(routeResult.origin.lat, routeResult.origin.lng));
+    points.add(LatLng(routeResult.destination.lat, routeResult.destination.lng));
+
+    for (final segment in routeResult.segments) {
+      points.add(LatLng(segment.fromStation.lat, segment.fromStation.lng));
+      points.add(LatLng(segment.toStation.lat, segment.toStation.lng));
+      for (final s in segment.intermediateStations) {
+        points.add(LatLng(s.lat, s.lng));
+      }
+    }
+
+    if (points.isEmpty) return;
+
+    double minLat = 90.0;
+    double maxLat = -90.0;
+    double minLng = 180.0;
+    double maxLng = -180.0;
+
+    for (final p in points) {
+      if (p.latitude < minLat) minLat = p.latitude;
+      if (p.latitude > maxLat) maxLat = p.latitude;
+      if (p.longitude < minLng) minLng = p.longitude;
+      if (p.longitude > maxLng) maxLng = p.longitude;
+    }
+
+    final bounds = LatLngBounds(
+      LatLng(minLat, minLng),
+      LatLng(maxLat, maxLng),
+    );
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _mapController.fitCamera(
+          CameraFit.bounds(
+            bounds: bounds,
+            padding: const EdgeInsets.only(
+              left: 50.0,
+              right: 50.0,
+              top: 80.0,
+              bottom: 260.0,
+            ),
+          ),
+        );
+      }
+    });
   }
 
   Future<void> _fetchUserLocation() async {
@@ -83,84 +141,230 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     final theme = Theme.of(context);
     final transitRepo = ref.watch(transitRepositoryProvider);
     final favoritesRepo = ref.watch(favoritesRepositoryProvider);
+    final searchState = ref.watch(searchViewModelProvider);
+    final routeResult = searchState.routeResult;
+    final isRouteActive = routeResult != null;
+    final localeCode = ref.watch(localeProvider);
+
+    ref.listen<SearchState>(searchViewModelProvider, (previous, next) {
+      if (next.routeResult != null && next.routeResult != previous?.routeResult) {
+        _fitRouteBounds(next.routeResult!);
+      }
+    });
 
     // Build Polylines for transit lines
     final polylines = <Polyline>[];
-    for (final line in transitRepo.lines) {
-      final points = line.stationIds.map((id) {
-        final station = transitRepo.getStation(id);
-        return LatLng(station!.lat, station.lng);
-      }).toList();
+    if (isRouteActive) {
+      // Highlight ONLY the active route
+      for (final segment in routeResult.segments) {
+        final points = <LatLng>[];
+        points.add(LatLng(segment.fromStation.lat, segment.fromStation.lng));
+        for (final s in segment.intermediateStations) {
+          points.add(LatLng(s.lat, s.lng));
+        }
+        points.add(LatLng(segment.toStation.lat, segment.toStation.lng));
 
-      if (line.isLoop && points.isNotEmpty) {
-        points.add(points.first); // Close the circle for MRT Blue Line
+        final isWalk = segment.lineId == 'WALK';
+        polylines.add(
+          Polyline(
+            points: points,
+            color: isWalk ? Colors.grey : TransitColors.getLineColor(segment.lineId),
+            strokeWidth: isWalk ? 3.5 : 6.0,
+            pattern: isWalk ? const StrokePattern.dotted() : const StrokePattern.solid(),
+            borderColor: isWalk 
+                ? Colors.transparent 
+                : (theme.brightness == Brightness.dark
+                    ? Colors.black.withValues(alpha: 0.3)
+                    : Colors.white.withValues(alpha: 0.3)),
+            borderStrokeWidth: isWalk ? 0.0 : 1.5,
+          ),
+        );
       }
+    } else {
+      // Show all lines
+      for (final line in transitRepo.lines) {
+        final points = line.stationIds.map((id) {
+          final station = transitRepo.getStation(id);
+          return LatLng(station!.lat, station.lng);
+        }).toList();
 
-      polylines.add(
-        Polyline(
-          points: points,
-          color: TransitColors.getLineColor(line.id),
-          strokeWidth: 4.5,
-          borderColor: theme.brightness == Brightness.dark
-              ? Colors.black.withValues(alpha: 0.3)
-              : Colors.white.withValues(alpha: 0.3),
-          borderStrokeWidth: 1.0,
-        ),
-      );
+        if (line.isLoop && points.isNotEmpty) {
+          points.add(points.first); // Close the circle for MRT Blue Line
+        }
+
+        polylines.add(
+          Polyline(
+            points: points,
+            color: TransitColors.getLineColor(line.id),
+            strokeWidth: 4.5,
+            borderColor: theme.brightness == Brightness.dark
+                ? Colors.black.withValues(alpha: 0.3)
+                : Colors.white.withValues(alpha: 0.3),
+            borderStrokeWidth: 1.0,
+          ),
+        );
+      }
     }
 
     // Build Station Markers
     final markers = <Marker>[];
-    for (final station in transitRepo.stations) {
-      final lineColor = TransitColors.getLineColor(station.lineId);
-      final isInterchange = station.interchange.isNotEmpty;
+    if (isRouteActive) {
+      // Find all transit stations on the route
+      final routeStations = <Station>[];
+      for (final segment in routeResult.segments) {
+        if (segment.fromStation is Station) {
+          final s = segment.fromStation as Station;
+          if (!routeStations.any((x) => x.id == s.id)) routeStations.add(s);
+        }
+        for (final s in segment.intermediateStations) {
+          if (!routeStations.any((x) => x.id == s.id)) routeStations.add(s);
+        }
+        if (segment.toStation is Station) {
+          final s = segment.toStation as Station;
+          if (!routeStations.any((x) => x.id == s.id)) routeStations.add(s);
+        }
+      }
 
-      // Always show full custom-designed interactive markers
+      // Add markers for only these stations
+      for (final station in routeStations) {
+        final lineColor = TransitColors.getLineColor(station.lineId);
+        final isInterchange = station.interchange.isNotEmpty;
+
+        markers.add(
+          Marker(
+            point: LatLng(station.lat, station.lng),
+            width: isInterchange ? 32 : 24,
+            height: isInterchange ? 32 : 24,
+            child: GestureDetector(
+              onTap: () {
+                setState(() => _selectedStation = station);
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  color: theme.brightness == Brightness.dark ? const Color(0xFF1E293B) : Colors.white,
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: lineColor,
+                    width: isInterchange ? 4.0 : 3.0,
+                  ),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Colors.black26,
+                      blurRadius: 4,
+                      offset: Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Center(
+                  child: isInterchange
+                      ? Icon(
+                          Icons.swap_horiz_rounded,
+                          size: 14,
+                          color: theme.brightness == Brightness.dark ? Colors.white : Colors.black,
+                        )
+                      : Container(
+                          width: 6,
+                          height: 6,
+                          decoration: BoxDecoration(
+                            color: lineColor,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                ),
+              ),
+            ),
+          ),
+        );
+      }
+
+      // Add custom origin/destination pins
+      // Origin Pin (Green)
       markers.add(
         Marker(
-          point: LatLng(station.lat, station.lng),
-          width: isInterchange ? 32 : 24,
-          height: isInterchange ? 32 : 24,
-          child: GestureDetector(
-            onTap: () {
-              setState(() => _selectedStation = station);
-            },
-            child: Container(
-              decoration: BoxDecoration(
-                color: theme.brightness == Brightness.dark ? const Color(0xFF1E293B) : Colors.white,
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: lineColor,
-                  width: isInterchange ? 4.0 : 3.0,
-                ),
-                boxShadow: const [
-                  BoxShadow(
-                    color: Colors.black26,
-                    blurRadius: 4,
-                    offset: Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: Center(
-                child: isInterchange
-                    ? Icon(
-                        Icons.swap_horiz_rounded,
-                        size: 14,
-                        color: theme.brightness == Brightness.dark ? Colors.white : Colors.black,
-                      )
-                    : Container(
-                        width: 6,
-                        height: 6,
-                        decoration: BoxDecoration(
-                          color: lineColor,
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-              ),
+          point: LatLng(routeResult.origin.lat, routeResult.origin.lng),
+          width: 40,
+          height: 40,
+          alignment: Alignment.topCenter,
+          child: Tooltip(
+            message: routeResult.origin.displayName(isEnglish: localeCode == 'en'),
+            child: Icon(
+              Icons.location_on_rounded,
+              color: Colors.green.shade600,
+              size: 38,
             ),
           ),
         ),
       );
+
+      // Destination Pin (Red)
+      markers.add(
+        Marker(
+          point: LatLng(routeResult.destination.lat, routeResult.destination.lng),
+          width: 40,
+          height: 40,
+          alignment: Alignment.topCenter,
+          child: Tooltip(
+            message: routeResult.destination.displayName(isEnglish: localeCode == 'en'),
+            child: Icon(
+              Icons.location_on_rounded,
+              color: Colors.red.shade600,
+              size: 38,
+            ),
+          ),
+        ),
+      );
+    } else {
+      // Show all stations
+      for (final station in transitRepo.stations) {
+        final lineColor = TransitColors.getLineColor(station.lineId);
+        final isInterchange = station.interchange.isNotEmpty;
+
+        markers.add(
+          Marker(
+            point: LatLng(station.lat, station.lng),
+            width: isInterchange ? 32 : 24,
+            height: isInterchange ? 32 : 24,
+            child: GestureDetector(
+              onTap: () {
+                setState(() => _selectedStation = station);
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  color: theme.brightness == Brightness.dark ? const Color(0xFF1E293B) : Colors.white,
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: lineColor,
+                    width: isInterchange ? 4.0 : 3.0,
+                  ),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Colors.black26,
+                      blurRadius: 4,
+                      offset: Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Center(
+                  child: isInterchange
+                      ? Icon(
+                          Icons.swap_horiz_rounded,
+                          size: 14,
+                          color: theme.brightness == Brightness.dark ? Colors.white : Colors.black,
+                        )
+                      : Container(
+                          width: 6,
+                          height: 6,
+                          decoration: BoxDecoration(
+                            color: lineColor,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                ),
+              ),
+            ),
+          ),
+        );
+      }
     }
 
     // User location marker
@@ -214,7 +418,6 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     }
 
     final t = ref.watch(translationsProvider);
-    final localeCode = ref.watch(localeProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -249,9 +452,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                 ),
               ),
               onPositionChanged: (position, hasGesture) {
-                if (position.zoom != null) {
-                  _currentZoom = position.zoom!;
-                }
+                _currentZoom = position.zoom;
               },
               onTap: (position, point) {
                 if (_selectedStation != null) {

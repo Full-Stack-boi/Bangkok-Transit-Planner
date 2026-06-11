@@ -19,13 +19,56 @@ class SearchScreen extends ConsumerStatefulWidget {
 }
 
 class _SearchScreenState extends ConsumerState<SearchScreen> {
-  final _searchController = TextEditingController();
+  final TextEditingController _originController = TextEditingController();
+  final TextEditingController _destController = TextEditingController();
+  final FocusNode _originFocusNode = FocusNode();
+  final FocusNode _destFocusNode = FocusNode();
+
+  bool _isEditingOrigin = false;
+  bool _isEditingDest = false;
   bool _isSelectingOrigin = true;
 
   @override
   void dispose() {
-    _searchController.dispose();
+    _originController.dispose();
+    _destController.dispose();
+    _originFocusNode.dispose();
+    _destFocusNode.dispose();
     super.dispose();
+  }
+
+  void _startEditingOrigin(SearchState state) {
+    setState(() {
+      _isEditingOrigin = true;
+      _isEditingDest = false;
+      _isSelectingOrigin = true;
+      _originController.text = state.origin != null 
+          ? state.origin!.displayName(isEnglish: ref.read(localeProvider) == 'en') 
+          : '';
+    });
+    _originFocusNode.requestFocus();
+    _originController.selection = TextSelection(
+      baseOffset: 0,
+      extentOffset: _originController.text.length,
+    );
+    ref.read(searchViewModelProvider.notifier).search(_originController.text);
+  }
+
+  void _startEditingDest(SearchState state) {
+    setState(() {
+      _isEditingOrigin = false;
+      _isEditingDest = true;
+      _isSelectingOrigin = false;
+      _destController.text = state.destination != null 
+          ? state.destination!.displayName(isEnglish: ref.read(localeProvider) == 'en') 
+          : '';
+    });
+    _destFocusNode.requestFocus();
+    _destController.selection = TextSelection(
+      baseOffset: 0,
+      extentOffset: _destController.text.length,
+    );
+    ref.read(searchViewModelProvider.notifier).search(_destController.text);
   }
 
   @override
@@ -45,39 +88,20 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               icon: const Icon(Icons.clear_all),
               onPressed: () {
                 vm.clear();
-                _searchController.clear();
+                _originController.clear();
+                _destController.clear();
+                setState(() {
+                  _isEditingOrigin = false;
+                  _isEditingDest = false;
+                });
               },
             ),
         ],
       ),
       body: Column(
         children: [
-          // ─── Origin / Destination Selector ───
+          // ─── Origin / Destination Selector with Inline Fields ───
           _buildStationSelector(context, state, vm, theme, t, localeCode),
-
-          // ─── Search Bar ───
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: TextField(
-              controller: _searchController,
-              onChanged: (query) => vm.search(query),
-              decoration: InputDecoration(
-                hintText: _isSelectingOrigin
-                    ? t.get('origin_hint')
-                    : t.get('dest_hint'),
-                prefixIcon: const Icon(Icons.search),
-                suffixIcon: _searchController.text.isNotEmpty
-                    ? IconButton(
-                        icon: const Icon(Icons.clear),
-                        onPressed: () {
-                          _searchController.clear();
-                          vm.search('');
-                        },
-                      )
-                    : null,
-              ),
-            ),
-          ),
 
           // ─── Route Calculation Progress Banner ───
           if (state.isCalculating)
@@ -116,7 +140,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
 
           // ─── Search Results or Quick Actions ───
           Expanded(
-            child: state.searchResults.isEmpty && state.query.isEmpty
+            child: (state.searchResults.isEmpty && state.query.isEmpty) || (!_isEditingOrigin && !_isEditingDest)
                 ? _buildQuickActions(context, t)
                 : _buildSearchResults(state, vm, t, localeCode),
           ),
@@ -179,10 +203,17 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           _buildStationRow(
             icon: Icons.trip_origin,
             iconColor: Colors.green,
+            isEditing: _isEditingOrigin,
+            controller: _originController,
+            focusNode: _originFocusNode,
             label: originLabel,
             sublabel: originSublabel,
-            isSelected: _isSelectingOrigin,
-            onTap: () => setState(() => _isSelectingOrigin = true),
+            onTap: () => _startEditingOrigin(state),
+            onChanged: (query) => vm.search(query),
+            onClear: () {
+              _originController.clear();
+              vm.search('');
+            },
             lineColor: state.origin != null
                 ? (state.origin is Station
                     ? TransitColors.getLineColor((state.origin as Station).lineId)
@@ -197,7 +228,13 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               IconButton(
                 icon: const Icon(Icons.swap_vert_rounded, size: 20),
                 onPressed: state.origin != null || state.destination != null
-                    ? () => vm.swapStations()
+                    ? () {
+                        setState(() {
+                          _isEditingOrigin = false;
+                          _isEditingDest = false;
+                        });
+                        vm.swapStations();
+                      }
                     : null,
                 style: IconButton.styleFrom(
                   backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.1),
@@ -211,10 +248,17 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           _buildStationRow(
             icon: Icons.location_on,
             iconColor: Colors.red,
+            isEditing: _isEditingDest,
+            controller: _destController,
+            focusNode: _destFocusNode,
             label: destLabel,
             sublabel: destSublabel,
-            isSelected: !_isSelectingOrigin,
-            onTap: () => setState(() => _isSelectingOrigin = false),
+            onTap: () => _startEditingDest(state),
+            onChanged: (query) => vm.search(query),
+            onClear: () {
+              _destController.clear();
+              vm.search('');
+            },
             lineColor: state.destination != null
                 ? (state.destination is Station
                     ? TransitColors.getLineColor((state.destination as Station).lineId)
@@ -229,62 +273,104 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   Widget _buildStationRow({
     required IconData icon,
     required Color iconColor,
+    required bool isEditing,
+    required TextEditingController controller,
+    required FocusNode focusNode,
     required String label,
     String? sublabel,
-    required bool isSelected,
     required VoidCallback onTap,
+    required ValueChanged<String> onChanged,
+    required VoidCallback onClear,
     Color? lineColor,
   }) {
     final theme = Theme.of(context);
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(8),
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
-          border: isSelected
-              ? Border.all(color: theme.colorScheme.primary, width: 2)
-              : null,
-        ),
-        child: Row(
-          children: [
-            Icon(icon, color: iconColor, size: 24),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    label,
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      color: sublabel != null
-                          ? theme.colorScheme.onSurface
-                          : theme.colorScheme.onSurface.withValues(alpha: 0.5),
+    final localeCode = ref.read(localeProvider);
+    final searchHint = localeCode == 'en' ? 'Search station or place...' : 'ค้นหาสถานีหรือสถานที่...';
+
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        border: isEditing
+            ? Border.all(color: theme.colorScheme.primary.withValues(alpha: 0.5), width: 1.5)
+            : null,
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: iconColor, size: 24),
+          const SizedBox(width: 12),
+          Expanded(
+            child: isEditing
+                ? TextField(
+                    controller: controller,
+                    focusNode: focusNode,
+                    onChanged: onChanged,
+                    style: theme.textTheme.titleMedium,
+                    textInputAction: TextInputAction.done,
+                    onSubmitted: (_) {
+                      FocusScope.of(context).unfocus();
+                    },
+                    decoration: InputDecoration(
+                      hintText: searchHint,
+                      border: InputBorder.none,
+                      enabledBorder: InputBorder.none,
+                      focusedBorder: InputBorder.none,
+                      contentPadding: EdgeInsets.zero,
+                      isDense: true,
                     ),
-                  ),
-                  if (sublabel != null)
-                    Text(
-                      sublabel,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
-                        fontSize: 12,
+                  )
+                : InkWell(
+                    onTap: onTap,
+                    borderRadius: BorderRadius.circular(8),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 4),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  label,
+                                  style: theme.textTheme.titleMedium?.copyWith(
+                                    color: sublabel != null
+                                        ? theme.colorScheme.onSurface
+                                        : theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                                  ),
+                                ),
+                                if (sublabel != null)
+                                  Text(
+                                    sublabel,
+                                    style: theme.textTheme.bodyMedium?.copyWith(
+                                      color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                ],
+                  ),
+          ),
+          if (isEditing && controller.text.isNotEmpty)
+            IconButton(
+              icon: const Icon(Icons.clear, size: 18),
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
+              onPressed: onClear,
+            ),
+          if (!isEditing && lineColor != null)
+            Container(
+              width: 12,
+              height: 12,
+              decoration: BoxDecoration(
+                color: lineColor,
+                shape: BoxShape.circle,
               ),
             ),
-            if (lineColor != null)
-              Container(
-                width: 12,
-                height: 12,
-                decoration: BoxDecoration(
-                  color: lineColor,
-                  shape: BoxShape.circle,
-                ),
-              ),
-          ],
-        ),
+        ],
       ),
     );
   }
@@ -322,11 +408,27 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           onTap: () {
             if (_isSelectingOrigin) {
               vm.setOrigin(item);
-              setState(() => _isSelectingOrigin = false);
+              setState(() {
+                _isEditingOrigin = false;
+                final nextState = ref.read(searchViewModelProvider);
+                if (nextState.destination == null) {
+                  _startEditingDest(nextState);
+                } else {
+                  FocusScope.of(context).unfocus();
+                }
+              });
             } else {
               vm.setDestination(item);
+              setState(() {
+                _isEditingDest = false;
+                final nextState = ref.read(searchViewModelProvider);
+                if (nextState.origin == null) {
+                  _startEditingOrigin(nextState);
+                } else {
+                  FocusScope.of(context).unfocus();
+                }
+              });
             }
-            _searchController.clear();
             vm.search('');
           },
         );
@@ -479,11 +581,24 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         );
 
         final vm = ref.read(searchViewModelProvider.notifier);
+        final searchState = ref.read(searchViewModelProvider);
         if (_isSelectingOrigin) {
           vm.setOrigin(currentLoc);
-          setState(() => _isSelectingOrigin = false);
+          setState(() {
+            _isSelectingOrigin = false;
+            _isEditingOrigin = false;
+            if (searchState.destination == null) {
+              _startEditingDest(searchState);
+            }
+          });
         } else {
           vm.setDestination(currentLoc);
+          setState(() {
+            _isEditingDest = false;
+            if (searchState.origin == null) {
+              _startEditingOrigin(searchState);
+            }
+          });
         }
       }
     } catch (e) {
