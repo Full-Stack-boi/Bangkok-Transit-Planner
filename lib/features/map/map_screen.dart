@@ -12,6 +12,8 @@ import '../../providers/providers.dart';
 import '../../repositories/favorites_repository.dart';
 import '../search/search_view_model.dart';
 import '../../core/constants/translation_helper.dart';
+import '../search/search_screen.dart';
+import '../route_result/route_result_sheet.dart';
 
 /// Map screen showing an interactive transit map with overlays
 class MapScreen extends ConsumerStatefulWidget {
@@ -523,6 +525,19 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                 localeCode,
               ),
             ),
+
+          // ─── Route Result Banner ───
+          if (isRouteActive && _selectedStation == null && _customSelectedLocation == null)
+            Positioned(
+              left: 16,
+              right: 16,
+              bottom: 16,
+              child: RouteResultBanner(
+                result: routeResult,
+                t: t,
+                onTap: () => _showRouteDetail(context),
+              ),
+            ),
         ],
       ),
     );
@@ -822,6 +837,15 @@ class _MapScreenState extends ConsumerState<MapScreen> {
       }
     }
     return closest;
+  }
+
+  void _showRouteDetail(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      builder: (context) => const RouteResultSheet(),
+    );
   }
 
   Widget _buildCustomLocationDetailsCard(

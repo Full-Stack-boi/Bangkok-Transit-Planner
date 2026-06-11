@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/transit_colors.dart';
 import '../../models/route_result.dart';
+import '../../models/station.dart';
+import '../../models/searchable_item.dart';
 
 import '../../models/crowd_report.dart';
 import '../../providers/providers.dart';
@@ -59,6 +61,13 @@ class RouteResultSheet extends ConsumerWidget {
 
               // Header
               _buildHeader(context, ref, result, theme, t, localeCode),
+
+              // Route Type Selector (Recommended vs Saver)
+              if (state.saverRoute != null) ...[
+                const SizedBox(height: 16),
+                _buildRouteTypeSelector(context, ref, state, theme, t),
+              ],
+
               const SizedBox(height: 24),
 
               // Route Timeline Segments
@@ -225,6 +234,10 @@ class RouteResultSheet extends ConsumerWidget {
                     originName: result.origin.nameTh,
                     destinationName: result.destination.nameTh,
                     routeName: name,
+                    originLat: result.origin.lat,
+                    originLng: result.origin.lng,
+                    destinationLat: result.destination.lat,
+                    destinationLng: result.destination.lng,
                   );
                   ref.read(favoritesViewModelProvider.notifier).refresh();
                   if (context.mounted) {
@@ -240,6 +253,111 @@ class RouteResultSheet extends ConsumerWidget {
           ],
         );
       },
+    );
+  }
+
+  Widget _buildRouteTypeSelector(
+    BuildContext context,
+    WidgetRef ref,
+    SearchState state,
+    ThemeData theme,
+    AppLocalizations t,
+  ) {
+    final activeType = state.activeRouteType;
+    final recommended = state.regularRoute;
+    final saver = state.saverRoute;
+
+    if (recommended == null || saver == null) return const SizedBox.shrink();
+
+    Widget buildTabButton({
+      required String type,
+      required String title,
+      required String subtitle,
+      required IconData icon,
+    }) {
+      final isSelected = activeType == type;
+      return Expanded(
+        child: InkWell(
+          onTap: () {
+            ref.read(searchViewModelProvider.notifier).selectRouteType(type);
+          },
+          borderRadius: BorderRadius.circular(12),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+            decoration: BoxDecoration(
+              color: isSelected
+                  ? theme.colorScheme.primary.withValues(alpha: 0.15)
+                  : theme.cardColor.withValues(alpha: 0.5),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: isSelected
+                    ? theme.colorScheme.primary
+                    : theme.colorScheme.outline.withValues(alpha: 0.2),
+                width: isSelected ? 2 : 1,
+              ),
+              boxShadow: isSelected
+                  ? [
+                      BoxShadow(
+                        color: theme.colorScheme.primary.withValues(alpha: 0.1),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      )
+                    ]
+                  : null,
+            ),
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      icon,
+                      size: 16,
+                      color: isSelected
+                          ? theme.colorScheme.primary
+                          : theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      title,
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: isSelected ? theme.colorScheme.primary : null,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  subtitle,
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    color: theme.colorScheme.onSurface.withValues(alpha: isSelected ? 0.8 : 0.5),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    return Row(
+      children: [
+        buildTabButton(
+          type: 'recommended',
+          title: t.get('route_recommended'),
+          subtitle: '~${recommended.totalMinutes.toInt()} ${t.get('minutes_unit')} · ${recommended.totalFareThb} ${t.get('currency_unit')}',
+          icon: Icons.star_rounded,
+        ),
+        const SizedBox(width: 12),
+        buildTabButton(
+          type: 'saver',
+          title: t.get('route_saver'),
+          subtitle: '~${saver.totalMinutes.toInt()} ${t.get('minutes_unit')} · ${saver.totalFareThb} ${t.get('currency_unit')}',
+          icon: Icons.savings_rounded,
+        ),
+      ],
     );
   }
 
@@ -282,7 +400,7 @@ class RouteResultSheet extends ConsumerWidget {
     String localeCode,
   ) {
     if (segment.lineId == 'WALK') {
-      return _buildWalkSegmentCard(context, segment, theme, t, localeCode);
+      return _buildWalkSegmentCard(context, ref, segment, theme, t, localeCode);
     }
 
     final lineColor = TransitColors.getLineColor(segment.lineId);
@@ -492,17 +610,87 @@ class RouteResultSheet extends ConsumerWidget {
     );
   }
 
+  Widget _buildLineBadge(String lineId, dynamic repo, ThemeData theme) {
+    final lineColor = TransitColors.getLineColor(lineId);
+    final line = repo.getLine(lineId);
+    final lineName = line?.nameEn ?? lineId;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: lineColor,
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Text(
+        lineName,
+        style: const TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+          fontSize: 10,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStationBadge(Station station, String localeCode, ThemeData theme) {
+    final lineColor = TransitColors.getLineColor(station.lineId);
+    final isEng = localeCode == 'en';
+    final name = station.displayName(isEnglish: isEng);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: lineColor,
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Text(
+        '$name (${station.code})',
+        style: const TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+          fontSize: 13,
+        ),
+      ),
+    );
+  }
+
   Widget _buildWalkSegmentCard(
     BuildContext context,
+    WidgetRef ref,
     RouteSegment segment,
     ThemeData theme,
     AppLocalizations t,
     String localeCode,
   ) {
-    final fromName = segment.fromStation.displayName(isEnglish: localeCode == 'en');
-    final toName = segment.toStation.displayName(isEnglish: localeCode == 'en');
+    final fromStation = segment.fromStation;
+    final toStation = segment.toStation;
     final timeStr = '~${segment.estimatedMinutes.toInt()} ${t.get('minutes_unit')}';
     
+    Widget buildLocationSpan(SearchableItem item) {
+      if (item is Station) {
+        return _buildStationBadge(item, localeCode, theme);
+      } else {
+        return Text(
+          item.displayName(isEnglish: localeCode == 'en'),
+          style: theme.textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
+        );
+      }
+    }
+
+    Widget buildSubtitleLocationSpan(SearchableItem item) {
+      if (item is Station) {
+        return _buildStationBadge(item, localeCode, theme);
+      } else {
+        return Text(
+          item.displayName(isEnglish: localeCode == 'en'),
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+          ),
+        );
+      }
+    }
+
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 4),
       child: Padding(
@@ -527,20 +715,40 @@ class RouteResultSheet extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    localeCode == 'en' ? 'Walk to $toName' : 'เดินเท้าไปยัง $toName',
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                  Wrap(
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    spacing: 8,
+                    runSpacing: 4,
+                    children: [
+                      Text(
+                        localeCode == 'en' ? 'Walk to' : 'เดินเท้าไปยัง',
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      buildLocationSpan(toStation),
+                    ],
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    localeCode == 'en'
-                        ? 'From $fromName · $timeStr'
-                        : 'จาก $fromName · $timeStr',
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                    ),
+                  const SizedBox(height: 6),
+                  Wrap(
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    spacing: 6,
+                    runSpacing: 4,
+                    children: [
+                      Text(
+                        localeCode == 'en' ? 'From' : 'จาก',
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                        ),
+                      ),
+                      buildSubtitleLocationSpan(fromStation),
+                      Text(
+                        '· $timeStr',
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),

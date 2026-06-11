@@ -42,8 +42,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       _isEditingOrigin = true;
       _isEditingDest = false;
       _isSelectingOrigin = true;
-      _originController.text = state.origin != null 
-          ? state.origin!.displayName(isEnglish: ref.read(localeProvider) == 'en') 
+      _originController.text = state.origin != null
+          ? state.origin!.displayName(
+              isEnglish: ref.read(localeProvider) == 'en',
+            )
           : '';
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -63,8 +65,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       _isEditingOrigin = false;
       _isEditingDest = true;
       _isSelectingOrigin = false;
-      _destController.text = state.destination != null 
-          ? state.destination!.displayName(isEnglish: ref.read(localeProvider) == 'en') 
+      _destController.text = state.destination != null
+          ? state.destination!.displayName(
+              isEnglish: ref.read(localeProvider) == 'en',
+            )
           : '';
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -139,7 +143,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           if (state.routeResult != null)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: _RouteResultBanner(
+              child: RouteResultBanner(
                 result: state.routeResult!,
                 t: t,
                 onTap: () => _showRouteDetail(context),
@@ -148,7 +152,9 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
 
           // ─── Search Results or Quick Actions ───
           Expanded(
-            child: (state.searchResults.isEmpty && state.query.isEmpty) || (!_isEditingOrigin && !_isEditingDest)
+            child:
+                (state.searchResults.isEmpty && state.query.isEmpty) ||
+                    (!_isEditingOrigin && !_isEditingDest)
                 ? _buildQuickActions(context, t)
                 : _buildSearchResults(state, vm, t, localeCode),
           ),
@@ -176,22 +182,34 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     String? originSublabel;
     if (state.origin != null) {
       if (state.origin is Station) {
-        originSublabel = localeCode == 'th' ? state.origin!.nameEn : state.origin!.nameTh;
+        originSublabel = localeCode == 'th'
+            ? state.origin!.nameEn
+            : state.origin!.nameTh;
       } else if (state.origin is Landmark) {
-        originSublabel = localeCode == 'th' ? 'สถานที่ยอดนิยม' : 'Popular Landmark';
+        originSublabel = localeCode == 'th'
+            ? 'สถานที่ยอดนิยม'
+            : 'Popular Landmark';
       } else {
-        originSublabel = localeCode == 'th' ? 'ตำแหน่งที่กำหนดเอง' : 'Custom Location';
+        originSublabel = localeCode == 'th'
+            ? 'ตำแหน่งที่กำหนดเอง'
+            : 'Custom Location';
       }
     }
 
     String? destSublabel;
     if (state.destination != null) {
       if (state.destination is Station) {
-        destSublabel = localeCode == 'th' ? state.destination!.nameEn : state.destination!.nameTh;
+        destSublabel = localeCode == 'th'
+            ? state.destination!.nameEn
+            : state.destination!.nameTh;
       } else if (state.destination is Landmark) {
-        destSublabel = localeCode == 'th' ? 'สถานที่ยอดนิยม' : 'Popular Landmark';
+        destSublabel = localeCode == 'th'
+            ? 'สถานที่ยอดนิยม'
+            : 'Popular Landmark';
       } else {
-        destSublabel = localeCode == 'th' ? 'ตำแหน่งที่กำหนดเอง' : 'Custom Location';
+        destSublabel = localeCode == 'th'
+            ? 'ตำแหน่งที่กำหนดเอง'
+            : 'Custom Location';
       }
     }
 
@@ -224,8 +242,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
             },
             lineColor: state.origin != null
                 ? (state.origin is Station
-                    ? TransitColors.getLineColor((state.origin as Station).lineId)
-                    : theme.colorScheme.secondary)
+                      ? TransitColors.getLineColor(
+                          (state.origin as Station).lineId,
+                        )
+                      : theme.colorScheme.secondary)
                 : null,
           ),
 
@@ -245,7 +265,9 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                       }
                     : null,
                 style: IconButton.styleFrom(
-                  backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.1),
+                  backgroundColor: theme.colorScheme.primary.withValues(
+                    alpha: 0.1,
+                  ),
                 ),
               ),
               const Expanded(child: Divider()),
@@ -269,8 +291,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
             },
             lineColor: state.destination != null
                 ? (state.destination is Station
-                    ? TransitColors.getLineColor((state.destination as Station).lineId)
-                    : theme.colorScheme.secondary)
+                      ? TransitColors.getLineColor(
+                          (state.destination as Station).lineId,
+                        )
+                      : theme.colorScheme.secondary)
                 : null,
           ),
         ],
@@ -293,14 +317,19 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   }) {
     final theme = Theme.of(context);
     final localeCode = ref.read(localeProvider);
-    final searchHint = localeCode == 'en' ? 'Search station or place...' : 'ค้นหาสถานีหรือสถานที่...';
+    final searchHint = localeCode == 'en'
+        ? 'Search station or place...'
+        : 'ค้นหาสถานีหรือสถานที่...';
 
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
         border: isEditing
-            ? Border.all(color: theme.colorScheme.primary.withValues(alpha: 0.5), width: 1.5)
+            ? Border.all(
+                color: theme.colorScheme.primary.withValues(alpha: 0.5),
+                width: 1.5,
+              )
             : null,
       ),
       child: Row(
@@ -343,14 +372,16 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                                   style: theme.textTheme.titleMedium?.copyWith(
                                     color: sublabel != null
                                         ? theme.colorScheme.onSurface
-                                        : theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                                        : theme.colorScheme.onSurface
+                                              .withValues(alpha: 0.5),
                                   ),
                                 ),
                                 if (sublabel != null)
                                   Text(
                                     sublabel,
                                     style: theme.textTheme.bodyMedium?.copyWith(
-                                      color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                                      color: theme.colorScheme.onSurface
+                                          .withValues(alpha: 0.5),
                                       fontSize: 12,
                                     ),
                                   ),
@@ -438,59 +469,67 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
 
   Widget _buildQuickActions(BuildContext context, AppLocalizations t) {
     final theme = Theme.of(context);
+    final state = ref.watch(searchViewModelProvider);
+    final hasRoute = state.routeResult != null;
+
     return ListView(
       padding: const EdgeInsets.all(24),
       children: [
         // ─── Use Current Location Button ───
-        Card(
-          margin: const EdgeInsets.only(bottom: 24),
-          child: InkWell(
-            onTap: _useCurrentLocation,
-            borderRadius: BorderRadius.circular(12),
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.primary.withValues(alpha: 0.1),
-                      shape: BoxShape.circle,
+        if (!hasRoute)
+          Card(
+            margin: const EdgeInsets.only(bottom: 24),
+            child: InkWell(
+              onTap: _useCurrentLocation,
+              borderRadius: BorderRadius.circular(12),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.primary.withValues(alpha: 0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.my_location_rounded,
+                        color: theme.colorScheme.primary,
+                      ),
                     ),
-                    child: Icon(
-                      Icons.my_location_rounded,
-                      color: theme.colorScheme.primary,
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          t.localeCode == 'en' ? 'Use Current Location' : 'ใช้ตำแหน่งปัจจุบันของคุณ',
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: theme.colorScheme.primary,
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            t.localeCode == 'en'
+                                ? 'Use Current Location'
+                                : 'ใช้ตำแหน่งปัจจุบันของคุณ',
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: theme.colorScheme.primary,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          t.localeCode == 'en'
-                              ? 'Find routes starting from where you are'
-                              : 'ค้นหาเส้นทางโดยเริ่มจากตำแหน่งที่คุณอยู่',
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                          const SizedBox(height: 4),
+                          Text(
+                            t.localeCode == 'en'
+                                ? 'Find routes starting from where you are'
+                                : 'ค้นหาเส้นทางโดยเริ่มจากตำแหน่งที่คุณอยู่',
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: theme.colorScheme.onSurface.withValues(
+                                alpha: 0.6,
+                              ),
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
-        ),
 
         const SizedBox(height: 16),
         Center(
@@ -527,9 +566,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => const Center(
-        child: CircularProgressIndicator(),
-      ),
+      builder: (context) => const Center(child: CircularProgressIndicator()),
     );
 
     try {
@@ -540,7 +577,13 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       if (!hasPermission) {
         if (mounted) Navigator.pop(context); // Dismiss loading
         scaffoldMessenger.showSnackBar(
-          SnackBar(content: Text(t.localeCode == 'en' ? 'Location permission denied' : 'ปฏิเสธการเข้าถึงตำแหน่งที่ตั้ง')),
+          SnackBar(
+            content: Text(
+              t.localeCode == 'en'
+                  ? 'Location permission denied'
+                  : 'ปฏิเสธการเข้าถึงตำแหน่งที่ตั้ง',
+            ),
+          ),
         );
         return;
       }
@@ -550,7 +593,13 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
 
       if (pos == null) {
         scaffoldMessenger.showSnackBar(
-          SnackBar(content: Text(t.localeCode == 'en' ? 'Unable to retrieve location' : 'ไม่สามารถดึงข้อมูลตำแหน่งที่ตั้งได้')),
+          SnackBar(
+            content: Text(
+              t.localeCode == 'en'
+                  ? 'Unable to retrieve location'
+                  : 'ไม่สามารถดึงข้อมูลตำแหน่งที่ตั้งได้',
+            ),
+          ),
         );
         return;
       }
@@ -560,7 +609,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       double minDist = double.infinity;
       for (final s in transitRepo.stations) {
         final dist = locationService.calculateDistance(
-          pos.latitude, pos.longitude, s.lat, s.lng
+          pos.latitude,
+          pos.longitude,
+          s.lat,
+          s.lng,
         );
         if (dist < minDist) {
           minDist = dist;
@@ -603,9 +655,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       }
     } catch (e) {
       if (mounted) Navigator.pop(context); // Dismiss loading
-      scaffoldMessenger.showSnackBar(
-        SnackBar(content: Text('Error: $e')),
-      );
+      scaffoldMessenger.showSnackBar(SnackBar(content: Text('Error: $e')));
     }
   }
 
@@ -669,7 +719,8 @@ class _StationListTile extends ConsumerWidget {
       final nearestStation = station.nearestStationId != null
           ? repo.getStation(station.nearestStationId!)
           : null;
-      final nearestName = nearestStation?.displayName(isEnglish: localeCode == 'en') ?? '';
+      final nearestName =
+          nearestStation?.displayName(isEnglish: localeCode == 'en') ?? '';
       final walkTime = station.walkingMinutes?.toInt() ?? 5;
 
       itemColor = theme.colorScheme.secondary;
@@ -686,11 +737,7 @@ class _StationListTile extends ConsumerWidget {
           borderRadius: BorderRadius.circular(10),
         ),
         child: Center(
-          child: Icon(
-            Icons.place_rounded,
-            color: itemColor,
-            size: 20,
-          ),
+          child: Icon(Icons.place_rounded, color: itemColor, size: 20),
         ),
       );
     }
@@ -711,22 +758,20 @@ class _StationListTile extends ConsumerWidget {
         trailing: Container(
           width: 8,
           height: 8,
-          decoration: BoxDecoration(
-            color: itemColor,
-            shape: BoxShape.circle,
-          ),
+          decoration: BoxDecoration(color: itemColor, shape: BoxShape.circle),
         ),
       ),
     );
   }
 }
 
-class _RouteResultBanner extends StatelessWidget {
+class RouteResultBanner extends StatelessWidget {
   final dynamic result;
   final AppLocalizations t;
   final VoidCallback onTap;
 
-  const _RouteResultBanner({
+  const RouteResultBanner({
+    super.key,
     required this.result,
     required this.t,
     required this.onTap,

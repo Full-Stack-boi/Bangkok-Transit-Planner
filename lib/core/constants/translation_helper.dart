@@ -77,6 +77,8 @@ class AppLocalizations {
       'interchange_levels': 'เปลี่ยนชานชาลาต่างระดับชั้น · เดิน ~{time} นาที',
       'fare_title': 'ค่าโดยสาร',
       'total': 'รวม',
+      'route_recommended': 'แนะนำ',
+      'route_saver': 'ประหยัด (เดินเท้า)',
     },
     'en': {
       'app_title': 'BKK Transit',
@@ -151,6 +153,8 @@ class AppLocalizations {
       'interchange_levels': 'Transfer platforms (different levels) · Walk ~{time} min',
       'fare_title': 'Fare',
       'total': 'Total',
+      'route_recommended': 'Recommended',
+      'route_saver': 'Saver (Walk)',
     }
   };
 
