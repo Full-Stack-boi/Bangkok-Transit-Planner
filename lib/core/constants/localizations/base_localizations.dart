@@ -10,6 +10,7 @@ abstract class BaseLocalizations {
   BaseProximity get proximity;
   BaseSettings get settings;
   BaseJourney get journey;
+  BaseAuth get auth;
 }
 
 abstract class BaseCommon {
@@ -174,4 +175,34 @@ abstract class BaseJourney {
   String get simulationMode;
   String get nextSimulationBtn;
   String get stationsCount;
+}
+
+abstract class BaseAuth {
+  String get loginTitle;
+  String get registerTitle;
+  String get emailLabel;
+  String get emailHint;
+  String get passwordLabel;
+  String get passwordHint;
+  String get confirmPasswordLabel;
+  String get confirmPasswordHint;
+  String get displayNameLabel;
+  String get displayNameHint;
+  String get loginBtn;
+  String get registerBtn;
+  String get googleLoginBtn;
+  String get dontHaveAccount;
+  String get alreadyHaveAccount;
+  String get profileTitle;
+  String get signOutBtn;
+  String get signInToSync;
+  String get signInToSyncDesc;
+  String get invalidEmail;
+  String get passwordTooShort;
+  String get passwordsDoNotMatch;
+  String get nameRequired;
+  String get loginFailed;
+  String get registrationFailed;
+  String get syncSuccess;
+}
 }

@@ -23,7 +23,7 @@ class CrowdRepository {
         await client?.from('crowd_presence').insert({
           'station_id': stationId,
           'user_id': actualUserId,
-          'detected_at': now,
+          'detected_at': DateTime.now().toUtc().toIso8601String(),
           'accuracy_meters': accuracy,
         });
       } catch (e) {
@@ -51,7 +51,7 @@ class CrowdRepository {
           'station_id': stationId,
           'user_id': actualUserId,
           'level': level,
-          'reported_at': now,
+          'reported_at': DateTime.now().toUtc().toIso8601String(),
           'direction': direction,
         });
       } catch (e) {

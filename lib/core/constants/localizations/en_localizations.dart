@@ -23,6 +23,8 @@ class EnglishLocalizations implements BaseLocalizations {
   final settings = EnglishSettings();
   @override
   final journey = EnglishJourney();
+  @override
+  final auth = EnglishAuth();
 }
 
 class EnglishCommon implements BaseCommon {
@@ -338,4 +340,60 @@ class EnglishJourney implements BaseJourney {
   String get nextSimulationBtn => 'Next Station (Sim)';
   @override
   String get stationsCount => 'stations';
+}
+
+class EnglishAuth implements BaseAuth {
+  @override
+  String get loginTitle => 'Login';
+  @override
+  String get registerTitle => 'Register';
+  @override
+  String get emailLabel => 'Email';
+  @override
+  String get emailHint => 'Enter your email';
+  @override
+  String get passwordLabel => 'Password';
+  @override
+  String get passwordHint => 'Enter your password';
+  @override
+  String get confirmPasswordLabel => 'Confirm Password';
+  @override
+  String get confirmPasswordHint => 'Enter your password again';
+  @override
+  String get displayNameLabel => 'Display Name';
+  @override
+  String get displayNameHint => 'Enter your display name';
+  @override
+  String get loginBtn => 'Login';
+  @override
+  String get registerBtn => 'Register';
+  @override
+  String get googleLoginBtn => 'Sign In with Google';
+  @override
+  String get dontHaveAccount => "Don't have an account? Register";
+  @override
+  String get alreadyHaveAccount => 'Already have an account? Login';
+  @override
+  String get profileTitle => 'User Profile';
+  @override
+  String get signOutBtn => 'Sign Out';
+  @override
+  String get signInToSync => 'Sign in to sync data';
+  @override
+  String get signInToSyncDesc => 'Save favorite stations and routes to use them across devices.';
+  @override
+  String get invalidEmail => 'Invalid email address format';
+  @override
+  String get passwordTooShort => 'Password must be at least 6 characters long';
+  @override
+  String get passwordsDoNotMatch => 'Passwords do not match';
+  @override
+  String get nameRequired => 'Display name is required';
+  @override
+  String get loginFailed => 'Login failed. Please check your credentials.';
+  @override
+  String get registrationFailed => 'Registration failed. Email might already be in use.';
+  @override
+  String get syncSuccess => 'Data synced successfully!';
+}
 }

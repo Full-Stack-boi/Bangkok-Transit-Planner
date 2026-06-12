@@ -11,6 +11,11 @@ import '../services/crowd_service.dart';
 import '../services/supabase_service.dart';
 import '../services/location_service.dart';
 import '../services/notification_service.dart';
+import 'auth_providers.dart';
+import 'location_providers.dart';
+
+export 'auth_providers.dart';
+export 'location_providers.dart';
 
 // ─── Repository Providers ───
 
@@ -47,7 +52,7 @@ final supabaseServiceProvider = Provider<SupabaseService>((ref) {
 });
 
 final locationServiceProvider = Provider<LocationService>((ref) {
-  return LocationService();
+  return LocationService(ref);
 });
 
 final notificationServiceProvider = Provider<NotificationService>((ref) {
@@ -56,13 +61,24 @@ final notificationServiceProvider = Provider<NotificationService>((ref) {
 
 // ─── Initialization Provider ───
 
-/// Initializes transit data (loads JSON, builds graph), Supabase, and Favorites
 final transitInitProvider = FutureProvider<void>((ref) async {
   final supabase = ref.read(supabaseServiceProvider);
   await supabase.initialize();
 
+  // Instantiate authNotifierProvider on startup so it listens to auth state events immediately
+  ref.read(authNotifierProvider);
+
   final favorites = ref.read(favoritesRepositoryProvider);
   await favorites.initialize();
+
+  // If user is already logged in on startup, proactively pull/push favorites & saved routes
+  if (supabase.isInitialized && supabase.client?.auth.currentUser != null) {
+    try {
+      await favorites.syncOfflineDataWithSupabase();
+    } catch (e) {
+      print('Favorites startup sync failed: $e');
+    }
+  }
 
   final repo = ref.read(transitRepositoryProvider);
   await repo.initialize();

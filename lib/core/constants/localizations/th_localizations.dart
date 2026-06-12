@@ -23,6 +23,8 @@ class ThaiLocalizations implements BaseLocalizations {
   final settings = ThaiSettings();
   @override
   final journey = ThaiJourney();
+  @override
+  final auth = ThaiAuth();
 }
 
 class ThaiCommon implements BaseCommon {
@@ -338,4 +340,60 @@ class ThaiJourney implements BaseJourney {
   String get nextSimulationBtn => 'สถานีถัดไป (จำลอง)';
   @override
   String get stationsCount => 'สถานี';
+}
+
+class ThaiAuth implements BaseAuth {
+  @override
+  String get loginTitle => 'เข้าสู่ระบบ';
+  @override
+  String get registerTitle => 'สมัครสมาชิก';
+  @override
+  String get emailLabel => 'อีเมล';
+  @override
+  String get emailHint => 'กรอกอีเมลของคุณ';
+  @override
+  String get passwordLabel => 'รหัสผ่าน';
+  @override
+  String get passwordHint => 'กรอกรหัสผ่านของคุณ';
+  @override
+  String get confirmPasswordLabel => 'ยืนยันรหัสผ่าน';
+  @override
+  String get confirmPasswordHint => 'กรอกรหัสผ่านอีกครั้ง';
+  @override
+  String get displayNameLabel => 'ชื่อผู้ใช้';
+  @override
+  String get displayNameHint => 'กรอกชื่อเล่นหรือชื่อแสดงตัวตน';
+  @override
+  String get loginBtn => 'เข้าสู่ระบบ';
+  @override
+  String get registerBtn => 'สมัครสมาชิก';
+  @override
+  String get googleLoginBtn => 'เข้าสู่ระบบด้วย Google';
+  @override
+  String get dontHaveAccount => 'ยังไม่มีบัญชีผู้ใช้? สมัครสมาชิก';
+  @override
+  String get alreadyHaveAccount => 'มีบัญชีผู้ใช้อยู่แล้ว? เข้าสู่ระบบ';
+  @override
+  String get profileTitle => 'ข้อมูลผู้ใช้งาน';
+  @override
+  String get signOutBtn => 'ออกจากระบบ';
+  @override
+  String get signInToSync => 'เข้าสู่ระบบเพื่อซิงค์ข้อมูล';
+  @override
+  String get signInToSyncDesc => 'บันทึกสถานีโปรดและเส้นทางเดินรถเพื่อใช้งานข้ามอุปกรณ์ได้ทุกที่';
+  @override
+  String get invalidEmail => 'รูปแบบอีเมลไม่ถูกต้อง';
+  @override
+  String get passwordTooShort => 'รหัสผ่านต้องมีความยาวอย่างน้อย 6 ตัวอักษร';
+  @override
+  String get passwordsDoNotMatch => 'รหัสผ่านไม่ตรงกัน';
+  @override
+  String get nameRequired => 'กรุณากรอกชื่อผู้ใช้';
+  @override
+  String get loginFailed => 'เข้าสู่ระบบล้มเหลว กรุณาตรวจสอบอีเมลและรหัสผ่าน';
+  @override
+  String get registrationFailed => 'สมัครสมาชิกไม่สำเร็จ อีเมลนี้อาจถูกใช้งานไปแล้ว';
+  @override
+  String get syncSuccess => 'ซิงค์ข้อมูลสำเร็จ!';
+}
 }

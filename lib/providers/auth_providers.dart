@@ -1,0 +1,141 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import '../repositories/auth_repository.dart';
+import 'providers.dart';
+import '../features/favorites/favorites_view_model.dart';
+
+/// State object representing the current user's session and profile information
+class AuthState {
+  final User? user;
+  final String? displayName;
+  final String? avatarUrl;
+  final bool isLoading;
+  final String? errorMessage;
+
+  const AuthState({
+    this.user,
+    this.displayName,
+    this.avatarUrl,
+    this.isLoading = false,
+    this.errorMessage,
+  });
+
+  bool get isAuthenticated => user != null;
+
+  AuthState copyWith({
+    User? user,
+    String? displayName,
+    String? avatarUrl,
+    bool? isLoading,
+    String? errorMessage,
+    bool clearUser = false,
+  }) {
+    return AuthState(
+      user: clearUser ? null : (user ?? this.user),
+      displayName: clearUser ? null : (displayName ?? this.displayName),
+      avatarUrl: clearUser ? null : (avatarUrl ?? this.avatarUrl),
+      isLoading: isLoading ?? this.isLoading,
+      errorMessage: errorMessage,
+    );
+  }
+}
+
+/// Provider exposing the AuthRepository instance
+final authRepositoryProvider = Provider<AuthRepository>((ref) {
+  final supabaseService = ref.watch(supabaseServiceProvider);
+  return AuthRepository(supabaseService);
+});
+
+/// Provider for managing authentication State
+final authNotifierProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
+  final repository = ref.watch(authRepositoryProvider);
+  return AuthNotifier(repository, ref);
+});
+
+/// StateNotifier that handles auth logic, captures session changes, and fetches user profiles
+class AuthNotifier extends StateNotifier<AuthState> {
+  final AuthRepository _repository;
+  final Ref _ref;
+
+  AuthNotifier(this._repository, this._ref) : super(const AuthState()) {
+    // Listen to Supabase authentication changes
+    _repository.onAuthStateChanged.listen((data) async {
+      final user = data.session?.user;
+      if (user != null) {
+        state = state.copyWith(user: user, isLoading: true);
+        final profile = await _repository.getUserProfile(user.id);
+        state = state.copyWith(
+          displayName: profile?['display_name'] as String?,
+          avatarUrl: profile?['avatar_url'] as String?,
+          isLoading: false,
+        );
+
+        // Perform offline sync to upload locally saved routes and favorites
+        try {
+          final favoritesRepo = _ref.read(favoritesRepositoryProvider);
+          await favoritesRepo.syncOfflineDataWithSupabase();
+          
+          // Refresh favorites screen view model to load updated synced listings
+          _ref.read(favoritesViewModelProvider.notifier).refresh();
+        } catch (e) {
+          print('Background sync failed on login: $e');
+        }
+      } else {
+        // Logged out
+        state = const AuthState();
+        // Refresh to clear synced lists/restore local listings
+        _ref.read(favoritesViewModelProvider.notifier).refresh();
+      }
+    });
+  }
+
+  /// Sign in with Email & Password
+  Future<bool> signIn({required String email, required String password}) async {
+    state = state.copyWith(isLoading: true, errorMessage: null);
+    try {
+      await _repository.signIn(email: email, password: password);
+      return true;
+    } catch (e) {
+      state = state.copyWith(isLoading: false, errorMessage: e.toString());
+      return false;
+    }
+  }
+
+  /// Register/Sign up with Email, Password and a Display Name
+  Future<bool> signUp({
+    required String email,
+    required String password,
+    required String displayName,
+  }) async {
+    state = state.copyWith(isLoading: true, errorMessage: null);
+    try {
+      await _repository.signUp(
+        email: email,
+        password: password,
+        displayName: displayName,
+      );
+      return true;
+    } catch (e) {
+      state = state.copyWith(isLoading: false, errorMessage: e.toString());
+      return false;
+    }
+  }
+
+  /// Login with Google Single Sign-On
+  Future<bool> signInWithGoogle() async {
+    state = state.copyWith(isLoading: true, errorMessage: null);
+    try {
+      final response = await _repository.signInWithGoogle();
+      return response != null;
+    } catch (e) {
+      state = state.copyWith(isLoading: false, errorMessage: e.toString());
+      return false;
+    }
+  }
+
+  /// Logout of current session
+  Future<void> signOut() async {
+    state = state.copyWith(isLoading: true);
+    await _repository.signOut();
+  }
+}

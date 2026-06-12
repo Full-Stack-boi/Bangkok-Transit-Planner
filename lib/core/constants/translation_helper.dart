@@ -33,4 +33,5 @@ class AppLocalizations {
   BaseProximity get proximity => _delegate.proximity;
   BaseSettings get settings => _delegate.settings;
   BaseJourney get journey => _delegate.journey;
+  BaseAuth get auth => _delegate.auth;
 }
