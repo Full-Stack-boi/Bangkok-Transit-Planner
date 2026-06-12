@@ -628,28 +628,6 @@ class RouteResultSheet extends ConsumerWidget {
     );
   }
 
-  Widget _buildLineBadge(String lineId, dynamic repo, ThemeData theme) {
-    final lineColor = TransitColors.getLineColor(lineId);
-    final line = repo.getLine(lineId);
-    final lineName = line?.nameEn ?? lineId;
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-      decoration: BoxDecoration(
-        color: lineColor,
-        borderRadius: BorderRadius.circular(6),
-      ),
-      child: Text(
-        lineName,
-        style: TextStyle(
-          color: TransitColors.getLineTextColor(lineId),
-          fontWeight: FontWeight.bold,
-          fontSize: 10,
-        ),
-      ),
-    );
-  }
-
   Widget _buildStationBadge(Station station, String localeCode, ThemeData theme) {
     final lineColor = TransitColors.getLineColor(station.lineId);
     final isEng = localeCode == 'en';

@@ -30,7 +30,6 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   CustomLocation? _customSelectedLocation;
   Position? _userPosition;
   bool _isLocating = false;
-  double _currentZoom = 12.0;
 
   @override
   void initState() {
@@ -452,9 +451,6 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                   const LatLng(14.25, 101.00),
                 ),
               ),
-              onPositionChanged: (position, hasGesture) {
-                _currentZoom = position.zoom;
-              },
               onTap: (position, point) {
                 if (_selectedStation != null) {
                   setState(() => _selectedStation = null);

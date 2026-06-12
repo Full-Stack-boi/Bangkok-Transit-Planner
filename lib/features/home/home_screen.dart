@@ -102,7 +102,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
       if (nearestEntries.isNotEmpty) {
         final t = ref.read(translationsProvider);
-        final localeCode = ref.read(localeProvider);
 
         setState(() {
           _nearestStations = nearestEntries;
