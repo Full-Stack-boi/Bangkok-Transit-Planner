@@ -205,4 +205,3 @@ abstract class BaseAuth {
   String get registrationFailed;
   String get syncSuccess;
 }
-}

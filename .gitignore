@@ -48,3 +48,6 @@ app.*.map.json
 /linux/flutter/ephemeral/
 /macos/Flutter/ephemeral/
 /windows/flutter/ephemeral/
+
+# Avoid committing local SQL files
+/assets/data/*.sql

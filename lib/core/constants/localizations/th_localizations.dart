@@ -396,4 +396,3 @@ class ThaiAuth implements BaseAuth {
   @override
   String get syncSuccess => 'ซิงค์ข้อมูลสำเร็จ!';
 }
-}

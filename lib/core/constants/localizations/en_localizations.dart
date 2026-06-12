@@ -396,4 +396,3 @@ class EnglishAuth implements BaseAuth {
   @override
   String get syncSuccess => 'Data synced successfully!';
 }
-}
