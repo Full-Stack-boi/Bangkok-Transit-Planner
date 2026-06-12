@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/transit_colors.dart';
@@ -558,18 +559,22 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     try {
       final locationService = ref.read(locationServiceProvider);
 
-      // Request permission
-      final hasPermission = await locationService.requestLocationPermission();
-      if (!hasPermission) {
-        if (mounted) Navigator.pop(context); // Dismiss loading
-        scaffoldMessenger.showSnackBar(
-          SnackBar(
-            content: Text(
-              t.search.locationDeniedSnack,
+      // Check if simulation is active (bypass permission checks in debug)
+      final hasMock = kDebugMode && ref.read(mockLocationProvider) != null;
+      if (!hasMock) {
+        // Request permission
+        final hasPermission = await locationService.requestLocationPermission();
+        if (!hasPermission) {
+          if (mounted) Navigator.pop(context); // Dismiss loading
+          scaffoldMessenger.showSnackBar(
+            SnackBar(
+              content: Text(
+                t.search.locationDeniedSnack,
+              ),
             ),
-          ),
-        );
-        return;
+          );
+          return;
+        }
       }
 
       final pos = await locationService.getCurrentPosition();

@@ -1,9 +1,15 @@
+import 'package:flutter/foundation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
 import '../models/station.dart';
+import '../providers/location_providers.dart';
 
 /// Service for handling GPS permissions, user location, and proximity detection
 class LocationService {
+  final Ref? _ref;
+
+  LocationService([this._ref]);
   /// Request location permissions from the user
   Future<bool> requestLocationPermission() async {
     final status = await Permission.location.request();
@@ -29,6 +35,15 @@ class LocationService {
   /// Get user's current position (returns null if disabled or denied)
   Future<Position?> getCurrentPosition() async {
     try {
+      // Check if simulation mode is active in debug mode
+      if (kDebugMode && _ref != null) {
+        final mockPos = _ref!.read(mockLocationProvider);
+        if (mockPos != null) {
+          print('Using simulated mock location: ${mockPos.latitude}, ${mockPos.longitude}');
+          return mockPos;
+        }
+      }
+
       final isServiceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!isServiceEnabled) {
         print('GPS Location Services are globally disabled in the device settings.');
@@ -49,29 +64,17 @@ class LocationService {
       }
 
       // Fetch fresh coordinates if no last known position is cached
-      print('Fetching fresh GPS coordinates with forceLocationManager: true...');
+      print('Fetching fresh GPS coordinates with forceLocationManager: false...');
       return await Geolocator.getCurrentPosition(
         locationSettings: AndroidSettings(
           accuracy: LocationAccuracy.medium,
-          timeLimit: const Duration(seconds: 5),
-          forceLocationManager: true,
+          timeLimit: const Duration(seconds: 10),
+          forceLocationManager: false,
         ),
       );
     } catch (e) {
       print('Failed to get current location: $e');
-      print('GPS Fallback triggered on emulator: Using TNI mock coordinates (13.7380062, 100.6283891)');
-      return Position(
-        latitude: 13.7380062,
-        longitude: 100.6283891,
-        timestamp: DateTime.now(),
-        accuracy: 10.0,
-        altitude: 0.0,
-        altitudeAccuracy: 0.0,
-        heading: 0.0,
-        headingAccuracy: 0.0,
-        speed: 0.0,
-        speedAccuracy: 0.0,
-      );
+      return null;
     }
   }
 

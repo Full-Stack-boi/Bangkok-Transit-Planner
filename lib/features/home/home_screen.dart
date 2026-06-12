@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../providers/providers.dart';
@@ -74,18 +75,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       // Request notification permission silently for Android 13+
       await locationService.requestNotificationPermission();
 
-      // Check location permission
-      final isGranted = await locationService.isLocationPermissionGranted();
-      if (!isGranted) {
-        // Request permission
-        final requested = await locationService.requestLocationPermission();
-        if (!requested) {
-          // Show alert dialog to guide user to open Settings directly
-          if (mounted) {
-            final t = ref.read(translationsProvider);
-            _showPermissionDialog(context, locationService, t);
+      // Check if simulation is active (bypass permission checks in debug)
+      final hasMock = kDebugMode && ref.read(mockLocationProvider) != null;
+      if (!hasMock) {
+        // Check location permission
+        final isGranted = await locationService.isLocationPermissionGranted();
+        if (!isGranted) {
+          // Request permission
+          final requested = await locationService.requestLocationPermission();
+          if (!requested) {
+            // Show alert dialog to guide user to open Settings directly
+            if (mounted) {
+              final t = ref.read(translationsProvider);
+              _showPermissionDialog(context, locationService, t);
+            }
+            return;
           }
-          return;
         }
       }
 
@@ -111,12 +116,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           _showInAppBanner = true;
         });
 
-        // 1. Always report presence passively for the absolute closest station
-        final closestStation = nearestEntries.first.key;
-        await crowdRepo.reportPresence(
-          stationId: closestStation.id,
-          accuracy: position.accuracy,
-        );
+        // 1. Report presence passively only if the user is within 50 meters (strictly inside the station)
+        final closestEntry = nearestEntries.first;
+        final closestStation = closestEntry.key;
+        final distance = closestEntry.value;
+        
+        if (distance <= 50.0) {
+          await crowdRepo.reportPresence(
+            stationId: closestStation.id,
+            accuracy: position.accuracy,
+          );
+        }
       }
     } catch (e) {
       print('Failed to perform passive GPS proximity check: $e');
@@ -179,6 +189,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Listen for mock location updates to re-trigger proximity checks instantly
+    ref.listen(mockLocationProvider, (previous, next) {
+      _initGPSProximityCheck();
+    });
+
     final initState = ref.watch(transitInitProvider);
     final currentIndex = ref.watch(homeTabIndexProvider);
     final t = ref.watch(translationsProvider);

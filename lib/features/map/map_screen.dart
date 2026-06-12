@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'dart:ui' as ui;
 import 'package:flutter_map/flutter_map.dart';
@@ -105,7 +106,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     setState(() => _isLocating = true);
     try {
       final locationService = ref.read(locationServiceProvider);
-      final hasPermission = await locationService.isLocationPermissionGranted();
+      final hasMock = kDebugMode && ref.read(mockLocationProvider) != null;
+      final hasPermission = hasMock || await locationService.isLocationPermissionGranted();
       if (hasPermission) {
         final pos = await locationService.getCurrentPosition();
         if (pos != null && mounted) {
