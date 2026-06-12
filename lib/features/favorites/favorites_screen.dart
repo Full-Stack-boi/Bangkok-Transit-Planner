@@ -44,16 +44,16 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          title: Text(t.get('favorites_title')),
+          title: Text(t.navigation.favoritesTitle),
           bottom: TabBar(
             tabs: [
               Tab(
                 icon: const Icon(Icons.favorite_rounded),
-                text: t.get('fav_stations_tab'),
+                text: t.favorites.favStationsTab,
               ),
               Tab(
                 icon: const Icon(Icons.route_rounded),
-                text: t.get('fav_routes_tab'),
+                text: t.favorites.favRoutesTab,
               ),
             ],
             indicatorColor: theme.colorScheme.primary,
@@ -83,8 +83,8 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
       return _buildEmptyState(
         context: context,
         icon: Icons.favorite_outline_rounded,
-        title: t.get('empty_fav_title'),
-        subtitle: t.get('empty_fav_subtitle'),
+        title: t.favorites.emptyFavTitle,
+        subtitle: t.favorites.emptyFavSubtitle,
         theme: theme,
       );
     }
@@ -106,23 +106,23 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
 
         final String trainStatusText;
         if (minutesUntilNext == null) {
-          trainStatusText = t.get('service_ended');
+          trainStatusText = t.routeResult.serviceEnded;
         } else if (minutesUntilNext == 0) {
-          trainStatusText = t.get('train_arriving');
+          trainStatusText = t.routeResult.trainArriving;
         } else {
-          trainStatusText = '${t.get('next_train')}: ~$minutesUntilNext ${t.get('minutes_unit')}';
+          trainStatusText = '${t.routeResult.nextTrain}: ~$minutesUntilNext ${t.common.minutesUnit}';
         }
 
         String getCrowdLevelText(CrowdLevel level) {
           switch (level) {
             case CrowdLevel.low:
-              return t.get('crowd_low');
+              return t.routeResult.crowdLow;
             case CrowdLevel.medium:
-              return t.get('crowd_medium');
+              return t.routeResult.crowdMedium;
             case CrowdLevel.high:
-              return t.get('crowd_high');
+              return t.routeResult.crowdHigh;
             case CrowdLevel.unknown:
-              return t.get('crowd_unknown');
+              return t.routeResult.crowdUnknown;
           }
         }
 
@@ -177,7 +177,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
                       onPressed: () {
                         vm.toggleFavoriteStation(station.id);
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text(t.get('station_removed_fav'))),
+                          SnackBar(content: Text(t.favorites.stationRemovedFav)),
                         );
                       },
                     ),
@@ -225,7 +225,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          '${t.get('crowd_level')}: ${getCrowdLevelText(crowdInfo.level)} (~${crowdInfo.presenceCount} ${localeCode == 'th' ? 'คน' : 'pax'})',
+                          '${t.routeResult.crowdLevel}: ${getCrowdLevelText(crowdInfo.level)} (~${crowdInfo.presenceCount} ${localeCode == 'th' ? 'คน' : 'pax'})',
                           style: theme.textTheme.bodyMedium?.copyWith(
                             color: crowdInfo.level == CrowdLevel.high
                                 ? Colors.red.shade400
@@ -251,7 +251,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
                           ref.read(homeTabIndexProvider.notifier).state = 0; // Switch to Search Screen
                         },
                         icon: const Icon(Icons.trip_origin_rounded, size: 16, color: Colors.green),
-                        label: Text(t.get('set_origin_btn')),
+                        label: Text(t.favorites.setOriginBtn),
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 8),
                         ),
@@ -265,7 +265,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
                           ref.read(homeTabIndexProvider.notifier).state = 0; // Switch to Search Screen
                         },
                         icon: const Icon(Icons.location_on_rounded, size: 16, color: Colors.red),
-                        label: Text(t.get('set_dest_btn')),
+                        label: Text(t.favorites.setDestBtn),
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 8),
                         ),
@@ -359,8 +359,8 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
       return _buildEmptyState(
         context: context,
         icon: Icons.alt_route_rounded,
-        title: t.get('empty_route_title'),
-        subtitle: t.get('empty_route_subtitle'),
+        title: t.favorites.emptyRouteTitle,
+        subtitle: t.favorites.emptyRouteSubtitle,
         theme: theme,
       );
     }
@@ -375,7 +375,10 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
         final route = state.savedRoutes[index];
         final originId = route['origin_id'] ?? '';
         final destinationId = route['destination_id'] ?? '';
-        final routeName = route['name'] ?? 'เส้นทางไม่มีชื่อ';
+        final String? routeName = route['name'];
+        final String routeDisplayName = (routeName == null || routeName.isEmpty || routeName == 'เส้นทางไม่มีชื่อ')
+            ? t.favorites.unnamedRoute
+            : routeName;
         final originName = route['origin_name'] ?? '';
         final destinationName = route['destination_name'] ?? '';
         final originLatStr = route['origin_lat'];
@@ -401,9 +404,6 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
           transitRepo,
         );
 
-        final String routeDisplayName = routeName == 'เส้นทางไม่มีชื่อ' && localeCode == 'en'
-            ? 'Unnamed Route'
-            : routeName;
         final String originDisplayName = originItem != null
             ? (localeCode == 'th' ? originItem.nameTh : originItem.nameEn)
             : originName;
@@ -440,7 +440,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
                   onPressed: () {
                     vm.deleteRoute(originId, destinationId);
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(t.get('route_deleted_success'))),
+                      SnackBar(content: Text(t.routeResult.routeDeletedSuccess)),
                     );
                   },
                 ),

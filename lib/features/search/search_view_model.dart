@@ -146,10 +146,11 @@ class SearchViewModel extends StateNotifier<SearchState> {
   void _tryCalculateRoute() {
     final origin = state.origin;
     final destination = state.destination;
+    final t = _ref.read(translationsProvider);
 
     if (origin == null || destination == null) return;
     if (origin.id == destination.id) {
-      state = state.copyWith(error: 'ต้นทางและปลายทางเป็นสถานที่เดียวกัน');
+      state = state.copyWith(error: t.errors.errorSamePlaces);
       return;
     }
 
@@ -196,7 +197,7 @@ class SearchViewModel extends StateNotifier<SearchState> {
         if (result == null) {
           state = state.copyWith(
             isCalculating: false,
-            error: 'ไม่พบเส้นทาง',
+            error: t.errors.errorNoRoute,
           );
           return;
         }
@@ -218,7 +219,7 @@ class SearchViewModel extends StateNotifier<SearchState> {
     } catch (e) {
       state = state.copyWith(
         isCalculating: false,
-        error: 'เกิดข้อผิดพลาด: $e',
+        error: t.errors.errorFailed(e.toString()),
       );
     }
   }

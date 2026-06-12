@@ -1,164 +1,35 @@
+import 'localizations/base_localizations.dart';
+import 'localizations/th_localizations.dart';
+import 'localizations/en_localizations.dart';
+
+export 'localizations/base_localizations.dart';
+
 class AppLocalizations {
   final String localeCode;
+  late final BaseLocalizations _delegate;
 
-  AppLocalizations(this.localeCode);
-
-  static const Map<String, Map<String, String>> _localizedValues = {
-    'th': {
-      'app_title': 'BKK Transit',
-      'search_title': 'ค้นหาเส้นทาง',
-      'map_title': 'แผนที่รถไฟฟ้า',
-      'favorites_title': 'รายการโปรด',
-      'settings_title': 'ตั้งค่า',
-      'theme_setting': 'ธีม',
-      'theme_dark': 'Dark Mode',
-      'theme_light': 'Light Mode',
-      'theme_system': 'ตามระบบ',
-      'lang_setting': 'ภาษา',
-      'lang_th': 'ไทย',
-      'lang_en': 'English',
-      'about_setting': 'เกี่ยวกับ',
-      'version_info': 'BKK Transit Planner\nv1.0.0',
-      'origin_label': 'สถานีต้นทาง',
-      'dest_label': 'สถานีปลายทาง',
-      'origin_hint': 'เลือกสถานีต้นทาง',
-      'dest_hint': 'เลือกสถานีปลายทาง',
-      'find_route_btn': 'คำนวณเส้นทาง',
-      'empty_fav_title': 'ยังไม่มีสถานีโปรด',
-      'empty_fav_subtitle': 'ค้นหาสถานีและกดรูปหัวใจเพื่อบันทึกสถานีที่ใช้เป็นประจำ',
-      'empty_route_title': 'ยังไม่มีเส้นทางที่บันทึก',
-      'empty_route_subtitle': 'คุณสามารถบันทึกเส้นทางที่ใช้ประจำหลังจากคำนวณเส้นทางแล้ว',
-      'set_origin_btn': 'ตั้งเป็นต้นทาง',
-      'set_dest_btn': 'ตั้งเป็นปลายทาง',
-      'fav_stations_tab': 'สถานีโปรด',
-      'fav_routes_tab': 'เส้นทางที่บันทึก',
-      'minutes_unit': 'นาที',
-      'next_train': 'ขบวนถัดไป',
-      'train_arriving': 'รถกำลังเข้าสถานี',
-      'service_ended': 'หมดระยะบริการ',
-      'crowd_level': 'คนรอ',
-      'crowd_low': 'โล่ง',
-      'crowd_medium': 'ปานกลาง',
-      'crowd_high': 'หนาแน่น',
-      'crowd_unknown': 'ไม่มีข้อมูล',
-      'route_result_title': 'ผลการคำนวณเส้นทาง',
-      'total_fare': 'ค่าโดยสารรวม',
-      'total_time': 'เวลาเดินทางประมาณ',
-      'stations_count': 'สถานี',
-      'interchange_at': 'เปลี่ยนสายที่',
-      'save_route_btn': 'บันทึกเส้นทาง',
-      'route_saved_success': 'บันทึกเส้นทางสำเร็จ!',
-      'route_deleted_success': 'ลบเส้นทางสำเร็จ!',
-      'station_added_fav': 'เพิ่มสถานีในรายการโปรดแล้ว',
-      'station_removed_fav': 'ลบสถานีออกจากรายการโปรดแล้ว',
-      'nearby_alert_title': 'อยู่ใกล้สถานี!',
-      'nearby_alert_body': 'คุณเข้าใกล้สถานี {stationName} ระยะ 200 เมตรแล้ว',
-      'nearest_station_title': 'สถานีรถไฟฟ้าใกล้คุณที่สุด',
-      'nearest_station_body': 'สถานี {stationName} อยู่ห่างจากคุณ {distance}',
-      'in_app_notif_title': 'พบสถานีรถไฟฟ้าใกล้เคียง!',
-      'in_app_notif_body': 'มี {count} สถานีใกล้คุณ แตะเพื่อดูตัวเลือกเดินทาง',
-      'select_station_title': 'คุณเดินทางจากสถานีใด?',
-      'select_station_subtitle': 'แตะเลือกสถานีเพื่อเช็คอินและตั้งเป็นต้นทาง',
-      'interconnect_text': 'เชื่อมต่อ: ',
-      'checkin_success': 'เช็คอินสถานี {stationName} สำเร็จ และตั้งเป็นต้นทางแล้ว!',
-      'seconds_unit': 'วินาที',
-      'loading_stations': 'กำลังโหลดข้อมูลสถานี...',
-      'search_desc': 'พิมพ์ชื่อสถานีเพื่อค้นหา\nรองรับ BTS, MRT, Airport Rail Link',
-      'no_station_found': 'ไม่พบสถานี',
-      'lines_count': 'สาย',
-      'transfers_count': 'ต่อรถ',
-      'currency_unit': 'บาท',
-      'no_route_data': 'ไม่มีข้อมูลเส้นทาง',
-      'route_name_label': 'ชื่อเส้นทาง',
-      'route_name_hint': 'เช่น ไปทำงาน, กลับบ้าน',
-      'cancel_btn': 'ยกเลิก',
-      'save_btn': 'บันทึก',
-      'interchange_walk': 'เปลี่ยนสาย · เดิน ~{time} นาที',
-      'interchange_levels': 'เปลี่ยนชานชาลาต่างระดับชั้น · เดิน ~{time} นาที',
-      'fare_title': 'ค่าโดยสาร',
-      'total': 'รวม',
-      'route_recommended': 'แนะนำ',
-      'route_saver': 'ประหยัด (เดินเท้า)',
-    },
-    'en': {
-      'app_title': 'BKK Transit',
-      'search_title': 'Search Route',
-      'map_title': 'Transit Map',
-      'favorites_title': 'Favorites',
-      'settings_title': 'Settings',
-      'theme_setting': 'Theme',
-      'theme_dark': 'Dark Mode',
-      'theme_light': 'Light Mode',
-      'theme_system': 'System Theme',
-      'lang_setting': 'Language',
-      'lang_th': 'ไทย',
-      'lang_en': 'English',
-      'about_setting': 'About',
-      'version_info': 'BKK Transit Planner\nv1.0.0',
-      'origin_label': 'Origin Station',
-      'dest_label': 'Destination Station',
-      'origin_hint': 'Select origin station',
-      'dest_hint': 'Select destination station',
-      'find_route_btn': 'Find Route',
-      'empty_fav_title': 'No favorite stations yet',
-      'empty_fav_subtitle': 'Search stations and tap the heart icon to save them here.',
-      'empty_route_title': 'No saved routes yet',
-      'empty_route_subtitle': 'You can save your regular routes after calculating them.',
-      'set_origin_btn': 'Set as Origin',
-      'set_dest_btn': 'Set as Dest',
-      'fav_stations_tab': 'Favorite Stations',
-      'fav_routes_tab': 'Saved Routes',
-      'minutes_unit': 'min',
-      'next_train': 'Next train',
-      'train_arriving': 'Arriving now',
-      'service_ended': 'Service ended',
-      'crowd_level': 'Crowd',
-      'crowd_low': 'Low',
-      'crowd_medium': 'Medium',
-      'crowd_high': 'High',
-      'crowd_unknown': 'Unknown',
-      'route_result_title': 'Route Calculation Result',
-      'total_fare': 'Total Fare',
-      'total_time': 'Approx. Time',
-      'stations_count': 'stations',
-      'interchange_at': 'Interchange at',
-      'save_route_btn': 'Save Route',
-      'route_saved_success': 'Route saved successfully!',
-      'route_deleted_success': 'Route deleted successfully!',
-      'station_added_fav': 'Station added to favorites',
-      'station_removed_fav': 'Station removed from favorites',
-      'nearby_alert_title': 'Station Nearby!',
-      'nearby_alert_body': 'You are within 200m of {stationName} station',
-      'nearest_station_title': 'Your Nearest Station',
-      'nearest_station_body': '{stationName} station is {distance} away',
-      'in_app_notif_title': 'Nearby stations found!',
-      'in_app_notif_body': '{count} stations nearby. Tap to view travel options.',
-      'select_station_title': 'Which station are you travelling from?',
-      'select_station_subtitle': 'Tap a station to check-in and set as origin.',
-      'interconnect_text': 'Interchange: ',
-      'checkin_success': 'Checked in to {stationName} and set as origin!',
-      'seconds_unit': 'sec',
-      'loading_stations': 'Loading station data...',
-      'search_desc': 'Type station name to search\nSupports BTS, MRT, Airport Rail Link',
-      'no_station_found': 'No station found',
-      'lines_count': 'lines',
-      'transfers_count': 'transfers',
-      'currency_unit': 'THB',
-      'no_route_data': 'No route data available',
-      'route_name_label': 'Route Name',
-      'route_name_hint': 'e.g., Work, Home',
-      'cancel_btn': 'Cancel',
-      'save_btn': 'Save',
-      'interchange_walk': 'Transfer · Walk ~{time} min',
-      'interchange_levels': 'Transfer platforms (different levels) · Walk ~{time} min',
-      'fare_title': 'Fare',
-      'total': 'Total',
-      'route_recommended': 'Recommended',
-      'route_saver': 'Saver (Walk)',
-    }
-  };
-
-  String get(String key) {
-    return _localizedValues[localeCode]?[key] ?? key;
+  AppLocalizations(this.localeCode) {
+    _delegate = _getDelegate();
   }
+
+  BaseLocalizations _getDelegate() {
+    switch (localeCode) {
+      case 'th':
+        return ThaiLocalizations();
+      default:
+        return EnglishLocalizations();
+    }
+  }
+
+  // Delegate all namespaces to the active language implementation
+  BaseCommon get common => _delegate.common;
+  BaseNavigation get navigation => _delegate.navigation;
+  BaseSearch get search => _delegate.search;
+  BaseFavorites get favorites => _delegate.favorites;
+  BaseRouteResult get routeResult => _delegate.routeResult;
+  BaseErrors get errors => _delegate.errors;
+  BaseDirections get directions => _delegate.directions;
+  BaseTransfers get transfers => _delegate.transfers;
+  BaseProximity get proximity => _delegate.proximity;
+  BaseSettings get settings => _delegate.settings;
 }

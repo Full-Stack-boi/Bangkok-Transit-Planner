@@ -25,7 +25,7 @@ class RouteResultSheet extends ConsumerWidget {
     if (result == null) {
       return SizedBox(
         height: 200,
-        child: Center(child: Text(t.get('no_route_data'))),
+        child: Center(child: Text(t.routeResult.noRouteData)),
       );
     }
 
@@ -139,21 +139,21 @@ class RouteResultSheet extends ConsumerWidget {
             Flexible(
               child: _buildInfoChip(
                 icon: Icons.timer_outlined,
-                label: '~${result.totalMinutes.toInt()} ${t.get('minutes_unit')}',
+                label: '~${result.totalMinutes.toInt()} ${t.common.minutesUnit}',
                 theme: theme,
               ),
             ),
             Flexible(
               child: _buildInfoChip(
                 icon: Icons.payments_outlined,
-                label: '${result.totalFareThb} ${t.get('currency_unit')}',
+                label: '${result.totalFareThb} ${t.common.currencyUnit}',
                 theme: theme,
               ),
             ),
             Flexible(
               child: _buildInfoChip(
                 icon: Icons.swap_horiz_rounded,
-                label: '${result.transferCount} ${t.get('transfers_count')}',
+                label: '${result.transferCount} ${t.routeResult.transfersCount}',
                 theme: theme,
               ),
             ),
@@ -202,7 +202,7 @@ class RouteResultSheet extends ConsumerWidget {
           ref.read(favoritesViewModelProvider.notifier).refresh();
           if (context.mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(t.get('route_deleted_success'))),
+              SnackBar(content: Text(t.routeResult.routeDeletedSuccess)),
             );
           }
         } else {
@@ -228,18 +228,18 @@ class RouteResultSheet extends ConsumerWidget {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text(t.get('save_route_btn')),
+          title: Text(t.routeResult.saveRouteBtn),
           content: TextField(
             controller: controller,
             decoration: InputDecoration(
-              labelText: t.get('route_name_label'),
-              hintText: t.get('route_name_hint'),
+              labelText: t.routeResult.routeNameLabel,
+              hintText: t.routeResult.routeNameHint,
             ),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text(t.get('cancel_btn')),
+              child: Text(t.common.cancelBtn),
             ),
             ElevatedButton(
               onPressed: () async {
@@ -261,12 +261,12 @@ class RouteResultSheet extends ConsumerWidget {
                   if (context.mounted) {
                     Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(t.get('route_saved_success'))),
+                      SnackBar(content: Text(t.routeResult.routeSavedSuccess)),
                     );
                   }
                 }
               },
-              child: Text(t.get('save_btn')),
+              child: Text(t.common.saveBtn),
             ),
           ],
         );
@@ -364,15 +364,15 @@ class RouteResultSheet extends ConsumerWidget {
       children: [
         buildTabButton(
           type: 'recommended',
-          title: t.get('route_recommended'),
-          subtitle: '~${recommended.totalMinutes.toInt()} ${t.get('minutes_unit')} · ${recommended.totalFareThb} ${t.get('currency_unit')}',
+          title: t.routeResult.routeRecommended,
+          subtitle: '~${recommended.totalMinutes.toInt()} ${t.common.minutesUnit} · ${recommended.totalFareThb} ${t.common.currencyUnit}',
           icon: Icons.star_rounded,
         ),
         const SizedBox(width: 12),
         buildTabButton(
           type: 'saver',
-          title: t.get('route_saver'),
-          subtitle: '~${saver.totalMinutes.toInt()} ${t.get('minutes_unit')} · ${saver.totalFareThb} ${t.get('currency_unit')}',
+          title: t.routeResult.routeSaver,
+          subtitle: '~${saver.totalMinutes.toInt()} ${t.common.minutesUnit} · ${saver.totalFareThb} ${t.common.currencyUnit}',
           icon: Icons.savings_rounded,
         ),
       ],
@@ -432,58 +432,31 @@ class RouteResultSheet extends ConsumerWidget {
     final String displayLineName = segment.lineName;
     
     // Parse simulated direction name
-    String displayDirection = segment.direction;
-    if (localeCode == 'en') {
-      if (segment.direction.contains('ไปคูคต')) {
-        displayDirection = 'to Khu Khot';
-      } else if (segment.direction.contains('ไปเคหะฯ')) {
-        displayDirection = 'to Kheha';
-      } else if (segment.direction.contains('ไปสนามกีฬาแห่งชาติ')) {
-        displayDirection = 'to National Stadium';
-      } else if (segment.direction.contains('ไปบางหว้า')) {
-        displayDirection = 'to Bang Wa';
-      } else if (segment.direction.contains('ไปกรุงธนบุรี')) {
-        displayDirection = 'to Krung Thon Buri';
-      } else if (segment.direction.contains('ไปคลองสาน')) {
-        displayDirection = 'to Khlong San';
-      } else if (segment.direction.contains('วงกลม (ตามเข็ม)')) {
-        displayDirection = 'Circle Loop (Clockwise)';
-      } else if (segment.direction.contains('วงกลม (ทวนเข็ม)')) {
-        displayDirection = 'Circle Loop (Counter-Clockwise)';
-      } else if (segment.direction.contains('ไปคลาดบางไผ่') || segment.direction.contains('ไปคลองบางไผ่')) {
-        displayDirection = 'to Khlong Bang Phai';
-      } else if (segment.direction.contains('ไปเตาปูน')) {
-        displayDirection = 'to Tao Poon';
-      } else if (segment.direction.contains('ไปลาดพร้าว')) {
-        displayDirection = 'to Lat Phrao';
-      } else if (segment.direction.contains('ไปสำโรง')) {
-        displayDirection = 'to Samrong';
-      } else if (segment.direction.contains('ไปสุวรรณภูมิ')) {
-        displayDirection = 'to Suvarnabhumi';
-      } else if (segment.direction.contains('ไปพญาไท')) {
-        displayDirection = 'to Phaya Thai';
-      }
-    }
+    final displayDirection = t.directions.getDirectionLabel(
+      segment.lineId,
+      segment.boundIndex,
+      segment.direction,
+    );
 
     final String trainStatusText;
     if (minutesUntilNext == null) {
-      trainStatusText = t.get('service_ended');
+      trainStatusText = t.routeResult.serviceEnded;
     } else if (minutesUntilNext == 0) {
-      trainStatusText = t.get('train_arriving');
+      trainStatusText = t.routeResult.trainArriving;
     } else {
-      trainStatusText = '${t.get('next_train')}: ~$minutesUntilNext ${t.get('minutes_unit')}';
+      trainStatusText = '${t.routeResult.nextTrain}: ~$minutesUntilNext ${t.common.minutesUnit}';
     }
 
     String getCrowdLevelText(CrowdLevel level) {
       switch (level) {
         case CrowdLevel.low:
-          return t.get('crowd_low');
+          return t.routeResult.crowdLow;
         case CrowdLevel.medium:
-          return t.get('crowd_medium');
+          return t.routeResult.crowdMedium;
         case CrowdLevel.high:
-          return t.get('crowd_high');
+          return t.routeResult.crowdHigh;
         case CrowdLevel.unknown:
-          return t.get('crowd_unknown');
+          return t.routeResult.crowdUnknown;
       }
     }
 
@@ -579,7 +552,7 @@ class RouteResultSheet extends ConsumerWidget {
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        '${t.get('crowd_level')}: ${getCrowdLevelText(crowdInfo.level)} (~${crowdInfo.presenceCount} ${localeCode == 'th' ? 'คน' : 'pax'})',
+                        '${t.routeResult.crowdLevel}: ${getCrowdLevelText(crowdInfo.level)} (~${crowdInfo.presenceCount} ${localeCode == 'th' ? 'คน' : 'pax'})',
                         style: theme.textTheme.bodyMedium?.copyWith(
                           color: crowdInfo.level == CrowdLevel.high
                               ? Colors.red.shade400
@@ -608,7 +581,7 @@ class RouteResultSheet extends ConsumerWidget {
                     ),
                   ),
                   child: Text(
-                    '${segment.stationCount} ${t.get('stations_count')} · ~${segment.estimatedMinutes.toInt()} ${t.get('minutes_unit')}',
+                    '${segment.stationCount} ${t.routeResult.stationsCount} · ~${segment.estimatedMinutes.toInt()} ${t.common.minutesUnit}',
                     style: theme.textTheme.bodyMedium,
                   ),
                 ),
@@ -659,7 +632,7 @@ class RouteResultSheet extends ConsumerWidget {
   ) {
     final fromStation = segment.fromStation;
     final toStation = segment.toStation;
-    final timeStr = '~${segment.estimatedMinutes.toInt()} ${t.get('minutes_unit')}';
+    final timeStr = '~${segment.estimatedMinutes.toInt()} ${t.common.minutesUnit}';
     
     Widget buildLocationSpan(SearchableItem item) {
       if (item is Station) {
@@ -717,7 +690,7 @@ class RouteResultSheet extends ConsumerWidget {
                     runSpacing: 4,
                     children: [
                       Text(
-                        localeCode == 'en' ? 'Walk to' : 'เดินเท้าไปยัง',
+                        t.routeResult.walkTo,
                         style: theme.textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
@@ -732,7 +705,7 @@ class RouteResultSheet extends ConsumerWidget {
                     runSpacing: 4,
                     children: [
                       Text(
-                        localeCode == 'en' ? 'From' : 'จาก',
+                        t.routeResult.fromLabel,
                         style: theme.textTheme.bodyMedium?.copyWith(
                           color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                         ),
@@ -873,125 +846,54 @@ class RouteResultSheet extends ConsumerWidget {
     // ─── Case 1: Tha Phra (MRT Blue Line Self-Interchange) ───
     if ((fromId == 'MRT_BL01' && toId == 'MRT_BL33') || (fromId == 'MRT_BL33' && toId == 'MRT_BL01')) {
       final toUpper = toId == 'MRT_BL01';
-      if (localeCode == 'th') {
-        return toUpper
-            ? 'ขึ้นบันไดเลื่อนไปชานชาลาชั้น 4 (สายวงกลม ไปทางจรัญฯ/เตาปูน) · เดิน ~1 นาที'
-            : 'ลงบันไดเลื่อนไปชานชาลาชั้น 3 (สายกิ่ง ไปทางบางหว้า/หลักสอง) · เดิน ~1 นาที';
-      } else {
-        return toUpper
-            ? 'Go up to Level 4 platform (Circle Line towards Charan / Tao Poon) · Walk ~1 min'
-            : 'Go down to Level 3 platform (Branch Line towards Bang Wa / Lak Song) · Walk ~1 min';
-      }
+      return toUpper ? t.transfers.transferThaphraUp : t.transfers.transferThaphraDown;
     }
 
     // ─── Case 2: Siam (BTS Sukhumvit <-> Silom) ───
     if ((fromId == 'BTS_CEN' && toId == 'BTS_CEN_SILOM') || (fromId == 'BTS_CEN_SILOM' && toId == 'BTS_CEN')) {
       int arrivalFloor = 3;
-      final prevDir = prevSegment.direction;
-      if (prevSegment.lineId == 'BTS_SUKHUMVIT') {
-        if (prevDir.contains('เคหะ') || prevDir.contains('Kheha')) {
-          arrivalFloor = 4;
-        } else {
-          arrivalFloor = 3;
-        }
-      } else if (prevSegment.lineId == 'BTS_SILOM') {
-        if (prevDir.contains('บางหว้า') || prevDir.contains('Bang Wa')) {
-          arrivalFloor = 4;
-        } else {
-          arrivalFloor = 3;
-        }
+      if (prevSegment.lineId == 'BTS_SUKHUMVIT' || prevSegment.lineId == 'BTS_SILOM') {
+        arrivalFloor = prevSegment.boundIndex == 1 ? 4 : 3;
       }
 
       int departureFloor = 3;
-      final nextDir = nextSegment.direction;
-      if (nextSegment.lineId == 'BTS_SUKHUMVIT') {
-        if (nextDir.contains('เคหะ') || nextDir.contains('Kheha')) {
-          departureFloor = 4;
-        } else {
-          departureFloor = 3;
-        }
-      } else if (nextSegment.lineId == 'BTS_SILOM') {
-        if (nextDir.contains('บางหว้า') || nextDir.contains('Bang Wa')) {
-          departureFloor = 4;
-        } else {
-          departureFloor = 3;
-        }
+      if (nextSegment.lineId == 'BTS_SUKHUMVIT' || nextSegment.lineId == 'BTS_SILOM') {
+        departureFloor = nextSegment.boundIndex == 1 ? 4 : 3;
       }
 
       if (arrivalFloor == departureFloor) {
-        if (localeCode == 'th') {
-          return 'เดินสลับฝั่งชานชาลาที่ชั้นเดียวกัน (ชั้น $arrivalFloor) · เดิน ~1 นาที';
-        } else {
-          return 'Cross-platform transfer on the same level (Level $arrivalFloor) · Walk ~1 min';
-        }
+        return t.transfers.transferSiamSameLevel(arrivalFloor);
       } else {
-        if (departureFloor == 3) {
-          if (localeCode == 'th') {
-            return 'ขึ้นบันไดเลื่อนขึ้นไปชานชาลาชั้น 3 · เดิน ~1 นาที';
-          } else {
-            return 'Go up to Level 3 platform · Walk ~1 min';
-          }
-        } else {
-          if (localeCode == 'th') {
-            return 'ลงบันไดเลื่อนลงไปชานชาลาชั้น 4 · เดิน ~1 นาที';
-          } else {
-            return 'Go down to Level 4 platform · Walk ~1 min';
-          }
-        }
+        return departureFloor == 3 ? t.transfers.transferSiamUp : t.transfers.transferSiamDown;
       }
     }
 
     // ─── Case 3: Other Same-Name Interchanges ───
-    if (transfer.fromStation.nameEn == transfer.toStation.nameEn) {
-      final toLine = transfer.toLineId;
+    final stationId = transfer.fromStation.id;
+    final toLine = transfer.toLineId;
 
-      // Lat Phrao (Blue <-> Yellow)
-      if (transfer.fromStation.nameEn.contains('Lat Phrao')) {
-        if (toLine == 'MRT_YELLOW') {
-          if (localeCode == 'th') {
-            return 'ขึ้นบันไดเลื่อนขึ้นไปชานชาลารถไฟฟ้ายกระดับสายสีเหลือง · เดิน ~2 นาที';
-          } else {
-            return 'Go up to the elevated Yellow Line platform · Walk ~2 min';
-          }
-        } else {
-          if (localeCode == 'th') {
-            return 'ลงบันไดเลื่อนลงไปสถานีรถไฟฟ้าใต้ดินสายสีน้ำเงิน · เดิน ~2 นาที';
-          } else {
-            return 'Go down to the underground Blue Line platform · Walk ~2 min';
-          }
-        }
-      }
+    // Lat Phrao (Blue <-> Yellow)
+    if (stationId == 'MRT_BL15' || stationId == 'MRT_YL01') {
+      return toLine == 'MRT_YELLOW' ? t.transfers.transferLatphraoYellow : t.transfers.transferLatphraoBlue;
+    }
 
-      // Phaya Thai (BTS <-> ARL)
-      if (transfer.fromStation.nameEn.contains('Phaya Thai')) {
-        if (localeCode == 'th') {
-          return 'เดินผ่านทางเชื่อมเพื่อเปลี่ยนชานชาลาต่างระดับ · เดิน ~2 นาที';
-        } else {
-          return 'Walk via connection link to the other station level · Walk ~2 min';
-        }
-      }
+    // Phaya Thai (BTS <-> ARL)
+    if (stationId == 'BTS_N2' || stationId == 'ARL_A8') {
+      return t.transfers.transferPhayathai;
+    }
 
-      // Samrong (BTS <-> Yellow)
-      if (transfer.fromStation.nameEn.contains('Samrong')) {
-        if (localeCode == 'th') {
-          return 'เดินผ่านทางเชื่อมสกายวอล์คเปลี่ยนชานชาลายกระดับ · เดิน ~2 นาที';
-        } else {
-          return 'Walk via skywalk connection link to the other line · Walk ~2 min';
-        }
-      }
+    // Samrong (BTS <-> Yellow)
+    if (stationId == 'BTS_E15' || stationId == 'MRT_YL23') {
+      return t.transfers.transferSamrong;
+    }
 
-      // Hua Mak (ARL <-> Yellow)
-      if (transfer.fromStation.nameEn.contains('Hua Mak')) {
-        if (localeCode == 'th') {
-          return 'เดินผ่านทางเชื่อมสกายวอล์คเพื่อเปลี่ยนสาย · เดิน ~2 นาที';
-        } else {
-          return 'Walk via skywalk transfer bridge to the other line · Walk ~2 min';
-        }
-      }
+    // Hua Mak (ARL <-> Yellow)
+    if (stationId == 'ARL_A4' || stationId == 'MRT_YL11') {
+      return t.transfers.transferHuamak;
     }
 
     // ─── Case 4: Default Walk ───
-    return t.get('interchange_walk').replaceAll('{time}', '${transfer.walkingMinutes.toInt()}');
+    return t.transfers.interchangeWalk(transfer.walkingMinutes.toInt());
   }
 
   Widget _buildFareBreakdown(
@@ -1007,7 +909,7 @@ class RouteResultSheet extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(t.get('fare_title'), style: theme.textTheme.titleMedium),
+            Text(t.routeResult.fareTitle, style: theme.textTheme.titleMedium),
             const SizedBox(height: 8),
             ...result.segments.map((s) {
               final lineColor = TransitColors.getLineColor(s.lineId);
@@ -1025,7 +927,7 @@ class RouteResultSheet extends ConsumerWidget {
                     ),
                     const SizedBox(width: 8),
                     Expanded(child: Text(s.lineName)),
-                    Text('${s.fareThb} ${t.get('currency_unit')}', style: theme.textTheme.labelLarge),
+                    Text('${s.fareThb} ${t.common.currencyUnit}', style: theme.textTheme.labelLarge),
                   ],
                 ),
               );
@@ -1034,9 +936,9 @@ class RouteResultSheet extends ConsumerWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(t.get('total'), style: theme.textTheme.titleMedium),
+                Text(t.common.total, style: theme.textTheme.titleMedium),
                 Text(
-                  '${result.totalFareThb} ${t.get('currency_unit')}',
+                  '${result.totalFareThb} ${t.common.currencyUnit}',
                   style: theme.textTheme.titleMedium?.copyWith(
                     color: theme.colorScheme.primary,
                     fontWeight: FontWeight.bold,

@@ -51,14 +51,14 @@ class NearestStationsSheet extends ConsumerWidget {
 
           // Header
           Text(
-            t.get('select_station_title'),
+            t.search.selectStationTitle,
             style: theme.textTheme.titleLarge?.copyWith(
               fontWeight: FontWeight.bold,
             ),
           ),
           const SizedBox(height: 4),
           Text(
-            t.get('select_station_subtitle'),
+            t.search.selectStationSubtitle,
             style: theme.textTheme.bodyMedium,
           ),
           const SizedBox(height: 20),
@@ -86,10 +86,10 @@ class NearestStationsSheet extends ConsumerWidget {
                 final String distanceText;
                 if (distanceM >= 1000.0) {
                   final km = (distanceM / 1000.0).toStringAsFixed(1);
-                  distanceText = localeCode == 'th' ? '$km กม.' : '$km km';
+                  distanceText = '$km ${t.common.kmUnit}';
                 } else {
                   final m = distanceM.round();
-                  distanceText = localeCode == 'th' ? '$m เมตร' : '$m m';
+                  distanceText = '$m ${t.common.metersUnit}';
                 }
 
                 return Card(
@@ -117,9 +117,7 @@ class NearestStationsSheet extends ConsumerWidget {
                         Navigator.pop(context); // Close bottom sheet
 
                         // 4. Show success banner
-                        final msg = t
-                            .get('checkin_success')
-                            .replaceAll('{stationName}', stationName);
+                        final msg = t.proximity.checkinSuccess(stationName);
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(msg),
@@ -186,7 +184,7 @@ class NearestStationsSheet extends ConsumerWidget {
                           Row(
                             children: [
                               Text(
-                                t.get('interconnect_text'),
+                                t.proximity.interconnectText,
                                 style: theme.textTheme.bodyMedium?.copyWith(
                                   fontSize: 11,
                                   fontWeight: FontWeight.w500,

@@ -93,7 +93,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(t.get('app_title')),
+        title: Text(t.common.appTitle),
         actions: [
           if (state.origin != null || state.destination != null)
             IconButton(
@@ -173,11 +173,11 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   ) {
     final originLabel = state.origin != null
         ? state.origin!.displayName(isEnglish: localeCode == 'en')
-        : t.get('origin_hint');
+        : t.search.originHint;
 
     final destLabel = state.destination != null
         ? state.destination!.displayName(isEnglish: localeCode == 'en')
-        : t.get('dest_hint');
+        : t.search.destHint;
 
     String? originSublabel;
     if (state.origin != null) {
@@ -186,13 +186,9 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
             ? state.origin!.nameEn
             : state.origin!.nameTh;
       } else if (state.origin is Landmark) {
-        originSublabel = localeCode == 'th'
-            ? 'สถานที่ยอดนิยม'
-            : 'Popular Landmark';
+        originSublabel = t.search.popularLandmark;
       } else {
-        originSublabel = localeCode == 'th'
-            ? 'ตำแหน่งที่กำหนดเอง'
-            : 'Custom Location';
+        originSublabel = t.search.customLocation;
       }
     }
 
@@ -203,13 +199,9 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
             ? state.destination!.nameEn
             : state.destination!.nameTh;
       } else if (state.destination is Landmark) {
-        destSublabel = localeCode == 'th'
-            ? 'สถานที่ยอดนิยม'
-            : 'Popular Landmark';
+        destSublabel = t.search.popularLandmark;
       } else {
-        destSublabel = localeCode == 'th'
-            ? 'ตำแหน่งที่กำหนดเอง'
-            : 'Custom Location';
+        destSublabel = t.search.customLocation;
       }
     }
 
@@ -316,10 +308,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     Color? lineColor,
   }) {
     final theme = Theme.of(context);
-    final localeCode = ref.read(localeProvider);
-    final searchHint = localeCode == 'en'
-        ? 'Search station or place...'
-        : 'ค้นหาสถานีหรือสถานที่...';
+    final t = ref.read(translationsProvider);
+    final searchHint = t.search.searchPlaceholder;
 
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
@@ -428,7 +418,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
             Icon(Icons.search_off, size: 64, color: Colors.grey.shade600),
             const SizedBox(height: 16),
             Text(
-              '${t.get('no_station_found')} "${state.query}"',
+              '${t.search.noStationFound} "${state.query}"',
               style: Theme.of(context).textTheme.titleMedium,
             ),
           ],
@@ -503,9 +493,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            t.localeCode == 'en'
-                                ? 'Use Current Location'
-                                : 'ใช้ตำแหน่งปัจจุบันของคุณ',
+                            t.search.useCurrentLocation,
                             style: theme.textTheme.titleMedium?.copyWith(
                               fontWeight: FontWeight.bold,
                               color: theme.colorScheme.primary,
@@ -513,9 +501,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            t.localeCode == 'en'
-                                ? 'Find routes starting from where you are'
-                                : 'ค้นหาเส้นทางโดยเริ่มจากตำแหน่งที่คุณอยู่',
+                            t.search.useCurrentLocationDesc,
                             style: theme.textTheme.bodyMedium?.copyWith(
                               color: theme.colorScheme.onSurface.withValues(
                                 alpha: 0.6,
@@ -542,14 +528,14 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         const SizedBox(height: 16),
         Center(
           child: Text(
-            t.get('search_title'),
+            t.navigation.searchTitle,
             style: Theme.of(context).textTheme.headlineMedium,
           ),
         ),
         const SizedBox(height: 8),
         Center(
           child: Text(
-            t.get('search_desc'),
+            t.search.searchDesc,
             style: Theme.of(context).textTheme.bodyMedium,
             textAlign: TextAlign.center,
           ),
@@ -579,9 +565,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         scaffoldMessenger.showSnackBar(
           SnackBar(
             content: Text(
-              t.localeCode == 'en'
-                  ? 'Location permission denied'
-                  : 'ปฏิเสธการเข้าถึงตำแหน่งที่ตั้ง',
+              t.search.locationDeniedSnack,
             ),
           ),
         );
@@ -595,9 +579,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         scaffoldMessenger.showSnackBar(
           SnackBar(
             content: Text(
-              t.localeCode == 'en'
-                  ? 'Unable to retrieve location'
-                  : 'ไม่สามารถดึงข้อมูลตำแหน่งที่ตั้งได้',
+              t.search.locationFailedSnack,
             ),
           ),
         );
@@ -683,6 +665,7 @@ class _StationListTile extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final t = ref.watch(translationsProvider);
     final isStation = station is Station;
 
     final title = station.displayName(isEnglish: localeCode == 'en');
@@ -725,9 +708,7 @@ class _StationListTile extends ConsumerWidget {
 
       itemColor = theme.colorScheme.secondary;
 
-      subtitle = localeCode == 'en'
-          ? 'Near $nearestName station · ~$walkTime min walk'
-          : 'ใกล้สถานี$nearestName · เดิน ~$walkTime นาที';
+      subtitle = t.proximity.nearStationWalk(nearestName, '$walkTime');
 
       leadingWidget = Container(
         width: 40,
@@ -796,14 +777,14 @@ class RouteResultBanner extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '~${result.totalMinutes.toInt()} ${t.get('minutes_unit')} · ${result.totalFareThb} ${t.get('currency_unit')}',
+                      '~${result.totalMinutes.toInt()} ${t.common.minutesUnit} · ${result.totalFareThb} ${t.common.currencyUnit}',
                       style: theme.textTheme.titleMedium?.copyWith(
                         color: theme.colorScheme.primary,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     Text(
-                      '${result.segments.length} ${t.get('lines_count')} · ${result.transferCount} ${t.get('transfers_count')} · ${result.totalStations} ${t.get('stations_count')}',
+                      '${result.segments.length} ${t.routeResult.linesCount} · ${result.transferCount} ${t.routeResult.transfersCount} · ${result.totalStations} ${t.routeResult.stationsCount}',
                       style: theme.textTheme.bodyMedium,
                     ),
                   ],

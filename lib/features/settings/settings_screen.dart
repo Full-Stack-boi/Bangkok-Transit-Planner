@@ -16,29 +16,29 @@ class SettingsScreen extends ConsumerWidget {
     String getThemeModeText(ThemeMode mode) {
       switch (mode) {
         case ThemeMode.light:
-          return t.get('theme_light');
+          return t.settings.themeLight;
         case ThemeMode.dark:
-          return t.get('theme_dark');
+          return t.settings.themeDark;
         case ThemeMode.system:
-          return t.get('theme_system');
+          return t.settings.themeSystem;
       }
     }
 
     String getLanguageText(String code) {
-      if (code == 'th') return t.get('lang_th');
-      return t.get('lang_en');
+      if (code == 'th') return t.settings.langTh;
+      return t.settings.langEn;
     }
 
     void showThemeDialog() {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: Text(t.get('theme_setting')),
+          title: Text(t.settings.themeSetting),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               RadioListTile<ThemeMode>(
-                title: Text(t.get('theme_light')),
+                title: Text(t.settings.themeLight),
                 value: ThemeMode.light,
                 groupValue: themeMode,
                 onChanged: (mode) {
@@ -49,7 +49,7 @@ class SettingsScreen extends ConsumerWidget {
                 },
               ),
               RadioListTile<ThemeMode>(
-                title: Text(t.get('theme_dark')),
+                title: Text(t.settings.themeDark),
                 value: ThemeMode.dark,
                 groupValue: themeMode,
                 onChanged: (mode) {
@@ -60,7 +60,7 @@ class SettingsScreen extends ConsumerWidget {
                 },
               ),
               RadioListTile<ThemeMode>(
-                title: Text(t.get('theme_system')),
+                title: Text(t.settings.themeSystem),
                 value: ThemeMode.system,
                 groupValue: themeMode,
                 onChanged: (mode) {
@@ -80,12 +80,12 @@ class SettingsScreen extends ConsumerWidget {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: Text(t.get('lang_setting')),
+          title: Text(t.settings.langSetting),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               RadioListTile<String>(
-                title: Text(t.get('lang_th')),
+                title: Text(t.settings.langTh),
                 value: 'th',
                 groupValue: localeCode,
                 onChanged: (lang) {
@@ -96,7 +96,7 @@ class SettingsScreen extends ConsumerWidget {
                 },
               ),
               RadioListTile<String>(
-                title: Text(t.get('lang_en')),
+                title: Text(t.settings.langEn),
                 value: 'en',
                 groupValue: localeCode,
                 onChanged: (lang) {
@@ -114,7 +114,7 @@ class SettingsScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(t.get('settings_title')),
+        title: Text(t.navigation.settingsTitle),
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
@@ -123,7 +123,7 @@ class SettingsScreen extends ConsumerWidget {
           Card(
             child: ListTile(
               leading: const Icon(Icons.dark_mode_rounded),
-              title: Text(t.get('theme_setting')),
+              title: Text(t.settings.themeSetting),
               subtitle: Text(getThemeModeText(themeMode)),
               trailing: const Icon(Icons.chevron_right),
               onTap: showThemeDialog,
@@ -135,7 +135,7 @@ class SettingsScreen extends ConsumerWidget {
           Card(
             child: ListTile(
               leading: const Icon(Icons.language_rounded),
-              title: Text(t.get('lang_setting')),
+              title: Text(t.settings.langSetting),
               subtitle: Text(getLanguageText(localeCode)),
               trailing: const Icon(Icons.chevron_right),
               onTap: showLanguageDialog,
@@ -147,7 +147,7 @@ class SettingsScreen extends ConsumerWidget {
           Card(
             child: ListTile(
               leading: const Icon(Icons.info_outline_rounded),
-              title: Text(t.get('about_setting')),
+              title: Text(t.settings.aboutSetting),
               subtitle: const Text('BKK Transit Planner'),
               trailing: const Icon(Icons.chevron_right),
               onTap: () {
@@ -158,7 +158,7 @@ class SettingsScreen extends ConsumerWidget {
                   applicationIcon: const Icon(Icons.directions_transit_rounded, size: 48),
                   children: [
                     const SizedBox(height: 8),
-                    const Text('แอปพลิเคชันวางแผนเดินทางรถไฟฟ้ากรุงเทพฯ พัฒนาด้วย Flutter & Riverpod'),
+                    Text(t.settings.aboutDesc),
                   ],
                 );
               },
@@ -169,7 +169,7 @@ class SettingsScreen extends ConsumerWidget {
           // Version Info Display
           Center(
             child: Text(
-              t.get('version_info'),
+              t.settings.versionInfo,
               style: theme.textTheme.bodyMedium,
               textAlign: TextAlign.center,
             ),

@@ -421,7 +421,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(t.get('map_title')),
+        title: Text(t.navigation.mapTitle),
         actions: [
           IconButton(
             icon: _isLocating
@@ -582,23 +582,23 @@ class _MapScreenState extends ConsumerState<MapScreen> {
 
     final String trainStatusText;
     if (minutesUntilNext == null) {
-      trainStatusText = t.get('service_ended');
+      trainStatusText = t.routeResult.serviceEnded;
     } else if (minutesUntilNext == 0) {
-      trainStatusText = t.get('train_arriving');
+      trainStatusText = t.routeResult.trainArriving;
     } else {
-      trainStatusText = '${t.get('next_train')}: ~$minutesUntilNext ${t.get('minutes_unit')}';
+      trainStatusText = '${t.routeResult.nextTrain}: ~$minutesUntilNext ${t.common.minutesUnit}';
     }
 
     String getCrowdLevelText(CrowdLevel level) {
       switch (level) {
         case CrowdLevel.low:
-          return t.get('crowd_low');
+          return t.routeResult.crowdLow;
         case CrowdLevel.medium:
-          return t.get('crowd_medium');
+          return t.routeResult.crowdMedium;
         case CrowdLevel.high:
-          return t.get('crowd_high');
+          return t.routeResult.crowdHigh;
         case CrowdLevel.unknown:
-          return t.get('crowd_unknown');
+          return t.routeResult.crowdUnknown;
       }
     }
 
@@ -762,7 +762,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                     ),
                     const SizedBox(width: 6),
                     Text(
-                      '${t.get('crowd_level')}: ${getCrowdLevelText(crowdInfo.level)} (~${crowdInfo.presenceCount} ${localeCode == 'th' ? 'คน' : 'pax'})',
+                      '${t.routeResult.crowdLevel}: ${getCrowdLevelText(crowdInfo.level)} (~${crowdInfo.presenceCount} ${localeCode == 'th' ? 'คน' : 'pax'})',
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: crowdInfo.level == CrowdLevel.high
                             ? Colors.red.shade400
@@ -789,7 +789,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                       setState(() => _selectedStation = null);
                     },
                     icon: const Icon(Icons.trip_origin_rounded, size: 16, color: Colors.green),
-                    label: Text(t.get('set_origin_btn')),
+                    label: Text(t.favorites.setOriginBtn),
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 10),
                     ),
@@ -804,7 +804,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                       setState(() => _selectedStation = null);
                     },
                     icon: const Icon(Icons.location_on_rounded, size: 16, color: Colors.red),
-                    label: Text(t.get('set_dest_btn')),
+                    label: Text(t.favorites.setDestBtn),
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 10),
                     ),
@@ -885,9 +885,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                         ),
                       ),
                       Text(
-                        localeCode == 'en'
-                            ? 'Near $nearestName station · ~$walkMin min walk'
-                            : 'ใกล้สถานี$nearestName · เดิน ~$walkMin นาที',
+                        t.proximity.nearStationWalk(nearestName, '${walkMin.toInt()}'),
                         style: theme.textTheme.bodyMedium?.copyWith(
                           color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                           fontSize: 12,
@@ -915,7 +913,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                       setState(() => _customSelectedLocation = null);
                     },
                     icon: const Icon(Icons.trip_origin_rounded, size: 16, color: Colors.green),
-                    label: Text(t.get('set_origin_btn')),
+                    label: Text(t.favorites.setOriginBtn),
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 10),
                     ),
@@ -930,7 +928,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                       setState(() => _customSelectedLocation = null);
                     },
                     icon: const Icon(Icons.location_on_rounded, size: 16, color: Colors.red),
-                    label: Text(t.get('set_dest_btn')),
+                    label: Text(t.favorites.setDestBtn),
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 10),
                     ),

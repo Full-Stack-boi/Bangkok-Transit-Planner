@@ -1,0 +1,316 @@
+import 'base_localizations.dart';
+
+class ThaiLocalizations implements BaseLocalizations {
+  @override
+  final common = ThaiCommon();
+  @override
+  final navigation = ThaiNavigation();
+  @override
+  final search = ThaiSearch();
+  @override
+  final favorites = ThaiFavorites();
+  @override
+  final routeResult = ThaiRouteResult();
+  @override
+  final errors = ThaiErrors();
+  @override
+  final directions = ThaiDirections();
+  @override
+  final transfers = ThaiTransfers();
+  @override
+  final proximity = ThaiProximity();
+  @override
+  final settings = ThaiSettings();
+}
+
+class ThaiCommon implements BaseCommon {
+  @override
+  String get appTitle => 'BKK Transit';
+  @override
+  String get cancelBtn => 'ยกเลิก';
+  @override
+  String get saveBtn => 'บันทึก';
+  @override
+  String get minutesUnit => 'นาที';
+  @override
+  String get secondsUnit => 'วินาที';
+  @override
+  String get currencyUnit => 'บาท';
+  @override
+  String get kmUnit => 'กม.';
+  @override
+  String get metersUnit => 'เมตร';
+  @override
+  String get total => 'รวม';
+  @override
+  String get laterBtn => 'ไว้ทีหลัง';
+  @override
+  String get errorOccurred => 'เกิดข้อผิดพลาด';
+}
+
+class ThaiNavigation implements BaseNavigation {
+  @override
+  String get searchTitle => 'ค้นหาเส้นทาง';
+  @override
+  String get mapTitle => 'แผนที่รถไฟฟ้า';
+  @override
+  String get favoritesTitle => 'รายการโปรด';
+  @override
+  String get settingsTitle => 'ตั้งค่า';
+}
+
+class ThaiSearch implements BaseSearch {
+  @override
+  String get originLabel => 'สถานีต้นทาง';
+  @override
+  String get destLabel => 'สถานีปลายทาง';
+  @override
+  String get originHint => 'เลือกสถานีต้นทาง';
+  @override
+  String get destHint => 'เลือกสถานีปลายทาง';
+  @override
+  String get findRouteBtn => 'คำนวณเส้นทาง';
+  @override
+  String get selectStationTitle => 'คุณเดินทางจากสถานีใด?';
+  @override
+  String get selectStationSubtitle => 'แตะเลือกสถานีเพื่อเช็คอินและตั้งเป็นต้นทาง';
+  @override
+  String get loadingStations => 'กำลังโหลดข้อมูลสถานี...';
+  @override
+  String get searchDesc => 'พิมพ์ชื่อสถานีเพื่อค้นหา\nรองรับ BTS, MRT, Airport Rail Link';
+  @override
+  String get noStationFound => 'ไม่พบสถานี';
+  @override
+  String get popularLandmark => 'สถานที่ยอดนิยม';
+  @override
+  String get customLocation => 'ตำแหน่งที่กำหนดเอง';
+  @override
+  String get searchPlaceholder => 'ค้นหาสถานีหรือสถานที่...';
+  @override
+  String get useCurrentLocation => 'ใช้ตำแหน่งปัจจุบันของคุณ';
+  @override
+  String get useCurrentLocationDesc => 'ค้นหาเส้นทางโดยเริ่มจากตำแหน่งที่คุณอยู่';
+  @override
+  String get locationDeniedSnack => 'ปฏิเสธการเข้าถึงตำแหน่งที่ตั้ง';
+  @override
+  String get locationFailedSnack => 'ไม่สามารถดึงข้อมูลตำแหน่งที่ตั้งได้';
+}
+
+class ThaiFavorites implements BaseFavorites {
+  @override
+  String get emptyFavTitle => 'ยังไม่มีสถานีโปรด';
+  @override
+  String get emptyFavSubtitle => 'ค้นหาสถานีและกดรูปหัวใจเพื่อบันทึกสถานีที่ใช้เป็นประจำ';
+  @override
+  String get emptyRouteTitle => 'ยังไม่มีเส้นทางที่บันทึก';
+  @override
+  String get emptyRouteSubtitle => 'คุณสามารถบันทึกเส้นทางที่ใช้ประจำหลังจากคำนวณเส้นทางแล้ว';
+  @override
+  String get setOriginBtn => 'ตั้งเป็นต้นทาง';
+  @override
+  String get setDestBtn => 'ตั้งเป็นปลายทาง';
+  @override
+  String get favStationsTab => 'สถานีโปรด';
+  @override
+  String get favRoutesTab => 'เส้นทางที่บันทึก';
+  @override
+  String get stationAddedFav => 'เพิ่มสถานีในรายการโปรดแล้ว';
+  @override
+  String get stationRemovedFav => 'ลบสถานีออกจากรายการโปรดแล้ว';
+  @override
+  String get unnamedRoute => 'เส้นทางไม่มีชื่อ';
+}
+
+class ThaiRouteResult implements BaseRouteResult {
+  @override
+  String get nextTrain => 'ขบวนถัดไป';
+  @override
+  String get trainArriving => 'รถกำลังเข้าสถานี';
+  @override
+  String get serviceEnded => 'หมดระยะบริการ';
+  @override
+  String get crowdLevel => 'คนรอ';
+  @override
+  String get crowdLow => 'โล่ง';
+  @override
+  String get crowdMedium => 'ปานกลาง';
+  @override
+  String get crowdHigh => 'หนาแน่น';
+  @override
+  String get crowdUnknown => 'ไม่มีข้อมูล';
+  @override
+  String get routeResultTitle => 'ผลการคำนวณเส้นทาง';
+  @override
+  String get totalFare => 'ค่าโดยสารรวม';
+  @override
+  String get totalTime => 'เวลาเดินทางประมาณ';
+  @override
+  String get stationsCount => 'สถานี';
+  @override
+  String get interchangeAt => 'เปลี่ยนสายที่';
+  @override
+  String get saveRouteBtn => 'บันทึกเส้นทาง';
+  @override
+  String get routeSavedSuccess => 'บันทึกเส้นทางสำเร็จ!';
+  @override
+  String get routeDeletedSuccess => 'ลบเส้นทางสำเร็จ!';
+  @override
+  String get linesCount => 'สาย';
+  @override
+  String get transfersCount => 'ต่อรถ';
+  @override
+  String get noRouteData => 'ไม่มีข้อมูลเส้นทาง';
+  @override
+  String get routeNameLabel => 'ชื่อเส้นทาง';
+  @override
+  String get routeNameHint => 'เช่น ไปทำงาน, กลับบ้าน';
+  @override
+  String get fareTitle => 'ค่าโดยสาร';
+  @override
+  String get routeRecommended => 'แนะนำ';
+  @override
+  String get routeSaver => 'ประหยัด (เดินเท้า)';
+  @override
+  String get walkTo => 'เดินเท้าไปยัง';
+  @override
+  String get fromLabel => 'จาก';
+}
+
+class ThaiErrors implements BaseErrors {
+  @override
+  String get errorSamePlaces => 'ต้นทางและปลายทางเป็นสถานที่เดียวกัน';
+  @override
+  String get errorNoRoute => 'ไม่พบเส้นทาง';
+  @override
+  String errorFailed(String error) => 'เกิดข้อผิดพลาด: $error';
+}
+
+class ThaiDirections implements BaseDirections {
+  @override
+  String get dirToKhuKhot => 'ไปคูคต';
+  @override
+  String get dirToKheha => 'ไปเคหะฯ';
+  @override
+  String get dirToNationalStadium => 'ไปสนามกีฬาแห่งชาติ';
+  @override
+  String get dirToBangWa => 'ไปบางหว้า';
+  @override
+  String get dirToKrungThonBuri => 'ไปกรุงธนบุรี';
+  @override
+  String get dirToKhlongSan => 'ไปคลองสาน';
+  @override
+  String get dirCircleClockwise => 'วงกลม (ตามเข็ม)';
+  @override
+  String get dirCircleCounterClockwise => 'วงกลม (ทวนเข็ม)';
+  @override
+  String get dirToKhlongBangPhai => 'ไปคลองบางไผ่';
+  @override
+  String get dirToTaoPoon => 'ไปเตาปูน';
+  @override
+  String get dirToLatPhrao => 'ไปลาดพร้าว';
+  @override
+  String get dirToSamrong => 'ไปสำโรง';
+  @override
+  String get dirToSuvarnabhumi => 'ไปสุวรรณภูมิ';
+  @override
+  String get dirToPhayaThai => 'ไปพญาไท';
+
+  @override
+  String getDirectionLabel(String lineId, int boundIndex, String fallback) {
+    switch (lineId) {
+      case 'BTS_SUKHUMVIT':
+        return boundIndex == 0 ? dirToKhuKhot : dirToKheha;
+      case 'BTS_SILOM':
+        return boundIndex == 0 ? dirToNationalStadium : dirToBangWa;
+      case 'BTS_GOLD':
+        return boundIndex == 0 ? dirToKrungThonBuri : dirToKhlongSan;
+      case 'MRT_BLUE':
+        return boundIndex == 0 ? dirCircleClockwise : dirCircleCounterClockwise;
+      case 'MRT_PURPLE':
+        return boundIndex == 0 ? dirToKhlongBangPhai : dirToTaoPoon;
+      case 'MRT_YELLOW':
+        return boundIndex == 0 ? dirToLatPhrao : dirToSamrong;
+      case 'ARL':
+        return boundIndex == 0 ? dirToPhayaThai : dirToSuvarnabhumi;
+      default:
+        return fallback;
+    }
+  }
+}
+
+class ThaiTransfers implements BaseTransfers {
+  @override
+  String get transferThaphraUp => 'ขึ้นบันไดเลื่อนไปชานชาลาชั้น 4 (สายวงกลม ไปทางจรัญฯ/เตาปูน) · เดิน ~1 นาที';
+  @override
+  String get transferThaphraDown => 'ลงบันไดเลื่อนไปชานชาลาชั้น 3 (สายกิ่ง ไปทางบางหว้า/หลักสอง) · เดิน ~1 นาที';
+  @override
+  String transferSiamSameLevel(int floor) => 'เดินสลับฝั่งชานชาลาที่ชั้นเดียวกัน (ชั้น $floor) · เดิน ~1 นาที';
+  @override
+  String get transferSiamUp => 'ขึ้นบันไดเลื่อนขึ้นไปชานชาลาชั้น 3 · เดิน ~1 นาที';
+  @override
+  String get transferSiamDown => 'ลงบันไดเลื่อนลงไปชานชาลาชั้น 4 · เดิน ~1 นาที';
+  @override
+  String get transferLatphraoYellow => 'ขึ้นบันไดเลื่อนขึ้นไปชานชาลารถไฟฟ้ายกระดับสายสีเหลือง · เดิน ~2 นาที';
+  @override
+  String get transferLatphraoBlue => 'ลงบันไดเลื่อนลงไปสถานีรถไฟฟ้าใต้ดินสายสีน้ำเงิน · เดิน ~2 นาที';
+  @override
+  String get transferPhayathai => 'เดินผ่านทางเชื่อมเพื่อเปลี่ยนชานชาลาต่างระดับ · เดิน ~2 นาที';
+  @override
+  String get transferSamrong => 'เดินผ่านทางเชื่อมสกายวอล์คเปลี่ยนชานชาลายกระดับ · เดิน ~2 นาที';
+  @override
+  String get transferHuamak => 'เดินผ่านทางเชื่อมสกายวอล์คเพื่อเปลี่ยนสาย · เดิน ~2 นาที';
+  @override
+  String interchangeWalk(int time) => 'เปลี่ยนสาย · เดิน ~$time นาที';
+  @override
+  String interchangeLevels(int time) => 'เปลี่ยนชานชาลาต่างระดับชั้น · เดิน ~$time นาที';
+}
+
+class ThaiProximity implements BaseProximity {
+  @override
+  String get nearbyAlertTitle => 'อยู่ใกล้สถานี!';
+  @override
+  String nearbyAlertBody(String stationName) => 'คุณเข้าใกล้สถานี $stationName ระยะ 200 เมตรแล้ว';
+  @override
+  String get nearestStationTitle => 'สถานีรถไฟฟ้าใกล้คุณที่สุด';
+  @override
+  String nearestStationBody(String stationName, String distance) => 'สถานี $stationName อยู่ห่างจากคุณ $distance';
+  @override
+  String get inAppNotifTitle => 'พบสถานีรถไฟฟ้าใกล้เคียง!';
+  @override
+  String inAppNotifBody(int count) => 'มี $count สถานีใกล้คุณ แตะเพื่อดูตัวเลือกเดินทาง';
+  @override
+  String get interconnectText => 'เชื่อมต่อ: ';
+  @override
+  String checkinSuccess(String stationName) => 'เช็คอินสถานี $stationName สำเร็จ และตั้งเป็นต้นทางแล้ว!';
+  @override
+  String nearStationWalk(String stationName, String time) => 'ใกล้สถานี$stationName · เดิน ~$time นาที';
+}
+
+class ThaiSettings implements BaseSettings {
+  @override
+  String get themeSetting => 'ธีม';
+  @override
+  String get themeDark => 'Dark Mode';
+  @override
+  String get themeLight => 'Light Mode';
+  @override
+  String get themeSystem => 'ตามระบบ';
+  @override
+  String get langSetting => 'ภาษา';
+  @override
+  String get langTh => 'ไทย';
+  @override
+  String get langEn => 'English';
+  @override
+  String get aboutSetting => 'เกี่ยวกับ';
+  @override
+  String get aboutDesc => 'แอปพลิเคชันวางแผนเดินทางรถไฟฟ้ากรุงเทพฯ พัฒนาด้วย Flutter & Riverpod';
+  @override
+  String get versionInfo => 'BKK Transit Planner\nv1.0.0';
+  @override
+  String get locationPermissionRequired => 'ต้องการสิทธิ์ระบุตำแหน่ง';
+  @override
+  String get locationPermissionDesc => 'แอป BKK Transit ต้องการสิทธิ์ระบุตำแหน่งของคุณ เพื่อตรวจหาและแจ้งเตือนสถานีที่อยู่ใกล้เคียงโดยรอบ กรุณากดเปิดสิทธิ์ในการตั้งค่า';
+  @override
+  String get openSettingsBtn => 'เปิดการตั้งค่า';
+}

@@ -106,9 +106,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         setState(() {
           _nearestStations = nearestEntries;
           _gpsAccuracy = position.accuracy;
-          _bannerTitle = t.get('in_app_notif_title');
-          _bannerBody = t.get('in_app_notif_body')
-              .replaceAll('{count}', '${nearestEntries.length}');
+          _bannerTitle = t.proximity.inAppNotifTitle;
+          _bannerBody = t.proximity.inAppNotifBody(nearestEntries.length);
           _showInAppBanner = true;
         });
 
@@ -142,23 +141,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
-                  t.localeCode == 'th' ? 'ต้องการสิทธิ์ระบุตำแหน่ง' : 'Location Permission Required',
+                  t.settings.locationPermissionRequired,
                   style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
                 ),
               ),
             ],
           ),
           content: Text(
-            t.localeCode == 'th'
-                ? 'แอป BKK Transit ต้องการสิทธิ์ระบุตำแหน่งของคุณ เพื่อตรวจหาและแจ้งเตือนสถานีที่อยู่ใกล้เคียงโดยรอบ กรุณากดเปิดสิทธิ์ในการตั้งค่า'
-                : 'BKK Transit requires location permission to detect and notify you about nearby transit stations. Please enable it in settings.',
+            t.settings.locationPermissionDesc,
             style: theme.textTheme.bodyMedium,
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
               child: Text(
-                t.localeCode == 'th' ? 'ไว้ทีหลัง' : 'Later',
+                t.common.laterBtn,
                 style: TextStyle(color: theme.colorScheme.onSurfaceVariant),
               ),
             ),
@@ -172,7 +169,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 foregroundColor: theme.colorScheme.onPrimary,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
               ),
-              child: Text(t.localeCode == 'th' ? 'เปิดการตั้งค่า' : 'Open Settings'),
+              child: Text(t.settings.openSettingsBtn),
             ),
           ],
         );
@@ -225,22 +222,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         NavigationDestination(
           icon: const Icon(Icons.search_rounded),
           selectedIcon: const Icon(Icons.search_rounded),
-          label: t.get('search_title'),
+          label: t.navigation.searchTitle,
         ),
         NavigationDestination(
           icon: const Icon(Icons.map_outlined),
           selectedIcon: const Icon(Icons.map_rounded),
-          label: t.get('map_title'),
+          label: t.navigation.mapTitle,
         ),
         NavigationDestination(
           icon: const Icon(Icons.favorite_outline_rounded),
           selectedIcon: const Icon(Icons.favorite_rounded),
-          label: t.get('favorites_title'),
+          label: t.navigation.favoritesTitle,
         ),
         NavigationDestination(
           icon: const Icon(Icons.settings_outlined),
           selectedIcon: const Icon(Icons.settings_rounded),
-          label: t.get('settings_title'),
+          label: t.navigation.settingsTitle,
         ),
       ],
     );
@@ -264,7 +261,7 @@ class _LoadingView extends StatelessWidget {
           ),
           const SizedBox(height: 24),
           Text(
-            t.get('loading_stations'),
+            t.search.loadingStations,
             style: Theme.of(context).textTheme.titleMedium,
           ),
         ],
@@ -289,7 +286,7 @@ class _ErrorView extends StatelessWidget {
             const Icon(Icons.error_outline, size: 64, color: Colors.red),
             const SizedBox(height: 16),
             Text(
-              t.get('error_occurred') == 'error_occurred' ? 'เกิดข้อผิดพลาด' : t.get('error_occurred'),
+              t.common.errorOccurred,
               style: Theme.of(context).textTheme.headlineMedium,
             ),
             const SizedBox(height: 8),
