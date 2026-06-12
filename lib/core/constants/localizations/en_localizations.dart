@@ -21,6 +21,8 @@ class EnglishLocalizations implements BaseLocalizations {
   final proximity = EnglishProximity();
   @override
   final settings = EnglishSettings();
+  @override
+  final journey = EnglishJourney();
 }
 
 class EnglishCommon implements BaseCommon {
@@ -313,4 +315,27 @@ class EnglishSettings implements BaseSettings {
   String get locationPermissionDesc => 'BKK Transit requires location permission to detect and notify you about nearby transit stations. Please enable it in settings.';
   @override
   String get openSettingsBtn => 'Open Settings';
+}
+
+class EnglishJourney implements BaseJourney {
+  @override
+  String get startJourneyBtn => 'Start Journey';
+  @override
+  String get endJourneyBtn => 'End Journey';
+  @override
+  String get currentStationLabel => 'Current Station';
+  @override
+  String get nextStationLabel => 'Next Station';
+  @override
+  String get transferAtLabel => 'Transfer at';
+  @override
+  String get arrivedLabel => 'Arrived at destination';
+  @override
+  String get walkToLabel => 'Walk to';
+  @override
+  String get simulationMode => 'GPS Simulation Mode';
+  @override
+  String get nextSimulationBtn => 'Next Station (Sim)';
+  @override
+  String get stationsCount => 'stations';
 }

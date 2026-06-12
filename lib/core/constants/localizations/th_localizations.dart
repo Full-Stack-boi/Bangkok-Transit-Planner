@@ -21,6 +21,8 @@ class ThaiLocalizations implements BaseLocalizations {
   final proximity = ThaiProximity();
   @override
   final settings = ThaiSettings();
+  @override
+  final journey = ThaiJourney();
 }
 
 class ThaiCommon implements BaseCommon {
@@ -313,4 +315,27 @@ class ThaiSettings implements BaseSettings {
   String get locationPermissionDesc => 'แอป BKK Transit ต้องการสิทธิ์ระบุตำแหน่งของคุณ เพื่อตรวจหาและแจ้งเตือนสถานีที่อยู่ใกล้เคียงโดยรอบ กรุณากดเปิดสิทธิ์ในการตั้งค่า';
   @override
   String get openSettingsBtn => 'เปิดการตั้งค่า';
+}
+
+class ThaiJourney implements BaseJourney {
+  @override
+  String get startJourneyBtn => 'เริ่มการเดินทาง';
+  @override
+  String get endJourneyBtn => 'สิ้นสุดการเดินทาง';
+  @override
+  String get currentStationLabel => 'สถานีปัจจุบัน';
+  @override
+  String get nextStationLabel => 'สถานีถัดไป';
+  @override
+  String get transferAtLabel => 'เปลี่ยนขบวนที่';
+  @override
+  String get arrivedLabel => 'ถึงจุดหมายแล้ว';
+  @override
+  String get walkToLabel => 'เดินเท้าไปยัง';
+  @override
+  String get simulationMode => 'โหมดจำลอง GPS';
+  @override
+  String get nextSimulationBtn => 'สถานีถัดไป (จำลอง)';
+  @override
+  String get stationsCount => 'สถานี';
 }

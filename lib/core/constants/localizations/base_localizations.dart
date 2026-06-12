@@ -9,6 +9,7 @@ abstract class BaseLocalizations {
   BaseTransfers get transfers;
   BaseProximity get proximity;
   BaseSettings get settings;
+  BaseJourney get journey;
 }
 
 abstract class BaseCommon {
@@ -160,4 +161,17 @@ abstract class BaseSettings {
   String get locationPermissionRequired;
   String get locationPermissionDesc;
   String get openSettingsBtn;
+}
+
+abstract class BaseJourney {
+  String get startJourneyBtn;
+  String get endJourneyBtn;
+  String get currentStationLabel;
+  String get nextStationLabel;
+  String get transferAtLabel;
+  String get arrivedLabel;
+  String get walkToLabel;
+  String get simulationMode;
+  String get nextSimulationBtn;
+  String get stationsCount;
 }

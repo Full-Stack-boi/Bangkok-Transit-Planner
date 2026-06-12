@@ -10,6 +10,7 @@ import '../../providers/providers.dart';
 import '../search/search_view_model.dart';
 import '../favorites/favorites_view_model.dart';
 import '../../core/constants/translation_helper.dart';
+import '../../providers/route_tracker.dart';
 
 /// Bottom sheet showing detailed route result with dynamic localization
 class RouteResultSheet extends ConsumerWidget {
@@ -175,6 +176,22 @@ class RouteResultSheet extends ConsumerWidget {
             ),
             _buildBookmarkButton(context, ref, result, theme, t, localeCode),
           ],
+        ),
+        const SizedBox(height: 12),
+        ElevatedButton.icon(
+          onPressed: () {
+            // Start the journey with simulation mode enabled by default for easy testing
+            ref.read(routeTrackerProvider.notifier).startTracking(result, simulation: true);
+            Navigator.pop(context);
+          },
+          icon: const Icon(Icons.navigation_rounded),
+          label: Text(t.journey.startJourneyBtn),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: theme.colorScheme.primary,
+            foregroundColor: theme.colorScheme.onPrimary,
+            minimumSize: const Size.fromHeight(48),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
         ),
       ],
     );

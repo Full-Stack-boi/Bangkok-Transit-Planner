@@ -32,4 +32,5 @@ class AppLocalizations {
   BaseTransfers get transfers => _delegate.transfers;
   BaseProximity get proximity => _delegate.proximity;
   BaseSettings get settings => _delegate.settings;
+  BaseJourney get journey => _delegate.journey;
 }
