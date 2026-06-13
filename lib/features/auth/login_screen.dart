@@ -99,7 +99,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: theme.brightness == Brightness.dark
-                ? [theme.colorScheme.surface, theme.colorScheme.surfaceDim ?? Colors.black87]
+                ? [theme.colorScheme.surface, theme.colorScheme.surfaceDim]
                 : [theme.colorScheme.surface, theme.colorScheme.primaryContainer.withValues(alpha: 0.15)],
           ),
         ),

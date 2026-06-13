@@ -37,7 +37,7 @@ class LocationService {
     try {
       // Check if simulation mode is active in debug mode
       if (kDebugMode && _ref != null) {
-        final mockPos = _ref!.read(mockLocationProvider);
+        final mockPos = _ref.read(mockLocationProvider);
         if (mockPos != null) {
           print('Using simulated mock location: ${mockPos.latitude}, ${mockPos.longitude}');
           return mockPos;

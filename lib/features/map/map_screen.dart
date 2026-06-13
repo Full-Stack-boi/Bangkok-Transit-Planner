@@ -811,7 +811,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                   child: OutlinedButton.icon(
                     onPressed: () {
                       searchVm.setOrigin(station);
-                      ref.read(homeTabIndexProvider.notifier).state = 0; // Switch to Search Screen
+                      ref.read(homeTabIndexProvider.notifier).setTab(0); // Switch to Search Screen
                       setState(() => _selectedStation = null);
                     },
                     icon: const Icon(Icons.trip_origin_rounded, size: 16, color: Colors.green),
@@ -826,7 +826,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                   child: OutlinedButton.icon(
                     onPressed: () {
                       searchVm.setDestination(station);
-                      ref.read(homeTabIndexProvider.notifier).state = 0; // Switch to Search Screen
+                      ref.read(homeTabIndexProvider.notifier).setTab(0); // Switch to Search Screen
                       setState(() => _selectedStation = null);
                     },
                     icon: const Icon(Icons.location_on_rounded, size: 16, color: Colors.red),
@@ -935,7 +935,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                   child: OutlinedButton.icon(
                     onPressed: () {
                       searchVm.setOrigin(location);
-                      ref.read(homeTabIndexProvider.notifier).state = 0; // Switch to Search Screen
+                      ref.read(homeTabIndexProvider.notifier).setTab(0); // Switch to Search Screen
                       setState(() => _customSelectedLocation = null);
                     },
                     icon: const Icon(Icons.trip_origin_rounded, size: 16, color: Colors.green),
@@ -950,7 +950,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                   child: OutlinedButton.icon(
                     onPressed: () {
                       searchVm.setDestination(location);
-                      ref.read(homeTabIndexProvider.notifier).state = 0; // Switch to Search Screen
+                      ref.read(homeTabIndexProvider.notifier).setTab(0); // Switch to Search Screen
                       setState(() => _customSelectedLocation = null);
                     },
                     icon: const Icon(Icons.location_on_rounded, size: 16, color: Colors.red),

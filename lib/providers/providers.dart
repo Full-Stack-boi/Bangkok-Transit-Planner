@@ -93,6 +93,10 @@ final transitInitProvider = FutureProvider<void>((ref) async {
 class HomeTabIndex extends _$HomeTabIndex {
   @override
   int build() => 0;
+
+  void setTab(int index) {
+    state = index;
+  }
 }
 
 final themeModeProvider = NotifierProvider<ThemeModeNotifier, ThemeMode>(() {

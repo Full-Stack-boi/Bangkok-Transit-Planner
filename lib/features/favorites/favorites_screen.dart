@@ -248,7 +248,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
                       child: OutlinedButton.icon(
                         onPressed: () {
                           searchVm.setOrigin(station);
-                          ref.read(homeTabIndexProvider.notifier).state = 0; // Switch to Search Screen
+                          ref.read(homeTabIndexProvider.notifier).setTab(0); // Switch to Search Screen
                         },
                         icon: const Icon(Icons.trip_origin_rounded, size: 16, color: Colors.green),
                         label: Text(t.favorites.setOriginBtn),
@@ -262,7 +262,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
                       child: OutlinedButton.icon(
                         onPressed: () {
                           searchVm.setDestination(station);
-                          ref.read(homeTabIndexProvider.notifier).state = 0; // Switch to Search Screen
+                          ref.read(homeTabIndexProvider.notifier).setTab(0); // Switch to Search Screen
                         },
                         icon: const Icon(Icons.location_on_rounded, size: 16, color: Colors.red),
                         label: Text(t.favorites.setDestBtn),
@@ -450,7 +450,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
               if (originItem != null && destItem != null) {
                 searchVm.setOrigin(originItem);
                 searchVm.setDestination(destItem);
-                ref.read(homeTabIndexProvider.notifier).state = 1; // Switch to Map Screen
+                ref.read(homeTabIndexProvider.notifier).setTab(1); // Switch to Map Screen
               }
             },
           ),

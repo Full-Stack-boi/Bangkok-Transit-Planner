@@ -231,7 +231,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return NavigationBar(
       selectedIndex: currentIndex,
       onDestinationSelected: (index) {
-        ref.read(homeTabIndexProvider.notifier).state = index;
+        ref.read(homeTabIndexProvider.notifier).setTab(index);
       },
       destinations: [
         NavigationDestination(
