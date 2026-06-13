@@ -1,7 +1,9 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+part 'location_providers.g.dart';
 
 // ============================================================================
 // WARNING: MOCK LOCATION PROVIDER FOR DEVELOPMENT & TESTING ONLY.
@@ -10,15 +12,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 // In release mode, the provider will always report 'null' (real GPS).
 // ============================================================================
 
-final mockLocationProvider = StateNotifierProvider<MockLocationNotifier, Position?>((ref) {
-  return MockLocationNotifier();
-});
-
-class MockLocationNotifier extends StateNotifier<Position?> {
-  MockLocationNotifier() : super(null) {
+@riverpod
+class MockLocation extends _$MockLocation {
+  @override
+  Position? build() {
     if (kDebugMode) {
       _loadMockLocation();
     }
+    return null;
   }
 
   Future<void> _loadMockLocation() async {

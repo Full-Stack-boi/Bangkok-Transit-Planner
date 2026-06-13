@@ -1,4 +1,4 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:geolocator/geolocator.dart';
 import '../../models/station.dart';
 import '../../models/route_result.dart';
@@ -8,6 +8,8 @@ import '../../providers/providers.dart';
 import '../../services/dijkstra_planner.dart';
 import '../../services/fare_service.dart';
 import '../../core/constants/transit_constants.dart';
+
+part 'search_view_model.g.dart';
 
 /// State for search feature
 class SearchState {
@@ -67,16 +69,18 @@ class SearchState {
 }
 
 /// ViewModel for search feature
-class SearchViewModel extends StateNotifier<SearchState> {
-  final Ref _ref;
-
-  SearchViewModel(this._ref) : super(const SearchState());
+@riverpod
+class SearchViewModel extends _$SearchViewModel {
+  @override
+  SearchState build() {
+    return const SearchState();
+  }
 
   /// Search stations and landmarks by query, querying online places if needed
   Future<void> search(String query) async {
     state = state.copyWith(query: query, clearError: true);
 
-    final repo = _ref.read(transitRepositoryProvider);
+    final repo = ref.read(transitRepositoryProvider);
 
     // 1. Search local places (stations + landmarks) instantly
     final localResults = repo.searchLocalPlaces(query);
@@ -146,7 +150,7 @@ class SearchViewModel extends StateNotifier<SearchState> {
   void _tryCalculateRoute() {
     final origin = state.origin;
     final destination = state.destination;
-    final t = _ref.read(translationsProvider);
+    final t = ref.read(translationsProvider);
 
     if (origin == null || destination == null) return;
     if (origin.id == destination.id) {
@@ -157,8 +161,8 @@ class SearchViewModel extends StateNotifier<SearchState> {
     state = state.copyWith(isCalculating: true, clearError: true);
 
     try {
-      final repo = _ref.read(transitRepositoryProvider);
-      final fareService = _ref.read(fareServiceProvider);
+      final repo = ref.read(transitRepositoryProvider);
+      final fareService = ref.read(fareServiceProvider);
 
       final originStationId = origin.nearestStationId ?? origin.id;
       final destinationStationId = destination.nearestStationId ?? destination.id;
@@ -536,9 +540,4 @@ class SearchViewModel extends StateNotifier<SearchState> {
   }
 }
 
-// ─── Provider ───
 
-final searchViewModelProvider =
-    StateNotifierProvider<SearchViewModel, SearchState>((ref) {
-  return SearchViewModel(ref);
-});

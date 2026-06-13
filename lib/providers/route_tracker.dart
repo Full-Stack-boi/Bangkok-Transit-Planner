@@ -82,10 +82,16 @@ class RouteTrackerState {
   }
 }
 
-class RouteTracker extends StateNotifier<RouteTrackerState> {
+class RouteTracker extends Notifier<RouteTrackerState> {
   StreamSubscription<Position>? _positionSubscription;
 
-  RouteTracker() : super(const RouteTrackerState());
+  @override
+  RouteTrackerState build() {
+    ref.onDispose(() {
+      _positionSubscription?.cancel();
+    });
+    return const RouteTrackerState();
+  }
 
   void startTracking(RouteResult route, {bool simulation = false}) {
     state = RouteTrackerState(
@@ -114,12 +120,6 @@ class RouteTracker extends StateNotifier<RouteTrackerState> {
     _positionSubscription?.cancel();
     _positionSubscription = null;
     state = const RouteTrackerState();
-  }
-
-  @override
-  void dispose() {
-    _positionSubscription?.cancel();
-    super.dispose();
   }
 
   void toggleSimulation(bool enable) {
@@ -181,6 +181,6 @@ class RouteTracker extends StateNotifier<RouteTrackerState> {
   }
 }
 
-final routeTrackerProvider = StateNotifierProvider<RouteTracker, RouteTrackerState>((ref) {
+final routeTrackerProvider = NotifierProvider<RouteTracker, RouteTrackerState>(() {
   return RouteTracker();
 });

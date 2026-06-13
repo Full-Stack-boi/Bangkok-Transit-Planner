@@ -1,6 +1,8 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../models/station.dart';
 import '../../providers/providers.dart';
+
+part 'favorites_view_model.g.dart';
 
 /// State for the favorites screen
 class FavoritesState {
@@ -24,17 +26,16 @@ class FavoritesState {
 }
 
 /// ViewModel for managing favorites and saved routes
-class FavoritesViewModel extends StateNotifier<FavoritesState> {
-  final Ref _ref;
-
-  FavoritesViewModel(this._ref) : super(const FavoritesState()) {
-    refresh();
+@riverpod
+class FavoritesViewModel extends _$FavoritesViewModel {
+  @override
+  FavoritesState build() {
+    return _getFavoritesState();
   }
 
-  /// Reload favorites and saved routes from repository
-  void refresh() {
-    final repo = _ref.read(favoritesRepositoryProvider);
-    final transitRepo = _ref.read(transitRepositoryProvider);
+  FavoritesState _getFavoritesState() {
+    final repo = ref.read(favoritesRepositoryProvider);
+    final transitRepo = ref.read(transitRepositoryProvider);
 
     final favoriteIds = repo.getFavoriteStationIds();
     final favoriteStations = favoriteIds
@@ -44,15 +45,20 @@ class FavoritesViewModel extends StateNotifier<FavoritesState> {
 
     final savedRoutes = repo.getSavedRoutes();
 
-    state = FavoritesState(
+    return FavoritesState(
       favoriteStations: favoriteStations,
       savedRoutes: savedRoutes,
     );
   }
 
+  /// Reload favorites and saved routes from repository
+  void refresh() {
+    state = _getFavoritesState();
+  }
+
   /// Toggle favorite station
   Future<void> toggleFavoriteStation(String stationId) async {
-    final repo = _ref.read(favoritesRepositoryProvider);
+    final repo = ref.read(favoritesRepositoryProvider);
     await repo.toggleFavoriteStation(stationId);
     refresh();
   }
@@ -69,7 +75,7 @@ class FavoritesViewModel extends StateNotifier<FavoritesState> {
     double? destinationLat,
     double? destinationLng,
   }) async {
-    final repo = _ref.read(favoritesRepositoryProvider);
+    final repo = ref.read(favoritesRepositoryProvider);
     await repo.saveRoute(
       originId: originId,
       destinationId: destinationId,
@@ -86,15 +92,8 @@ class FavoritesViewModel extends StateNotifier<FavoritesState> {
 
   /// Delete a saved route
   Future<void> deleteRoute(String originId, String destinationId) async {
-    final repo = _ref.read(favoritesRepositoryProvider);
+    final repo = ref.read(favoritesRepositoryProvider);
     await repo.deleteRoute(originId, destinationId);
     refresh();
   }
 }
-
-// ─── Provider ───
-
-final favoritesViewModelProvider =
-    StateNotifierProvider<FavoritesViewModel, FavoritesState>((ref) {
-  return FavoritesViewModel(ref);
-});

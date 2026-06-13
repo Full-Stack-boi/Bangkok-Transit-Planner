@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../core/constants/translation_helper.dart';
 import '../repositories/transit_repository.dart';
@@ -12,10 +13,11 @@ import '../services/supabase_service.dart';
 import '../services/location_service.dart';
 import '../services/notification_service.dart';
 import 'auth_providers.dart';
-import 'location_providers.dart';
 
 export 'auth_providers.dart';
 export 'location_providers.dart';
+
+part 'providers.g.dart';
 
 // ─── Repository Providers ───
 
@@ -65,8 +67,8 @@ final transitInitProvider = FutureProvider<void>((ref) async {
   final supabase = ref.read(supabaseServiceProvider);
   await supabase.initialize();
 
-  // Instantiate authNotifierProvider on startup so it listens to auth state events immediately
-  ref.read(authNotifierProvider);
+  // Instantiate authProvider on startup so it listens to auth state events immediately
+  ref.read(authProvider);
 
   final favorites = ref.read(favoritesRepositoryProvider);
   await favorites.initialize();
@@ -87,15 +89,21 @@ final transitInitProvider = FutureProvider<void>((ref) async {
 
 // ─── UI Providers ───
 
-final homeTabIndexProvider = StateProvider<int>((ref) => 0);
+@riverpod
+class HomeTabIndex extends _$HomeTabIndex {
+  @override
+  int build() => 0;
+}
 
-final themeModeProvider = StateNotifierProvider<ThemeModeNotifier, ThemeMode>((ref) {
+final themeModeProvider = NotifierProvider<ThemeModeNotifier, ThemeMode>(() {
   return ThemeModeNotifier();
 });
 
-class ThemeModeNotifier extends StateNotifier<ThemeMode> {
-  ThemeModeNotifier() : super(ThemeMode.dark) {
+class ThemeModeNotifier extends Notifier<ThemeMode> {
+  @override
+  ThemeMode build() {
     _loadTheme();
+    return ThemeMode.dark;
   }
 
   Future<void> _loadTheme() async {
@@ -121,13 +129,15 @@ class ThemeModeNotifier extends StateNotifier<ThemeMode> {
   }
 }
 
-final localeProvider = StateNotifierProvider<LocaleNotifier, String>((ref) {
+final localeProvider = NotifierProvider<LocaleNotifier, String>(() {
   return LocaleNotifier();
 });
 
-class LocaleNotifier extends StateNotifier<String> {
-  LocaleNotifier() : super('th') {
+class LocaleNotifier extends Notifier<String> {
+  @override
+  String build() {
     _loadLocale();
+    return 'th';
   }
 
   Future<void> _loadLocale() async {

@@ -1,8 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../repositories/auth_repository.dart';
 import 'providers.dart';
 import '../features/favorites/favorites_view_model.dart';
+
+part 'auth_providers.g.dart';
 
 /// State object representing the current user's session and profile information
 class AuthState {
@@ -46,24 +49,18 @@ final authRepositoryProvider = Provider<AuthRepository>((ref) {
   return AuthRepository(supabaseService);
 });
 
-/// Provider for managing authentication State
-final authNotifierProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
-  final repository = ref.watch(authRepositoryProvider);
-  return AuthNotifier(repository, ref);
-});
-
-/// StateNotifier that handles auth logic, captures session changes, and fetches user profiles
-class AuthNotifier extends StateNotifier<AuthState> {
-  final AuthRepository _repository;
-  final Ref _ref;
-
-  AuthNotifier(this._repository, this._ref) : super(const AuthState()) {
+/// Notifier that handles auth logic, captures session changes, and fetches user profiles
+@riverpod
+class AuthNotifier extends _$AuthNotifier {
+  @override
+  AuthState build() {
+    final repository = ref.watch(authRepositoryProvider);
     // Listen to Supabase authentication changes
-    _repository.onAuthStateChanged.listen((data) async {
+    final subscription = repository.onAuthStateChanged.listen((data) async {
       final user = data.session?.user;
       if (user != null) {
         state = state.copyWith(user: user, isLoading: true);
-        final profile = await _repository.getUserProfile(user.id);
+        final profile = await repository.getUserProfile(user.id);
         state = state.copyWith(
           displayName: profile?['display_name'] as String?,
           avatarUrl: profile?['avatar_url'] as String?,
@@ -72,11 +69,11 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
         // Perform offline sync to upload locally saved routes and favorites
         try {
-          final favoritesRepo = _ref.read(favoritesRepositoryProvider);
+          final favoritesRepo = ref.read(favoritesRepositoryProvider);
           await favoritesRepo.syncOfflineDataWithSupabase();
           
           // Refresh favorites screen view model to load updated synced listings
-          _ref.read(favoritesViewModelProvider.notifier).refresh();
+          ref.read(favoritesViewModelProvider.notifier).refresh();
         } catch (e) {
           print('Background sync failed on login: $e');
         }
@@ -84,16 +81,21 @@ class AuthNotifier extends StateNotifier<AuthState> {
         // Logged out
         state = const AuthState();
         // Refresh to clear synced lists/restore local listings
-        _ref.read(favoritesViewModelProvider.notifier).refresh();
+        ref.read(favoritesViewModelProvider.notifier).refresh();
       }
     });
+
+    ref.onDispose(subscription.cancel);
+
+    return const AuthState();
   }
 
   /// Sign in with Email & Password
   Future<bool> signIn({required String email, required String password}) async {
     state = state.copyWith(isLoading: true, errorMessage: null);
     try {
-      await _repository.signIn(email: email, password: password);
+      final repository = ref.read(authRepositoryProvider);
+      await repository.signIn(email: email, password: password);
       return true;
     } catch (e) {
       state = state.copyWith(isLoading: false, errorMessage: e.toString());
@@ -109,7 +111,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }) async {
     state = state.copyWith(isLoading: true, errorMessage: null);
     try {
-      await _repository.signUp(
+      final repository = ref.read(authRepositoryProvider);
+      await repository.signUp(
         email: email,
         password: password,
         displayName: displayName,
@@ -125,7 +128,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
   Future<bool> signInWithGoogle() async {
     state = state.copyWith(isLoading: true, errorMessage: null);
     try {
-      final response = await _repository.signInWithGoogle();
+      final repository = ref.read(authRepositoryProvider);
+      final response = await repository.signInWithGoogle();
       return response != null;
     } catch (e) {
       state = state.copyWith(isLoading: false, errorMessage: e.toString());
@@ -136,6 +140,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
   /// Logout of current session
   Future<void> signOut() async {
     state = state.copyWith(isLoading: true);
-    await _repository.signOut();
+    final repository = ref.read(authRepositoryProvider);
+    await repository.signOut();
   }
 }

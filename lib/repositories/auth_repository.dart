@@ -77,9 +77,9 @@ class AuthRepository {
     }
 
     try {
-      // Create google sign in client
-      final GoogleSignIn googleSignIn = GoogleSignIn();
-      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+      // Ensure google sign in is initialized
+      await GoogleSignIn.instance.initialize();
+      final GoogleSignInAccount? googleUser = await GoogleSignIn.instance.authenticate();
 
       if (googleUser == null) {
         // User cancelled the flow
@@ -88,7 +88,10 @@ class AuthRepository {
 
       final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
       final String? idToken = googleAuth.idToken;
-      final String? accessToken = googleAuth.accessToken;
+      
+      // Explicitly request access token by authorizing scopes
+      final clientAuth = await googleUser.authorizationClient.authorizeScopes(['email', 'profile']);
+      final String? accessToken = clientAuth.accessToken;
 
       if (idToken == null) {
         throw Exception('Google Sign-In failed: missing ID Token.');
@@ -113,10 +116,7 @@ class AuthRepository {
     if (client == null) return;
     try {
       await client.auth.signOut();
-      final GoogleSignIn googleSignIn = GoogleSignIn();
-      if (await googleSignIn.isSignedIn()) {
-        await googleSignIn.signOut();
-      }
+      await GoogleSignIn.instance.signOut();
     } catch (e) {
       print('Sign out error in AuthRepository: $e');
     }
