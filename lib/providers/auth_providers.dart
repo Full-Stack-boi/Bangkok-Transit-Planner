@@ -59,8 +59,11 @@ class AuthNotifier extends _$AuthNotifier {
     final subscription = repository.onAuthStateChanged.listen((data) async {
       final user = data.session?.user;
       if (user != null) {
+        if (!ref.mounted) return;
         state = state.copyWith(user: user, isLoading: true);
         final profile = await repository.getUserProfile(user.id);
+        
+        if (!ref.mounted) return;
         state = state.copyWith(
           displayName: profile?['display_name'] as String?,
           avatarUrl: profile?['avatar_url'] as String?,
@@ -72,12 +75,14 @@ class AuthNotifier extends _$AuthNotifier {
           final favoritesRepo = ref.read(favoritesRepositoryProvider);
           await favoritesRepo.syncOfflineDataWithSupabase();
           
+          if (!ref.mounted) return;
           // Refresh favorites screen view model to load updated synced listings
           ref.read(favoritesViewModelProvider.notifier).refresh();
         } catch (e) {
           print('Background sync failed on login: $e');
         }
       } else {
+        if (!ref.mounted) return;
         // Logged out
         state = const AuthState();
         // Refresh to clear synced lists/restore local listings
@@ -98,7 +103,9 @@ class AuthNotifier extends _$AuthNotifier {
       await repository.signIn(email: email, password: password);
       return true;
     } catch (e) {
-      state = state.copyWith(isLoading: false, errorMessage: e.toString());
+      if (ref.mounted) {
+        state = state.copyWith(isLoading: false, errorMessage: e.toString());
+      }
       return false;
     }
   }
@@ -119,7 +126,9 @@ class AuthNotifier extends _$AuthNotifier {
       );
       return true;
     } catch (e) {
-      state = state.copyWith(isLoading: false, errorMessage: e.toString());
+      if (ref.mounted) {
+        state = state.copyWith(isLoading: false, errorMessage: e.toString());
+      }
       return false;
     }
   }
@@ -132,7 +141,9 @@ class AuthNotifier extends _$AuthNotifier {
       final response = await repository.signInWithGoogle();
       return response != null;
     } catch (e) {
-      state = state.copyWith(isLoading: false, errorMessage: e.toString());
+      if (ref.mounted) {
+        state = state.copyWith(isLoading: false, errorMessage: e.toString());
+      }
       return false;
     }
   }
