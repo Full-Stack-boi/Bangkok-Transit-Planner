@@ -27,7 +27,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   void _submitLogin(BuildContext context) async {
     if (!_formKey.currentState!.validate()) return;
 
-    final notifier = ref.read(authNotifierProvider.notifier);
+    final notifier = ref.read(authProvider.notifier);
     final success = await notifier.signIn(
       email: _emailController.text.trim(),
       password: _passwordController.text,
@@ -42,7 +42,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       );
       Navigator.pop(context); // Go back to settings or previous screen
     } else if (mounted) {
-      final authState = ref.read(authNotifierProvider);
+      final authState = ref.read(authProvider);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(authState.errorMessage ?? ref.read(translationsProvider).auth.loginFailed),
@@ -53,7 +53,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   void _submitGoogleLogin(BuildContext context) async {
-    final notifier = ref.read(authNotifierProvider.notifier);
+    final notifier = ref.read(authProvider.notifier);
     final success = await notifier.signInWithGoogle();
 
     if (success && mounted) {
@@ -65,7 +65,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       );
       Navigator.pop(context);
     } else if (mounted) {
-      final authState = ref.read(authNotifierProvider);
+      final authState = ref.read(authProvider);
       if (authState.errorMessage != null) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -80,7 +80,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final authState = ref.watch(authNotifierProvider);
+    final authState = ref.watch(authProvider);
     final t = ref.watch(translationsProvider);
 
     return Scaffold(

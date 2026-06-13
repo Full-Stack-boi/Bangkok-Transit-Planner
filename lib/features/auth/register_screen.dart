@@ -32,7 +32,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   void _submitRegister(BuildContext context) async {
     if (!_formKey.currentState!.validate()) return;
 
-    final notifier = ref.read(authNotifierProvider.notifier);
+    final notifier = ref.read(authProvider.notifier);
     final success = await notifier.signUp(
       email: _emailController.text.trim(),
       password: _passwordController.text,
@@ -48,7 +48,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       );
       Navigator.pop(context); // Go back to settings or previous screen
     } else if (mounted) {
-      final authState = ref.read(authNotifierProvider);
+      final authState = ref.read(authProvider);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(authState.errorMessage ?? ref.read(translationsProvider).auth.registrationFailed),
@@ -61,7 +61,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final authState = ref.watch(authNotifierProvider);
+    final authState = ref.watch(authProvider);
     final t = ref.watch(translationsProvider);
 
     return Scaffold(

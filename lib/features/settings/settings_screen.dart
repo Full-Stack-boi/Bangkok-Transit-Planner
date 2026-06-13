@@ -117,7 +117,7 @@ class SettingsScreen extends ConsumerWidget {
       );
     }
 
-    final authState = ref.watch(authNotifierProvider);
+    final authState = ref.watch(authProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -276,7 +276,7 @@ class SettingsScreen extends ConsumerWidget {
               IconButton(
                 icon: const Icon(Icons.logout_rounded, color: Colors.red),
                 onPressed: () {
-                  ref.read(authNotifierProvider.notifier).signOut();
+                  ref.read(authProvider.notifier).signOut();
                 },
               ),
             ],
