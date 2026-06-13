@@ -69,7 +69,7 @@ class AuthRepository {
     }
   }
 
-  /// Sign in using Google authentication
+  /// Sign in natively using Google SDK and pass ID token to Supabase
   Future<AuthResponse?> signInWithGoogle() async {
     final client = _client;
     if (client == null) {
@@ -77,13 +77,14 @@ class AuthRepository {
     }
 
     try {
-      // Ensure google sign in is initialized
-      await GoogleSignIn.instance.initialize();
-      final GoogleSignInAccount? googleUser = await GoogleSignIn.instance.authenticate();
+      // Ensure Google Sign-In is initialized with the Web client ID as serverClientId
+      await GoogleSignIn.instance.initialize(
+        serverClientId: '1010460816238-0q8gpanpmepu2g457mh1kb7124e1jn0b.apps.googleusercontent.com',
+      );
 
+      final GoogleSignInAccount? googleUser = await GoogleSignIn.instance.authenticate();
       if (googleUser == null) {
-        // User cancelled the flow
-        return null;
+        return null; // User cancelled
       }
 
       final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
@@ -105,7 +106,7 @@ class AuthRepository {
 
       return response;
     } catch (e) {
-      print('Google Sign-In error in AuthRepository: $e');
+      print('Native Google Sign-In error in AuthRepository: $e');
       rethrow;
     }
   }

@@ -33,15 +33,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       password: _passwordController.text,
     );
 
-    if (success && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(ref.read(translationsProvider).auth.syncSuccess),
-          backgroundColor: Colors.green,
-        ),
-      );
-      Navigator.pop(context); // Go back to settings or previous screen
-    } else if (mounted) {
+    if (!success && mounted) {
       final authState = ref.read(authProvider);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -56,15 +48,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final notifier = ref.read(authProvider.notifier);
     final success = await notifier.signInWithGoogle();
 
-    if (success && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(ref.read(translationsProvider).auth.syncSuccess),
-          backgroundColor: Colors.green,
-        ),
-      );
-      Navigator.pop(context);
-    } else if (mounted) {
+    if (!success && mounted) {
       final authState = ref.read(authProvider);
       if (authState.errorMessage != null) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -82,6 +66,21 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final theme = Theme.of(context);
     final authState = ref.watch(authProvider);
     final t = ref.watch(translationsProvider);
+
+    // Listen to authentication state and pop automatically on success (e.g. email/password or OAuth redirect)
+    ref.listen<AuthState>(authProvider, (previous, next) {
+      if (next.user != null && previous?.user == null && mounted) {
+        if (ModalRoute.of(context)?.isCurrent ?? false) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(ref.read(translationsProvider).auth.syncSuccess),
+              backgroundColor: Colors.green,
+            ),
+          );
+          Navigator.pop(context);
+        }
+      }
+    });
 
     return Scaffold(
       appBar: AppBar(
