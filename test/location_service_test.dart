@@ -3,7 +3,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:bkk_transit_planner/services/location_service.dart';
 import 'package:bkk_transit_planner/models/station.dart';
-import 'package:bkk_transit_planner/providers/location_providers.dart';
+import 'package:bkk_transit_planner/providers/providers.dart';
 
 void main() {
   group('LocationService Proximity & Geofencing Tests', () {
@@ -111,8 +111,12 @@ void main() {
         speedAccuracy: 0.0,
       );
 
-      final fakeRef = FakeRef(mockPosition);
-      final customLocationService = LocationService(fakeRef);
+      final container = ProviderContainer(
+        overrides: [
+          mockLocationProvider.overrideWith(() => TestLocationNotifier(mockPosition)),
+        ],
+      );
+      final customLocationService = container.read(locationServiceProvider);
 
       final result = await customLocationService.getCurrentPosition();
       expect(result, isNotNull);
@@ -122,15 +126,13 @@ void main() {
   });
 }
 
-class FakeRef implements Ref {
-  final Position? mockPosition;
-  FakeRef(this.mockPosition);
+class TestLocationNotifier extends MockLocation {
+  final Position initialPosition;
+
+  TestLocationNotifier(this.initialPosition);
 
   @override
-  T read<T>(ProviderListenable<T> provider) {
-    return mockPosition as T;
+  Position? build() {
+    return initialPosition;
   }
-
-  @override
-  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
