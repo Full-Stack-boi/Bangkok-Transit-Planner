@@ -17,6 +17,7 @@ import '../../core/constants/translation_helper.dart';
 import '../search/search_screen.dart';
 import '../route_result/route_result_sheet.dart';
 import '../../providers/route_tracker.dart';
+import 'cached_tile_provider.dart';
 
 /// Map screen showing an interactive transit map with overlays
 class MapScreen extends ConsumerStatefulWidget {
@@ -37,6 +38,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   void initState() {
     super.initState();
     _fetchUserLocation();
+    _initOfflineMap();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         final routeResult = ref.read(searchViewModelProvider).routeResult;
@@ -45,6 +47,19 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         }
       }
     });
+  }
+
+  Future<void> _initOfflineMap() async {
+    try {
+      await CachedTileProvider.getCachePath();
+      if (mounted) {
+        final stations = ref.read(transitRepositoryProvider).stations;
+        // Prefetch tiles in background (non-blocking)
+        CachedTileProvider.prefetchBangkokTiles(stations);
+      }
+    } catch (e) {
+      print('Failed to initialize offline map prefetching: $e');
+    }
   }
 
   @override
@@ -495,6 +510,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                     ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png'
                     : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png',
                 userAgentPackageName: 'com.bkktransit.bkk_transit_planner',
+                tileProvider: CachedTileProvider(),
               ),
               PolylineLayer(polylines: polylines),
               MarkerLayer(markers: markers),
