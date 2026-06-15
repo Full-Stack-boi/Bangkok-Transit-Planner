@@ -147,7 +147,9 @@ class RouteResultSheet extends ConsumerWidget {
             Flexible(
               child: _buildInfoChip(
                 icon: Icons.payments_outlined,
-                label: '${result.totalFareThb} ${t.common.currencyUnit}',
+                label: result.totalDiscountThb > 0
+                    ? '${result.totalFareThb} ${t.common.currencyUnit} (-${result.totalDiscountThb} ฿)'
+                    : '${result.totalFareThb} ${t.common.currencyUnit}',
                 theme: theme,
               ),
             ),
@@ -382,14 +384,18 @@ class RouteResultSheet extends ConsumerWidget {
         buildTabButton(
           type: 'recommended',
           title: t.routeResult.routeRecommended,
-          subtitle: '~${recommended.totalMinutes.toInt()} ${t.common.minutesUnit} · ${recommended.totalFareThb} ${t.common.currencyUnit}',
+          subtitle: recommended.totalDiscountThb > 0
+              ? '~${recommended.totalMinutes.toInt()} ${t.common.minutesUnit} · ${recommended.totalFareThb} ${t.common.currencyUnit} (-${recommended.totalDiscountThb} ฿)'
+              : '~${recommended.totalMinutes.toInt()} ${t.common.minutesUnit} · ${recommended.totalFareThb} ${t.common.currencyUnit}',
           icon: Icons.star_rounded,
         ),
         const SizedBox(width: 12),
         buildTabButton(
           type: 'saver',
           title: t.routeResult.routeSaver,
-          subtitle: '~${saver.totalMinutes.toInt()} ${t.common.minutesUnit} · ${saver.totalFareThb} ${t.common.currencyUnit}',
+          subtitle: saver.totalDiscountThb > 0
+              ? '~${saver.totalMinutes.toInt()} ${t.common.minutesUnit} · ${saver.totalFareThb} ${t.common.currencyUnit} (-${saver.totalDiscountThb} ฿)'
+              : '~${saver.totalMinutes.toInt()} ${t.common.minutesUnit} · ${saver.totalFareThb} ${t.common.currencyUnit}',
           icon: Icons.savings_rounded,
         ),
       ],
@@ -930,6 +936,7 @@ class RouteResultSheet extends ConsumerWidget {
             const SizedBox(height: 8),
             ...result.segments.map((s) {
               final lineColor = TransitColors.getLineColor(s.lineId);
+              final hasSegmentDiscount = s.standardFareThb > s.fareThb;
               return Padding(
                 padding: const EdgeInsets.symmetric(vertical: 4),
                 child: Row(
@@ -944,11 +951,48 @@ class RouteResultSheet extends ConsumerWidget {
                     ),
                     const SizedBox(width: 8),
                     Expanded(child: Text(s.lineName)),
-                    Text('${s.fareThb} ${t.common.currencyUnit}', style: theme.textTheme.labelLarge),
+                    if (hasSegmentDiscount) ...[
+                      Text(
+                        '${s.standardFareThb} ',
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                          decoration: TextDecoration.lineThrough,
+                        ),
+                      ),
+                    ],
+                    Text(
+                      '${s.fareThb} ${t.common.currencyUnit}',
+                      style: theme.textTheme.labelLarge?.copyWith(
+                        color: hasSegmentDiscount ? Colors.green.shade600 : null,
+                        fontWeight: hasSegmentDiscount ? FontWeight.bold : null,
+                      ),
+                    ),
                   ],
                 ),
               );
             }),
+            if (result.totalDiscountThb > 0) ...[
+              const Divider(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    localeCode == 'th' ? 'ส่วนลดบัตรโดยสาร' : 'Card Discount',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: Colors.green.shade600,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  Text(
+                    '-${result.totalDiscountThb} ${t.common.currencyUnit}',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: Colors.green.shade600,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ],
             const Divider(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,

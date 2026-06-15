@@ -187,6 +187,7 @@ class SearchViewModel extends _$SearchViewModel {
           stationCount: 0,
           estimatedMinutes: walkMinutes > 0 ? walkMinutes : 5.0,
           fareThb: 0,
+          standardFareThb: 0,
         );
 
         routeResult = RouteResult(
@@ -196,6 +197,7 @@ class SearchViewModel extends _$SearchViewModel {
           transfers: [],
           totalMinutes: walkMinutes > 0 ? walkMinutes : 5.0,
           totalFareThb: 0,
+          totalStandardFareThb: 0,
           totalStations: 0,
           calculatedAt: DateTime.now(),
         );
@@ -392,6 +394,7 @@ class SearchViewModel extends _$SearchViewModel {
           stationCount: 0,
           estimatedMinutes: origin.walkingMinutes ?? 5.0,
           fareThb: 0,
+          standardFareThb: 0,
         ));
       }
     }
@@ -413,6 +416,18 @@ class SearchViewModel extends _$SearchViewModel {
           final stationCount = segmentStations.length - 1;
           final bound = line?.getBound(segmentStart.id, segmentStations.last.id) ?? 0;
 
+          final standardFare = fareService.calculateFare(
+            currentLineId,
+            stationCount,
+          );
+          final discountedFare = fareService.calculateFare(
+            currentLineId,
+            stationCount,
+            btsCardType: cardState.btsCardType,
+            mrtCardType: cardState.mrtCardType,
+            arlCardType: cardState.arlCardType,
+          );
+
           segments.add(RouteSegment(
             lineId: currentLineId,
             lineName: line?.nameEn ?? currentLineId,
@@ -425,13 +440,8 @@ class SearchViewModel extends _$SearchViewModel {
                 : [],
             stationCount: stationCount,
             estimatedMinutes: stationCount * TransitConstants.avgTimeBetweenStations,
-            fareThb: fareService.calculateFare(
-              currentLineId,
-              stationCount,
-              btsCardType: cardState.btsCardType,
-              mrtCardType: cardState.mrtCardType,
-              arlCardType: cardState.arlCardType,
-            ),
+            fareThb: discountedFare,
+            standardFareThb: standardFare,
           ));
         }
 
@@ -463,6 +473,18 @@ class SearchViewModel extends _$SearchViewModel {
             final stationCount = segmentStations.length - 1;
             final bound = line?.getBound(segmentStart.id, segmentStations.last.id) ?? 0;
 
+            final standardFare = fareService.calculateFare(
+              currentLineId,
+              stationCount,
+            );
+            final discountedFare = fareService.calculateFare(
+              currentLineId,
+              stationCount,
+              btsCardType: cardState.btsCardType,
+              mrtCardType: cardState.mrtCardType,
+              arlCardType: cardState.arlCardType,
+            );
+
             segments.add(RouteSegment(
               lineId: currentLineId,
               lineName: line?.nameEn ?? currentLineId,
@@ -475,13 +497,8 @@ class SearchViewModel extends _$SearchViewModel {
                   : [],
               stationCount: stationCount,
               estimatedMinutes: stationCount * TransitConstants.avgTimeBetweenStations,
-              fareThb: fareService.calculateFare(
-                currentLineId,
-                stationCount,
-                btsCardType: cardState.btsCardType,
-                mrtCardType: cardState.mrtCardType,
-                arlCardType: cardState.arlCardType,
-              ),
+              fareThb: discountedFare,
+              standardFareThb: standardFare,
             ));
           }
           currentLineId = step.lineId;
@@ -503,6 +520,18 @@ class SearchViewModel extends _$SearchViewModel {
       final stationCount = segmentStations.length - 1;
       final bound = line?.getBound(segmentStart.id, segmentStations.last.id) ?? 0;
 
+      final standardFare = fareService.calculateFare(
+        currentLineId,
+        stationCount,
+      );
+      final discountedFare = fareService.calculateFare(
+        currentLineId,
+        stationCount,
+        btsCardType: cardState.btsCardType,
+        mrtCardType: cardState.mrtCardType,
+        arlCardType: cardState.arlCardType,
+      );
+
       segments.add(RouteSegment(
         lineId: currentLineId,
         lineName: line?.nameEn ?? currentLineId,
@@ -515,13 +544,8 @@ class SearchViewModel extends _$SearchViewModel {
             : [],
         stationCount: stationCount,
         estimatedMinutes: stationCount * TransitConstants.avgTimeBetweenStations,
-        fareThb: fareService.calculateFare(
-          currentLineId,
-          stationCount,
-          btsCardType: cardState.btsCardType,
-          mrtCardType: cardState.mrtCardType,
-          arlCardType: cardState.arlCardType,
-        ),
+        fareThb: discountedFare,
+        standardFareThb: standardFare,
       ));
     }
 
@@ -539,12 +563,14 @@ class SearchViewModel extends _$SearchViewModel {
           stationCount: 0,
           estimatedMinutes: destination.walkingMinutes ?? 5.0,
           fareThb: 0,
+          standardFareThb: 0,
         ));
       }
     }
 
     final totalFare = segments.fold<int>(0, (sum, s) => sum + s.fareThb);
-    
+    final totalStandardFare = segments.fold<int>(0, (sum, s) => sum + s.standardFareThb);
+
     double totalMinutes = dijkstraResult.totalWeight;
     if (origin.walkingMinutes != null) totalMinutes += origin.walkingMinutes!;
     if (destination.walkingMinutes != null) totalMinutes += destination.walkingMinutes!;
@@ -558,6 +584,7 @@ class SearchViewModel extends _$SearchViewModel {
       transfers: transfers,
       totalMinutes: totalMinutes,
       totalFareThb: totalFare,
+      totalStandardFareThb: totalStandardFare,
       totalStations: totalStations,
       calculatedAt: DateTime.now(),
     );

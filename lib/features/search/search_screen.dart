@@ -782,7 +782,9 @@ class RouteResultBanner extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '~${result.totalMinutes.toInt()} ${t.common.minutesUnit} · ${result.totalFareThb} ${t.common.currencyUnit}',
+                      result.totalDiscountThb > 0
+                          ? '~${result.totalMinutes.toInt()} ${t.common.minutesUnit} · ${result.totalFareThb} ${t.common.currencyUnit} (-${result.totalDiscountThb} ฿)'
+                          : '~${result.totalMinutes.toInt()} ${t.common.minutesUnit} · ${result.totalFareThb} ${t.common.currencyUnit}',
                       style: theme.textTheme.titleMedium?.copyWith(
                         color: theme.colorScheme.primary,
                         fontWeight: FontWeight.bold,

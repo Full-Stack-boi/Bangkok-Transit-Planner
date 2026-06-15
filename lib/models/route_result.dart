@@ -13,6 +13,7 @@ class RouteSegment {
   final int stationCount;
   final double estimatedMinutes;
   final int fareThb;
+  final int standardFareThb; // Standard fare (without discount)
 
   const RouteSegment({
     required this.lineId,
@@ -25,6 +26,7 @@ class RouteSegment {
     required this.stationCount,
     required this.estimatedMinutes,
     required this.fareThb,
+    required this.standardFareThb,
   });
 
   /// Total stations including origin and destination
@@ -56,6 +58,7 @@ class RouteResult {
   final List<TransferStep> transfers;
   final double totalMinutes;
   final int totalFareThb;
+  final int totalStandardFareThb; // Standard fare (without discount)
   final int totalStations;
   final DateTime calculatedAt;
 
@@ -66,6 +69,7 @@ class RouteResult {
     required this.transfers,
     required this.totalMinutes,
     required this.totalFareThb,
+    required this.totalStandardFareThb,
     required this.totalStations,
     required this.calculatedAt,
   });
@@ -79,4 +83,7 @@ class RouteResult {
 
   /// Is this a direct route (no transfers)?
   bool get isDirect => transfers.isEmpty;
+
+  /// Total discount in THB
+  int get totalDiscountThb => totalStandardFareThb - totalFareThb;
 }

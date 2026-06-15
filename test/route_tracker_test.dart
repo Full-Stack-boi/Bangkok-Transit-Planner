@@ -40,6 +40,7 @@ void main() {
       stationCount: 1,
       estimatedMinutes: 3.0,
       fareThb: 15,
+      standardFareThb: 15,
     );
 
     final mockRoute = RouteResult(
@@ -49,6 +50,7 @@ void main() {
       transfers: const [],
       totalMinutes: 3.0,
       totalFareThb: 15,
+      totalStandardFareThb: 15,
       totalStations: 2,
       calculatedAt: DateTime.now(),
     );
