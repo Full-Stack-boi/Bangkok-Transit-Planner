@@ -140,4 +140,27 @@ class AuthRepository {
       return null;
     }
   }
+
+  /// Update the authenticated user's card preferences in Supabase userMetadata
+  Future<void> updateUserCards({
+    required String btsCardType,
+    required String mrtCardType,
+    required String arlCardType,
+  }) async {
+    final client = _client;
+    if (client == null) return;
+    try {
+      await client.auth.updateUser(
+        UserAttributes(
+          data: {
+            'bts_card_type': btsCardType,
+            'mrt_card_type': mrtCardType,
+            'arl_card_type': arlCardType,
+          },
+        ),
+      );
+    } catch (e) {
+      print('Failed to update user cards metadata: $e');
+    }
+  }
 }

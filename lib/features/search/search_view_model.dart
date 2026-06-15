@@ -73,6 +73,11 @@ class SearchState {
 class SearchViewModel extends _$SearchViewModel {
   @override
   SearchState build() {
+    ref.listen(userCardsProvider, (previous, next) {
+      if (state.origin != null && state.destination != null) {
+        _tryCalculateRoute();
+      }
+    });
     return const SearchState();
   }
 
@@ -371,6 +376,7 @@ class SearchViewModel extends _$SearchViewModel {
   ) {
     final segments = <RouteSegment>[];
     final transfers = <TransferStep>[];
+    final cardState = ref.read(userCardsProvider);
 
     // ─── 1. If Origin requires walking, add initial Walk Segment ───
     if (origin.nearestStationId != null) {
@@ -419,7 +425,13 @@ class SearchViewModel extends _$SearchViewModel {
                 : [],
             stationCount: stationCount,
             estimatedMinutes: stationCount * TransitConstants.avgTimeBetweenStations,
-            fareThb: fareService.calculateFare(currentLineId, stationCount),
+            fareThb: fareService.calculateFare(
+              currentLineId,
+              stationCount,
+              btsCardType: cardState.btsCardType,
+              mrtCardType: cardState.mrtCardType,
+              arlCardType: cardState.arlCardType,
+            ),
           ));
         }
 
@@ -463,7 +475,13 @@ class SearchViewModel extends _$SearchViewModel {
                   : [],
               stationCount: stationCount,
               estimatedMinutes: stationCount * TransitConstants.avgTimeBetweenStations,
-              fareThb: fareService.calculateFare(currentLineId, stationCount),
+              fareThb: fareService.calculateFare(
+                currentLineId,
+                stationCount,
+                btsCardType: cardState.btsCardType,
+                mrtCardType: cardState.mrtCardType,
+                arlCardType: cardState.arlCardType,
+              ),
             ));
           }
           currentLineId = step.lineId;
@@ -497,7 +515,13 @@ class SearchViewModel extends _$SearchViewModel {
             : [],
         stationCount: stationCount,
         estimatedMinutes: stationCount * TransitConstants.avgTimeBetweenStations,
-        fareThb: fareService.calculateFare(currentLineId, stationCount),
+        fareThb: fareService.calculateFare(
+          currentLineId,
+          stationCount,
+          btsCardType: cardState.btsCardType,
+          mrtCardType: cardState.mrtCardType,
+          arlCardType: cardState.arlCardType,
+        ),
       ));
     }
 

@@ -70,6 +70,17 @@ class AuthNotifier extends _$AuthNotifier {
           isLoading: false,
         );
 
+        // Sync card preferences from userMetadata
+        final userMetadata = user.userMetadata ?? {};
+        final bts = userMetadata['bts_card_type'] as String? ?? 'standard';
+        final mrt = userMetadata['mrt_card_type'] as String? ?? 'standard';
+        final arl = userMetadata['arl_card_type'] as String? ?? 'standard';
+        ref.read(userCardsProvider.notifier).updateFromSync(
+          btsCardType: bts,
+          mrtCardType: mrt,
+          arlCardType: arl,
+        );
+
         // Perform offline sync to upload locally saved routes and favorites
         try {
           final favoritesRepo = ref.read(favoritesRepositoryProvider);

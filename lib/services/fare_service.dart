@@ -76,21 +76,67 @@ class FareService {
     45,  // 7 stops (full line Phaya Thai - Suvarnabhumi)
   ];
 
-  /// Calculate fare for a single line segment
-  int calculateFare(String lineId, int stationCount) {
+  /// Calculate fare for a single line segment taking card types and discounts into account
+  int calculateFare(
+    String lineId,
+    int stationCount, {
+    String btsCardType = 'standard',
+    String mrtCardType = 'standard',
+    String arlCardType = 'standard',
+  }) {
     final table = _getFareTable(lineId);
     if (table == null) return 0;
 
     final index = stationCount.clamp(0, table.length - 1);
-    return table[index];
+    final standardFare = table[index];
+
+    // Determine network type
+    final isBts = lineId.startsWith('BTS');
+    final isMrt = lineId.startsWith('MRT');
+    final isArl = lineId == 'ARL';
+
+    if (isBts) {
+      if (btsCardType == 'senior') {
+        return (standardFare * 0.5).round(); // 50% Senior discount
+      } else if (btsCardType == 'trip_package') {
+        // BTS Trip Package flat rate (usually ~28-30 THB per trip). If standard fare is cheaper, pay standard.
+        return standardFare < 30 ? standardFare : 30;
+      } else if (btsCardType == 'student') {
+        return (standardFare * 0.9).round(); // 10% Student discount for app utility
+      }
+    } else if (isMrt) {
+      if (mrtCardType == 'student') {
+        return (standardFare * 0.9).round(); // 10% Student discount
+      } else if (mrtCardType == 'senior') {
+        return (standardFare * 0.5).round(); // 50% Senior discount
+      }
+    } else if (isArl) {
+      if (arlCardType == 'student') {
+        return (standardFare * 0.8).round(); // 20% Student discount
+      } else if (arlCardType == 'senior') {
+        return (standardFare * 0.5).round(); // 50% Senior discount
+      }
+    }
+
+    return standardFare;
   }
 
-  /// Calculate total fare for a multi-line route
-  /// Each line segment is calculated separately and summed
-  int calculateTotalFare(List<FareSegment> segments) {
+  /// Calculate total fare for a multi-line route taking card types and discounts into account
+  int calculateTotalFare(
+    List<FareSegment> segments, {
+    String btsCardType = 'standard',
+    String mrtCardType = 'standard',
+    String arlCardType = 'standard',
+  }) {
     int total = 0;
     for (final segment in segments) {
-      total += calculateFare(segment.lineId, segment.stationCount);
+      total += calculateFare(
+        segment.lineId,
+        segment.stationCount,
+        btsCardType: btsCardType,
+        mrtCardType: mrtCardType,
+        arlCardType: arlCardType,
+      );
     }
     return total;
   }

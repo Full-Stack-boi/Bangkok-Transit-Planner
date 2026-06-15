@@ -152,6 +152,22 @@ class SettingsScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 8),
 
+          // Transit Cards Option
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.credit_card_rounded),
+              title: Text(localeCode == 'th' ? 'บัตรโดยสารและสิทธิ์ของฉัน' : 'My Transit Cards & Passes'),
+              subtitle: Text(
+                localeCode == 'th'
+                    ? 'ตั้งค่าส่วนลดและตั๋วรถไฟฟ้า BTS, MRT, ARL'
+                    : 'Set up discounts and fares for BTS, MRT, ARL',
+              ),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => _showTransitCardsDialog(context, ref, theme, localeCode),
+            ),
+          ),
+          const SizedBox(height: 8),
+
           // Location Simulation Option (DEBUG ONLY - Hidden in release build)
           if (kDebugMode) ...[
             Card(
@@ -444,6 +460,150 @@ class SettingsScreen extends ConsumerWidget {
                   ],
                 ),
               ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _showTransitCardsDialog(
+    BuildContext context,
+    WidgetRef ref,
+    ThemeData theme,
+    String localeCode,
+  ) {
+    final isTh = localeCode == 'th';
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return Consumer(
+          builder: (context, ref, child) {
+            final cardState = ref.watch(userCardsProvider);
+
+            return AlertDialog(
+              title: Row(
+                children: [
+                  Icon(Icons.credit_card_rounded, color: theme.colorScheme.primary),
+                  const SizedBox(width: 8),
+                  Text(isTh ? 'บัตรโดยสารและสิทธิ์ของฉัน' : 'My Transit Cards & Passes'),
+                ],
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    isTh 
+                        ? 'เลือกประเภทบัตรโดยสารรถไฟฟ้าตามจริง เพื่อคำนวณและแสดงค่าโดยสารที่เหมาะสมสำหรับคุณ'
+                        : 'Select your actual fare cards to calculate and show personalized pricing.',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+
+                  // BTS Dropdown
+                  DropdownButtonFormField<String>(
+                    value: cardState.btsCardType,
+                    decoration: InputDecoration(
+                      labelText: isTh ? 'รถไฟฟ้า BTS' : 'BTS Skytrain',
+                      border: const OutlineInputBorder(),
+                      prefixIcon: const Icon(Icons.directions_transit_rounded, color: Colors.green),
+                    ),
+                    items: [
+                      DropdownMenuItem(
+                        value: 'standard',
+                        child: Text(isTh ? 'บุคคลทั่วไป (ปกติ)' : 'Standard / Adult'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'student',
+                        child: Text(isTh ? 'นักเรียน/นักศึกษา' : 'Student (10% off)'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'senior',
+                        child: Text(isTh ? 'ผู้สูงอายุ (ลด 50%)' : 'Senior (50% off)'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'trip_package',
+                        child: Text(isTh ? 'เหมาจ่ายรายเที่ยว (30 บาท)' : 'Trip Package (Flat 30 THB)'),
+                      ),
+                    ],
+                    onChanged: (val) {
+                      if (val != null) {
+                        ref.read(userCardsProvider.notifier).setCardType('BTS', val);
+                      }
+                    },
+                  ),
+                  const SizedBox(height: 16),
+
+                  // MRT Dropdown
+                  DropdownButtonFormField<String>(
+                    value: cardState.mrtCardType,
+                    decoration: InputDecoration(
+                      labelText: isTh ? 'รถไฟฟ้า MRT (สีน้ำเงิน/ม่วง/เหลือง)' : 'MRT Metro',
+                      border: const OutlineInputBorder(),
+                      prefixIcon: const Icon(Icons.directions_transit_rounded, color: Colors.blue),
+                    ),
+                    items: [
+                      DropdownMenuItem(
+                        value: 'standard',
+                        child: Text(isTh ? 'บุคคลทั่วไป (ปกติ)' : 'Standard / Adult'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'student',
+                        child: Text(isTh ? 'นักเรียน/นักศึกษา (ลด 10%)' : 'Student (10% off)'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'senior',
+                        child: Text(isTh ? 'ผู้สูงอายุ (ลด 50%)' : 'Senior (50% off)'),
+                      ),
+                    ],
+                    onChanged: (val) {
+                      if (val != null) {
+                        ref.read(userCardsProvider.notifier).setCardType('MRT', val);
+                      }
+                    },
+                  ),
+                  const SizedBox(height: 16),
+
+                  // ARL Dropdown
+                  DropdownButtonFormField<String>(
+                    value: cardState.arlCardType,
+                    decoration: InputDecoration(
+                      labelText: isTh ? 'รถไฟฟ้า ARL (Airport Link)' : 'ARL Airport Link',
+                      border: const OutlineInputBorder(),
+                      prefixIcon: const Icon(Icons.directions_transit_rounded, color: Colors.red),
+                    ),
+                    items: [
+                      DropdownMenuItem(
+                        value: 'standard',
+                        child: Text(isTh ? 'บุคคลทั่วไป (ปกติ)' : 'Standard / Adult'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'student',
+                        child: Text(isTh ? 'นักเรียน/นักศึกษา (ลด 20%)' : 'Student (20% off)'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'senior',
+                        child: Text(isTh ? 'ผู้สูงอายุ (ลด 50%)' : 'Senior (50% off)'),
+                      ),
+                    ],
+                    onChanged: (val) {
+                      if (val != null) {
+                        ref.read(userCardsProvider.notifier).setCardType('ARL', val);
+                      }
+                    },
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text(isTh ? 'ตกลง' : 'OK'),
+                ),
+              ],
             );
           },
         );

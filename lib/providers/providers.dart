@@ -13,9 +13,11 @@ import '../services/supabase_service.dart';
 import '../services/location_service.dart';
 import '../services/notification_service.dart';
 import 'auth_providers.dart';
+import 'user_cards_provider.dart';
 
 export 'auth_providers.dart';
 export 'location_providers.dart';
+export 'user_cards_provider.dart';
 
 part 'providers.g.dart';
 
