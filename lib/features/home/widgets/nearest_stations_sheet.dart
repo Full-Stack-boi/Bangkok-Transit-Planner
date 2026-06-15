@@ -110,8 +110,8 @@ class NearestStationsSheet extends ConsumerWidget {
                       // 2. Set as origin in Search
                       searchVm.setOrigin(station);
 
-                      // 3. Switch to Search tab (index 0)
-                      ref.read(homeTabIndexProvider.notifier).setTab(0);
+                      // 3. Switch to Map tab (index 1) — search lives inside Map screen
+                      ref.read(homeTabIndexProvider.notifier).setTab(1);
 
                       if (context.mounted) {
                         Navigator.pop(context); // Close bottom sheet

@@ -94,7 +94,7 @@ final transitInitProvider = FutureProvider<void>((ref) async {
 @riverpod
 class HomeTabIndex extends _$HomeTabIndex {
   @override
-  int build() => 0;
+  int build() => 1;
 
   void setTab(int index) {
     state = index;

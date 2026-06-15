@@ -14,7 +14,8 @@ import '../../providers/providers.dart';
 import '../../repositories/favorites_repository.dart';
 import '../search/search_view_model.dart';
 import '../../core/constants/translation_helper.dart';
-import '../search/search_screen.dart';
+import 'widgets/map_search_overlay.dart';
+import 'widgets/route_result_banner.dart';
 import '../route_result/route_result_sheet.dart';
 import '../../providers/route_tracker.dart';
 import 'cached_tile_provider.dart';
@@ -445,22 +446,12 @@ class _MapScreenState extends ConsumerState<MapScreen> {
 
     final t = ref.watch(translationsProvider);
 
+    final isBottomCardVisible = _selectedStation != null ||
+        _customSelectedLocation != null ||
+        (isRouteActive && !isTrackingActive) ||
+        isTrackingActive;
+
     return Scaffold(
-      appBar: AppBar(
-        title: Text(t.navigation.mapTitle),
-        actions: [
-          IconButton(
-            icon: _isLocating
-                ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : const Icon(Icons.my_location_rounded),
-            onPressed: _centerOnUser,
-          ),
-        ],
-      ),
       body: Stack(
         children: [
           // ─── Map Layer ───
@@ -515,6 +506,36 @@ class _MapScreenState extends ConsumerState<MapScreen> {
               PolylineLayer(polylines: polylines),
               MarkerLayer(markers: markers),
             ],
+          ),
+
+          // ─── Floating Top Search Card ───
+          Positioned(
+            top: 16,
+            left: 16,
+            right: 16,
+            child: SafeArea(
+              bottom: false,
+              child: _buildTopSearchCard(context, searchState, t, localeCode),
+            ),
+          ),
+
+          // ─── Floating GPS Button ───
+          Positioned(
+            right: 16,
+            bottom: isBottomCardVisible ? 180 : 24,
+            child: FloatingActionButton.small(
+              heroTag: 'map_gps_fab',
+              onPressed: _centerOnUser,
+              backgroundColor: theme.colorScheme.surface,
+              foregroundColor: theme.colorScheme.onSurface,
+              child: _isLocating
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(Icons.my_location_rounded),
+            ),
           ),
 
           // ─── Station Details Popup Card ───
@@ -827,8 +848,11 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                   child: OutlinedButton.icon(
                     onPressed: () {
                       searchVm.setOrigin(station);
-                      ref.read(homeTabIndexProvider.notifier).setTab(0); // Switch to Search Screen
                       setState(() => _selectedStation = null);
+                      final currentState = ref.read(searchViewModelProvider);
+                      if (currentState.destination == null) {
+                        _openSearchOverlay(context, focusDestination: true);
+                      }
                     },
                     icon: const Icon(Icons.trip_origin_rounded, size: 16, color: Colors.green),
                     label: Text(t.favorites.setOriginBtn),
@@ -842,8 +866,11 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                   child: OutlinedButton.icon(
                     onPressed: () {
                       searchVm.setDestination(station);
-                      ref.read(homeTabIndexProvider.notifier).setTab(0); // Switch to Search Screen
                       setState(() => _selectedStation = null);
+                      final currentState = ref.read(searchViewModelProvider);
+                      if (currentState.origin == null) {
+                        _openSearchOverlay(context, focusDestination: false);
+                      }
                     },
                     icon: const Icon(Icons.location_on_rounded, size: 16, color: Colors.red),
                     label: Text(t.favorites.setDestBtn),
@@ -951,8 +978,11 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                   child: OutlinedButton.icon(
                     onPressed: () {
                       searchVm.setOrigin(location);
-                      ref.read(homeTabIndexProvider.notifier).setTab(0); // Switch to Search Screen
                       setState(() => _customSelectedLocation = null);
+                      final currentState = ref.read(searchViewModelProvider);
+                      if (currentState.destination == null) {
+                        _openSearchOverlay(context, focusDestination: true);
+                      }
                     },
                     icon: const Icon(Icons.trip_origin_rounded, size: 16, color: Colors.green),
                     label: Text(t.favorites.setOriginBtn),
@@ -966,8 +996,11 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                   child: OutlinedButton.icon(
                     onPressed: () {
                       searchVm.setDestination(location);
-                      ref.read(homeTabIndexProvider.notifier).setTab(0); // Switch to Search Screen
                       setState(() => _customSelectedLocation = null);
+                      final currentState = ref.read(searchViewModelProvider);
+                      if (currentState.origin == null) {
+                        _openSearchOverlay(context, focusDestination: false);
+                      }
                     },
                     icon: const Icon(Icons.location_on_rounded, size: 16, color: Colors.red),
                     label: Text(t.favorites.setDestBtn),
@@ -1214,6 +1247,188 @@ class _MapScreenState extends ConsumerState<MapScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildTopSearchCard(
+    BuildContext context,
+    SearchState searchState,
+    AppLocalizations t,
+    String localeCode,
+  ) {
+    final theme = Theme.of(context);
+    final hasOrigin = searchState.origin != null;
+    final hasDest = searchState.destination != null;
+
+    if (!hasOrigin && !hasDest) {
+      return Card(
+        elevation: 6,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: InkWell(
+          onTap: () {
+            _openSearchOverlay(context);
+          },
+          borderRadius: BorderRadius.circular(16),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Row(
+              children: [
+                Icon(Icons.search_rounded, color: theme.colorScheme.primary),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    t.localeCode == 'th' ? 'ค้นหาเส้นทาง...' : 'Plan a Journey...',
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    if (hasOrigin && hasDest) {
+      return Card(
+        elevation: 6,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+          child: Row(
+            children: [
+              IconButton(
+                icon: const Icon(Icons.close_rounded),
+                tooltip: t.localeCode == 'th' ? 'ล้างเส้นทาง' : 'Clear Route',
+                onPressed: () {
+                  ref.read(searchViewModelProvider.notifier).clear();
+                },
+              ),
+              Expanded(
+                child: InkWell(
+                  onTap: () {
+                    _openSearchOverlay(context);
+                  },
+                  borderRadius: BorderRadius.circular(8),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(Icons.trip_origin_rounded, color: Colors.green, size: 14),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                searchState.origin!.displayName(isEnglish: localeCode == 'en'),
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 2),
+                        Row(
+                          children: [
+                            const Icon(Icons.location_on_rounded, color: Colors.red, size: 14),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                searchState.destination!.displayName(isEnglish: localeCode == 'en'),
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.swap_vert_rounded),
+                tooltip: t.localeCode == 'th' ? 'สลับต้นทาง/ปลายทาง' : 'Swap Origin/Destination',
+                onPressed: () {
+                  ref.read(searchViewModelProvider.notifier).swapStations();
+                },
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    // Only one is set
+    final setItem = hasOrigin ? searchState.origin : searchState.destination;
+    final isOrigin = hasOrigin;
+
+    return Card(
+      elevation: 6,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: InkWell(
+        onTap: () {
+          _openSearchOverlay(context, focusDestination: isOrigin);
+        },
+        borderRadius: BorderRadius.circular(16),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Row(
+            children: [
+              Icon(
+                isOrigin ? Icons.trip_origin_rounded : Icons.location_on_rounded,
+                color: isOrigin ? Colors.green : Colors.red,
+                size: 20,
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  '${isOrigin ? (t.localeCode == 'th' ? 'ต้นทาง: ' : 'From: ') : (t.localeCode == 'th' ? 'ปลายทาง: ' : 'To: ')}'
+                  '${setItem!.displayName(isEnglish: localeCode == 'en')}',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                isOrigin
+                    ? (t.localeCode == 'th' ? 'เลือกปลายทาง...' : 'Choose destination...')
+                    : (t.localeCode == 'th' ? 'เลือกต้นทาง...' : 'Choose origin...'),
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.primary,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _openSearchOverlay(BuildContext context, {bool focusDestination = false}) {
+    Navigator.of(context).push(
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            MapSearchOverlay(focusDestination: focusDestination),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return FadeTransition(
+            opacity: animation,
+            child: child,
+          );
+        },
+        transitionDuration: const Duration(milliseconds: 200),
+        reverseTransitionDuration: const Duration(milliseconds: 150),
       ),
     );
   }

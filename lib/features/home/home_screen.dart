@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../providers/providers.dart';
-import '../search/search_screen.dart';
+import '../utility/utility_screen.dart';
 import '../map/map_screen.dart';
 import '../favorites/favorites_screen.dart';
 import '../settings/settings_screen.dart';
@@ -22,7 +22,7 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   final _screens = const [
-    SearchScreen(),
+    UtilityScreen(),
     MapScreen(),
     FavoritesScreen(),
     SettingsScreen(),
@@ -235,9 +235,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       },
       destinations: [
         NavigationDestination(
-          icon: const Icon(Icons.search_rounded),
-          selectedIcon: const Icon(Icons.search_rounded),
-          label: t.navigation.searchTitle,
+          icon: const Icon(Icons.dashboard_customize_outlined),
+          selectedIcon: const Icon(Icons.dashboard_customize),
+          label: t.localeCode == 'th' ? 'อำนวยความสะดวก' : 'Utility',
         ),
         NavigationDestination(
           icon: const Icon(Icons.map_outlined),

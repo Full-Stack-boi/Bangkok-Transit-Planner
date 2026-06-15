@@ -11,7 +11,7 @@ import 'package:bkk_transit_planner/repositories/transit_repository.dart';
 import 'package:bkk_transit_planner/services/location_service.dart';
 import 'package:bkk_transit_planner/services/notification_service.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:bkk_transit_planner/features/search/search_screen.dart';
+import 'package:bkk_transit_planner/features/map/widgets/route_result_banner.dart';
 import 'package:bkk_transit_planner/features/route_result/route_result_sheet.dart';
 import 'package:bkk_transit_planner/features/search/search_view_model.dart';
 import 'package:bkk_transit_planner/features/map/map_screen.dart';
@@ -168,19 +168,20 @@ void main() {
       // รอให้การโหลด asynchronous ต่างๆ หรืออนิเมชั่นเริ่มต้นเสร็จสิ้น
       await tester.pumpAndSettle();
 
-      // 3. ตรวจสอบหน้าจอเริ่มต้น (Assert): ตรวจพบหัวข้อแอป 'BKK Transit' บนหน้าจอค้นหา (หน้าแรก)
-      expect(find.text('BKK Transit'), findsOneWidget);
-      
+      // 3. ตรวจสอบหน้าจอเริ่มต้น (Assert): ตอนนี้เปิดที่หน้า Map (fullscreen, ไม่มี AppBar title)
       // ตรวจสอบว่ามี NavigationBar อยู่บนหน้าจอจริง
       expect(find.byType(NavigationBar), findsOneWidget);
 
-      // ค้นหาและตรวจสอบว่ามีแท็บนำทางครบทั้ง 4 แท็บ (ค้นหาเส้นทาง, แผนที่, รายการโปรด, ตั้งค่า) ใน NavigationBar
+      // ค้นหาและตรวจสอบว่ามีแท็บนำทางครบทั้ง 4 แท็บใน NavigationBar
       // อิงตามคำแปลภาษาไทยเริ่มต้น
       final navBar = find.byType(NavigationBar);
-      expect(find.descendant(of: navBar, matching: find.text('ค้นหาเส้นทาง')), findsOneWidget);
+      expect(find.descendant(of: navBar, matching: find.text('อำนวยความสะดวก')), findsOneWidget);
       expect(find.descendant(of: navBar, matching: find.text('แผนที่รถไฟฟ้า')), findsOneWidget);
       expect(find.descendant(of: navBar, matching: find.text('รายการโปรด')), findsOneWidget);
       expect(find.descendant(of: navBar, matching: find.text('ตั้งค่า')), findsOneWidget);
+
+      // ตรวจสอบว่า app เปิดที่หน้า Map (MapScreen widget ควรมีอยู่บนหน้าจอ)
+      expect(find.byType(MapScreen), findsOneWidget);
 
       // 4. จำลองการคลิกเปลี่ยนแท็บไปยังแท็บ "ตั้งค่า" (Act)
       final settingsTab = find.descendant(of: navBar, matching: find.text('ตั้งค่า'));
