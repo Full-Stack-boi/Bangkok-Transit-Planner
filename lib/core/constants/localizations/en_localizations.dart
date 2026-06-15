@@ -25,6 +25,8 @@ class EnglishLocalizations implements BaseLocalizations {
   final journey = EnglishJourney();
   @override
   final auth = EnglishAuth();
+  @override
+  final utility = EnglishUtility();
 }
 
 class EnglishCommon implements BaseCommon {
@@ -395,4 +397,68 @@ class EnglishAuth implements BaseAuth {
   String get registrationFailed => 'Registration failed. Email might already be in use.';
   @override
   String get syncSuccess => 'Data synced successfully!';
+}
+
+class EnglishUtility implements BaseUtility {
+  @override
+  String get statusSectionTitle => 'Transit Service Status';
+  @override
+  String get newsSectionTitle => 'Transit News & Alerts';
+  @override
+  String get cardsSectionTitle => 'My Transit Cards & Passes';
+  @override
+  String get cardsSubtitle =>
+      'Configure your active cards to display customized fares across the map.';
+
+  @override
+  String get rabbitCardName => 'Rabbit Card';
+  @override
+  String get mrtCardName => 'MRT Card';
+  @override
+  String get arlCardName => 'ARL Smart Pass';
+
+  @override
+  String get optionStandardTitle => 'Standard';
+  @override
+  String get optionStudentTitle => 'Student';
+  @override
+  String get optionSeniorTitle => 'Senior';
+  @override
+  String get optionTripPackageTitle => 'Trip Package';
+
+  @override
+  String get optionStandardSubtitle => 'Regular fare';
+  @override
+  String get optionStudentBtsSubtitle => '10% off';
+  @override
+  String get optionSeniorBtsSubtitle => '50% off';
+  @override
+  String get optionTripPackageBtsSubtitle => 'Flat 30 \u0e3f';
+  @override
+  String get optionStudentMrtSubtitle => '10% off';
+  @override
+  String get optionSeniorMrtSubtitle => '50% off';
+  @override
+  String get optionStudentArlSubtitle => '20% off';
+  @override
+  String get optionSeniorArlSubtitle => '50% off';
+
+  @override
+  String get debugSimGpsTitle => 'Simulate GPS Location';
+  @override
+  String get debugSimGpsDisabled => 'Disabled (Using Real GPS)\n(Debug Mode Only)';
+  @override
+  String debugSimGpsActive(String lat, String lng) =>
+      'Simulating at: $lat, $lng\n(Debug Mode Only)';
+  @override
+  String get debugSimGpsDialogTitle => 'Simulate Location';
+  @override
+  String get debugSimGpsDisableOption => 'Disable Simulation';
+  @override
+  String get debugSimGpsDisableSubtitle => 'Use real hardware/emulator GPS';
+  @override
+  String get debugSimGpsDisabledSnack => 'Mock location disabled';
+  @override
+  String debugSimGpsEnabledSnack(String stationName) =>
+      'Simulating at $stationName';
 }

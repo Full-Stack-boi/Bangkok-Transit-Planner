@@ -25,6 +25,8 @@ class ThaiLocalizations implements BaseLocalizations {
   final journey = ThaiJourney();
   @override
   final auth = ThaiAuth();
+  @override
+  final utility = ThaiUtility();
 }
 
 class ThaiCommon implements BaseCommon {
@@ -395,4 +397,68 @@ class ThaiAuth implements BaseAuth {
   String get registrationFailed => 'สมัครสมาชิกไม่สำเร็จ อีเมลนี้อาจถูกใช้งานไปแล้ว';
   @override
   String get syncSuccess => 'ซิงค์ข้อมูลสำเร็จ!';
+}
+
+class ThaiUtility implements BaseUtility {
+  @override
+  String get statusSectionTitle => 'สถานะการเดินรถไฟฟ้า';
+  @override
+  String get newsSectionTitle => 'ข่าวสารและประกาศ';
+  @override
+  String get cardsSectionTitle => 'บัตรโดยสารและสิทธิ์ของฉัน';
+  @override
+  String get cardsSubtitle =>
+      'เลือกสิทธิ์ส่วนลดของคุณเพื่อการแสดงผลราคาในระบบเดินทางอย่างถูกต้อง';
+
+  @override
+  String get rabbitCardName => 'บัตรแรบบิท (Rabbit)';
+  @override
+  String get mrtCardName => 'บัตรเอ็มอาร์ที (MRT)';
+  @override
+  String get arlCardName => 'แอร์พอร์ตลิงก์ (ARL)';
+
+  @override
+  String get optionStandardTitle => 'บุคคลทั่วไป';
+  @override
+  String get optionStudentTitle => 'นักเรียน/นักศึกษา';
+  @override
+  String get optionSeniorTitle => 'ผู้สูงอายุ';
+  @override
+  String get optionTripPackageTitle => 'เหมาเที่ยว (BTS)';
+
+  @override
+  String get optionStandardSubtitle => 'ราคาปกติ';
+  @override
+  String get optionStudentBtsSubtitle => 'ลด 10%';
+  @override
+  String get optionSeniorBtsSubtitle => 'ลด 50%';
+  @override
+  String get optionTripPackageBtsSubtitle => '30 บาท/เที่ยว';
+  @override
+  String get optionStudentMrtSubtitle => 'ลด 10%';
+  @override
+  String get optionSeniorMrtSubtitle => 'ลด 50%';
+  @override
+  String get optionStudentArlSubtitle => 'ลด 20%';
+  @override
+  String get optionSeniorArlSubtitle => 'ลด 50%';
+
+  @override
+  String get debugSimGpsTitle => 'จำลองตำแหน่งพิกัด GPS';
+  @override
+  String get debugSimGpsDisabled => 'ปิดใช้งาน (ใช้ GPS จริง)\n(โหมด Debug เท่านั้น)';
+  @override
+  String debugSimGpsActive(String lat, String lng) =>
+      'กำลังจำลอง: $lat, $lng\n(โหมด Debug เท่านั้น)';
+  @override
+  String get debugSimGpsDialogTitle => 'จำลองตำแหน่งพิกัด';
+  @override
+  String get debugSimGpsDisableOption => 'ปิดการจำลอง';
+  @override
+  String get debugSimGpsDisableSubtitle => 'ใช้ GPS จริงจากเครื่องหรือ Emulator';
+  @override
+  String get debugSimGpsDisabledSnack => 'ปิดการจำลองตำแหน่งแล้ว';
+  @override
+  String debugSimGpsEnabledSnack(String stationName) =>
+      'กำลังจำลองตำแหน่งที่ $stationName';
 }

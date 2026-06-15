@@ -237,7 +237,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         NavigationDestination(
           icon: const Icon(Icons.dashboard_customize_outlined),
           selectedIcon: const Icon(Icons.dashboard_customize),
-          label: t.localeCode == 'th' ? 'อำนวยความสะดวก' : 'Utility',
+          label: t.localeCode == 'th' ? 'บริการ' : 'Utility',
         ),
         NavigationDestination(
           icon: const Icon(Icons.map_outlined),

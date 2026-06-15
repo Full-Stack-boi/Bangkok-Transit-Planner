@@ -175,7 +175,7 @@ void main() {
       // ค้นหาและตรวจสอบว่ามีแท็บนำทางครบทั้ง 4 แท็บใน NavigationBar
       // อิงตามคำแปลภาษาไทยเริ่มต้น
       final navBar = find.byType(NavigationBar);
-      expect(find.descendant(of: navBar, matching: find.text('อำนวยความสะดวก')), findsOneWidget);
+      expect(find.descendant(of: navBar, matching: find.text('บริการ')), findsOneWidget);
       expect(find.descendant(of: navBar, matching: find.text('แผนที่รถไฟฟ้า')), findsOneWidget);
       expect(find.descendant(of: navBar, matching: find.text('รายการโปรด')), findsOneWidget);
       expect(find.descendant(of: navBar, matching: find.text('ตั้งค่า')), findsOneWidget);

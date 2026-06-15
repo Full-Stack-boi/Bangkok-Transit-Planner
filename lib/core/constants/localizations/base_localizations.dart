@@ -11,6 +11,7 @@ abstract class BaseLocalizations {
   BaseSettings get settings;
   BaseJourney get journey;
   BaseAuth get auth;
+  BaseUtility get utility;
 }
 
 abstract class BaseCommon {
@@ -175,6 +176,45 @@ abstract class BaseJourney {
   String get simulationMode;
   String get nextSimulationBtn;
   String get stationsCount;
+}
+
+abstract class BaseUtility {
+  // ─── Section headings ───
+  String get statusSectionTitle;
+  String get newsSectionTitle;
+  String get cardsSectionTitle;
+  String get cardsSubtitle;
+
+  // ─── Card names ───
+  String get rabbitCardName;
+  String get mrtCardName;
+  String get arlCardName;
+
+  // ─── Card option titles ───
+  String get optionStandardTitle;
+  String get optionStudentTitle;
+  String get optionSeniorTitle;
+  String get optionTripPackageTitle;
+
+  // ─── Card option subtitles ───
+  String get optionStandardSubtitle;
+  String get optionStudentBtsSubtitle;
+  String get optionSeniorBtsSubtitle;
+  String get optionTripPackageBtsSubtitle;
+  String get optionStudentMrtSubtitle;
+  String get optionSeniorMrtSubtitle;
+  String get optionStudentArlSubtitle;
+  String get optionSeniorArlSubtitle;
+
+  // ─── Debug GPS simulation ───
+  String get debugSimGpsTitle;
+  String get debugSimGpsDisabled;
+  String debugSimGpsActive(String lat, String lng);
+  String get debugSimGpsDialogTitle;
+  String get debugSimGpsDisableOption;
+  String get debugSimGpsDisableSubtitle;
+  String get debugSimGpsDisabledSnack;
+  String debugSimGpsEnabledSnack(String stationName);
 }
 
 abstract class BaseAuth {

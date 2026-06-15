@@ -34,4 +34,8 @@ class AppLocalizations {
   BaseSettings get settings => _delegate.settings;
   BaseJourney get journey => _delegate.journey;
   BaseAuth get auth => _delegate.auth;
+  BaseUtility get utility => _delegate.utility;
+
+  /// Convenience helpers — avoids importing localeProvider just for a boolean
+  bool get isTh => localeCode == 'th';
 }
