@@ -197,8 +197,9 @@ class NearestStationsSheet extends ConsumerWidget {
                                   final connStation = transitRepo.getStation(
                                     id,
                                   );
-                                  if (connStation == null)
+                                  if (connStation == null) {
                                     return const SizedBox();
+                                  }
                                   final connColor = TransitColors.getLineColor(
                                     connStation.lineId,
                                   );
