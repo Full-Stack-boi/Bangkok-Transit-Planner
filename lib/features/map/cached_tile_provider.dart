@@ -24,8 +24,8 @@ class CachedTileProvider extends TileProvider {
   static Future<String> getCachePath() async {
     if (kIsWeb) return '';
     if (_resolvedCachePath != null) return _resolvedCachePath!;
-    final tempDir = await getTemporaryDirectory();
-    _resolvedCachePath = '${tempDir.path}/map_tiles';
+    final supportDir = await getApplicationSupportDirectory();
+    _resolvedCachePath = '${supportDir.path}/map_tiles';
     return _resolvedCachePath!;
   }
 
