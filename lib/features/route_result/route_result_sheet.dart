@@ -18,10 +18,14 @@ class RouteResultSheet extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(searchViewModelProvider);
-    final result = state.routeResult;
+    final result = ref.watch(searchViewModelProvider.select((s) => s.routeResult));
+    final saverRoute = ref.watch(searchViewModelProvider.select((s) => s.saverRoute));
+    final regularRoute = ref.watch(searchViewModelProvider.select((s) => s.regularRoute));
+    final activeRouteType = ref.watch(searchViewModelProvider.select((s) => s.activeRouteType));
     final t = ref.watch(translationsProvider);
     final localeCode = ref.watch(localeProvider);
+    final crowdService = ref.watch(crowdServiceProvider);
+    final scheduleService = ref.watch(scheduleServiceProvider);
 
     if (result == null) {
       return SizedBox(
@@ -64,51 +68,55 @@ class RouteResultSheet extends ConsumerWidget {
               _buildHeader(context, ref, result, theme, t, localeCode),
 
               // Route Type Selector (Recommended vs Saver)
-              if (state.saverRoute != null) ...[
+              if (saverRoute != null) ...[
                 const SizedBox(height: 16),
-                _buildRouteTypeSelector(context, ref, state, theme, t),
+                _buildRouteTypeSelector(context, ref, activeRouteType, regularRoute, saverRoute, theme, t),
               ],
 
               const SizedBox(height: 24),
 
               // Route Timeline Segments
-              ...result.segments.asMap().entries.map((entry) {
-                final i = entry.key;
-                final segment = entry.value;
-                return Column(
-                  children: [
-                    _buildSegmentCard(context, ref, segment, theme, t, localeCode),
-                    if (i < result.segments.length - 1)
-                      Builder(
-                        builder: (context) {
-                          final nextSegment = result.segments[i + 1];
-                          TransferStep? matchingTransfer;
-                          for (final transfer in result.transfers) {
-                            if (transfer.fromStation.id == segment.toStation.id &&
-                                transfer.toStation.id == nextSegment.fromStation.id &&
-                                transfer.fromLineId == segment.lineId &&
-                                transfer.toLineId == nextSegment.lineId) {
-                              matchingTransfer = transfer;
-                              break;
-                            }
-                          }
-                          if (matchingTransfer != null) {
-                            return _buildTransferIndicator(
-                              context,
-                              matchingTransfer,
-                              segment,
-                              nextSegment,
-                              theme,
-                              t,
-                              localeCode,
-                            );
-                          }
-                          return const SizedBox.shrink();
-                        },
-                      ),
-                  ],
-                );
-              }),
+              Builder(
+                builder: (context) {
+                  final transferMap = <String, TransferStep>{};
+                  for (final tr in result.transfers) {
+                    transferMap['${tr.fromStation.id}-${tr.toStation.id}-${tr.fromLineId}-${tr.toLineId}'] = tr;
+                  }
+                  return RepaintBoundary(
+                    child: Column(
+                      children: result.segments.asMap().entries.map((entry) {
+                        final i = entry.key;
+                        final segment = entry.value;
+                        return Column(
+                          children: [
+                            _buildSegmentCard(context, ref, segment, theme, t, localeCode, crowdService, scheduleService),
+                            if (i < result.segments.length - 1)
+                              Builder(
+                                builder: (context) {
+                                  final nextSegment = result.segments[i + 1];
+                                  final key = '${segment.toStation.id}-${nextSegment.fromStation.id}-${segment.lineId}-${nextSegment.lineId}';
+                                  final matchingTransfer = transferMap[key];
+                                  if (matchingTransfer != null) {
+                                    return _buildTransferIndicator(
+                                      context,
+                                      matchingTransfer,
+                                      segment,
+                                      nextSegment,
+                                      theme,
+                                      t,
+                                      localeCode,
+                                    );
+                                  }
+                                  return const SizedBox.shrink();
+                                },
+                              ),
+                          ],
+                        );
+                      }).toList(),
+                    ),
+                  );
+                },
+              ),
 
               const SizedBox(height: 16),
 
@@ -296,14 +304,12 @@ class RouteResultSheet extends ConsumerWidget {
   Widget _buildRouteTypeSelector(
     BuildContext context,
     WidgetRef ref,
-    SearchState state,
+    String activeType,
+    RouteResult? recommended,
+    RouteResult? saver,
     ThemeData theme,
     AppLocalizations t,
   ) {
-    final activeType = state.activeRouteType;
-    final recommended = state.regularRoute;
-    final saver = state.saverRoute;
-
     if (recommended == null || saver == null) return const SizedBox.shrink();
 
     Widget buildTabButton({
@@ -439,14 +445,14 @@ class RouteResultSheet extends ConsumerWidget {
     ThemeData theme,
     AppLocalizations t,
     String localeCode,
+    dynamic crowdService,
+    dynamic scheduleService,
   ) {
     if (segment.lineId == 'WALK') {
       return _buildWalkSegmentCard(context, ref, segment, theme, t, localeCode);
     }
 
     final lineColor = TransitColors.getLineColor(segment.lineId);
-    final crowdService = ref.watch(crowdServiceProvider);
-    final scheduleService = ref.watch(scheduleServiceProvider);
 
     final crowdInfo = crowdService.getCrowdInfo(segment.fromStation.id);
     final minutesUntilNext = scheduleService.getMinutesUntilNextTrain(segment.lineId);

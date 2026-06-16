@@ -120,6 +120,7 @@ class _MapSearchOverlayState extends ConsumerState<MapSearchOverlay> {
     final theme = Theme.of(context);
     final t = ref.watch(translationsProvider);
     final localeCode = ref.watch(localeProvider);
+    final transitRepo = ref.read(transitRepositoryProvider);
 
     _initFields(state, localeCode);
 

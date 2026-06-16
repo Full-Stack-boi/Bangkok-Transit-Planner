@@ -30,10 +30,21 @@ class MapScreen extends ConsumerStatefulWidget {
 
 class _MapScreenState extends ConsumerState<MapScreen> {
   final MapController _mapController = MapController();
+  final _tileProvider = CachedTileProvider();
   Station? _selectedStation;
   CustomLocation? _customSelectedLocation;
   Position? _userPosition;
   bool _isLocating = false;
+
+  // Caches for Map Layer Optimization
+  List<Polyline> _cachedPolylines = [];
+  RouteResult? _lastRouteResultForPolylines;
+  Brightness? _lastBrightnessForPolylines;
+
+  List<Marker> _cachedBaseMarkers = [];
+  RouteResult? _lastRouteResultForMarkers;
+  Brightness? _lastBrightnessForMarkers;
+  String? _lastCurrentStationId;
 
   @override
   void initState() {
@@ -46,6 +57,12 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         if (routeResult != null) {
           _fitRouteBounds(routeResult);
         }
+        // Register listener once — not every build()
+        ref.listenManual<SearchState>(searchViewModelProvider, (previous, next) {
+          if (next.routeResult != null && next.routeResult != previous?.routeResult) {
+            _fitRouteBounds(next.routeResult!);
+          }
+        });
       }
     });
   }
@@ -162,76 +179,80 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     final theme = Theme.of(context);
     final transitRepo = ref.watch(transitRepositoryProvider);
     final favoritesRepo = ref.watch(favoritesRepositoryProvider);
-    final searchState = ref.watch(searchViewModelProvider);
-    final routeResult = searchState.routeResult;
+    final routeResult = ref.watch(searchViewModelProvider.select((s) => s.routeResult));
     final isRouteActive = routeResult != null;
     final localeCode = ref.watch(localeProvider);
-    final trackerState = ref.watch(routeTrackerProvider);
-    final isTrackingActive = trackerState.isActive;
-
-    ref.listen<SearchState>(searchViewModelProvider, (previous, next) {
-      if (next.routeResult != null && next.routeResult != previous?.routeResult) {
-        _fitRouteBounds(next.routeResult!);
-      }
-    });
+    final isTrackingActive = ref.watch(routeTrackerProvider.select((s) => s.isActive));
+    final trackerState = isTrackingActive ? ref.watch(routeTrackerProvider) : null;
 
     // Build Polylines for transit lines
-    final polylines = <Polyline>[];
-    if (isRouteActive) {
-      // Highlight ONLY the active route
-      for (final segment in routeResult.segments) {
-        final points = <LatLng>[];
-        points.add(LatLng(segment.fromStation.lat, segment.fromStation.lng));
-        for (final s in segment.intermediateStations) {
-          points.add(LatLng(s.lat, s.lng));
+    final themeBrightness = theme.brightness;
+    if (_lastRouteResultForPolylines != routeResult || _lastBrightnessForPolylines != themeBrightness) {
+      _lastRouteResultForPolylines = routeResult;
+      _lastBrightnessForPolylines = themeBrightness;
+      final newPolylines = <Polyline>[];
+      if (isRouteActive) {
+        // Highlight ONLY the active route
+        for (final segment in routeResult!.segments) {
+          final points = <LatLng>[];
+          points.add(LatLng(segment.fromStation.lat, segment.fromStation.lng));
+          for (final s in segment.intermediateStations) {
+            points.add(LatLng(s.lat, s.lng));
+          }
+          points.add(LatLng(segment.toStation.lat, segment.toStation.lng));
+
+          final isWalk = segment.lineId == 'WALK';
+          newPolylines.add(
+            Polyline(
+              points: points,
+              color: isWalk ? Colors.grey : TransitColors.getLineColor(segment.lineId),
+              strokeWidth: isWalk ? 3.5 : 6.0,
+              pattern: isWalk ? const StrokePattern.dotted() : const StrokePattern.solid(),
+              borderColor: isWalk 
+                  ? Colors.transparent 
+                  : (themeBrightness == Brightness.dark
+                      ? Colors.black.withValues(alpha: 0.3)
+                      : Colors.white.withValues(alpha: 0.3)),
+              borderStrokeWidth: isWalk ? 0.0 : 1.5,
+            ),
+          );
         }
-        points.add(LatLng(segment.toStation.lat, segment.toStation.lng));
+      } else {
+        // Show all lines
+        for (final line in transitRepo.lines) {
+          final points = line.stationIds.map((id) {
+            final station = transitRepo.getStation(id);
+            return LatLng(station!.lat, station.lng);
+          }).toList();
 
-        final isWalk = segment.lineId == 'WALK';
-        polylines.add(
-          Polyline(
-            points: points,
-            color: isWalk ? Colors.grey : TransitColors.getLineColor(segment.lineId),
-            strokeWidth: isWalk ? 3.5 : 6.0,
-            pattern: isWalk ? const StrokePattern.dotted() : const StrokePattern.solid(),
-            borderColor: isWalk 
-                ? Colors.transparent 
-                : (theme.brightness == Brightness.dark
-                    ? Colors.black.withValues(alpha: 0.3)
-                    : Colors.white.withValues(alpha: 0.3)),
-            borderStrokeWidth: isWalk ? 0.0 : 1.5,
-          ),
-        );
-      }
-    } else {
-      // Show all lines
-      for (final line in transitRepo.lines) {
-        final points = line.stationIds.map((id) {
-          final station = transitRepo.getStation(id);
-          return LatLng(station!.lat, station.lng);
-        }).toList();
-
-        if (line.isLoop && points.isNotEmpty) {
-          points.add(points.first); // Close the circle for MRT Blue Line
+          newPolylines.add(
+            Polyline(
+              points: points,
+              color: TransitColors.getLineColor(line.id),
+              strokeWidth: 4.5,
+              borderColor: themeBrightness == Brightness.dark
+                  ? Colors.black.withValues(alpha: 0.3)
+                  : Colors.white.withValues(alpha: 0.3),
+              borderStrokeWidth: 1.0,
+            ),
+          );
         }
-
-        polylines.add(
-          Polyline(
-            points: points,
-            color: TransitColors.getLineColor(line.id),
-            strokeWidth: 4.5,
-            borderColor: theme.brightness == Brightness.dark
-                ? Colors.black.withValues(alpha: 0.3)
-                : Colors.white.withValues(alpha: 0.3),
-            borderStrokeWidth: 1.0,
-          ),
-        );
       }
+      _cachedPolylines = newPolylines;
     }
+    final polylines = _cachedPolylines;
 
     // Build Station Markers
-    final markers = <Marker>[];
-    if (isRouteActive) {
+    final currentStationId = trackerState?.currentStation?.id;
+    if (_lastRouteResultForMarkers != routeResult || 
+        _lastBrightnessForMarkers != themeBrightness || 
+        _lastCurrentStationId != currentStationId) {
+      _lastRouteResultForMarkers = routeResult;
+      _lastBrightnessForMarkers = themeBrightness;
+      _lastCurrentStationId = currentStationId;
+      final newMarkers = <Marker>[];
+      
+      if (isRouteActive) {
       // Find all transit stations on the route
       final routeStations = <Station>[];
       for (final segment in routeResult.segments) {
@@ -252,9 +273,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
       for (final station in routeStations) {
         final lineColor = TransitColors.getLineColor(station.lineId);
         final isInterchange = station.interchange.isNotEmpty;
-        final isCurrentStation = isTrackingActive && trackerState.currentStation?.id == station.id;
+        final isCurrentStation = isTrackingActive && trackerState?.currentStation?.id == station.id;
 
-        markers.add(
+        newMarkers.add(
           Marker(
             point: LatLng(station.lat, station.lng),
             width: isCurrentStation ? 44 : (isInterchange ? 32 : 24),
@@ -306,47 +327,47 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         );
       }
 
-      // Add custom origin/destination pins
-      // Origin Pin (Green)
-      markers.add(
-        Marker(
-          point: LatLng(routeResult.origin.lat, routeResult.origin.lng),
-          width: 40,
-          height: 44,
-          alignment: Alignment.topCenter,
-          child: Tooltip(
-            message: routeResult.origin.displayName(isEnglish: localeCode == 'en'),
-            child: CustomMapPin(
-              color: Colors.green.shade600,
-              icon: Icons.trip_origin_rounded,
+        // Add custom origin/destination pins
+        // Origin Pin (Green)
+        newMarkers.add(
+          Marker(
+            point: LatLng(routeResult.origin.lat, routeResult.origin.lng),
+            width: 40,
+            height: 44,
+            alignment: Alignment.topCenter,
+            child: Tooltip(
+              message: routeResult.origin.displayName(isEnglish: localeCode == 'en'),
+              child: CustomMapPin(
+                color: Colors.green.shade600,
+                icon: Icons.trip_origin_rounded,
+              ),
             ),
           ),
-        ),
-      );
+        );
 
-      // Destination Pin (Red)
-      markers.add(
-        Marker(
-          point: LatLng(routeResult.destination.lat, routeResult.destination.lng),
-          width: 40,
-          height: 44,
-          alignment: Alignment.topCenter,
-          child: Tooltip(
-            message: routeResult.destination.displayName(isEnglish: localeCode == 'en'),
-            child: CustomMapPin(
-              color: Colors.red.shade600,
-              icon: Icons.flag_rounded,
+        // Destination Pin (Red)
+        newMarkers.add(
+          Marker(
+            point: LatLng(routeResult.destination.lat, routeResult.destination.lng),
+            width: 40,
+            height: 44,
+            alignment: Alignment.topCenter,
+            child: Tooltip(
+              message: routeResult.destination.displayName(isEnglish: localeCode == 'en'),
+              child: CustomMapPin(
+                color: Colors.red.shade600,
+                icon: Icons.flag_rounded,
+              ),
             ),
           ),
-        ),
-      );
-    } else {
-      // Show all stations
+        );
+      } else {
+        // Show all stations
       for (final station in transitRepo.stations) {
         final lineColor = TransitColors.getLineColor(station.lineId);
         final isInterchange = station.interchange.isNotEmpty;
 
-        markers.add(
+        newMarkers.add(
           Marker(
             point: LatLng(station.lat, station.lng),
             width: isInterchange ? 32 : 24,
@@ -357,7 +378,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
               },
               child: Container(
                 decoration: BoxDecoration(
-                  color: theme.brightness == Brightness.dark ? const Color(0xFF1E293B) : Colors.white,
+                  color: themeBrightness == Brightness.dark ? const Color(0xFF1E293B) : Colors.white,
                   shape: BoxShape.circle,
                   border: Border.all(
                     color: lineColor,
@@ -376,7 +397,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                       ? Icon(
                           Icons.swap_horiz_rounded,
                           size: 14,
-                          color: theme.brightness == Brightness.dark ? Colors.white : Colors.black,
+                          color: themeBrightness == Brightness.dark ? Colors.white : Colors.black,
                         )
                       : Container(
                           width: 6,
@@ -393,6 +414,10 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         );
       }
     }
+    _cachedBaseMarkers = newMarkers;
+    }
+    
+    final markers = List<Marker>.from(_cachedBaseMarkers);
 
     // User location marker
     if (_userPosition != null) {
@@ -455,8 +480,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
       body: Stack(
         children: [
           // ─── Map Layer ───
-          FlutterMap(
-            mapController: _mapController,
+          RepaintBoundary(
+            child: FlutterMap(
+              mapController: _mapController,
             options: MapOptions(
               initialCenter: const LatLng(13.7563, 100.5018),
               initialZoom: 12.0,
@@ -501,11 +527,12 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                     ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png'
                     : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png',
                 userAgentPackageName: 'com.bkktransit.bkk_transit_planner',
-                tileProvider: CachedTileProvider(),
+                tileProvider: _tileProvider,
               ),
               PolylineLayer(polylines: polylines),
               MarkerLayer(markers: markers),
             ],
+          ),
           ),
 
           // ─── Floating Top Search Card ───
@@ -515,7 +542,12 @@ class _MapScreenState extends ConsumerState<MapScreen> {
             right: 16,
             child: SafeArea(
               bottom: false,
-              child: _buildTopSearchCard(context, searchState, t, localeCode),
+              child: Consumer(
+                builder: (context, ref, child) {
+                  final searchState = ref.watch(searchViewModelProvider);
+                  return _buildTopSearchCard(context, searchState, t, localeCode);
+                },
+              ),
             ),
           ),
 
@@ -576,7 +608,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
               right: 16,
               bottom: 16,
               child: RouteResultBanner(
-                result: routeResult,
+                result: routeResult!,
                 t: t,
                 onTap: () => _showRouteDetail(context),
               ),
@@ -590,7 +622,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
               bottom: 16,
               child: _buildActiveJourneyPanel(
                 context,
-                trackerState,
+                trackerState!,
                 theme,
                 t,
                 localeCode,
