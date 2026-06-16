@@ -36,7 +36,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   CustomLocation? _customSelectedLocation;
   Position? _userPosition;
   bool _isLocating = false;
-  bool _isPrefetchExpanded = false;
+  bool _isPrefetchExpanded = true;
 
   // Caches for Map Layer Optimization
   List<Polyline> _cachedPolylines = [];
@@ -92,13 +92,17 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                     error: error,
                   );
             },
-            onFinish: () async {
-              ref.read(mapPrefetchProvider.notifier).finishPrefetch();
-              try {
-                final prefs = await SharedPreferences.getInstance();
-                await prefs.setBool('map_prefetch_completed', true);
-              } catch (e) {
-                print('Failed to save prefetching completion status: $e');
+            onFinish: (completed) async {
+              if (completed) {
+                ref.read(mapPrefetchProvider.notifier).finishPrefetch();
+                try {
+                  final prefs = await SharedPreferences.getInstance();
+                  await prefs.setBool('map_prefetch_completed', true);
+                } catch (e) {
+                  print('Failed to save prefetching completion status: $e');
+                }
+              } else {
+                ref.read(mapPrefetchProvider.notifier).pausePrefetch();
               }
             },
           );
@@ -1496,146 +1500,185 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   ) {
     final isTh = t.localeCode == 'th';
     final percentage = (prefetchState.progress * 100).toInt();
+    final showDetails = _isPrefetchExpanded && !prefetchState.isPaused;
 
-    if (!_isPrefetchExpanded) {
-      // Collapsed state: beautiful glassmorphic pill next to search bar
-      return GestureDetector(
-        onTap: () {
-          setState(() {
-            _isPrefetchExpanded = true;
-          });
-        },
-        child: Container(
-          decoration: BoxDecoration(
-            color: theme.colorScheme.surface.withValues(alpha: 0.85),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: theme.colorScheme.outline.withValues(alpha: 0.2),
-            ),
-            boxShadow: const [
-              BoxShadow(
-                color: Colors.black12,
-                blurRadius: 6,
-                offset: Offset(0, 3),
-              ),
-            ],
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        // Control Button (Larger 44x44px button with custom progress border)
+        CustomPaint(
+          foregroundPainter: _RoundedRectangleProgressPainter(
+            progress: prefetchState.progress,
+            color: theme.colorScheme.primary,
+            backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.25),
+            strokeWidth: 3.0,
+            borderRadius: 8.0,
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              SizedBox(
-                width: 18,
-                height: 18,
-                child: CircularProgressIndicator(
-                  value: prefetchState.progress,
-                  strokeWidth: 2.5,
-                  backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.2),
-                  valueColor: AlwaysStoppedAnimation<Color>(theme.colorScheme.primary),
-                ),
+          child: GestureDetector(
+            onTap: () {
+              if (prefetchState.isPaused) {
+                // Resume
+                CachedTileProvider.isPaused = false;
+                ref.read(mapPrefetchProvider.notifier).resumePrefetch();
+                setState(() {
+                  _isPrefetchExpanded = true;
+                });
+                _initOfflineMap();
+              } else {
+                if (!_isPrefetchExpanded) {
+                  // If collapsed but downloading, tapping expands it
+                  setState(() {
+                    _isPrefetchExpanded = true;
+                  });
+                } else {
+                  // If expanded, tapping pauses and collapses
+                  CachedTileProvider.isPaused = true;
+                  ref.read(mapPrefetchProvider.notifier).pausePrefetch();
+                  setState(() {
+                    _isPrefetchExpanded = false;
+                  });
+                }
+              }
+            },
+            child: Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                color: theme.colorScheme.surface.withValues(alpha: 0.9),
+                borderRadius: BorderRadius.circular(8),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 3,
+                    offset: Offset(0, 1.5),
+                  ),
+                ],
               ),
-              const SizedBox(width: 8),
-              Icon(
-                Icons.download_for_offline_rounded,
-                size: 16,
-                color: theme.colorScheme.primary,
-              ),
-              const SizedBox(width: 4),
-              Text(
-                '$percentage%',
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
+              child: Center(
+                child: Icon(
+                  prefetchState.isPaused ? Icons.play_arrow : Icons.pause,
                   color: theme.colorScheme.primary,
+                  size: 24,
                 ),
               ),
-            ],
+            ),
           ),
         ),
-      );
-    }
-
-    // Expanded state: detailed status card
-    return Card(
-      elevation: 6,
-      margin: EdgeInsets.zero,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              children: [
-                Icon(
-                  Icons.download_for_offline_rounded,
-                  color: theme.colorScheme.primary,
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    isTh ? 'ดาวน์โหลดแผนที่สำหรับใช้งานออฟไลน์' : 'Downloading Offline Map',
-                    style: theme.textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
+        // Animated Details Card
+        AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+          width: showDetails ? 288 : 0,
+          height: showDetails ? 104 : 44,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: OverflowBox(
+              alignment: Alignment.centerLeft,
+              minWidth: 288,
+              maxWidth: 288,
+              minHeight: 104,
+              maxHeight: 104,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 8),
+                child: Container(
+                  width: 280,
+                  height: 104,
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.surface.withValues(alpha: 0.9),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: theme.colorScheme.outline.withValues(alpha: 0.2),
                     ),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 4,
+                        offset: Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              isTh ? 'ดาวน์โหลดแผนที่ออฟไลน์' : 'Downloading Offline Map',
+                              style: theme.textTheme.titleSmall?.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _isPrefetchExpanded = false;
+                              });
+                            },
+                            child: Icon(
+                              Icons.close,
+                              size: 18,
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 6),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(4),
+                        child: LinearProgressIndicator(
+                          value: prefetchState.progress,
+                          minHeight: 6,
+                          backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.1),
+                          valueColor: AlwaysStoppedAnimation<Color>(theme.colorScheme.primary),
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            isTh 
+                                ? 'ดาวน์โหลดแล้ว ${prefetchState.currentTile} / ${prefetchState.totalTiles} รูป' 
+                                : 'Downloaded ${prefetchState.currentTile} / ${prefetchState.totalTiles} tiles',
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                          Text(
+                            '$percentage%',
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: theme.colorScheme.primary,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        isTh
+                            ? 'เก็บในเครื่องแล้ว: ${prefetchState.cachedCount} รูป | โหลดใหม่: ${prefetchState.successCount} รูป'
+                            : 'Cached: ${prefetchState.cachedCount} | New: ${prefetchState.successCount} tiles',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+                          fontSize: 10,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                IconButton(
-                  icon: const Icon(Icons.close_rounded, size: 18),
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
-                  onPressed: () {
-                    setState(() {
-                      _isPrefetchExpanded = false;
-                    });
-                  },
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(4),
-              child: LinearProgressIndicator(
-                value: prefetchState.progress,
-                minHeight: 6,
-                backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.1),
-                valueColor: AlwaysStoppedAnimation<Color>(theme.colorScheme.primary),
               ),
             ),
-            const SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  isTh 
-                      ? 'ดาวน์โหลดแล้ว ${prefetchState.currentTile} / ${prefetchState.totalTiles} รูป' 
-                      : 'Downloaded ${prefetchState.currentTile} / ${prefetchState.totalTiles} tiles',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                ),
-                Text(
-                  '$percentage%',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: theme.colorScheme.primary,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 4),
-            Text(
-              isTh
-                  ? 'เก็บในเครื่องแล้ว: ${prefetchState.cachedCount} รูป | โหลดใหม่: ${prefetchState.successCount} รูป'
-                  : 'Cached: ${prefetchState.cachedCount} | New: ${prefetchState.successCount} tiles',
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
-                fontSize: 10,
-              ),
-            ),
-          ],
+          ),
         ),
-      ),
+      ],
     );
   }
 
@@ -1745,6 +1788,65 @@ class _TrianglePainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class _RoundedRectangleProgressPainter extends CustomPainter {
+  final double progress;
+  final Color color;
+  final Color backgroundColor;
+  final double strokeWidth;
+  final double borderRadius;
+
+  _RoundedRectangleProgressPainter({
+    required this.progress,
+    required this.color,
+    required this.backgroundColor,
+    this.strokeWidth = 3.0,
+    this.borderRadius = 8.0,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final rect = Rect.fromLTWH(
+      strokeWidth / 2,
+      strokeWidth / 2,
+      size.width - strokeWidth,
+      size.height - strokeWidth,
+    );
+    final rrect = RRect.fromRectAndRadius(rect, Radius.circular(borderRadius));
+
+    // 1. Paint background border
+    final bgPaint = Paint()
+      ..color = backgroundColor
+      ..strokeWidth = strokeWidth
+      ..style = PaintingStyle.stroke;
+    canvas.drawRRect(rrect, bgPaint);
+
+    // 2. Paint progress border
+    if (progress > 0) {
+      final progressPaint = Paint()
+        ..color = color
+        ..strokeWidth = strokeWidth
+        ..style = PaintingStyle.stroke
+        ..strokeCap = StrokeCap.round;
+
+      final path = ui.Path()..addRRect(rrect);
+      final pathMetrics = path.computeMetrics();
+      for (final metric in pathMetrics) {
+        final extractPath = metric.extractPath(0.0, metric.length * progress);
+        canvas.drawPath(extractPath, progressPaint);
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _RoundedRectangleProgressPainter oldDelegate) {
+    return oldDelegate.progress != progress ||
+        oldDelegate.color != color ||
+        oldDelegate.backgroundColor != backgroundColor ||
+        oldDelegate.strokeWidth != strokeWidth ||
+        oldDelegate.borderRadius != borderRadius;
+  }
 }
 
 
