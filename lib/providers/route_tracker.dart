@@ -12,7 +12,7 @@ class RouteTrackerState {
   final bool isSimulation;
   final bool hasArrived;
 
-  const RouteTrackerState({
+  RouteTrackerState({
     this.activeRoute,
     this.isActive = false,
     this.currentSegmentIndex = 0,
@@ -27,7 +27,9 @@ class RouteTrackerState {
     return activeRoute!.segments[currentSegmentIndex];
   }
 
-  List<Station> get currentSegmentStations {
+  late final List<Station> currentSegmentStations = _buildStations();
+
+  List<Station> _buildStations() {
     final segment = currentSegment;
     if (segment == null) return [];
     final list = <Station>[];
@@ -90,7 +92,7 @@ class RouteTracker extends Notifier<RouteTrackerState> {
     ref.onDispose(() {
       _positionSubscription?.cancel();
     });
-    return const RouteTrackerState();
+    return RouteTrackerState();
   }
 
   void startTracking(RouteResult route, {bool simulation = false}) {
@@ -119,7 +121,7 @@ class RouteTracker extends Notifier<RouteTrackerState> {
   void stopTracking() {
     _positionSubscription?.cancel();
     _positionSubscription = null;
-    state = const RouteTrackerState();
+    state = RouteTrackerState();
   }
 
   void toggleSimulation(bool enable) {
@@ -160,22 +162,25 @@ class RouteTracker extends Notifier<RouteTrackerState> {
     final stations = state.currentSegmentStations;
     if (stations.isEmpty) return;
 
-    // Check if we are close to any subsequent station in the current segment
-    for (int i = state.currentStationIndex + 1; i < stations.length; i++) {
-      final station = stations[i];
-      final dist = Geolocator.distanceBetween(
-        position.latitude,
-        position.longitude,
-        station.lat,
-        station.lng,
-      );
-      if (dist <= threshold) {
-        if (i == stations.length - 1) {
-          _advanceSegment();
-        } else {
-          state = state.copyWith(currentStationIndex: i);
-        }
-        break;
+    final nextIdx = state.currentStationIndex + 1;
+    if (nextIdx >= stations.length) {
+      _advanceSegment();
+      return;
+    }
+
+    final next = stations[nextIdx];
+    final dist = Geolocator.distanceBetween(
+      position.latitude,
+      position.longitude,
+      next.lat,
+      next.lng,
+    );
+    
+    if (dist <= threshold) {
+      if (nextIdx == stations.length - 1) {
+        _advanceSegment();
+      } else {
+        state = state.copyWith(currentStationIndex: nextIdx);
       }
     }
   }

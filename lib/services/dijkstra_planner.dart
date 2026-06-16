@@ -102,7 +102,7 @@ class TransitGraph {
       );
     }
 
-    final dist = <String, double>{};
+    final dist = <String, double>{fromId: 0.0};
     final prev = <String, String?>{};
     final prevEdge = <String, GraphEdge?>{};
     final visited = <String>{};
@@ -112,12 +112,6 @@ class TransitGraph {
       return a.stationId.compareTo(b.stationId);
     });
 
-    for (final id in _stations.keys) {
-      dist[id] = double.infinity;
-      prev[id] = null;
-      prevEdge[id] = null;
-    }
-    dist[fromId] = 0;
     pq.add(_DijkstraNode(fromId, 0));
 
     while (pq.isNotEmpty) {
@@ -140,10 +134,15 @@ class TransitGraph {
           penalty = 3.0; // 3 min penalty for unnecessary line changes
         }
 
-        final newDist = dist[current.stationId]! + edge.weight + penalty;
-        if (newDist < dist[edge.toId]!) {
+        final currentDist = dist[current.stationId] ?? double.infinity;
+        final newDist = currentDist + edge.weight + penalty;
+        final edgeToDist = dist[edge.toId] ?? double.infinity;
+        
+        if (newDist < edgeToDist) {
           // Remove old entry if exists
-          pq.remove(_DijkstraNode(edge.toId, dist[edge.toId]!));
+          if (edgeToDist != double.infinity) {
+            pq.remove(_DijkstraNode(edge.toId, edgeToDist));
+          }
           dist[edge.toId] = newDist;
           prev[edge.toId] = current.stationId;
           prevEdge[edge.toId] = edge;
@@ -153,7 +152,7 @@ class TransitGraph {
     }
 
     // Reconstruct path
-    if (dist[toId] == double.infinity) return null;
+    if (!dist.containsKey(toId)) return null;
 
     final path = <PathStep>[];
     String? current = toId;

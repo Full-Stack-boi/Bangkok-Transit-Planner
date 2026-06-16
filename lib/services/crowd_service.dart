@@ -19,11 +19,21 @@ class CrowdService {
     return majorHubs.contains(stationId);
   }
 
+  final Map<String, StationCrowdInfo> _cache = {};
+
   /// Get crowd information for a station based on the current time and station characteristics
   StationCrowdInfo getCrowdInfo(String stationId, {DateTime? currentTime}) {
     final now = currentTime ?? DateTime.now();
     final hour = now.hour;
     final isWeekend = now.weekday == DateTime.saturday || now.weekday == DateTime.sunday;
+
+    final cacheKey = '${stationId}_${hour}_$isWeekend';
+    if (_cache.containsKey(cacheKey)) {
+      final cached = _cache[cacheKey]!;
+      if (now.difference(cached.updatedAt).inMinutes < 60) {
+        return cached;
+      }
+    }
 
     CrowdLevel level;
     int presenceCount;
@@ -81,7 +91,7 @@ class CrowdService {
       }
     }
 
-    return StationCrowdInfo(
+    final info = StationCrowdInfo(
       stationId: stationId,
       level: level,
       presenceCount: presenceCount,
@@ -89,5 +99,7 @@ class CrowdService {
       averageReportLevel: activeReportCount > 0 ? averageReportLevel : null,
       updatedAt: now,
     );
+    _cache[cacheKey] = info;
+    return info;
   }
 }
