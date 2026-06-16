@@ -19,6 +19,7 @@ import 'widgets/route_result_banner.dart';
 import '../route_result/route_result_sheet.dart';
 import '../../providers/route_tracker.dart';
 import 'cached_tile_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 /// Map screen showing an interactive transit map with overlays
 class MapScreen extends ConsumerStatefulWidget {
@@ -72,25 +73,36 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     try {
       await CachedTileProvider.getCachePath();
       if (mounted) {
-        final stations = ref.read(transitRepositoryProvider).stations;
-        // Prefetch tiles in background (non-blocking)
-        CachedTileProvider.prefetchBangkokTiles(
-          stations,
-          onStart: (total) {
-            ref.read(mapPrefetchProvider.notifier).startPrefetch(total);
-          },
-          onProgress: (current, success, cached, error) {
-            ref.read(mapPrefetchProvider.notifier).updateProgress(
-                  current: current,
-                  success: success,
-                  cached: cached,
-                  error: error,
-                );
-          },
-          onFinish: () {
-            ref.read(mapPrefetchProvider.notifier).finishPrefetch();
-          },
-        );
+        final prefs = await SharedPreferences.getInstance();
+        final isPrefetched = prefs.getBool('map_prefetch_completed') ?? false;
+
+        if (!isPrefetched) {
+          final stations = ref.read(transitRepositoryProvider).stations;
+          // Prefetch tiles in background (non-blocking)
+          CachedTileProvider.prefetchBangkokTiles(
+            stations,
+            onStart: (total) {
+              ref.read(mapPrefetchProvider.notifier).startPrefetch(total);
+            },
+            onProgress: (current, success, cached, error) {
+              ref.read(mapPrefetchProvider.notifier).updateProgress(
+                    current: current,
+                    success: success,
+                    cached: cached,
+                    error: error,
+                  );
+            },
+            onFinish: () async {
+              ref.read(mapPrefetchProvider.notifier).finishPrefetch();
+              try {
+                final prefs = await SharedPreferences.getInstance();
+                await prefs.setBool('map_prefetch_completed', true);
+              } catch (e) {
+                print('Failed to save prefetching completion status: $e');
+              }
+            },
+          );
+        }
       }
     } catch (e) {
       print('Failed to initialize offline map prefetching: $e');
