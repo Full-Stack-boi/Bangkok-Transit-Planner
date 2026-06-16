@@ -82,17 +82,13 @@ class AuthRepository {
         serverClientId: '1010460816238-0q8gpanpmepu2g457mh1kb7124e1jn0b.apps.googleusercontent.com',
       );
 
-      final GoogleSignInAccount? googleUser = await GoogleSignIn.instance.authenticate();
-      if (googleUser == null) {
-        return null; // User cancelled
-      }
-
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final googleUser = await GoogleSignIn.instance.authenticate();
+      final googleAuth = googleUser.authentication;
       final String? idToken = googleAuth.idToken;
       
       // Explicitly request access token by authorizing scopes
       final clientAuth = await googleUser.authorizationClient.authorizeScopes(['email', 'profile']);
-      final String? accessToken = clientAuth.accessToken;
+      final accessToken = clientAuth.accessToken;
 
       if (idToken == null) {
         throw Exception('Google Sign-In failed: missing ID Token.');
