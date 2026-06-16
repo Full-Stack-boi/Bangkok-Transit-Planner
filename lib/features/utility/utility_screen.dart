@@ -662,135 +662,137 @@ class _CardDetailBottomSheetContentState
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Center(
-              child: Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.outline.withValues(alpha: 0.3),
-                  borderRadius: BorderRadius.circular(2),
+        child: RadioGroup<String>(
+          groupValue: _activeType,
+          onChanged: (val) {
+            if (val != null) {
+              setState(() {
+                _activeType = val;
+              });
+              ref
+                  .read(userCardsProvider.notifier)
+                  .setCardType(widget.networkId, val);
+              Future.delayed(const Duration(milliseconds: 150), () {
+                if (context.mounted) {
+                  Navigator.pop(context);
+                }
+              });
+            }
+          },
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.outline.withValues(alpha: 0.3),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Container(
-                  width: 12,
-                  height: 12,
-                  decoration: BoxDecoration(
-                    color: networkColor,
-                    shape: BoxShape.circle,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  widget.cardName,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const Spacer(),
-                IconButton(
-                  icon: const Icon(Icons.close_rounded),
-                  onPressed: () => Navigator.pop(context),
-                  constraints: const BoxConstraints(),
-                  padding: EdgeInsets.zero,
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            ...widget.options.map((opt) {
-              final isSelected = opt.value == _activeType;
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 8.0),
-                child: InkWell(
-                  onTap: () {
-                    setState(() {
-                      _activeType = opt.value;
-                    });
-                    ref
-                        .read(userCardsProvider.notifier)
-                        .setCardType(widget.networkId, opt.value);
-                    // Short delay to show ripple animation before auto closing
-                    Future.delayed(const Duration(milliseconds: 150), () {
-                      if (context.mounted) {
-                        Navigator.pop(context);
-                      }
-                    });
-                  },
-                  borderRadius: BorderRadius.circular(16),
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 150),
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Container(
+                    width: 12,
+                    height: 12,
                     decoration: BoxDecoration(
-                      color: isSelected
-                          ? networkColor.withValues(alpha: 0.08)
-                          : theme.cardColor,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
+                      color: networkColor,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    widget.cardName,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const Spacer(),
+                  IconButton(
+                    icon: const Icon(Icons.close_rounded),
+                    onPressed: () => Navigator.pop(context),
+                    constraints: const BoxConstraints(),
+                    padding: EdgeInsets.zero,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              ...widget.options.map((opt) {
+                final isSelected = opt.value == _activeType;
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 8.0),
+                  child: InkWell(
+                    onTap: () {
+                      setState(() {
+                        _activeType = opt.value;
+                      });
+                      ref
+                          .read(userCardsProvider.notifier)
+                          .setCardType(widget.networkId, opt.value);
+                      // Short delay to show ripple animation before auto closing
+                      Future.delayed(const Duration(milliseconds: 150), () {
+                        if (context.mounted) {
+                          Navigator.pop(context);
+                        }
+                      });
+                    },
+                    borderRadius: BorderRadius.circular(16),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 150),
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                      decoration: BoxDecoration(
                         color: isSelected
-                            ? networkColor
-                            : theme.colorScheme.outline.withValues(alpha: 0.12),
-                        width: isSelected ? 2.0 : 1.0,
+                            ? networkColor.withValues(alpha: 0.08)
+                            : theme.cardColor,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: isSelected
+                              ? networkColor
+                              : theme.colorScheme.outline.withValues(alpha: 0.12),
+                          width: isSelected ? 2.0 : 1.0,
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  opt.title,
+                                  style: theme.textTheme.bodyLarge?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: isSelected ? networkColor : null,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  opt.subtitle,
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    color: isSelected
+                                        ? networkColor.withValues(alpha: 0.8)
+                                        : theme.colorScheme.onSurfaceVariant,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Radio<String>(
+                            value: opt.value,
+                            activeColor: networkColor,
+                          ),
+                        ],
                       ),
                     ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                opt.title,
-                                style: theme.textTheme.bodyLarge?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  color: isSelected ? networkColor : null,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                opt.subtitle,
-                                style: theme.textTheme.bodyMedium?.copyWith(
-                                  color: isSelected
-                                      ? networkColor.withValues(alpha: 0.8)
-                                      : theme.colorScheme.onSurfaceVariant,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Radio<String>(
-                          value: opt.value,
-                          groupValue: _activeType,
-                          activeColor: networkColor,
-                          onChanged: (val) {
-                            if (val != null) {
-                              setState(() {
-                                _activeType = val;
-                              });
-                              ref
-                                  .read(userCardsProvider.notifier)
-                                  .setCardType(widget.networkId, val);
-                              Future.delayed(const Duration(milliseconds: 150), () {
-                                if (context.mounted) {
-                                  Navigator.pop(context);
-                                }
-                              });
-                            }
-                          },
-                        ),
-                      ],
-                    ),
                   ),
-                ),
-              );
-            }),
-          ],
+                );
+              }),
+            ],
+          ),
         ),
       ),
     );

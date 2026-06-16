@@ -39,43 +39,31 @@ class SettingsScreen extends ConsumerWidget {
         context: context,
         builder: (context) => AlertDialog(
           title: Text(t.settings.themeSetting),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              RadioListTile<ThemeMode>(
-                title: Text(t.settings.themeLight),
-                value: ThemeMode.light,
-                groupValue: themeMode,
-                onChanged: (mode) {
-                  if (mode != null) {
-                    ref.read(themeModeProvider.notifier).setTheme(mode);
-                  }
-                  Navigator.pop(context);
-                },
-              ),
-              RadioListTile<ThemeMode>(
-                title: Text(t.settings.themeDark),
-                value: ThemeMode.dark,
-                groupValue: themeMode,
-                onChanged: (mode) {
-                  if (mode != null) {
-                    ref.read(themeModeProvider.notifier).setTheme(mode);
-                  }
-                  Navigator.pop(context);
-                },
-              ),
-              RadioListTile<ThemeMode>(
-                title: Text(t.settings.themeSystem),
-                value: ThemeMode.system,
-                groupValue: themeMode,
-                onChanged: (mode) {
-                  if (mode != null) {
-                    ref.read(themeModeProvider.notifier).setTheme(mode);
-                  }
-                  Navigator.pop(context);
-                },
-              ),
-            ],
+          content: RadioGroup<ThemeMode>(
+            groupValue: themeMode,
+            onChanged: (mode) {
+              if (mode != null) {
+                ref.read(themeModeProvider.notifier).setTheme(mode);
+              }
+              Navigator.pop(context);
+            },
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                RadioListTile<ThemeMode>(
+                  title: Text(t.settings.themeLight),
+                  value: ThemeMode.light,
+                ),
+                RadioListTile<ThemeMode>(
+                  title: Text(t.settings.themeDark),
+                  value: ThemeMode.dark,
+                ),
+                RadioListTile<ThemeMode>(
+                  title: Text(t.settings.themeSystem),
+                  value: ThemeMode.system,
+                ),
+              ],
+            ),
           ),
         ),
       );
@@ -86,32 +74,27 @@ class SettingsScreen extends ConsumerWidget {
         context: context,
         builder: (context) => AlertDialog(
           title: Text(t.settings.langSetting),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              RadioListTile<String>(
-                title: Text(t.settings.langTh),
-                value: 'th',
-                groupValue: localeCode,
-                onChanged: (lang) {
-                  if (lang != null) {
-                    ref.read(localeProvider.notifier).setLocale(lang);
-                  }
-                  Navigator.pop(context);
-                },
-              ),
-              RadioListTile<String>(
-                title: Text(t.settings.langEn),
-                value: 'en',
-                groupValue: localeCode,
-                onChanged: (lang) {
-                  if (lang != null) {
-                    ref.read(localeProvider.notifier).setLocale(lang);
-                  }
-                  Navigator.pop(context);
-                },
-              ),
-            ],
+          content: RadioGroup<String>(
+            groupValue: localeCode,
+            onChanged: (lang) {
+              if (lang != null) {
+                ref.read(localeProvider.notifier).setLocale(lang);
+              }
+              Navigator.pop(context);
+            },
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                RadioListTile<String>(
+                  title: Text(t.settings.langTh),
+                  value: 'th',
+                ),
+                RadioListTile<String>(
+                  title: Text(t.settings.langEn),
+                  value: 'en',
+                ),
+              ],
+            ),
           ),
         ),
       );
