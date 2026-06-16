@@ -29,7 +29,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     super.dispose();
   }
 
-  void _submitRegister(BuildContext context) async {
+  void _submitRegister() async {
     if (!_formKey.currentState!.validate()) return;
 
     final notifier = ref.read(authProvider.notifier);
@@ -201,7 +201,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       controller: _confirmPasswordController,
                       obscureText: _obscureConfirmPassword,
                       textInputAction: TextInputAction.done,
-                      onFieldSubmitted: (_) => _submitRegister(context),
+                      onFieldSubmitted: (_) => _submitRegister(),
                       decoration: InputDecoration(
                         labelText: t.auth.confirmPasswordLabel,
                         hintText: t.auth.confirmPasswordHint,
@@ -233,7 +233,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
                     // Submit Button
                     ElevatedButton(
-                      onPressed: authState.isLoading ? null : () => _submitRegister(context),
+                      onPressed: authState.isLoading ? null : () => _submitRegister(),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: theme.colorScheme.primary,
                         foregroundColor: theme.colorScheme.onPrimary,
