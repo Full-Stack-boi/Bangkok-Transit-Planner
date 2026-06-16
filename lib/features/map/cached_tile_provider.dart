@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:collection';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
@@ -17,6 +18,7 @@ class CachedTileProvider extends TileProvider {
 
   static String? _resolvedCachePath;
   static bool _isPrefetching = false;
+  static final Map<String, String> _hashCache = {};
 
   /// Get the local cache directory path for map tiles
   static Future<String> getCachePath() async {
@@ -33,8 +35,12 @@ class CachedTileProvider extends TileProvider {
     if (kIsWeb) {
       return NetworkImage(url);
     }
-    final folderHash = options.urlTemplate.hashCode.toString();
-    final cacheDir = _resolvedCachePath ?? '/tmp/map_tiles';
+    final folderHash = _hashCache.putIfAbsent(options.urlTemplate ?? 'default', () => (options.urlTemplate ?? 'default').hashCode.toString());
+    final cacheDir = _resolvedCachePath;
+    if (cacheDir == null) {
+      // Safe fallback if not initialized
+      return NetworkImage(url);
+    }
     
     final tileFile = File('$cacheDir/$folderHash/${coordinates.z}/${coordinates.x}/${coordinates.y}.png');
     final metaFile = File('$cacheDir/$folderHash/${coordinates.z}/${coordinates.x}/${coordinates.y}.meta');
@@ -152,10 +158,6 @@ class CachedTileProvider extends TileProvider {
           if (await tileFile.exists()) {
             cachedCount++;
             // Background check for update (send ETag)
-            if (index % 10 == 0) {
-              // Yield to main thread every 10 tiles to avoid CPU blocking
-              await Future.delayed(const Duration(milliseconds: 5));
-            }
             // Do a check in background
             _validateAndDownloadTile(url, tileFile, metaFile, isBackground: true);
           } else {
@@ -166,8 +168,6 @@ class CachedTileProvider extends TileProvider {
             } else {
               errorCount++;
             }
-            // Wait 5ms between fresh downloads to respect servers
-            await Future.delayed(const Duration(milliseconds: 5));
           }
         } catch (e) {
           errorCount++;
@@ -234,11 +234,41 @@ class CachedTileProvider extends TileProvider {
   }
 }
 
+class _Semaphore {
+  final int maxCount;
+  int _currentCount = 0;
+  final Queue<Completer<void>> _queue = Queue();
+
+  _Semaphore(this.maxCount);
+
+  Future<void> acquire() async {
+    if (_currentCount < maxCount) {
+      _currentCount++;
+      return;
+    }
+    final completer = Completer<void>();
+    _queue.add(completer);
+    return completer.future;
+  }
+
+  void release() {
+    if (_queue.isNotEmpty) {
+      final completer = _queue.removeFirst();
+      completer.complete();
+    } else {
+      _currentCount--;
+    }
+  }
+}
+
+final _bgSemaphore = _Semaphore(4);
+
 /// Custom ImageProvider to handle tile caching and background revalidation
 class CachedTileImageProvider extends ImageProvider<CachedTileImageProvider> {
   final String url;
   final File tileFile;
   final File metaFile;
+  static ui.ImmutableBuffer? _fallbackBuffer;
 
   CachedTileImageProvider({
     required this.url,
@@ -289,7 +319,8 @@ class CachedTileImageProvider extends ImageProvider<CachedTileImageProvider> {
     }
 
     // 2. Fallback: transparent 1x1 png if everything fails (so map doesn't break)
-    return decode(await ui.ImmutableBuffer.fromUint8List(_kTransparentImageBytes));
+    _fallbackBuffer ??= await ui.ImmutableBuffer.fromUint8List(_kTransparentImageBytes);
+    return decode(_fallbackBuffer!);
   }
 
   /// Downloads the tile, saves it to disk with metadata, and returns the raw bytes
@@ -323,6 +354,7 @@ class CachedTileImageProvider extends ImageProvider<CachedTileImageProvider> {
 
   /// Perform asynchronous HTTP Headers verification in the background
   Future<void> _validateCacheInBackground(CachedTileImageProvider key) async {
+    await _bgSemaphore.acquire();
     try {
       final Map<String, String> headers = {};
       if (await key.metaFile.exists()) {
@@ -351,6 +383,8 @@ class CachedTileImageProvider extends ImageProvider<CachedTileImageProvider> {
       }
     } catch (_) {
       // Ignore background network errors (e.g. user is offline)
+    } finally {
+      _bgSemaphore.release();
     }
   }
 

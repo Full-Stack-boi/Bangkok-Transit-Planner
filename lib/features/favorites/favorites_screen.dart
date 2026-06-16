@@ -21,6 +21,8 @@ class FavoritesScreen extends ConsumerStatefulWidget {
 }
 
 class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
+  final _resolvedItems = <String, SearchableItem?>{};
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -289,13 +291,25 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
     String? lngStr,
     TransitRepository transitRepo,
   ) {
+    if (id.isEmpty) return null;
+    final cacheKey = '${id}_${latStr}_${lngStr}';
+    if (_resolvedItems.containsKey(cacheKey)) {
+      return _resolvedItems[cacheKey];
+    }
+
     // 1. Check if it's a station
     final station = transitRepo.getStation(id);
-    if (station != null) return station;
+    if (station != null) {
+      _resolvedItems[cacheKey] = station;
+      return station;
+    }
 
     // 2. Check if it's a landmark
     for (final l in transitRepo.landmarks) {
-      if (l.id == id) return l;
+      if (l.id == id) {
+        _resolvedItems[cacheKey] = l;
+        return l;
+      }
     }
 
     // 3. Check if we have stored coordinates
@@ -333,7 +347,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
           ? (minDist / 80.0).clamp(1.0, 30.0)
           : 5.0;
 
-      return CustomLocation(
+      final loc = CustomLocation(
         id: id,
         nameTh: nameTh,
         nameEn: nameEn,
@@ -342,8 +356,11 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
         lat: lat,
         lng: lng,
       );
+      _resolvedItems[cacheKey] = loc;
+      return loc;
     }
 
+    _resolvedItems[cacheKey] = null;
     return null;
   }
 
