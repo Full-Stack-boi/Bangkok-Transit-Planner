@@ -13,7 +13,7 @@ void main() {
       try {
         await Supabase.initialize(
           url: supabaseUrl,
-          anonKey: supabaseAnonKey,
+          publishableKey: supabaseAnonKey,
         );
       } catch (e) {
         print('Supabase was already initialized: $e');
