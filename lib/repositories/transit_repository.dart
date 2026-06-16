@@ -17,6 +17,10 @@ class TransitRepository {
   TransitGraph? _graph;
   bool _initialized = false;
 
+  final Map<String, Station> _stationCache = {};
+  final Map<String, TransitLine> _lineCache = {};
+  final Map<String, List<Station>> _lineStationsCache = {};
+
   bool get isInitialized => _initialized;
   List<Station> get stations => _stations ?? [];
   List<TransitLine> get lines => _lines ?? [];
@@ -42,6 +46,10 @@ class TransitRepository {
       final jsonStr = await rootBundle.loadString('assets/data/stations.json');
       final List<dynamic> jsonList = json.decode(jsonStr);
       _stations = jsonList.map((j) => Station.fromJson(j as Map<String, dynamic>)).toList();
+      _stationCache.clear();
+      for (final s in _stations!) {
+        _stationCache[s.id] = s;
+      }
     } catch (e) {
       // If JSON not available yet, use empty list
       _stations = [];
@@ -53,6 +61,10 @@ class TransitRepository {
       final jsonStr = await rootBundle.loadString('assets/data/lines.json');
       final List<dynamic> jsonList = json.decode(jsonStr);
       _lines = jsonList.map((j) => TransitLine.fromJson(j as Map<String, dynamic>)).toList();
+      _lineCache.clear();
+      for (final l in _lines!) {
+        _lineCache[l.id] = l;
+      }
     } catch (e) {
       _lines = [];
     }
@@ -129,11 +141,12 @@ class TransitRepository {
 
   /// Get a station by ID
   Station? getStation(String id) {
-    return _graph?.getStation(id);
+    return _stationCache[id] ?? _graph?.getStation(id);
   }
 
   /// Get a line by ID
   TransitLine? getLine(String lineId) {
+    if (_lineCache.containsKey(lineId)) return _lineCache[lineId];
     return _lines?.firstWhere(
       (l) => l.id == lineId,
       orElse: () => throw StateError('Line not found: $lineId'),
@@ -142,12 +155,17 @@ class TransitRepository {
 
   /// Get all stations on a line
   List<Station> getStationsOnLine(String lineId) {
+    if (_lineStationsCache.containsKey(lineId)) {
+      return _lineStationsCache[lineId]!;
+    }
     final line = getLine(lineId);
     if (line == null) return [];
-    return line.stationIds
+    final list = line.stationIds
         .map((id) => getStation(id))
         .whereType<Station>()
         .toList();
+    _lineStationsCache[lineId] = list;
+    return list;
   }
 
   /// Find shortest path between two stations

@@ -34,6 +34,8 @@ class ScheduleService {
     },
   };
 
+  static final Map<String, Map<String, Map<String, int>>> _parsedHours = {};
+
   /// Get the next train time from now
   /// Returns minutes until next train, or null if service is not running
   int? getMinutesUntilNextTrain(String lineId, {DateTime? currentTime}) {
@@ -52,26 +54,28 @@ class ScheduleService {
 
   /// Check if service is currently running
   bool isServiceRunning(String lineId, DateTime time) {
+    if (_parsedHours.isEmpty) {
+      for (final line in _operatingHours.entries) {
+        _parsedHours[line.key] = {};
+        for (final day in line.value.entries) {
+          final firstParts = day.value['first']!.split(':');
+          final firstMins = int.parse(firstParts[0]) * 60 + int.parse(firstParts[1]);
+          final lastParts = day.value['last']!.split(':');
+          final lastHour = int.parse(lastParts[0]);
+          final lastMins = lastHour == 0 ? 1440 : lastHour * 60;
+          _parsedHours[line.key]![day.key] = {'first': firstMins, 'last': lastMins};
+        }
+      }
+    }
+
     final isWeekend = time.weekday == DateTime.saturday || time.weekday == DateTime.sunday;
     final dayType = isWeekend ? 'weekend' : 'weekday';
-    final hours = _operatingHours[lineId]?[dayType];
+    final hours = _parsedHours[lineId]?[dayType];
 
     if (hours == null) return false;
 
-    final firstParts = hours['first']!.split(':');
-    final firstHour = int.parse(firstParts[0]);
-    final firstMin = int.parse(firstParts[1]);
-
-    final lastParts = hours['last']!.split(':');
-    final lastHour = int.parse(lastParts[0]);
-
     final currentMinutes = time.hour * 60 + time.minute;
-    final firstMinutes = firstHour * 60 + firstMin;
-
-    // If last = 00:00, it means midnight (1440 minutes)
-    final lastMinutes = lastHour == 0 ? 1440 : lastHour * 60;
-
-    return currentMinutes >= firstMinutes && currentMinutes < lastMinutes;
+    return currentMinutes >= hours['first']! && currentMinutes < hours['last']!;
   }
 
   /// Get operating hours text for a line
