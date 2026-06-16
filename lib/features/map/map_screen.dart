@@ -193,7 +193,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
       final newPolylines = <Polyline>[];
       if (isRouteActive) {
         // Highlight ONLY the active route
-        for (final segment in routeResult!.segments) {
+        for (final segment in routeResult.segments) {
           final points = <LatLng>[];
           points.add(LatLng(segment.fromStation.lat, segment.fromStation.lng));
           for (final s in segment.intermediateStations) {
@@ -608,7 +608,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
               right: 16,
               bottom: 16,
               child: RouteResultBanner(
-                result: routeResult!,
+                result: routeResult,
                 t: t,
                 onTap: () => _showRouteDetail(context),
               ),

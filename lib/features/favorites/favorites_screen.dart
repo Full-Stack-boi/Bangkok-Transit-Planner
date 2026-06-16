@@ -292,7 +292,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
     TransitRepository transitRepo,
   ) {
     if (id.isEmpty) return null;
-    final cacheKey = '${id}_${latStr}_${lngStr}';
+    final cacheKey = '${id}_${latStr}_$lngStr';
     if (_resolvedItems.containsKey(cacheKey)) {
       return _resolvedItems[cacheKey];
     }

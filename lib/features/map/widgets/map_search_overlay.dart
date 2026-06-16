@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/transit_colors.dart';
 import '../../../models/station.dart';
 import '../../../models/searchable_item.dart';
-import '../../../models/landmark.dart';
 import '../../../models/custom_location.dart';
 import '../../search/search_view_model.dart';
 import '../../../providers/providers.dart';
@@ -120,7 +119,6 @@ class _MapSearchOverlayState extends ConsumerState<MapSearchOverlay> {
     final theme = Theme.of(context);
     final t = ref.watch(translationsProvider);
     final localeCode = ref.watch(localeProvider);
-    final transitRepo = ref.read(transitRepositoryProvider);
 
     _initFields(state, localeCode);
 
