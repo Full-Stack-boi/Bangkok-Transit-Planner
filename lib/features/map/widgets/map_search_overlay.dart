@@ -543,8 +543,10 @@ class _MapSearchOverlayState extends ConsumerState<MapSearchOverlay> {
           if (searchState.destination == null) {
             _startEditingDest(searchState);
           } else {
-            FocusScope.of(context).unfocus();
-            Navigator.of(context).pop(true);
+            if (mounted) {
+              FocusScope.of(context).unfocus();
+              Navigator.of(context).pop(true);
+            }
           }
         } else {
           vm.setDestination(currentLoc);
@@ -552,8 +554,10 @@ class _MapSearchOverlayState extends ConsumerState<MapSearchOverlay> {
           if (searchState.origin == null) {
             _startEditingOrigin(searchState);
           } else {
-            FocusScope.of(context).unfocus();
-            Navigator.of(context).pop(true);
+            if (mounted) {
+              FocusScope.of(context).unfocus();
+              Navigator.of(context).pop(true);
+            }
           }
         }
       }

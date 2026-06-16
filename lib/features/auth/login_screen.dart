@@ -24,7 +24,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     super.dispose();
   }
 
-  void _submitLogin(BuildContext context) async {
+  void _submitLogin() async {
     if (!_formKey.currentState!.validate()) return;
 
     final notifier = ref.read(authProvider.notifier);
@@ -44,7 +44,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     }
   }
 
-  void _submitGoogleLogin(BuildContext context) async {
+  void _submitGoogleLogin() async {
     final notifier = ref.read(authProvider.notifier);
     final success = await notifier.signInWithGoogle();
 
@@ -171,7 +171,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       controller: _passwordController,
                       obscureText: _obscurePassword,
                       textInputAction: TextInputAction.done,
-                      onFieldSubmitted: (_) => _submitLogin(context),
+                      onFieldSubmitted: (_) => _submitLogin(),
                       decoration: InputDecoration(
                         labelText: t.auth.passwordLabel,
                         hintText: t.auth.passwordHint,
@@ -203,7 +203,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
                     // Submit Button
                     ElevatedButton(
-                      onPressed: authState.isLoading ? null : () => _submitLogin(context),
+                      onPressed: authState.isLoading ? null : () => _submitLogin(),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: theme.colorScheme.primary,
                         foregroundColor: theme.colorScheme.onPrimary,
@@ -252,7 +252,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
                     // Google Sign-In Button
                     ElevatedButton(
-                      onPressed: authState.isLoading ? null : () => _submitGoogleLogin(context),
+                      onPressed: authState.isLoading ? null : () => _submitGoogleLogin(),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: theme.brightness == Brightness.dark ? const Color(0xFF131314) : Colors.white,
                         foregroundColor: theme.brightness == Brightness.dark ? const Color(0xFFE3E3E3) : const Color(0xFF1F1F1F),
