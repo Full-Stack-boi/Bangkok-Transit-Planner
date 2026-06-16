@@ -65,7 +65,12 @@ class CachedTileProvider extends TileProvider {
 
   /// Prefetch map tiles for the Bangkok transit network in the background.
   /// Loops through all stations and downloads tiles for zoom levels 12 to 15 (with surrounding padding).
-  static Future<void> prefetchBangkokTiles(List<Station> stations) async {
+  static Future<void> prefetchBangkokTiles(
+    List<Station> stations, {
+    void Function(int total)? onStart,
+    void Function(int current, int success, int cached, int error)? onProgress,
+    void Function()? onFinish,
+  }) async {
     if (kIsWeb) return;
     if (_isPrefetching) {
       print('[Prefetch] Already running. Skipping start.');
@@ -129,6 +134,7 @@ class CachedTileProvider extends TileProvider {
       }
 
       print('[Prefetch] Deduplicated total tiles to fetch: ${tilesToFetch.length}');
+      onStart?.call(tilesToFetch.length);
 
       int successCount = 0;
       int cachedCount = 0;
@@ -173,6 +179,8 @@ class CachedTileProvider extends TileProvider {
           errorCount++;
         }
 
+        onProgress?.call(index, successCount, cachedCount, errorCount);
+
         if (index % 100 == 0) {
           print('[Prefetch] Progress: $index/${tilesToFetch.length} (Cached: $cachedCount, Downloaded: $successCount, Fail: $errorCount)');
         }
@@ -183,6 +191,7 @@ class CachedTileProvider extends TileProvider {
       print('[Prefetch] Fatal error in prefetcher: $e');
     } finally {
       _isPrefetching = false;
+      onFinish?.call();
     }
   }
 

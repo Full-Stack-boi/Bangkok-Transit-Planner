@@ -35,6 +35,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   CustomLocation? _customSelectedLocation;
   Position? _userPosition;
   bool _isLocating = false;
+  bool _isPrefetchExpanded = false;
 
   // Caches for Map Layer Optimization
   List<Polyline> _cachedPolylines = [];
@@ -73,7 +74,23 @@ class _MapScreenState extends ConsumerState<MapScreen> {
       if (mounted) {
         final stations = ref.read(transitRepositoryProvider).stations;
         // Prefetch tiles in background (non-blocking)
-        CachedTileProvider.prefetchBangkokTiles(stations);
+        CachedTileProvider.prefetchBangkokTiles(
+          stations,
+          onStart: (total) {
+            ref.read(mapPrefetchProvider.notifier).startPrefetch(total);
+          },
+          onProgress: (current, success, cached, error) {
+            ref.read(mapPrefetchProvider.notifier).updateProgress(
+                  current: current,
+                  success: success,
+                  cached: cached,
+                  error: error,
+                );
+          },
+          onFinish: () {
+            ref.read(mapPrefetchProvider.notifier).finishPrefetch();
+          },
+        );
       }
     } catch (e) {
       print('Failed to initialize offline map prefetching: $e');
@@ -184,6 +201,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     final localeCode = ref.watch(localeProvider);
     final isTrackingActive = ref.watch(routeTrackerProvider.select((s) => s.isActive));
     final trackerState = isTrackingActive ? ref.watch(routeTrackerProvider) : null;
+    final prefetchState = ref.watch(mapPrefetchProvider);
 
     // Build Polylines for transit lines
     final themeBrightness = theme.brightness;
@@ -535,18 +553,28 @@ class _MapScreenState extends ConsumerState<MapScreen> {
           ),
           ),
 
-          // ─── Floating Top Search Card ───
+          // ─── Floating Top Search Card & Prefetch Indicator ───
           Positioned(
             top: 16,
             left: 16,
             right: 16,
             child: SafeArea(
               bottom: false,
-              child: Consumer(
-                builder: (context, ref, child) {
-                  final searchState = ref.watch(searchViewModelProvider);
-                  return _buildTopSearchCard(context, searchState, t, localeCode);
-                },
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Consumer(
+                    builder: (context, ref, child) {
+                      final searchState = ref.watch(searchViewModelProvider);
+                      return _buildTopSearchCard(context, searchState, t, localeCode);
+                    },
+                  ),
+                  if (prefetchState.isPrefetching) ...[
+                    const SizedBox(height: 8),
+                    _buildMapPrefetchWidget(context, prefetchState, theme, t),
+                  ],
+                ],
               ),
             ),
           ),
@@ -1443,6 +1471,157 @@ class _MapScreenState extends ConsumerState<MapScreen> {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMapPrefetchWidget(
+    BuildContext context,
+    MapPrefetchProgress prefetchState,
+    ThemeData theme,
+    AppLocalizations t,
+  ) {
+    final isTh = t.localeCode == 'th';
+    final percentage = (prefetchState.progress * 100).toInt();
+
+    if (!_isPrefetchExpanded) {
+      // Collapsed state: beautiful glassmorphic pill next to search bar
+      return GestureDetector(
+        onTap: () {
+          setState(() {
+            _isPrefetchExpanded = true;
+          });
+        },
+        child: Container(
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surface.withValues(alpha: 0.85),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: theme.colorScheme.outline.withValues(alpha: 0.2),
+            ),
+            boxShadow: const [
+              BoxShadow(
+                color: Colors.black12,
+                blurRadius: 6,
+                offset: Offset(0, 3),
+              ),
+            ],
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(
+                width: 18,
+                height: 18,
+                child: CircularProgressIndicator(
+                  value: prefetchState.progress,
+                  strokeWidth: 2.5,
+                  backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.2),
+                  valueColor: AlwaysStoppedAnimation<Color>(theme.colorScheme.primary),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Icon(
+                Icons.download_for_offline_rounded,
+                size: 16,
+                color: theme.colorScheme.primary,
+              ),
+              const SizedBox(width: 4),
+              Text(
+                '$percentage%',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: theme.colorScheme.primary,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    // Expanded state: detailed status card
+    return Card(
+      elevation: 6,
+      margin: EdgeInsets.zero,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  Icons.download_for_offline_rounded,
+                  color: theme.colorScheme.primary,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    isTh ? 'ดาวน์โหลดแผนที่สำหรับใช้งานออฟไลน์' : 'Downloading Offline Map',
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.close_rounded, size: 18),
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                  onPressed: () {
+                    setState(() {
+                      _isPrefetchExpanded = false;
+                    });
+                  },
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(4),
+              child: LinearProgressIndicator(
+                value: prefetchState.progress,
+                minHeight: 6,
+                backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.1),
+                valueColor: AlwaysStoppedAnimation<Color>(theme.colorScheme.primary),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  isTh 
+                      ? 'ดาวน์โหลดแล้ว ${prefetchState.currentTile} / ${prefetchState.totalTiles} รูป' 
+                      : 'Downloaded ${prefetchState.currentTile} / ${prefetchState.totalTiles} tiles',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                Text(
+                  '$percentage%',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: theme.colorScheme.primary,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 4),
+            Text(
+              isTh
+                  ? 'เก็บในเครื่องแล้ว: ${prefetchState.cachedCount} รูป | โหลดใหม่: ${prefetchState.successCount} รูป'
+                  : 'Cached: ${prefetchState.cachedCount} | New: ${prefetchState.successCount} tiles',
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+                fontSize: 10,
+              ),
+            ),
+          ],
         ),
       ),
     );
