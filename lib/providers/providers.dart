@@ -166,3 +166,77 @@ final translationsProvider = Provider<AppLocalizations>((ref) {
   final lang = ref.watch(localeProvider);
   return AppLocalizations(lang);
 });
+
+class MapPrefetchProgress {
+  final bool isPrefetching;
+  final int totalTiles;
+  final int currentTile;
+  final int successCount;
+  final int cachedCount;
+  final int errorCount;
+
+  const MapPrefetchProgress({
+    this.isPrefetching = false,
+    this.totalTiles = 0,
+    this.currentTile = 0,
+    this.successCount = 0,
+    this.cachedCount = 0,
+    this.errorCount = 0,
+  });
+
+  double get progress => totalTiles > 0 ? currentTile / totalTiles : 0.0;
+
+  MapPrefetchProgress copyWith({
+    bool? isPrefetching,
+    int? totalTiles,
+    int? currentTile,
+    int? successCount,
+    int? cachedCount,
+    int? errorCount,
+  }) {
+    return MapPrefetchProgress(
+      isPrefetching: isPrefetching ?? this.isPrefetching,
+      totalTiles: totalTiles ?? this.totalTiles,
+      currentTile: currentTile ?? this.currentTile,
+      successCount: successCount ?? this.successCount,
+      cachedCount: cachedCount ?? this.cachedCount,
+      errorCount: errorCount ?? this.errorCount,
+    );
+  }
+}
+
+class MapPrefetchNotifier extends Notifier<MapPrefetchProgress> {
+  @override
+  MapPrefetchProgress build() {
+    return const MapPrefetchProgress();
+  }
+
+  void startPrefetch(int total) {
+    state = MapPrefetchProgress(
+      isPrefetching: true,
+      totalTiles: total,
+    );
+  }
+
+  void updateProgress({
+    required int current,
+    required int success,
+    required int cached,
+    required int error,
+  }) {
+    state = state.copyWith(
+      currentTile: current,
+      successCount: success,
+      cachedCount: cached,
+      errorCount: error,
+    );
+  }
+
+  void finishPrefetch() {
+    state = state.copyWith(isPrefetching: false);
+  }
+}
+
+final mapPrefetchProvider = NotifierProvider<MapPrefetchNotifier, MapPrefetchProgress>(() {
+  return MapPrefetchNotifier();
+});
