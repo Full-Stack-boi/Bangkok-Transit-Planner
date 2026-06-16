@@ -18,6 +18,7 @@ class CachedTileProvider extends TileProvider {
 
   static String? _resolvedCachePath;
   static bool _isPrefetching = false;
+  static bool isPaused = false;
   static final Map<String, String> _hashCache = {};
 
   /// Get the local cache directory path for map tiles
@@ -69,7 +70,7 @@ class CachedTileProvider extends TileProvider {
     List<Station> stations, {
     void Function(int total)? onStart,
     void Function(int current, int success, int cached, int error)? onProgress,
-    void Function()? onFinish,
+    void Function(bool completed)? onFinish,
   }) async {
     if (kIsWeb) return;
     if (_isPrefetching) {
@@ -77,6 +78,8 @@ class CachedTileProvider extends TileProvider {
       return;
     }
     _isPrefetching = true;
+    isPaused = false;
+    bool completed = false;
 
     try {
       final cacheDir = await getCachePath();
@@ -143,6 +146,9 @@ class CachedTileProvider extends TileProvider {
 
       // Download tiles sequentially in the background to avoid rate limits
       for (final tileInfo in tilesToFetch) {
+        if (isPaused) {
+          break;
+        }
         index++;
         final parts = tileInfo.split(':');
         final folderHash = parts[0];
@@ -184,11 +190,14 @@ class CachedTileProvider extends TileProvider {
       }
 
       print('[Prefetch] Finished. Total: ${tilesToFetch.length}, Cached/Verified: $cachedCount, New Downloaded: $successCount, Errors: $errorCount');
+      if (!isPaused && index == tilesToFetch.length) {
+        completed = true;
+      }
     } catch (e) {
       print('[Prefetch] Fatal error in prefetcher: $e');
     } finally {
       _isPrefetching = false;
-      onFinish?.call();
+      onFinish?.call(completed);
     }
   }
 

@@ -169,6 +169,7 @@ final translationsProvider = Provider<AppLocalizations>((ref) {
 
 class MapPrefetchProgress {
   final bool isPrefetching;
+  final bool isPaused;
   final int totalTiles;
   final int currentTile;
   final int successCount;
@@ -177,6 +178,7 @@ class MapPrefetchProgress {
 
   const MapPrefetchProgress({
     this.isPrefetching = false,
+    this.isPaused = false,
     this.totalTiles = 0,
     this.currentTile = 0,
     this.successCount = 0,
@@ -188,6 +190,7 @@ class MapPrefetchProgress {
 
   MapPrefetchProgress copyWith({
     bool? isPrefetching,
+    bool? isPaused,
     int? totalTiles,
     int? currentTile,
     int? successCount,
@@ -196,6 +199,7 @@ class MapPrefetchProgress {
   }) {
     return MapPrefetchProgress(
       isPrefetching: isPrefetching ?? this.isPrefetching,
+      isPaused: isPaused ?? this.isPaused,
       totalTiles: totalTiles ?? this.totalTiles,
       currentTile: currentTile ?? this.currentTile,
       successCount: successCount ?? this.successCount,
@@ -214,6 +218,7 @@ class MapPrefetchNotifier extends Notifier<MapPrefetchProgress> {
   void startPrefetch(int total) {
     state = MapPrefetchProgress(
       isPrefetching: true,
+      isPaused: false,
       totalTiles: total,
     );
   }
@@ -232,8 +237,16 @@ class MapPrefetchNotifier extends Notifier<MapPrefetchProgress> {
     );
   }
 
+  void pausePrefetch() {
+    state = state.copyWith(isPaused: true);
+  }
+
+  void resumePrefetch() {
+    state = state.copyWith(isPaused: false);
+  }
+
   void finishPrefetch() {
-    state = state.copyWith(isPrefetching: false);
+    state = state.copyWith(isPrefetching: false, isPaused: false);
   }
 }
 
