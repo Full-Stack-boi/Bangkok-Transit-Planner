@@ -163,11 +163,6 @@ class CachedTileProvider extends TileProvider {
         try {
           if (await tileFile.exists()) {
             cachedCount++;
-            // Background check for update (send ETag) if older than 7 days
-            final needsReval = await _needsRevalidation(tileFile);
-            if (needsReval) {
-              _validateAndDownloadTile(url, tileFile, metaFile, isBackground: true);
-            }
           } else {
             // Download fresh tile
             final success = await _validateAndDownloadTile(url, tileFile, metaFile, isBackground: false);
@@ -243,17 +238,6 @@ class CachedTileProvider extends TileProvider {
     }
     return false;
   }
-
-  /// Checks if a cached tile file is older than 7 days and needs revalidation
-  static Future<bool> _needsRevalidation(File file) async {
-    try {
-      final lastModified = await file.lastModified();
-      final age = DateTime.now().difference(lastModified);
-      return age.inDays >= 7;
-    } catch (_) {
-      return true;
-    }
-  }
 }
 
 class _Semaphore {
@@ -324,12 +308,8 @@ class CachedTileImageProvider extends ImageProvider<CachedTileImageProvider> {
         // 1. Read cached image bytes from disk
         final Uint8List bytes = await key.tileFile.readAsBytes();
         
-        // 2. Trigger asynchronous background check with server (no UI blocking) if older than 7 days
-        CachedTileProvider._needsRevalidation(key.tileFile).then((needs) {
-          if (needs) {
-            _validateCacheInBackground(key);
-          }
-        });
+        // 2. Trigger asynchronous background check with server (no UI blocking)
+        _validateCacheInBackground(key);
         
         // 3. Return decoded image instantly from cache
         return decode(await ui.ImmutableBuffer.fromUint8List(bytes));
