@@ -113,7 +113,10 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                           const Icon(Icons.cloud_off_rounded, color: Colors.white),
                           const SizedBox(width: 12),
                           Expanded(
-                            child: Text(t.errors.errorNoInternet),
+                            child: Text(
+                              t.errors.errorNoInternet,
+                              style: const TextStyle(color: Colors.white),
+                            ),
                           ),
                         ],
                       ),
@@ -582,6 +585,12 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                     : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png',
                 userAgentPackageName: 'com.bkktransit.bkk_transit_planner',
                 tileProvider: _tileProvider,
+                maxNativeZoom: 18,
+                keepBuffer: 4,
+                panBuffer: 2,
+                tileDisplay: const TileDisplay.fadeIn(
+                  duration: Duration(milliseconds: 300),
+                ),
               ),
               PolylineLayer(polylines: polylines),
               MarkerLayer(markers: markers),
