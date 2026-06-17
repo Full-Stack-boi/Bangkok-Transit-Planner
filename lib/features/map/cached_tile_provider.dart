@@ -66,6 +66,14 @@ class CachedTileProvider extends TileProvider {
 
   /// Prefetch map tiles for the Bangkok transit network in the background.
   /// Loops through all stations and downloads tiles for zoom levels 12 to 15 (with surrounding padding).
+  /// Result codes for tile prefetching
+  static const int _tileSuccess = 0;
+  static const int _tileUnmodified = 1;
+  static const int _tileErrorHttp = 2;
+  static const int _tileErrorNetwork = 3;
+
+  /// Prefetch map tiles for the Bangkok transit network in the background.
+  /// Loops through all stations and downloads tiles for zoom levels 12 to 15 (with surrounding padding).
   static Future<void> prefetchBangkokTiles(
     List<Station> stations, {
     void Function(int total)? onStart,
@@ -143,6 +151,7 @@ class CachedTileProvider extends TileProvider {
       int cachedCount = 0;
       int errorCount = 0;
       int index = 0;
+      int consecutiveNetworkErrors = 0;
 
       // Download tiles sequentially in the background to avoid rate limits
       for (final tileInfo in tilesToFetch) {
@@ -169,13 +178,25 @@ class CachedTileProvider extends TileProvider {
         try {
           if (await tileFile.exists()) {
             cachedCount++;
+            // NOTE: do NOT reset consecutiveNetworkErrors here.
+            // A cached tile proves nothing about internet availability.
           } else {
             // Download fresh tile
-            final success = await _validateAndDownloadTile(url, tileFile, metaFile, isBackground: false);
-            if (success) {
+            final status = await _downloadTileStatus(url, tileFile, metaFile);
+            if (status == _tileSuccess || status == _tileUnmodified) {
               successCount++;
-            } else {
+              consecutiveNetworkErrors = 0; // Live download succeeded → internet is up
+            } else if (status == _tileErrorHttp) {
               errorCount++;
+              consecutiveNetworkErrors = 0; // HTTP error (e.g. 400/404) → server replied → internet is up
+            } else if (status == _tileErrorNetwork) {
+              errorCount++;
+              consecutiveNetworkErrors++;
+              if (consecutiveNetworkErrors >= 3) {
+                print('[Prefetch] Lost internet connection (3 consecutive network errors). Pausing prefetch.');
+                isPaused = true;
+                break;
+              }
             }
           }
         } catch (e) {
@@ -201,13 +222,12 @@ class CachedTileProvider extends TileProvider {
     }
   }
 
-  /// Downloads/Validates a tile using ETag/Last-Modified headers. Returns true if successful.
-  static Future<bool> _validateAndDownloadTile(
+  /// Downloads/Validates a tile using ETag/Last-Modified headers. Returns status code.
+  static Future<int> _downloadTileStatus(
     String url,
     File tileFile,
-    File metaFile, {
-    required bool isBackground,
-  }) async {
+    File metaFile,
+  ) async {
     try {
       final Map<String, String> headers = {};
       if (await metaFile.exists()) {
@@ -220,7 +240,7 @@ class CachedTileProvider extends TileProvider {
         } catch (_) {}
       }
 
-      final response = await http.get(Uri.parse(url), headers: headers);
+      final response = await http.get(Uri.parse(url), headers: headers).timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 200) {
         final bytes = response.bodyBytes;
@@ -235,17 +255,25 @@ class CachedTileProvider extends TileProvider {
           'etag': ?etag,
           'lastModified': ?lastModified,
         }));
-        return true;
+        return _tileSuccess;
       } else if (response.statusCode == 304) {
-        // Tile is unmodified
-        return true;
+        return _tileUnmodified;
+      } else {
+        return _tileErrorHttp;
       }
+    } on SocketException catch (_) {
+      return _tileErrorNetwork;
+    } on HttpException catch (_) {
+      return _tileErrorNetwork;
+    } on TimeoutException catch (_) {
+      return _tileErrorNetwork;
     } catch (e) {
-      if (!isBackground) {
-        print('[Prefetch] Failed to download tile $url: $e');
+      final errStr = e.toString();
+      if (errStr.contains('ClientException') || errStr.contains('SocketException') || errStr.contains('Failed host lookup')) {
+        return _tileErrorNetwork;
       }
+      return _tileErrorHttp;
     }
-    return false;
   }
 }
 
