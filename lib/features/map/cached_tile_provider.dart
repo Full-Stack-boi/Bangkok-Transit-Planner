@@ -50,6 +50,11 @@ class CachedTileProvider extends TileProvider {
       url: url,
       tileFile: tileFile,
       metaFile: metaFile,
+      z: coordinates.z.toInt(),
+      x: coordinates.x.toInt(),
+      y: coordinates.y.toInt(),
+      cacheDir: cacheDir,
+      folderHash: folderHash,
     );
   }
 
@@ -248,7 +253,9 @@ class CachedTileProvider extends TileProvider {
     File metaFile,
   ) async {
     try {
-      final Map<String, String> headers = {};
+      final Map<String, String> headers = {
+        'User-Agent': 'com.bkktransit.bkk_transit_planner',
+      };
       if (await metaFile.exists()) {
         try {
           final metaJson = jsonDecode(await metaFile.readAsString());
@@ -330,12 +337,22 @@ class CachedTileImageProvider extends ImageProvider<CachedTileImageProvider> {
   final String url;
   final File tileFile;
   final File metaFile;
+  final int z;
+  final int x;
+  final int y;
+  final String cacheDir;
+  final String folderHash;
   static ui.ImmutableBuffer? _fallbackBuffer;
 
   CachedTileImageProvider({
     required this.url,
     required this.tileFile,
     required this.metaFile,
+    required this.z,
+    required this.x,
+    required this.y,
+    required this.cacheDir,
+    required this.folderHash,
   });
 
   @override
@@ -345,18 +362,16 @@ class CachedTileImageProvider extends ImageProvider<CachedTileImageProvider> {
 
   @override
   ImageStreamCompleter loadImage(CachedTileImageProvider key, ImageDecoderCallback decode) {
-    return MultiFrameImageStreamCompleter(
-      codec: _loadAsync(key, decode),
-      scale: 1.0,
-      debugLabel: key.url,
-      informationCollector: () => <DiagnosticsNode>[
-        DiagnosticsProperty<ImageProvider>('Image provider', this),
-        DiagnosticsProperty<CachedTileImageProvider>('Image key', key),
-      ],
-    );
+    final completer = Completer<ImageInfo>();
+    _loadAsync(key, decode, completer);
+    return OneFrameImageStreamCompleter(completer.future);
   }
 
-  Future<ui.Codec> _loadAsync(CachedTileImageProvider key, ImageDecoderCallback decode) async {
+  Future<void> _loadAsync(
+    CachedTileImageProvider key,
+    ImageDecoderCallback decode,
+    Completer<ImageInfo> completer,
+  ) async {
     try {
       final fileExists = await key.tileFile.exists();
 
@@ -368,27 +383,117 @@ class CachedTileImageProvider extends ImageProvider<CachedTileImageProvider> {
         _validateCacheInBackground(key);
         
         // 3. Return decoded image instantly from cache
-        return decode(await ui.ImmutableBuffer.fromUint8List(bytes));
+        final codec = await decode(await ui.ImmutableBuffer.fromUint8List(bytes));
+        final frame = await codec.getNextFrame();
+        completer.complete(ImageInfo(image: frame.image, scale: 1.0));
+        return;
       } else {
         // 1. No cache exists. Must perform a blocking network request.
         final bytes = await _downloadTile(key);
         if (bytes != null) {
-          return decode(await ui.ImmutableBuffer.fromUint8List(bytes));
+          final codec = await decode(await ui.ImmutableBuffer.fromUint8List(bytes));
+          final frame = await codec.getNextFrame();
+          completer.complete(ImageInfo(image: frame.image, scale: 1.0));
+          return;
+        }
+
+        // 2. Fallback: try to find and crop/scale from an ancestor tile on disk
+        final fallbackImage = await _fallbackFromAncestor(key);
+        if (fallbackImage != null) {
+          completer.complete(ImageInfo(image: fallbackImage, scale: 1.0));
+          return;
         }
       }
     } catch (e) {
       print('Error loading tile image: $e');
     }
 
-    // 2. Fallback: transparent 1x1 png if everything fails (so map doesn't break)
-    _fallbackBuffer ??= await ui.ImmutableBuffer.fromUint8List(_kTransparentImageBytes);
-    return decode(_fallbackBuffer!);
+    // 3. Fallback: transparent 1x1 png if everything fails (so map doesn't break)
+    try {
+      _fallbackBuffer ??= await ui.ImmutableBuffer.fromUint8List(_kTransparentImageBytes);
+      final codec = await decode(_fallbackBuffer!);
+      final frame = await codec.getNextFrame();
+      completer.complete(ImageInfo(image: frame.image, scale: 1.0));
+    } catch (e) {
+      completer.completeError(e);
+    }
+  }
+
+  /// Searches the local cache for the nearest ancestor tile (from z-1 down to 10)
+  Future<ui.Image?> _fallbackFromAncestor(CachedTileImageProvider key) async {
+    int currentZ = key.z - 1;
+    int currentX = key.x;
+    int currentY = key.y;
+
+    while (currentZ >= 10) {
+      currentX = currentX >> 1;
+      currentY = currentY >> 1;
+      final file = File('${key.cacheDir}/${key.folderHash}/$currentZ/$currentX/$currentY.png');
+      if (await file.exists()) {
+        try {
+          return await _cropAndScaleAncestor(file, currentZ, currentX, currentY, key.z, key.x, key.y);
+        } catch (e) {
+          print('Failed to crop ancestor tile ($currentZ, $currentX, $currentY) for child (${key.z}, ${key.x}, ${key.y}): $e');
+        }
+      }
+      currentZ--;
+    }
+    return null;
+  }
+
+  /// Decodes parent tile, calculates the child bounds within the parent, crops and scales it on a canvas.
+  Future<ui.Image> _cropAndScaleAncestor(
+    File file,
+    int parentZ,
+    int parentX,
+    int parentY,
+    int childZ,
+    int childX,
+    int childY,
+  ) async {
+    final parentBytes = await file.readAsBytes();
+    final buffer = await ui.ImmutableBuffer.fromUint8List(parentBytes);
+    final codec = await ui.instantiateImageCodecFromBuffer(buffer);
+    final frame = await codec.getNextFrame();
+    final ui.Image parentImage = frame.image;
+
+    final pictureRecorder = ui.PictureRecorder();
+    final canvas = ui.Canvas(pictureRecorder);
+
+    final int dz = childZ - parentZ;
+    final int scale = 1 << dz;
+    final double subSize = 256.0 / scale;
+
+    final double srcX = (childX - (parentX << dz)) * subSize;
+    final double srcY = (childY - (parentY << dz)) * subSize;
+
+    final srcRect = ui.Rect.fromLTWH(srcX, srcY, subSize, subSize);
+    final dstRect = const ui.Rect.fromLTWH(0, 0, 256, 256);
+
+    final paint = ui.Paint()
+      ..filterQuality = ui.FilterQuality.medium
+      ..isAntiAlias = true;
+
+    canvas.drawImageRect(parentImage, srcRect, dstRect, paint);
+
+    final picture = pictureRecorder.endRecording();
+    final croppedImage = await picture.toImage(256, 256);
+
+    parentImage.dispose();
+    // Do NOT dispose croppedImage because it is passed back and used in ImageInfo
+
+    return croppedImage;
   }
 
   /// Downloads the tile, saves it to disk with metadata, and returns the raw bytes
   Future<Uint8List?> _downloadTile(CachedTileImageProvider key) async {
     try {
-      final response = await http.get(Uri.parse(key.url));
+      final response = await http.get(
+        Uri.parse(key.url),
+        headers: {
+          'User-Agent': 'com.bkktransit.bkk_transit_planner',
+        },
+      );
       if (response.statusCode == 200) {
         final bytes = response.bodyBytes;
         
@@ -418,7 +523,9 @@ class CachedTileImageProvider extends ImageProvider<CachedTileImageProvider> {
   Future<void> _validateCacheInBackground(CachedTileImageProvider key) async {
     await _bgSemaphore.acquire();
     try {
-      final Map<String, String> headers = {};
+      final Map<String, String> headers = {
+        'User-Agent': 'com.bkktransit.bkk_transit_planner',
+      };
       if (await key.metaFile.exists()) {
         try {
           final metaJson = jsonDecode(await key.metaFile.readAsString());

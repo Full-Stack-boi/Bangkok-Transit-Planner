@@ -51,6 +51,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   @override
   void initState() {
     super.initState();
+    // Clear Flutter's memory image cache to force reloading fresh tiles from disk
+    PaintingBinding.instance.imageCache.clear();
+    PaintingBinding.instance.imageCache.clearLiveImages();
     _fetchUserLocation();
     _initOfflineMap();
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -95,6 +98,12 @@ class _MapScreenState extends ConsumerState<MapScreen> {
             onFinish: (completed, lostConnection) async {
               if (completed) {
                 ref.read(mapPrefetchProvider.notifier).finishPrefetch();
+                // Clear cache and rebuild map when prefetch completes to immediately show high-res tiles
+                PaintingBinding.instance.imageCache.clear();
+                PaintingBinding.instance.imageCache.clearLiveImages();
+                if (mounted) {
+                  setState(() {});
+                }
                 try {
                   final prefs = await SharedPreferences.getInstance();
                   await prefs.setBool('map_prefetch_completed', true);
@@ -538,64 +547,69 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         children: [
           // ─── Map Layer ───
           RepaintBoundary(
-            child: FlutterMap(
-              mapController: _mapController,
-            options: MapOptions(
-              initialCenter: const LatLng(13.7563, 100.5018),
-              initialZoom: 12.0,
-              minZoom: 10.5,
-              maxZoom: 16.0,
-              cameraConstraint: CameraConstraint.containCenter(
-                bounds: LatLngBounds(
-                  const LatLng(13.20, 100.00),
-                  const LatLng(14.25, 101.00),
+            child: ColoredBox(
+              color: themeBrightness == Brightness.dark
+                  ? const Color(0xFF111111) // Matches CartoDB Dark Matter theme
+                  : const Color(0xFFE4E3DF), // Matches CartoDB Voyager theme
+              child: FlutterMap(
+                mapController: _mapController,
+              options: MapOptions(
+                initialCenter: const LatLng(13.7563, 100.5018),
+                initialZoom: 12.0,
+                minZoom: 10.5,
+                maxZoom: 16.0,
+                cameraConstraint: CameraConstraint.containCenter(
+                  bounds: LatLngBounds(
+                    const LatLng(13.20, 100.00),
+                    const LatLng(14.25, 101.00),
+                  ),
                 ),
-              ),
-              onTap: (position, point) {
-                if (_selectedStation != null) {
-                  setState(() => _selectedStation = null);
-                }
-                
-                final nearest = _findNearestStation(point, transitRepo.stations);
-                if (nearest != null) {
-                  final dist = Geolocator.distanceBetween(
-                    point.latitude, point.longitude, nearest.lat, nearest.lng
-                  );
-                  final walkMin = (dist / 80.0).clamp(1.0, 30.0);
-
-                  setState(() {
-                    _selectedStation = null;
-                    _customSelectedLocation = CustomLocation(
-                      id: 'CUSTOM_${point.latitude.toStringAsFixed(6)}_${point.longitude.toStringAsFixed(6)}',
-                      nameTh: 'จุดที่เลือก (${point.latitude.toStringAsFixed(4)}, ${point.longitude.toStringAsFixed(4)})',
-                      nameEn: 'Selected Location (${point.latitude.toStringAsFixed(4)}, ${point.longitude.toStringAsFixed(4)})',
-                      nearestStationId: nearest.id,
-                      walkingMinutes: walkMin,
-                      lat: point.latitude,
-                      lng: point.longitude,
+                onTap: (position, point) {
+                  if (_selectedStation != null) {
+                    setState(() => _selectedStation = null);
+                  }
+                  
+                  final nearest = _findNearestStation(point, transitRepo.stations);
+                  if (nearest != null) {
+                    final dist = Geolocator.distanceBetween(
+                      point.latitude, point.longitude, nearest.lat, nearest.lng
                     );
-                  });
-                }
-              },
-            ),
-            children: [
-              TileLayer(
-                urlTemplate: theme.brightness == Brightness.dark
-                    ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png'
-                    : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png',
-                userAgentPackageName: 'com.bkktransit.bkk_transit_planner',
-                tileProvider: _tileProvider,
-                maxNativeZoom: 18,
-                keepBuffer: 4,
-                panBuffer: 2,
-                tileDisplay: const TileDisplay.fadeIn(
-                  duration: Duration(milliseconds: 300),
-                ),
+                    final walkMin = (dist / 80.0).clamp(1.0, 30.0);
+  
+                    setState(() {
+                      _selectedStation = null;
+                      _customSelectedLocation = CustomLocation(
+                        id: 'CUSTOM_${point.latitude.toStringAsFixed(6)}_${point.longitude.toStringAsFixed(6)}',
+                        nameTh: 'จุดที่เลือก (${point.latitude.toStringAsFixed(4)}, ${point.longitude.toStringAsFixed(4)})',
+                        nameEn: 'Selected Location (${point.latitude.toStringAsFixed(4)}, ${point.longitude.toStringAsFixed(4)})',
+                        nearestStationId: nearest.id,
+                        walkingMinutes: walkMin,
+                        lat: point.latitude,
+                        lng: point.longitude,
+                      );
+                    });
+                  }
+                },
               ),
-              PolylineLayer(polylines: polylines),
-              MarkerLayer(markers: markers),
-            ],
-          ),
+              children: [
+                TileLayer(
+                  urlTemplate: theme.brightness == Brightness.dark
+                      ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png'
+                      : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png',
+                  userAgentPackageName: 'com.bkktransit.bkk_transit_planner',
+                  tileProvider: _tileProvider,
+                  maxNativeZoom: 18,
+                  keepBuffer: 4,
+                  panBuffer: 2,
+                  tileDisplay: const TileDisplay.fadeIn(
+                    duration: Duration(milliseconds: 300),
+                  ),
+                ),
+                PolylineLayer(polylines: polylines),
+                MarkerLayer(markers: markers),
+              ],
+            ),
+            ),
           ),
 
           // ─── Floating Top Search Card & Prefetch Indicator ───
