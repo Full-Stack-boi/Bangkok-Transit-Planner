@@ -189,6 +189,8 @@ class ThaiErrors implements BaseErrors {
   String get errorNoRoute => 'ไม่พบเส้นทาง';
   @override
   String errorFailed(String error) => 'เกิดข้อผิดพลาด: $error';
+  @override
+  String get errorNoInternet => 'ไม่มีการเชื่อมต่ออินเทอร์เน็ต หยุดดาวน์โหลดแผนที่ชั่วคราว';
 }
 
 class ThaiDirections implements BaseDirections {

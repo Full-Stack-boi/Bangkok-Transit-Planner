@@ -78,7 +78,7 @@ class CachedTileProvider extends TileProvider {
     List<Station> stations, {
     void Function(int total)? onStart,
     void Function(int current, int success, int cached, int error)? onProgress,
-    void Function(bool completed)? onFinish,
+    void Function(bool completed, bool lostConnection)? onFinish,
   }) async {
     if (kIsWeb) return;
     if (_isPrefetching) {
@@ -88,6 +88,7 @@ class CachedTileProvider extends TileProvider {
     _isPrefetching = true;
     isPaused = false;
     bool completed = false;
+    bool lostConnection = false;
 
     try {
       final cacheDir = await getCachePath();
@@ -195,6 +196,7 @@ class CachedTileProvider extends TileProvider {
               if (consecutiveNetworkErrors >= 3) {
                 print('[Prefetch] Lost internet connection (3 consecutive network errors). Pausing prefetch.');
                 isPaused = true;
+                lostConnection = true;
                 break;
               }
             }
@@ -218,7 +220,7 @@ class CachedTileProvider extends TileProvider {
       print('[Prefetch] Fatal error in prefetcher: $e');
     } finally {
       _isPrefetching = false;
-      onFinish?.call(completed);
+      onFinish?.call(completed, lostConnection);
     }
   }
 
