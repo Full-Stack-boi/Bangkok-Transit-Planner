@@ -189,6 +189,8 @@ class EnglishErrors implements BaseErrors {
   String get errorNoRoute => 'No route found';
   @override
   String errorFailed(String error) => 'Error occurred: $error';
+  @override
+  String get errorNoInternet => 'No internet connection. Map prefetching paused.';
 }
 
 class EnglishDirections implements BaseDirections {

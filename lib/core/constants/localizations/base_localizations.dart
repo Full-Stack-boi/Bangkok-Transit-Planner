@@ -102,6 +102,7 @@ abstract class BaseErrors {
   String get errorSamePlaces;
   String get errorNoRoute;
   String errorFailed(String error);
+  String get errorNoInternet;
 }
 
 abstract class BaseDirections {

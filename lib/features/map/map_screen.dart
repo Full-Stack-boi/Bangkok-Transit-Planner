@@ -92,7 +92,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                     error: error,
                   );
             },
-            onFinish: (completed) async {
+            onFinish: (completed, lostConnection) async {
               if (completed) {
                 ref.read(mapPrefetchProvider.notifier).finishPrefetch();
                 try {
@@ -103,6 +103,26 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                 }
               } else {
                 ref.read(mapPrefetchProvider.notifier).pausePrefetch();
+                if (lostConnection && mounted) {
+                  final t = ref.read(translationsProvider);
+                  ScaffoldMessenger.of(context).clearSnackBars();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Row(
+                        children: [
+                          const Icon(Icons.cloud_off_rounded, color: Colors.white),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(t.errors.errorNoInternet),
+                          ),
+                        ],
+                      ),
+                      behavior: SnackBarBehavior.floating,
+                      backgroundColor: Colors.redAccent,
+                      duration: const Duration(seconds: 4),
+                    ),
+                  );
+                }
               }
             },
           );
