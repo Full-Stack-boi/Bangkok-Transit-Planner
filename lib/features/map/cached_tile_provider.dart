@@ -119,6 +119,21 @@ class CachedTileProvider extends TileProvider {
       // Key format: "hash:z:x:y"
       final tilesToFetch = <String>{};
 
+      // Pre-fetch zoom 10 & 11 for full Bangkok bounding box coverage
+      for (int z = 10; z <= 11; z++) {
+        final xMin = lonToTileX(minLng, z);
+        final xMax = lonToTileX(maxLng, z);
+        final yMin = latToTileY(maxLat, z); // y is inverted for lat
+        final yMax = latToTileY(minLat, z);
+        for (int tx = xMin; tx <= xMax; tx++) {
+          for (int ty = yMin; ty <= yMax; ty++) {
+            for (final target in targets) {
+              tilesToFetch.add('${target['hash']}:$z:$tx:$ty:${target['template']}');
+            }
+          }
+        }
+      }
+
       for (final station in stations) {
         // Guard coordinates
         if (station.lat < minLat || station.lat > maxLat || station.lng < minLng || station.lng > maxLng) {
