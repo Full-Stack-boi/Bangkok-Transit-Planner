@@ -119,8 +119,10 @@ class CachedTileProvider extends TileProvider {
       // Key format: "hash:z:x:y"
       final tilesToFetch = <String>{};
 
-      // Pre-fetch zoom 10 & 11 for full Bangkok bounding box coverage
-      for (int z = 10; z <= 11; z++) {
+      // Pre-fetch zoom 10 to 13 for full Bangkok bounding box coverage
+      // This ensures that when fitting route bounds (which typically zooms to levels 11-13),
+      // the entire path is pre-rendered and cached.
+      for (int z = 10; z <= 13; z++) {
         final xMin = lonToTileX(minLng, z);
         final xMax = lonToTileX(maxLng, z);
         final yMin = latToTileY(maxLat, z); // y is inverted for lat
