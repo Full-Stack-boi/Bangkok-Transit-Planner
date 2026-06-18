@@ -33,6 +33,12 @@ migrate_working_dir/
 /build/
 /coverage/
 
+# Firebase - Android config
+/android/app/google-services.json
+
+# Firebase - iOS config 
+/ios/Runner/GoogleService-Info.plist
+
 # Generated code (Riverpod, Freezed, JsonSerializable)
 *.g.dart
 *.freezed.dart
