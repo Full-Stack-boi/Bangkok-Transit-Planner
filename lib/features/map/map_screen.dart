@@ -157,10 +157,14 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     points.add(LatLng(routeResult.destination.lat, routeResult.destination.lng));
 
     for (final segment in routeResult.segments) {
-      points.add(LatLng(segment.fromStation.lat, segment.fromStation.lng));
-      points.add(LatLng(segment.toStation.lat, segment.toStation.lng));
-      for (final s in segment.intermediateStations) {
-        points.add(LatLng(s.lat, s.lng));
+      if (segment.lineId == 'WALK' && segment.walkingPath != null && segment.walkingPath!.isNotEmpty) {
+        points.addAll(segment.walkingPath!);
+      } else {
+        points.add(LatLng(segment.fromStation.lat, segment.fromStation.lng));
+        points.add(LatLng(segment.toStation.lat, segment.toStation.lng));
+        for (final s in segment.intermediateStations) {
+          points.add(LatLng(s.lat, s.lng));
+        }
       }
     }
 
@@ -261,11 +265,15 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         // Highlight ONLY the active route
         for (final segment in routeResult.segments) {
           final points = <LatLng>[];
-          points.add(LatLng(segment.fromStation.lat, segment.fromStation.lng));
-          for (final s in segment.intermediateStations) {
-            points.add(LatLng(s.lat, s.lng));
+          if (segment.lineId == 'WALK' && segment.walkingPath != null && segment.walkingPath!.isNotEmpty) {
+            points.addAll(segment.walkingPath!);
+          } else {
+            points.add(LatLng(segment.fromStation.lat, segment.fromStation.lng));
+            for (final s in segment.intermediateStations) {
+              points.add(LatLng(s.lat, s.lng));
+            }
+            points.add(LatLng(segment.toStation.lat, segment.toStation.lng));
           }
-          points.add(LatLng(segment.toStation.lat, segment.toStation.lng));
 
           final isWalk = segment.lineId == 'WALK';
           newPolylines.add(
@@ -391,6 +399,47 @@ class _MapScreenState extends ConsumerState<MapScreen> {
             ),
           ),
         );
+      }
+
+      // Add Station Exit Markers
+      for (final segment in routeResult.segments) {
+        if (segment.lineId == 'WALK' && segment.exit != null) {
+          final exit = segment.exit!;
+          newMarkers.add(
+            Marker(
+              point: LatLng(exit.lat, exit.lng),
+              width: 32,
+              height: 32,
+              child: Tooltip(
+                message: localeCode == 'en' ? 'Exit ${exit.exitCode}' : 'ทางออก ${exit.exitCode}',
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.orange.shade800,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white, width: 2.0),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Colors.black26,
+                        blurRadius: 4,
+                        offset: Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Center(
+                    child: Text(
+                      exit.exitCode,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          );
+        }
       }
 
         // Add custom origin/destination pins
