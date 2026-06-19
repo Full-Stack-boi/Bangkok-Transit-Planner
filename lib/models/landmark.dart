@@ -21,6 +21,11 @@ class Landmark extends SearchableItem {
   final List<LatLng>? walkingPath;
   final String? exitCode;
   final Map<String, StationWalk>? alternativeWalks;
+  final double? entranceLat;
+  final double? entranceLng;
+
+  double get routeLat => entranceLat ?? lat;
+  double get routeLng => entranceLng ?? lng;
 
   const Landmark({
     required this.id,
@@ -33,6 +38,8 @@ class Landmark extends SearchableItem {
     this.walkingPath,
     this.exitCode,
     this.alternativeWalks,
+    this.entranceLat,
+    this.entranceLng,
   });
 
   factory Landmark.fromJson(Map<String, dynamic> json) {
@@ -57,6 +64,8 @@ class Landmark extends SearchableItem {
           .toList(),
       exitCode: json['exit_code'] as String?,
       alternativeWalks: alternativeWalks,
+      entranceLat: json['entrance_lat'] != null ? (json['entrance_lat'] as num).toDouble() : null,
+      entranceLng: json['entrance_lng'] != null ? (json['entrance_lng'] as num).toDouble() : null,
     );
   }
 
@@ -71,6 +80,8 @@ class Landmark extends SearchableItem {
         'walking_path': walkingPath?.map((p) => [p.latitude, p.longitude]).toList(),
         'exit_code': exitCode,
         'alternative_walks': alternativeWalks?.map((k, v) => MapEntry(k, v.toJson())),
+        'entrance_lat': entranceLat,
+        'entrance_lng': entranceLng,
       };
 }
 
