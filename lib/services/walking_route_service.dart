@@ -61,12 +61,23 @@ class WalkingRouteService {
     double toLat,
     double toLng,
   ) {
-    final double midLng = (fromLng + toLng) / 2.0;
-    return [
-      LatLng(fromLat, fromLng),
-      LatLng(fromLat, midLng),
-      LatLng(toLat, midLng),
-      LatLng(toLat, toLng),
-    ];
+    final latDiff = (fromLat - toLat).abs();
+    final lngDiff = (fromLng - toLng).abs();
+
+    if (lngDiff > latDiff) {
+      // Horizontal first (align with East-West main roads like Rama I / Sukhumvit)
+      return [
+        LatLng(fromLat, fromLng),
+        LatLng(fromLat, toLng),
+        LatLng(toLat, toLng),
+      ];
+    } else {
+      // Vertical first (align with North-South main roads like Phaya Thai / Ratchadaphisek)
+      return [
+        LatLng(fromLat, fromLng),
+        LatLng(toLat, fromLng),
+        LatLng(toLat, toLng),
+      ];
+    }
   }
 }

@@ -403,13 +403,38 @@ class SearchViewModel extends _$SearchViewModel {
       if (nearestStation != null) {
         StationExit? exit;
         List<LatLng>? walkingPath;
+        double walkingMinutes = origin.walkingMinutes ?? 5.0;
 
-        if (origin is Landmark && origin.walkingPath != null && origin.walkingPath!.isNotEmpty) {
-          walkingPath = origin.walkingPath;
-          if (origin.exitCode != null) {
+        Landmark? originLandmark;
+        if (origin is Landmark) {
+          originLandmark = origin;
+        } else {
+          final List<dynamic> allLandmarks = repo.landmarks;
+          for (final l in allLandmarks) {
+            if (l.id == origin.id && l is Landmark) {
+              originLandmark = l;
+              break;
+            }
+          }
+        }
+
+        if (originLandmark != null) {
+          if (nearestStation.id == originLandmark.nearestStationId && originLandmark.walkingPath != null) {
+            walkingPath = originLandmark.walkingPath;
+            if (originLandmark.exitCode != null) {
+              final exits = repo.getExitsForStation(nearestStation.id);
+              exit = exits.firstWhere(
+                (e) => e.exitCode == originLandmark!.exitCode,
+                orElse: () => nearestStation.findClosestExit(repo.exits, origin.lat, origin.lng),
+              );
+            }
+          } else if (originLandmark.alternativeWalks != null && originLandmark.alternativeWalks!.containsKey(nearestStation.id)) {
+            final walk = originLandmark.alternativeWalks![nearestStation.id]!;
+            walkingPath = walk.walkingPath;
+            walkingMinutes = walk.walkingMinutes;
             final exits = repo.getExitsForStation(nearestStation.id);
             exit = exits.firstWhere(
-              (e) => e.exitCode == origin.exitCode,
+              (e) => e.exitCode == walk.exitCode,
               orElse: () => nearestStation.findClosestExit(repo.exits, origin.lat, origin.lng),
             );
           }
@@ -426,7 +451,7 @@ class SearchViewModel extends _$SearchViewModel {
           fromStation: origin,
           toStation: nearestStation,
           stationCount: 0,
-          estimatedMinutes: origin.walkingMinutes ?? 5.0,
+          estimatedMinutes: walkingMinutes,
           fareThb: 0,
           standardFareThb: 0,
           walkingPath: walkingPath,
@@ -591,13 +616,38 @@ class SearchViewModel extends _$SearchViewModel {
       if (nearestStation != null) {
         StationExit? exit;
         List<LatLng>? walkingPath;
+        double walkingMinutes = destination.walkingMinutes ?? 5.0;
 
-        if (destination is Landmark && destination.walkingPath != null && destination.walkingPath!.isNotEmpty) {
-          walkingPath = destination.walkingPath;
-          if (destination.exitCode != null) {
+        Landmark? destLandmark;
+        if (destination is Landmark) {
+          destLandmark = destination;
+        } else {
+          final List<dynamic> allLandmarks = repo.landmarks;
+          for (final l in allLandmarks) {
+            if (l.id == destination.id && l is Landmark) {
+              destLandmark = l;
+              break;
+            }
+          }
+        }
+
+        if (destLandmark != null) {
+          if (nearestStation.id == destLandmark.nearestStationId && destLandmark.walkingPath != null) {
+            walkingPath = destLandmark.walkingPath;
+            if (destLandmark.exitCode != null) {
+              final exits = repo.getExitsForStation(nearestStation.id);
+              exit = exits.firstWhere(
+                (e) => e.exitCode == destLandmark!.exitCode,
+                orElse: () => nearestStation.findClosestExit(repo.exits, destination.lat, destination.lng),
+              );
+            }
+          } else if (destLandmark.alternativeWalks != null && destLandmark.alternativeWalks!.containsKey(nearestStation.id)) {
+            final walk = destLandmark.alternativeWalks![nearestStation.id]!;
+            walkingPath = walk.walkingPath;
+            walkingMinutes = walk.walkingMinutes;
             final exits = repo.getExitsForStation(nearestStation.id);
             exit = exits.firstWhere(
-              (e) => e.exitCode == destination.exitCode,
+              (e) => e.exitCode == walk.exitCode,
               orElse: () => nearestStation.findClosestExit(repo.exits, destination.lat, destination.lng),
             );
           }
@@ -614,7 +664,7 @@ class SearchViewModel extends _$SearchViewModel {
           fromStation: nearestStation,
           toStation: destination,
           stationCount: 0,
-          estimatedMinutes: destination.walkingMinutes ?? 5.0,
+          estimatedMinutes: walkingMinutes,
           fareThb: 0,
           standardFareThb: 0,
           walkingPath: walkingPath,
@@ -664,6 +714,7 @@ class SearchViewModel extends _$SearchViewModel {
 
   /// Asynchronously hydrates a RouteResult's walking segments with realistic OSRM paths
   Future<RouteResult> _hydrateRouteWalkingPaths(RouteResult route) async {
+    final repo = ref.read(transitRepositoryProvider);
     final hydratedSegments = <RouteSegment>[];
     bool modified = false;
 
@@ -673,7 +724,41 @@ class SearchViewModel extends _$SearchViewModel {
         final to = segment.toStation;
         
         // Skip if it's already a precalculated landmark path
-        if ((from is Landmark && from.walkingPath != null) || (to is Landmark && to.walkingPath != null)) {
+        bool isPrecalculated = false;
+        Landmark? lm;
+        Station? st;
+        if (from is Landmark) {
+          lm = from;
+          if (to is Station) st = to;
+        } else if (to is Landmark) {
+          lm = to;
+          if (from is Station) st = from;
+        }
+
+        if (lm == null) {
+          final List<dynamic> allLandmarks = repo.landmarks;
+          for (final l in allLandmarks) {
+            if (l.id == from.id && l is Landmark) {
+              lm = l;
+              if (to is Station) st = to;
+              break;
+            } else if (l.id == to.id && l is Landmark) {
+              lm = l;
+              if (from is Station) st = from;
+              break;
+            }
+          }
+        }
+
+        if (lm != null && st != null) {
+          if (st.id == lm.nearestStationId && lm.walkingPath != null) {
+            isPrecalculated = true;
+          } else if (lm.alternativeWalks != null && lm.alternativeWalks!.containsKey(st.id)) {
+            isPrecalculated = true;
+          }
+        }
+
+        if (isPrecalculated) {
           hydratedSegments.add(segment);
           continue;
         }

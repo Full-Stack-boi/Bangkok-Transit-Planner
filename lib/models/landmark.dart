@@ -20,6 +20,7 @@ class Landmark extends SearchableItem {
   
   final List<LatLng>? walkingPath;
   final String? exitCode;
+  final Map<String, StationWalk>? alternativeWalks;
 
   const Landmark({
     required this.id,
@@ -31,9 +32,18 @@ class Landmark extends SearchableItem {
     required this.lng,
     this.walkingPath,
     this.exitCode,
+    this.alternativeWalks,
   });
 
   factory Landmark.fromJson(Map<String, dynamic> json) {
+    final rawAlternative = json['alternative_walks'] as Map<String, dynamic>?;
+    Map<String, StationWalk>? alternativeWalks;
+    if (rawAlternative != null) {
+      alternativeWalks = rawAlternative.map(
+        (key, value) => MapEntry(key, StationWalk.fromJson(value as Map<String, dynamic>)),
+      );
+    }
+
     return Landmark(
       id: json['id'] as String,
       nameTh: json['name_th'] as String,
@@ -46,6 +56,7 @@ class Landmark extends SearchableItem {
           ?.map((c) => LatLng((c[0] as num).toDouble(), (c[1] as num).toDouble()))
           .toList(),
       exitCode: json['exit_code'] as String?,
+      alternativeWalks: alternativeWalks,
     );
   }
 
@@ -59,6 +70,37 @@ class Landmark extends SearchableItem {
         'lng': lng,
         'walking_path': walkingPath?.map((p) => [p.latitude, p.longitude]).toList(),
         'exit_code': exitCode,
+        'alternative_walks': alternativeWalks?.map((k, v) => MapEntry(k, v.toJson())),
       };
 }
+
+/// Model representing a walking route from a specific station to a landmark
+class StationWalk {
+  final List<LatLng> walkingPath;
+  final String exitCode;
+  final double walkingMinutes;
+
+  const StationWalk({
+    required this.walkingPath,
+    required this.exitCode,
+    required this.walkingMinutes,
+  });
+
+  factory StationWalk.fromJson(Map<String, dynamic> json) {
+    return StationWalk(
+      walkingPath: (json['walking_path'] as List<dynamic>)
+          .map((c) => LatLng((c[0] as num).toDouble(), (c[1] as num).toDouble()))
+          .toList(),
+      exitCode: json['exit_code'] as String,
+      walkingMinutes: (json['walking_minutes'] as num).toDouble(),
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        'walking_path': walkingPath.map((p) => [p.latitude, p.longitude]).toList(),
+        'exit_code': exitCode,
+        'walking_minutes': walkingMinutes,
+      };
+}
+
 
