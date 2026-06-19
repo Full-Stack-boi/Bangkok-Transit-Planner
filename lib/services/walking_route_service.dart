@@ -51,11 +51,11 @@ class WalkingRouteService {
     }
 
     // Offline / Error Fallback: Manhattan grid path
-    return _generateManhattanPath(fromLat, fromLng, toLat, toLng);
+    return generateManhattanPath(fromLat, fromLng, toLat, toLng);
   }
 
   /// Generates a right-angle grid-like path between two points
-  static List<LatLng> _generateManhattanPath(
+  static List<LatLng> generateManhattanPath(
     double fromLat,
     double fromLng,
     double toLat,
