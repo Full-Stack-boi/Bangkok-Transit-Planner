@@ -937,6 +937,37 @@ class RouteResultSheet extends ConsumerWidget {
     final stationId = transfer.fromStation.id;
     final toLine = transfer.toLineId;
 
+    // Sukhumvit (MRT_BL22) <-> Asok (BTS_E4)
+    if ((stationId == 'MRT_BL22' && toId == 'BTS_E4') || (stationId == 'BTS_E4' && toId == 'MRT_BL22')) {
+      if (localeCode == 'th') {
+        return 'ออกทางออก 3 เพื่อเชื่อมต่อไปยังสถานี${toId == 'BTS_E4' ? 'อโศก' : 'สุขุมวิท'} · เดิน ~2 นาที';
+      } else {
+        return 'Take Exit 3 to connect to ${toId == 'BTS_E4' ? 'Asok' : 'Sukhumvit'} Station · Walk ~2 min';
+      }
+    }
+
+    // Si Lom (MRT_BL26) <-> Sala Daeng (BTS_S2)
+    if ((stationId == 'MRT_BL26' && toId == 'BTS_S2') || (stationId == 'BTS_S2' && toId == 'MRT_BL26')) {
+      if (localeCode == 'th') {
+        final exitNum = stationId == 'MRT_BL26' ? '2' : '4';
+        return 'ออกทางออก $exitNum เพื่อเชื่อมต่อไปยังสถานี${toId == 'BTS_S2' ? 'ศาลาแดง' : 'สีลม'} · เดิน ~3 นาที';
+      } else {
+        final exitNum = stationId == 'MRT_BL26' ? '2' : '4';
+        return 'Take Exit $exitNum to connect to ${toId == 'BTS_S2' ? 'Sala Daeng' : 'Si Lom'} Station · Walk ~3 min';
+      }
+    }
+
+    // Chatuchak Park (MRT_BL13) <-> Mo Chit (BTS_N8)
+    if ((stationId == 'MRT_BL13' && toId == 'BTS_N8') || (stationId == 'BTS_N8' && toId == 'MRT_BL13')) {
+      if (localeCode == 'th') {
+        final exits = stationId == 'MRT_BL13' ? '1 หรือ 2' : '1 หรือ 3';
+        return 'ออกทางออก $exits เพื่อเชื่อมต่อไปยังสถานี${toId == 'BTS_N8' ? 'หมอชิต' : 'สวนจตุจักร'} · เดิน ~2 นาที';
+      } else {
+        final exits = stationId == 'MRT_BL13' ? '1 or 2' : '1 or 3';
+        return 'Take Exit $exits to connect to ${toId == 'BTS_N8' ? 'Mo Chit' : 'Chatuchak Park'} Station · Walk ~2 min';
+      }
+    }
+
     // Lat Phrao (Blue <-> Yellow)
     if (stationId == 'MRT_BL15' || stationId == 'MRT_YL01') {
       return toLine == 'MRT_YELLOW' ? t.transfers.transferLatphraoYellow : t.transfers.transferLatphraoBlue;

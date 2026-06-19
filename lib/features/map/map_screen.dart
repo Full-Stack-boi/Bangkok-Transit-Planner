@@ -600,64 +600,66 @@ class _MapScreenState extends ConsumerState<MapScreen> {
               color: themeBrightness == Brightness.dark
                   ? const Color(0xFF111111) // Matches CartoDB Dark Matter theme
                   : const Color(0xFFE4E3DF), // Matches CartoDB Voyager theme
-              child: FlutterMap(
-                mapController: _mapController,
-              options: MapOptions(
-                initialCenter: const LatLng(13.7563, 100.5018),
-                initialZoom: 12.0,
-                minZoom: 10.5,
-                maxZoom: 16.0,
-                cameraConstraint: CameraConstraint.containCenter(
-                  bounds: LatLngBounds(
-                    const LatLng(13.20, 100.00),
-                    const LatLng(14.25, 101.00),
+              child: ExcludeSemantics(
+                child: FlutterMap(
+                  mapController: _mapController,
+                  options: MapOptions(
+                    initialCenter: const LatLng(13.7563, 100.5018),
+                    initialZoom: 12.0,
+                    minZoom: 10.5,
+                    maxZoom: 16.0,
+                    cameraConstraint: CameraConstraint.containCenter(
+                      bounds: LatLngBounds(
+                        const LatLng(13.20, 100.00),
+                        const LatLng(14.25, 101.00),
+                      ),
+                    ),
+                    onTap: (position, point) {
+                      if (_selectedStation != null) {
+                        setState(() => _selectedStation = null);
+                      }
+                      
+                      final nearest = _findNearestStation(point, transitRepo.stations);
+                      if (nearest != null) {
+                        final dist = Geolocator.distanceBetween(
+                          point.latitude, point.longitude, nearest.lat, nearest.lng
+                        );
+                        final walkMin = (dist / 80.0).clamp(1.0, 30.0);
+      
+                        setState(() {
+                          _selectedStation = null;
+                          _customSelectedLocation = CustomLocation(
+                            id: 'CUSTOM_${point.latitude.toStringAsFixed(6)}_${point.longitude.toStringAsFixed(6)}',
+                            nameTh: 'จุดที่เลือก (${point.latitude.toStringAsFixed(4)}, ${point.longitude.toStringAsFixed(4)})',
+                            nameEn: 'Selected Location (${point.latitude.toStringAsFixed(4)}, ${point.longitude.toStringAsFixed(4)})',
+                            nearestStationId: nearest.id,
+                            walkingMinutes: walkMin,
+                            lat: point.latitude,
+                            lng: point.longitude,
+                          );
+                        });
+                      }
+                    },
                   ),
+                  children: [
+                    TileLayer(
+                      urlTemplate: theme.brightness == Brightness.dark
+                          ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png'
+                          : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png',
+                      userAgentPackageName: 'com.bkktransit.bkk_transit_planner',
+                      tileProvider: _tileProvider,
+                      maxNativeZoom: 18,
+                      keepBuffer: 4,
+                      panBuffer: 2,
+                      tileDisplay: const TileDisplay.fadeIn(
+                        duration: Duration(milliseconds: 300),
+                      ),
+                    ),
+                    PolylineLayer(polylines: polylines),
+                    MarkerLayer(markers: markers),
+                  ],
                 ),
-                onTap: (position, point) {
-                  if (_selectedStation != null) {
-                    setState(() => _selectedStation = null);
-                  }
-                  
-                  final nearest = _findNearestStation(point, transitRepo.stations);
-                  if (nearest != null) {
-                    final dist = Geolocator.distanceBetween(
-                      point.latitude, point.longitude, nearest.lat, nearest.lng
-                    );
-                    final walkMin = (dist / 80.0).clamp(1.0, 30.0);
-  
-                    setState(() {
-                      _selectedStation = null;
-                      _customSelectedLocation = CustomLocation(
-                        id: 'CUSTOM_${point.latitude.toStringAsFixed(6)}_${point.longitude.toStringAsFixed(6)}',
-                        nameTh: 'จุดที่เลือก (${point.latitude.toStringAsFixed(4)}, ${point.longitude.toStringAsFixed(4)})',
-                        nameEn: 'Selected Location (${point.latitude.toStringAsFixed(4)}, ${point.longitude.toStringAsFixed(4)})',
-                        nearestStationId: nearest.id,
-                        walkingMinutes: walkMin,
-                        lat: point.latitude,
-                        lng: point.longitude,
-                      );
-                    });
-                  }
-                },
               ),
-              children: [
-                TileLayer(
-                  urlTemplate: theme.brightness == Brightness.dark
-                      ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png'
-                      : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png',
-                  userAgentPackageName: 'com.bkktransit.bkk_transit_planner',
-                  tileProvider: _tileProvider,
-                  maxNativeZoom: 18,
-                  keepBuffer: 4,
-                  panBuffer: 2,
-                  tileDisplay: const TileDisplay.fadeIn(
-                    duration: Duration(milliseconds: 300),
-                  ),
-                ),
-                PolylineLayer(polylines: polylines),
-                MarkerLayer(markers: markers),
-              ],
-            ),
             ),
           ),
 
