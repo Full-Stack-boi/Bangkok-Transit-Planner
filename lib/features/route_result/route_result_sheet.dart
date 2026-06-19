@@ -725,24 +725,6 @@ class RouteResultSheet extends ConsumerWidget {
                         ),
                       ),
                       buildLocationSpan(toStation),
-                      if (toStation is Station && segment.exit != null) ...[
-                        const SizedBox(width: 4),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: Colors.orange.shade800,
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: Text(
-                            localeCode == 'en' ? 'Exit ${segment.exit!.exitCode}' : 'ทางออก ${segment.exit!.exitCode}',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ],
                     ],
                   ),
                   const SizedBox(height: 6),

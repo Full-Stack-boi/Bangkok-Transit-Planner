@@ -158,7 +158,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
 
     for (final segment in routeResult.segments) {
       if (segment.lineId == 'WALK' && segment.walkingPath != null && segment.walkingPath!.isNotEmpty) {
-        points.addAll(segment.walkingPath!);
+        if (kDebugMode) {
+          points.addAll(segment.walkingPath!);
+        }
       } else {
         points.add(LatLng(segment.fromStation.lat, segment.fromStation.lng));
         points.add(LatLng(segment.toStation.lat, segment.toStation.lng));
@@ -264,8 +266,12 @@ class _MapScreenState extends ConsumerState<MapScreen> {
       if (isRouteActive) {
         // Highlight ONLY the active route
         for (final segment in routeResult.segments) {
+          final isWalk = segment.lineId == 'WALK';
+          if (isWalk && !kDebugMode) {
+            continue;
+          }
           final points = <LatLng>[];
-          if (segment.lineId == 'WALK' && segment.walkingPath != null && segment.walkingPath!.isNotEmpty) {
+          if (isWalk && segment.walkingPath != null && segment.walkingPath!.isNotEmpty) {
             points.addAll(segment.walkingPath!);
           } else {
             points.add(LatLng(segment.fromStation.lat, segment.fromStation.lng));
@@ -275,7 +281,6 @@ class _MapScreenState extends ConsumerState<MapScreen> {
             points.add(LatLng(segment.toStation.lat, segment.toStation.lng));
           }
 
-          final isWalk = segment.lineId == 'WALK';
           newPolylines.add(
             Polyline(
               points: points,
@@ -404,6 +409,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
       // Add Station Exit Markers
       for (final segment in routeResult.segments) {
         if (segment.lineId == 'WALK' && segment.exit != null) {
+          // Exits are only shown at destination (where we walk from station: fromStation is Station), not at origin (where we walk to station: toStation is Station)
+          if (segment.fromStation is! Station) continue;
+
           final exit = segment.exit!;
           newMarkers.add(
             Marker(
@@ -607,7 +615,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                     initialCenter: const LatLng(13.7563, 100.5018),
                     initialZoom: 12.0,
                     minZoom: 10.5,
-                    maxZoom: 16.0,
+                    maxZoom: 19.0,
                     cameraConstraint: CameraConstraint.containCenter(
                       bounds: LatLngBounds(
                         const LatLng(13.20, 100.00),
@@ -644,10 +652,11 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                   children: [
                     TileLayer(
                       urlTemplate: theme.brightness == Brightness.dark
-                          ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png'
-                          : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png',
+                          ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+                          : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
                       userAgentPackageName: 'com.bkktransit.bkk_transit_planner',
                       tileProvider: _tileProvider,
+                      retinaMode: true,
                       maxNativeZoom: 18,
                       keepBuffer: 4,
                       panBuffer: 2,
