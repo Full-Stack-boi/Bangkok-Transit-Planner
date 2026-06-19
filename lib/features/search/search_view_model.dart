@@ -1,12 +1,16 @@
+import 'package:latlong2/latlong.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:geolocator/geolocator.dart';
 import '../../models/station.dart';
 import '../../models/route_result.dart';
 import '../../models/searchable_item.dart';
 import '../../models/custom_location.dart';
+import '../../models/station_exit.dart';
+import '../../models/landmark.dart';
 import '../../providers/providers.dart';
 import '../../services/dijkstra_planner.dart';
 import '../../services/fare_service.dart';
+import '../../services/walking_route_service.dart';
 import '../../core/constants/transit_constants.dart';
 
 part 'search_view_model.g.dart';
@@ -71,8 +75,14 @@ class SearchState {
 /// ViewModel for search feature
 @riverpod
 class SearchViewModel extends _$SearchViewModel {
+  bool _mounted = true;
+
   @override
   SearchState build() {
+    _mounted = true;
+    ref.onDispose(() {
+      _mounted = false;
+    });
     ref.listen(userCardsProvider, (previous, next) {
       if (state.origin != null && state.destination != null) {
         _tryCalculateRoute();
@@ -177,6 +187,9 @@ class SearchViewModel extends _$SearchViewModel {
       if (originStationId == destinationStationId) {
         // Direct walk scenario (e.g. between landmarks near same station, or landmark and its station)
         final walkMinutes = (origin.walkingMinutes ?? 0.0) + (destination.walkingMinutes ?? 0.0);
+        
+        final walkingPath = [LatLng(origin.lat, origin.lng), LatLng(destination.lat, destination.lng)];
+
         final walkSegment = RouteSegment(
           lineId: 'WALK',
           lineName: 'Walk',
@@ -188,6 +201,7 @@ class SearchViewModel extends _$SearchViewModel {
           estimatedMinutes: walkMinutes > 0 ? walkMinutes : 5.0,
           fareThb: 0,
           standardFareThb: 0,
+          walkingPath: walkingPath,
         );
 
         routeResult = RouteResult(
@@ -227,6 +241,9 @@ class SearchViewModel extends _$SearchViewModel {
         activeRouteType: 'recommended',
         isCalculating: false,
       );
+
+      // Hydrate walking paths asynchronously in the background
+      _hydrateAllRoutes(routeResult, saverRoute);
     } catch (e) {
       state = state.copyWith(
         isCalculating: false,
@@ -384,6 +401,23 @@ class SearchViewModel extends _$SearchViewModel {
     if (origin.nearestStationId != null) {
       final nearestStation = repo.getStation(origin.nearestStationId!) as Station?;
       if (nearestStation != null) {
+        StationExit? exit;
+        List<LatLng>? walkingPath;
+
+        if (origin is Landmark && origin.walkingPath != null && origin.walkingPath!.isNotEmpty) {
+          walkingPath = origin.walkingPath;
+          if (origin.exitCode != null) {
+            final exits = repo.getExitsForStation(nearestStation.id);
+            exit = exits.firstWhere(
+              (e) => e.exitCode == origin.exitCode,
+              orElse: () => nearestStation.findClosestExit(repo.exits, origin.lat, origin.lng),
+            );
+          }
+        }
+
+        exit ??= nearestStation.findClosestExit(repo.exits, origin.lat, origin.lng);
+        walkingPath ??= [LatLng(origin.lat, origin.lng), LatLng(exit.lat, exit.lng)];
+
         segments.add(RouteSegment(
           lineId: 'WALK',
           lineName: 'Walk',
@@ -395,6 +429,8 @@ class SearchViewModel extends _$SearchViewModel {
           estimatedMinutes: origin.walkingMinutes ?? 5.0,
           fareThb: 0,
           standardFareThb: 0,
+          walkingPath: walkingPath,
+          exit: exit,
         ));
       }
     }
@@ -553,6 +589,23 @@ class SearchViewModel extends _$SearchViewModel {
     if (destination.nearestStationId != null) {
       final nearestStation = repo.getStation(destination.nearestStationId!) as Station?;
       if (nearestStation != null) {
+        StationExit? exit;
+        List<LatLng>? walkingPath;
+
+        if (destination is Landmark && destination.walkingPath != null && destination.walkingPath!.isNotEmpty) {
+          walkingPath = destination.walkingPath;
+          if (destination.exitCode != null) {
+            final exits = repo.getExitsForStation(nearestStation.id);
+            exit = exits.firstWhere(
+              (e) => e.exitCode == destination.exitCode,
+              orElse: () => nearestStation.findClosestExit(repo.exits, destination.lat, destination.lng),
+            );
+          }
+        }
+
+        exit ??= nearestStation.findClosestExit(repo.exits, destination.lat, destination.lng);
+        walkingPath ??= [LatLng(exit.lat, exit.lng), LatLng(destination.lat, destination.lng)];
+
         segments.add(RouteSegment(
           lineId: 'WALK',
           lineName: 'Walk',
@@ -564,6 +617,8 @@ class SearchViewModel extends _$SearchViewModel {
           estimatedMinutes: destination.walkingMinutes ?? 5.0,
           fareThb: 0,
           standardFareThb: 0,
+          walkingPath: walkingPath,
+          exit: exit,
         ));
       }
     }
@@ -588,6 +643,101 @@ class SearchViewModel extends _$SearchViewModel {
       totalStations: totalStations,
       calculatedAt: DateTime.now(),
     );
+  }
+
+  /// Hydrates all routes asynchronously in the background
+  Future<void> _hydrateAllRoutes(RouteResult recommended, RouteResult? saver) async {
+    final hydratedRecommended = await _hydrateRouteWalkingPaths(recommended);
+    RouteResult? hydratedSaver;
+    if (saver != null) {
+      hydratedSaver = await _hydrateRouteWalkingPaths(saver);
+    }
+
+    if (_mounted) {
+      state = state.copyWith(
+        routeResult: state.activeRouteType == 'recommended' ? hydratedRecommended : (hydratedSaver ?? state.routeResult),
+        regularRoute: hydratedRecommended,
+        saverRoute: hydratedSaver,
+      );
+    }
+  }
+
+  /// Asynchronously hydrates a RouteResult's walking segments with realistic OSRM paths
+  Future<RouteResult> _hydrateRouteWalkingPaths(RouteResult route) async {
+    final hydratedSegments = <RouteSegment>[];
+    bool modified = false;
+
+    for (final segment in route.segments) {
+      if (segment.lineId == 'WALK') {
+        final from = segment.fromStation;
+        final to = segment.toStation;
+        
+        // Skip if it's already a precalculated landmark path
+        if ((from is Landmark && from.walkingPath != null) || (to is Landmark && to.walkingPath != null)) {
+          hydratedSegments.add(segment);
+          continue;
+        }
+
+        double fLat, fLng, tLat, tLng;
+        if (segment.exit != null) {
+          if (from is Station) {
+            // Walk from station exit to destination
+            fLat = segment.exit!.lat;
+            fLng = segment.exit!.lng;
+            tLat = to.lat;
+            tLng = to.lng;
+          } else {
+            // Walk from origin to station exit
+            fLat = from.lat;
+            fLng = from.lng;
+            tLat = segment.exit!.lat;
+            tLng = segment.exit!.lng;
+          }
+        } else {
+          // Direct walk
+          fLat = from.lat;
+          fLng = from.lng;
+          tLat = to.lat;
+          tLng = to.lng;
+        }
+
+        final path = await WalkingRouteService.getWalkingPath(fLat, fLng, tLat, tLng);
+        
+        hydratedSegments.add(RouteSegment(
+          lineId: segment.lineId,
+          lineName: segment.lineName,
+          direction: segment.direction,
+          boundIndex: segment.boundIndex,
+          fromStation: segment.fromStation,
+          toStation: segment.toStation,
+          intermediateStations: segment.intermediateStations,
+          stationCount: segment.stationCount,
+          estimatedMinutes: segment.estimatedMinutes,
+          fareThb: segment.fareThb,
+          standardFareThb: segment.standardFareThb,
+          walkingPath: path,
+          exit: segment.exit,
+        ));
+        modified = true;
+      } else {
+        hydratedSegments.add(segment);
+      }
+    }
+
+    if (modified) {
+      return RouteResult(
+        origin: route.origin,
+        destination: route.destination,
+        segments: hydratedSegments,
+        transfers: route.transfers,
+        totalMinutes: route.totalMinutes,
+        totalFareThb: route.totalFareThb,
+        totalStandardFareThb: route.totalStandardFareThb,
+        totalStations: route.totalStations,
+        calculatedAt: route.calculatedAt,
+      );
+    }
+    return route;
   }
 }
 

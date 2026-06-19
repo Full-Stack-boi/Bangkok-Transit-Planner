@@ -1,3 +1,4 @@
+import 'package:latlong2/latlong.dart';
 import 'searchable_item.dart';
 
 /// Landmark model representing a popular attraction/place near transit stations
@@ -16,6 +17,9 @@ class Landmark extends SearchableItem {
   final double lat;
   @override
   final double lng;
+  
+  final List<LatLng>? walkingPath;
+  final String? exitCode;
 
   const Landmark({
     required this.id,
@@ -25,6 +29,8 @@ class Landmark extends SearchableItem {
     required this.walkingMinutes,
     required this.lat,
     required this.lng,
+    this.walkingPath,
+    this.exitCode,
   });
 
   factory Landmark.fromJson(Map<String, dynamic> json) {
@@ -36,6 +42,10 @@ class Landmark extends SearchableItem {
       walkingMinutes: (json['walking_minutes'] as num).toDouble(),
       lat: (json['lat'] as num).toDouble(),
       lng: (json['lng'] as num).toDouble(),
+      walkingPath: (json['walking_path'] as List<dynamic>?)
+          ?.map((c) => LatLng((c[0] as num).toDouble(), (c[1] as num).toDouble()))
+          .toList(),
+      exitCode: json['exit_code'] as String?,
     );
   }
 
@@ -47,5 +57,8 @@ class Landmark extends SearchableItem {
         'walking_minutes': walkingMinutes,
         'lat': lat,
         'lng': lng,
+        'walking_path': walkingPath?.map((p) => [p.latitude, p.longitude]).toList(),
+        'exit_code': exitCode,
       };
 }
+

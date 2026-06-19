@@ -1,5 +1,7 @@
+import 'package:latlong2/latlong.dart';
 import 'station.dart';
 import 'searchable_item.dart';
+import 'station_exit.dart';
 
 /// A single segment of a route (travel on one line)
 class RouteSegment {
@@ -14,6 +16,8 @@ class RouteSegment {
   final double estimatedMinutes;
   final int fareThb;
   final int standardFareThb; // Standard fare (without discount)
+  final List<LatLng>? walkingPath;
+  final StationExit? exit;
 
   const RouteSegment({
     required this.lineId,
@@ -27,6 +31,8 @@ class RouteSegment {
     required this.estimatedMinutes,
     required this.fareThb,
     required this.standardFareThb,
+    this.walkingPath,
+    this.exit,
   });
 
   /// Total stations including origin and destination

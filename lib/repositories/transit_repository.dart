@@ -7,6 +7,7 @@ import '../models/line.dart';
 import '../models/landmark.dart';
 import '../models/custom_location.dart';
 import '../models/searchable_item.dart';
+import '../models/station_exit.dart';
 import '../services/dijkstra_planner.dart';
 
 /// Repository for loading and accessing static transit data
@@ -14,6 +15,7 @@ class TransitRepository {
   List<Station>? _stations;
   List<TransitLine>? _lines;
   List<Landmark>? _landmarks;
+  List<StationExit> _exits = [];
   TransitGraph? _graph;
   bool _initialized = false;
 
@@ -25,6 +27,7 @@ class TransitRepository {
   List<Station> get stations => _stations ?? [];
   List<TransitLine> get lines => _lines ?? [];
   List<Landmark> get landmarks => _landmarks ?? [];
+  List<StationExit> get exits => _exits;
   TransitGraph get graph => _graph!;
 
   /// Initialize repository by loading all static data
@@ -35,10 +38,26 @@ class TransitRepository {
       _loadStations(),
       _loadLines(),
       _loadLandmarks(),
+      _loadExits(),
     ]);
 
     _buildGraph();
     _initialized = true;
+  }
+
+  Future<void> _loadExits() async {
+    try {
+      final jsonStr = await rootBundle.loadString('assets/data/station_exits.json');
+      final List<dynamic> jsonList = json.decode(jsonStr);
+      _exits = jsonList.map((j) => StationExit.fromJson(j as Map<String, dynamic>)).toList();
+    } catch (e) {
+      _exits = [];
+      print('Failed to load station exits: $e');
+    }
+  }
+
+  List<StationExit> getExitsForStation(String stationId) {
+    return _exits.where((e) => e.stationId == stationId).toList();
   }
 
   Future<void> _loadStations() async {
@@ -190,17 +209,17 @@ class TransitRepository {
     return [...matchingStations, ...matchingLandmarks];
   }
 
-  /// Search places online via OpenStreetMap Nominatim API, bounded to Bangkok
+  /// Search places online via Photon API (Elasticsearch-based autocomplete), bounded to Bangkok
   Future<List<CustomLocation>> searchOnlinePlaces(String query) async {
     if (query.trim().length < 3) return [];
 
     final client = HttpClient();
-    client.userAgent = 'com.bkktransit.bkk_transit_planner'; // Required by Nominatim Policy
+    client.userAgent = 'com.bkktransit.bkk_transit_planner';
 
     try {
-      // Bounded search within Greater Bangkok area (viewbox=100.1,13.4,101.0,14.2&bounded=1)
+      // Query Photon API with Bangkok location bias (lat=13.7563, lon=100.5018)
       final uri = Uri.parse(
-        'https://nominatim.openstreetmap.org/search?q=${Uri.encodeComponent(query)}&format=json&limit=5&countrycodes=th&viewbox=100.1,13.4,101.0,14.2&bounded=1'
+        'https://photon.komoot.io/api/?q=${Uri.encodeComponent(query)}&limit=5&lat=13.7563&lon=100.5018&lang=en'
       );
 
       final request = await client.getUrl(uri);
@@ -208,28 +227,39 @@ class TransitRepository {
 
       if (response.statusCode == 200) {
         final body = await response.transform(utf8.decoder).join();
-        final List<dynamic> jsonList = json.decode(body);
+        final Map<String, dynamic> data = json.decode(body);
+        final List<dynamic> features = data['features'] ?? [];
 
         final results = <CustomLocation>[];
 
-        for (final item in jsonList) {
-          final lat = double.tryParse(item['lat'] as String) ?? 0.0;
-          final lon = double.tryParse(item['lon'] as String) ?? 0.0;
+        for (final item in features) {
+          final geometry = item['geometry'] as Map<String, dynamic>?;
+          final properties = item['properties'] as Map<String, dynamic>?;
+          if (geometry == null || properties == null) continue;
+
+          final coords = geometry['coordinates'] as List<dynamic>?;
+          if (coords == null || coords.length < 2) continue;
+
+          final lon = (coords[0] as num).toDouble();
+          final lat = (coords[1] as num).toDouble();
           if (lat == 0.0 || lon == 0.0) continue;
 
-          final displayName = item['display_name'] as String;
-          // Extract shorter display name
-          final parts = displayName.split(',');
-          final shortName = parts.isNotEmpty ? parts.first.trim() : displayName;
+          final name = properties['name'] as String? ?? '';
+          if (name.isEmpty) continue;
+
+          final city = properties['city'] as String? ?? '';
+          final state = properties['state'] as String? ?? '';
 
           // Explicitly exclude Phetchaburi Province to prevent it from being selectable
-          final lowerShort = shortName.toLowerCase();
-          final lowerDisplay = displayName.toLowerCase();
-          if (lowerShort.contains('จังหวัดเพชรบุรี') ||
-              lowerDisplay.contains('จังหวัดเพชรบุรี') ||
-              lowerShort.contains('phetchaburi province') ||
-              lowerDisplay.contains('phetchaburi province') ||
-              (lowerShort == 'phetchaburi' && !lowerDisplay.contains('bangkok') && !lowerDisplay.contains('กรุงเทพ'))) {
+          final lowerName = name.toLowerCase();
+          final lowerCity = city.toLowerCase();
+          final lowerState = state.toLowerCase();
+          if (lowerName.contains('จังหวัดเพชรบุรี') ||
+              lowerCity.contains('จังหวัดเพชรบุรี') ||
+              lowerState.contains('จังหวัดเพชรบุรี') ||
+              lowerName.contains('phetchaburi') ||
+              lowerCity.contains('phetchaburi') ||
+              lowerState.contains('phetchaburi')) {
             continue;
           }
 
@@ -237,15 +267,15 @@ class TransitRepository {
           final nearest = _findNearestStation(lat, lon);
           if (nearest != null) {
             final dist = Geolocator.distanceBetween(lat, lon, nearest.lat, nearest.lng);
-            // Limit results to locations within 10 km of a transit station to filter out far-away provinces
-            if (dist <= 10000.0) {
+            // Limit results to locations within 12 km of a transit station to filter out far-away provinces
+            if (dist <= 12000.0) {
               // Walking minutes based on 80 meters/minute, capped between 1 and 30 mins
               final walkMin = (dist / 80.0).clamp(1.0, 30.0);
 
               results.add(CustomLocation(
-                id: 'OSM_${item['place_id'] ?? DateTime.now().millisecondsSinceEpoch}',
-                nameTh: shortName,
-                nameEn: shortName,
+                id: 'OSM_${properties['osm_id'] ?? DateTime.now().millisecondsSinceEpoch}',
+                nameTh: name,
+                nameEn: name,
                 nearestStationId: nearest.id,
                 walkingMinutes: walkMin,
                 lat: lat,

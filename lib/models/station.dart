@@ -1,4 +1,6 @@
+import 'package:geolocator/geolocator.dart';
 import 'searchable_item.dart';
+import 'station_exit.dart';
 
 /// Station model for a transit station
 class Station extends SearchableItem {
@@ -75,4 +77,31 @@ class Station extends SearchableItem {
 
   @override
   String toString() => 'Station($id: $nameEn)';
+
+  /// Find the exit of this station that is closest to the given target coordinates
+  StationExit findClosestExit(List<StationExit> allExits, double targetLat, double targetLng) {
+    final exits = allExits.where((e) => e.stationId == id).toList();
+    if (exits.isEmpty) {
+      // Fallback: generate a temporary exit at station coordinates
+      return StationExit(
+        id: '${id}_EX_FALLBACK',
+        stationId: id,
+        exitCode: '1',
+        nameTh: 'ทางออก 1',
+        nameEn: 'Exit 1',
+        lat: lat,
+        lng: lng,
+      );
+    }
+    StationExit closest = exits.first;
+    double minDistance = double.infinity;
+    for (final exit in exits) {
+      final dist = Geolocator.distanceBetween(targetLat, targetLng, exit.lat, exit.lng);
+      if (dist < minDistance) {
+        minDistance = dist;
+        closest = exit;
+      }
+    }
+    return closest;
+  }
 }

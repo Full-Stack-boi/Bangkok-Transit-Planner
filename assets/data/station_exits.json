@@ -1,0 +1,5402 @@
+[
+  {
+    "id": "BTS_N24_EX1",
+    "station_id": "BTS_N24",
+    "exit_code": "1",
+    "name_th": "ทางออก 1",
+    "name_en": "Exit 1",
+    "lat": 13.9325646,
+    "lng": 100.6461538
+  },
+  {
+    "id": "BTS_N24_EX2",
+    "station_id": "BTS_N24",
+    "exit_code": "2",
+    "name_th": "ทางออก 2",
+    "name_en": "Exit 2",
+    "lat": 13.9321096,
+    "lng": 100.6458757
+  },
+  {
+    "id": "BTS_N24_EX3",
+    "station_id": "BTS_N24",
+    "exit_code": "3",
+    "name_th": "ทางออก 3",
+    "name_en": "Exit 3",
+    "lat": 13.9325196,
+    "lng": 100.6467664
+  },
+  {
+    "id": "BTS_N24_EX4",
+    "station_id": "BTS_N24",
+    "exit_code": "4",
+    "name_th": "ทางออก 4",
+    "name_en": "Exit 4",
+    "lat": 13.9322119,
+    "lng": 100.6470886
+  },
+  {
+    "id": "BTS_N23_EX1",
+    "station_id": "BTS_N23",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.92775,
+    "lng": 100.64035
+  },
+  {
+    "id": "BTS_N23_EX2",
+    "station_id": "BTS_N23",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.92725,
+    "lng": 100.63985000000001
+  },
+  {
+    "id": "BTS_N23_EX3",
+    "station_id": "BTS_N23",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.92775,
+    "lng": 100.63985000000001
+  },
+  {
+    "id": "BTS_N23_EX4",
+    "station_id": "BTS_N23",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.92725,
+    "lng": 100.64035
+  },
+  {
+    "id": "BTS_N22_EX1",
+    "station_id": "BTS_N22",
+    "exit_code": "1",
+    "name_th": "ทางออก 1",
+    "name_en": "Exit 1",
+    "lat": 13.9177799,
+    "lng": 100.6213844
+  },
+  {
+    "id": "BTS_N22_EX2",
+    "station_id": "BTS_N22",
+    "exit_code": "2",
+    "name_th": "ทางออก 2",
+    "name_en": "Exit 2",
+    "lat": 13.9176246,
+    "lng": 100.6216603
+  },
+  {
+    "id": "BTS_N22_EX3",
+    "station_id": "BTS_N22",
+    "exit_code": "3",
+    "name_th": "ทางออก 3",
+    "name_en": "Exit 3",
+    "lat": 13.9181828,
+    "lng": 100.6216402
+  },
+  {
+    "id": "BTS_N22_EX4",
+    "station_id": "BTS_N22",
+    "exit_code": "4",
+    "name_th": "ทางออก 4",
+    "name_en": "Exit 4",
+    "lat": 13.9180813,
+    "lng": 100.6219272
+  },
+  {
+    "id": "BTS_N21_EX1",
+    "station_id": "BTS_N21",
+    "exit_code": "1",
+    "name_th": "ทางออก 1",
+    "name_en": "Exit 1",
+    "lat": 13.9103959,
+    "lng": 100.6170399
+  },
+  {
+    "id": "BTS_N21_EX2",
+    "station_id": "BTS_N21",
+    "exit_code": "2",
+    "name_th": "ทางออก 2",
+    "name_en": "Exit 2",
+    "lat": 13.9102202,
+    "lng": 100.6172632
+  },
+  {
+    "id": "BTS_N21_EX3",
+    "station_id": "BTS_N21",
+    "exit_code": "3",
+    "name_th": "ทางออก 3",
+    "name_en": "Exit 3",
+    "lat": 13.910987,
+    "lng": 100.6173839
+  },
+  {
+    "id": "BTS_N21_EX4",
+    "station_id": "BTS_N21",
+    "exit_code": "4",
+    "name_th": "ทางออก 4",
+    "name_en": "Exit 4",
+    "lat": 13.911108,
+    "lng": 100.6177983
+  },
+  {
+    "id": "BTS_N20_EX1",
+    "station_id": "BTS_N20",
+    "exit_code": "1",
+    "name_th": "ทางออก 1",
+    "name_en": "Exit 1",
+    "lat": 13.8962852,
+    "lng": 100.6087187
+  },
+  {
+    "id": "BTS_N20_EX2",
+    "station_id": "BTS_N20",
+    "exit_code": "2",
+    "name_th": "ทางออก 2",
+    "name_en": "Exit 2",
+    "lat": 13.8962488,
+    "lng": 100.6090379
+  },
+  {
+    "id": "BTS_N20_EX3",
+    "station_id": "BTS_N20",
+    "exit_code": "3",
+    "name_th": "ทางออก 3",
+    "name_en": "Exit 3",
+    "lat": 13.8968548,
+    "lng": 100.6090506
+  },
+  {
+    "id": "BTS_N20_EX4",
+    "station_id": "BTS_N20",
+    "exit_code": "4",
+    "name_th": "ทางออก 4",
+    "name_en": "Exit 4",
+    "lat": 13.8967552,
+    "lng": 100.6093363
+  },
+  {
+    "id": "BTS_N19_EX1",
+    "station_id": "BTS_N19",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.88875,
+    "lng": 100.60454999999999
+  },
+  {
+    "id": "BTS_N19_EX2",
+    "station_id": "BTS_N19",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.888250000000001,
+    "lng": 100.60405
+  },
+  {
+    "id": "BTS_N19_EX3",
+    "station_id": "BTS_N19",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.88875,
+    "lng": 100.60405
+  },
+  {
+    "id": "BTS_N19_EX4",
+    "station_id": "BTS_N19",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.888250000000001,
+    "lng": 100.60454999999999
+  },
+  {
+    "id": "BTS_N18_EX1",
+    "station_id": "BTS_N18",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.88275,
+    "lng": 100.60105
+  },
+  {
+    "id": "BTS_N18_EX2",
+    "station_id": "BTS_N18",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.88225,
+    "lng": 100.60055000000001
+  },
+  {
+    "id": "BTS_N18_EX3",
+    "station_id": "BTS_N18",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.88275,
+    "lng": 100.60055000000001
+  },
+  {
+    "id": "BTS_N18_EX4",
+    "station_id": "BTS_N18",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.88225,
+    "lng": 100.60105
+  },
+  {
+    "id": "BTS_N17_EX1",
+    "station_id": "BTS_N17",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.875449999999999,
+    "lng": 100.59694999999999
+  },
+  {
+    "id": "BTS_N17_EX2",
+    "station_id": "BTS_N17",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.87495,
+    "lng": 100.59645
+  },
+  {
+    "id": "BTS_N17_EX3",
+    "station_id": "BTS_N17",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.875449999999999,
+    "lng": 100.59645
+  },
+  {
+    "id": "BTS_N17_EX4",
+    "station_id": "BTS_N17",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.87495,
+    "lng": 100.59694999999999
+  },
+  {
+    "id": "BTS_N16_EX1",
+    "station_id": "BTS_N16",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.86465,
+    "lng": 100.59224999999999
+  },
+  {
+    "id": "BTS_N16_EX2",
+    "station_id": "BTS_N16",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.86415,
+    "lng": 100.59175
+  },
+  {
+    "id": "BTS_N16_EX3",
+    "station_id": "BTS_N16",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.86465,
+    "lng": 100.59175
+  },
+  {
+    "id": "BTS_N16_EX4",
+    "station_id": "BTS_N16",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.86415,
+    "lng": 100.59224999999999
+  },
+  {
+    "id": "BTS_N15_EX1",
+    "station_id": "BTS_N15",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.85605,
+    "lng": 100.58534999999999
+  },
+  {
+    "id": "BTS_N15_EX2",
+    "station_id": "BTS_N15",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.855550000000001,
+    "lng": 100.58485
+  },
+  {
+    "id": "BTS_N15_EX3",
+    "station_id": "BTS_N15",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.85605,
+    "lng": 100.58485
+  },
+  {
+    "id": "BTS_N15_EX4",
+    "station_id": "BTS_N15",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.855550000000001,
+    "lng": 100.58534999999999
+  },
+  {
+    "id": "BTS_N14_EX1",
+    "station_id": "BTS_N14",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.850449999999999,
+    "lng": 100.58024999999999
+  },
+  {
+    "id": "BTS_N14_EX2",
+    "station_id": "BTS_N14",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.84995,
+    "lng": 100.57975
+  },
+  {
+    "id": "BTS_N14_EX3",
+    "station_id": "BTS_N14",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.850449999999999,
+    "lng": 100.57975
+  },
+  {
+    "id": "BTS_N14_EX4",
+    "station_id": "BTS_N14",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.84995,
+    "lng": 100.58024999999999
+  },
+  {
+    "id": "BTS_N13_EX1",
+    "station_id": "BTS_N13",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.842649999999999,
+    "lng": 100.57735
+  },
+  {
+    "id": "BTS_N13_EX2",
+    "station_id": "BTS_N13",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.84215,
+    "lng": 100.57685000000001
+  },
+  {
+    "id": "BTS_N13_EX3",
+    "station_id": "BTS_N13",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.842649999999999,
+    "lng": 100.57685000000001
+  },
+  {
+    "id": "BTS_N13_EX4",
+    "station_id": "BTS_N13",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.84215,
+    "lng": 100.57735
+  },
+  {
+    "id": "BTS_N12_EX1",
+    "station_id": "BTS_N12",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.836649999999999,
+    "lng": 100.57385
+  },
+  {
+    "id": "BTS_N12_EX2",
+    "station_id": "BTS_N12",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.83615,
+    "lng": 100.57335
+  },
+  {
+    "id": "BTS_N12_EX3",
+    "station_id": "BTS_N12",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.836649999999999,
+    "lng": 100.57335
+  },
+  {
+    "id": "BTS_N12_EX4",
+    "station_id": "BTS_N12",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.83615,
+    "lng": 100.57385
+  },
+  {
+    "id": "BTS_N11_EX1",
+    "station_id": "BTS_N11",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.82995,
+    "lng": 100.56994999999999
+  },
+  {
+    "id": "BTS_N11_EX2",
+    "station_id": "BTS_N11",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.829450000000001,
+    "lng": 100.56945
+  },
+  {
+    "id": "BTS_N11_EX3",
+    "station_id": "BTS_N11",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.82995,
+    "lng": 100.56945
+  },
+  {
+    "id": "BTS_N11_EX4",
+    "station_id": "BTS_N11",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.829450000000001,
+    "lng": 100.56994999999999
+  },
+  {
+    "id": "BTS_N10_EX1",
+    "station_id": "BTS_N10",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.82325,
+    "lng": 100.56675
+  },
+  {
+    "id": "BTS_N10_EX2",
+    "station_id": "BTS_N10",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.822750000000001,
+    "lng": 100.56625000000001
+  },
+  {
+    "id": "BTS_N10_EX3",
+    "station_id": "BTS_N10",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.82325,
+    "lng": 100.56625000000001
+  },
+  {
+    "id": "BTS_N10_EX4",
+    "station_id": "BTS_N10",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.822750000000001,
+    "lng": 100.56675
+  },
+  {
+    "id": "BTS_N9_EX1",
+    "station_id": "BTS_N9",
+    "exit_code": "1",
+    "name_th": "ทางออก 1",
+    "name_en": "Exit 1",
+    "lat": 13.8124295,
+    "lng": 100.5618436
+  },
+  {
+    "id": "BTS_N9_EX2",
+    "station_id": "BTS_N9",
+    "exit_code": "2",
+    "name_th": "ทางออก 2",
+    "name_en": "Exit 2",
+    "lat": 13.8129796,
+    "lng": 100.5608394
+  },
+  {
+    "id": "BTS_N9_EX3",
+    "station_id": "BTS_N9",
+    "exit_code": "3",
+    "name_th": "ทางออก 3",
+    "name_en": "Exit 3",
+    "lat": 13.8142455,
+    "lng": 100.5601597
+  },
+  {
+    "id": "BTS_N9_EX4",
+    "station_id": "BTS_N9",
+    "exit_code": "4",
+    "name_th": "ทางออก 4",
+    "name_en": "Exit 4",
+    "lat": 13.8135,
+    "lng": 100.560764
+  },
+  {
+    "id": "BTS_N9_EX5",
+    "station_id": "BTS_N9",
+    "exit_code": "5",
+    "name_th": "ทางออก 5",
+    "name_en": "Exit 5",
+    "lat": 13.8126046,
+    "lng": 100.5623157
+  },
+  {
+    "id": "BTS_N8_EX1",
+    "station_id": "BTS_N8",
+    "exit_code": "1",
+    "name_th": "ทางออก 1",
+    "name_en": "Exit 1",
+    "lat": 13.80239,
+    "lng": 100.5533243
+  },
+  {
+    "id": "BTS_N8_EX2",
+    "station_id": "BTS_N8",
+    "exit_code": "2",
+    "name_th": "ทางออก 2",
+    "name_en": "Exit 2",
+    "lat": 13.8019911,
+    "lng": 100.5535992
+  },
+  {
+    "id": "BTS_N8_EX3",
+    "station_id": "BTS_N8",
+    "exit_code": "3",
+    "name_th": "ทางออก 3",
+    "name_en": "Exit 3",
+    "lat": 13.8030994,
+    "lng": 100.5537443
+  },
+  {
+    "id": "BTS_N8_EX4",
+    "station_id": "BTS_N8",
+    "exit_code": "4",
+    "name_th": "ทางออก 4",
+    "name_en": "Exit 4",
+    "lat": 13.8027226,
+    "lng": 100.5540326
+  },
+  {
+    "id": "BTS_N7_EX1",
+    "station_id": "BTS_N7",
+    "exit_code": "1",
+    "name_th": "ทางออก 1",
+    "name_en": "Exit 1",
+    "lat": 13.7932309,
+    "lng": 100.5494281
+  },
+  {
+    "id": "BTS_N7_EX2",
+    "station_id": "BTS_N7",
+    "exit_code": "2",
+    "name_th": "ทางออก 2",
+    "name_en": "Exit 2",
+    "lat": 13.7931808,
+    "lng": 100.5495858
+  },
+  {
+    "id": "BTS_N7_EX3",
+    "station_id": "BTS_N7",
+    "exit_code": "3",
+    "name_th": "ทางออก 3",
+    "name_en": "Exit 3",
+    "lat": 13.7944435,
+    "lng": 100.5498614
+  },
+  {
+    "id": "BTS_N7_EX4",
+    "station_id": "BTS_N7",
+    "exit_code": "4",
+    "name_th": "ทางออก 4",
+    "name_en": "Exit 4",
+    "lat": 13.7943837,
+    "lng": 100.5500177
+  },
+  {
+    "id": "BTS_N5_EX1",
+    "station_id": "BTS_N5",
+    "exit_code": "1",
+    "name_th": "ทางออก 1",
+    "name_en": "Exit 1",
+    "lat": 13.7792633,
+    "lng": 100.5443572
+  },
+  {
+    "id": "BTS_N5_EX2",
+    "station_id": "BTS_N5",
+    "exit_code": "2",
+    "name_th": "ทางออก 2",
+    "name_en": "Exit 2",
+    "lat": 13.7791854,
+    "lng": 100.5445649
+  },
+  {
+    "id": "BTS_N5_EX3",
+    "station_id": "BTS_N5",
+    "exit_code": "3",
+    "name_th": "Ari",
+    "name_en": "Ari",
+    "lat": 13.7803521,
+    "lng": 100.5447675
+  },
+  {
+    "id": "BTS_N5_EX4",
+    "station_id": "BTS_N5",
+    "exit_code": "4",
+    "name_th": "ทางออก 4",
+    "name_en": "Exit 4",
+    "lat": 13.7802912,
+    "lng": 100.5449542
+  },
+  {
+    "id": "BTS_N4_EX1",
+    "station_id": "BTS_N4",
+    "exit_code": "1",
+    "name_th": "ทางออก 1",
+    "name_en": "Exit 1",
+    "lat": 13.7720524,
+    "lng": 100.5417495
+  },
+  {
+    "id": "BTS_N4_EX2",
+    "station_id": "BTS_N4",
+    "exit_code": "2",
+    "name_th": "ทางออก 2",
+    "name_en": "Exit 2",
+    "lat": 13.7719735,
+    "lng": 100.5419845
+  },
+  {
+    "id": "BTS_N4_EX3",
+    "station_id": "BTS_N4",
+    "exit_code": "3",
+    "name_th": "ทางออก 3",
+    "name_en": "Exit 3",
+    "lat": 13.7731517,
+    "lng": 100.5421547
+  },
+  {
+    "id": "BTS_N4_EX4",
+    "station_id": "BTS_N4",
+    "exit_code": "4",
+    "name_th": "ทางออก 4",
+    "name_en": "Exit 4",
+    "lat": 13.7730748,
+    "lng": 100.542398
+  },
+  {
+    "id": "BTS_N3_EX1",
+    "station_id": "BTS_N3",
+    "exit_code": "1",
+    "name_th": "ทางออก 1",
+    "name_en": "Exit 1",
+    "lat": 13.7624678,
+    "lng": 100.536755
+  },
+  {
+    "id": "BTS_N3_EX2",
+    "station_id": "BTS_N3",
+    "exit_code": "2",
+    "name_th": "ทางออก 2",
+    "name_en": "Exit 2",
+    "lat": 13.7623369,
+    "lng": 100.5369841
+  },
+  {
+    "id": "BTS_N3_EX3",
+    "station_id": "BTS_N3",
+    "exit_code": "3",
+    "name_th": "ทางออก 3",
+    "name_en": "Exit 3",
+    "lat": 13.7631867,
+    "lng": 100.5371567
+  },
+  {
+    "id": "BTS_N3_EX4",
+    "station_id": "BTS_N3",
+    "exit_code": "4",
+    "name_th": "ทางออก 4",
+    "name_en": "Exit 4",
+    "lat": 13.7630643,
+    "lng": 100.5373853
+  },
+  {
+    "id": "BTS_N2_EX1",
+    "station_id": "BTS_N2",
+    "exit_code": "1",
+    "name_th": "ทางออก 1",
+    "name_en": "Exit 1",
+    "lat": 13.7563967,
+    "lng": 100.5333659
+  },
+  {
+    "id": "BTS_N2_EX2",
+    "station_id": "BTS_N2",
+    "exit_code": "2",
+    "name_th": "ทางออก 2",
+    "name_en": "Exit 2",
+    "lat": 13.7562778,
+    "lng": 100.5336028
+  },
+  {
+    "id": "BTS_N2_EX3",
+    "station_id": "BTS_N2",
+    "exit_code": "3",
+    "name_th": "ทางออก 3",
+    "name_en": "Exit 3",
+    "lat": 13.7576539,
+    "lng": 100.5340701
+  },
+  {
+    "id": "BTS_N2_EX4",
+    "station_id": "BTS_N2",
+    "exit_code": "4",
+    "name_th": "ทางออก 4",
+    "name_en": "Exit 4",
+    "lat": 13.7575267,
+    "lng": 100.5344392
+  },
+  {
+    "id": "BTS_N2_EX5",
+    "station_id": "BTS_N2",
+    "exit_code": "5",
+    "name_th": "ทางออก 5",
+    "name_en": "Exit 5",
+    "lat": 13.75693,
+    "lng": 100.533926
+  },
+  {
+    "id": "BTS_N1_EX1",
+    "station_id": "BTS_N1",
+    "exit_code": "1",
+    "name_th": "ทางออก 1",
+    "name_en": "Exit 1",
+    "lat": 13.7514925,
+    "lng": 100.531343
+  },
+  {
+    "id": "BTS_N1_EX2",
+    "station_id": "BTS_N1",
+    "exit_code": "2",
+    "name_th": "ทางออก 2",
+    "name_en": "Exit 2",
+    "lat": 13.7514563,
+    "lng": 100.5316452
+  },
+  {
+    "id": "BTS_N1_EX3",
+    "station_id": "BTS_N1",
+    "exit_code": "3",
+    "name_th": "ทางออก 3",
+    "name_en": "Exit 3",
+    "lat": 13.7522868,
+    "lng": 100.5314836
+  },
+  {
+    "id": "BTS_N1_EX4",
+    "station_id": "BTS_N1",
+    "exit_code": "4",
+    "name_th": "ทางออก 4",
+    "name_en": "Exit 4",
+    "lat": 13.7522502,
+    "lng": 100.5317553
+  },
+  {
+    "id": "BTS_CEN_EX1",
+    "station_id": "BTS_CEN",
+    "exit_code": "1",
+    "name_th": "ทางออก 1",
+    "name_en": "Exit 1",
+    "lat": 13.745807,
+    "lng": 100.5335574
+  },
+  {
+    "id": "BTS_CEN_EX2",
+    "station_id": "BTS_CEN",
+    "exit_code": "2",
+    "name_th": "ทางออก 2",
+    "name_en": "Exit 2",
+    "lat": 13.7456708,
+    "lng": 100.5335355
+  },
+  {
+    "id": "BTS_CEN_EX3",
+    "station_id": "BTS_CEN",
+    "exit_code": "3",
+    "name_th": "ทางออก 3",
+    "name_en": "Exit 3",
+    "lat": 13.7457304,
+    "lng": 100.534
+  },
+  {
+    "id": "BTS_CEN_EX4",
+    "station_id": "BTS_CEN",
+    "exit_code": "4",
+    "name_th": "ทางออก 4",
+    "name_en": "Exit 4",
+    "lat": 13.7455931,
+    "lng": 100.5339752
+  },
+  {
+    "id": "BTS_CEN_EX6",
+    "station_id": "BTS_CEN",
+    "exit_code": "6",
+    "name_th": "ทางออก 6",
+    "name_en": "Exit 6",
+    "lat": 13.7454324,
+    "lng": 100.5348889
+  },
+  {
+    "id": "BTS_E1_EX1",
+    "station_id": "BTS_E1",
+    "exit_code": "1",
+    "name_th": "ทางออก 1",
+    "name_en": "Exit 1",
+    "lat": 13.7443453,
+    "lng": 100.5423
+  },
+  {
+    "id": "BTS_E1_EX2",
+    "station_id": "BTS_E1",
+    "exit_code": "2",
+    "name_th": "ทางออก 2",
+    "name_en": "Exit 2",
+    "lat": 13.7441894,
+    "lng": 100.541895
+  },
+  {
+    "id": "BTS_E1_EX3",
+    "station_id": "BTS_E1",
+    "exit_code": "3",
+    "name_th": "ทางออก 3",
+    "name_en": "Exit 3",
+    "lat": 13.7441677,
+    "lng": 100.5432609
+  },
+  {
+    "id": "BTS_E1_EX4",
+    "station_id": "BTS_E1",
+    "exit_code": "4",
+    "name_th": "ทางออก 4",
+    "name_en": "Exit 4",
+    "lat": 13.7437729,
+    "lng": 100.5442505
+  },
+  {
+    "id": "BTS_E1_EX5",
+    "station_id": "BTS_E1",
+    "exit_code": "5",
+    "name_th": "ทางออก 5",
+    "name_en": "Exit 5",
+    "lat": 13.7440601,
+    "lng": 100.5440295
+  },
+  {
+    "id": "BTS_E2_EX1",
+    "station_id": "BTS_E2",
+    "exit_code": "1",
+    "name_th": "ทางออก 1",
+    "name_en": "Exit 1",
+    "lat": 13.7432755,
+    "lng": 100.5483676
+  },
+  {
+    "id": "BTS_E2_EX2",
+    "station_id": "BTS_E2",
+    "exit_code": "2",
+    "name_th": "ทางออก 2",
+    "name_en": "Exit 2",
+    "lat": 13.7431223,
+    "lng": 100.5483425
+  },
+  {
+    "id": "BTS_E2_EX3",
+    "station_id": "BTS_E2",
+    "exit_code": "3",
+    "name_th": "ทางออก 3",
+    "name_en": "Exit 3",
+    "lat": 13.7430613,
+    "lng": 100.5497426
+  },
+  {
+    "id": "BTS_E2_EX5",
+    "station_id": "BTS_E2",
+    "exit_code": "5",
+    "name_th": "ทางออก 5",
+    "name_en": "Exit 5",
+    "lat": 13.7432089,
+    "lng": 100.5482487
+  },
+  {
+    "id": "BTS_E3_EX1",
+    "station_id": "BTS_E3",
+    "exit_code": "1",
+    "name_th": "ทางออก 1",
+    "name_en": "Exit 1",
+    "lat": 13.7409691,
+    "lng": 100.5549867
+  },
+  {
+    "id": "BTS_E3_EX2",
+    "station_id": "BTS_E3",
+    "exit_code": "2",
+    "name_th": "ทางออก 2",
+    "name_en": "Exit 2",
+    "lat": 13.7408075,
+    "lng": 100.554874
+  },
+  {
+    "id": "BTS_E3_EX3",
+    "station_id": "BTS_E3",
+    "exit_code": "3",
+    "name_th": "ทางออก 3",
+    "name_en": "Exit 3",
+    "lat": 13.740442,
+    "lng": 100.5557779
+  },
+  {
+    "id": "BTS_E3_EX4",
+    "station_id": "BTS_E3",
+    "exit_code": "4",
+    "name_th": "ทางออก 4",
+    "name_en": "Exit 4",
+    "lat": 13.7402255,
+    "lng": 100.5556148
+  },
+  {
+    "id": "BTS_E4_EX1",
+    "station_id": "BTS_E4",
+    "exit_code": "1",
+    "name_th": "ทางออก 1",
+    "name_en": "Exit 1",
+    "lat": 13.738532,
+    "lng": 100.5614678
+  },
+  {
+    "id": "BTS_E4_EX2",
+    "station_id": "BTS_E4",
+    "exit_code": "2",
+    "name_th": "ทางออก 2",
+    "name_en": "Exit 2",
+    "lat": 13.7368144,
+    "lng": 100.5615551
+  },
+  {
+    "id": "BTS_E4_EX3",
+    "station_id": "BTS_E4",
+    "exit_code": "3",
+    "name_th": "ทางออก 3",
+    "name_en": "Exit 3",
+    "lat": 13.7369204,
+    "lng": 100.560787
+  },
+  {
+    "id": "BTS_E4_EX4",
+    "station_id": "BTS_E4",
+    "exit_code": "4",
+    "name_th": "ทางออก 4",
+    "name_en": "Exit 4",
+    "lat": 13.7370017,
+    "lng": 100.5602019
+  },
+  {
+    "id": "BTS_E4_EX5",
+    "station_id": "BTS_E4",
+    "exit_code": "5",
+    "name_th": "ทางออก 5",
+    "name_en": "Exit 5",
+    "lat": 13.7374846,
+    "lng": 100.5597356
+  },
+  {
+    "id": "BTS_E4_EX6",
+    "station_id": "BTS_E4",
+    "exit_code": "6",
+    "name_th": "ทางออก 6",
+    "name_en": "Exit 6",
+    "lat": 13.7366465,
+    "lng": 100.5609508
+  },
+  {
+    "id": "BTS_E5_EX1",
+    "station_id": "BTS_E5",
+    "exit_code": "1",
+    "name_th": "เอ็มควอเทียร์",
+    "name_en": "EmQuartier",
+    "lat": 13.7308831,
+    "lng": 100.5692378
+  },
+  {
+    "id": "BTS_E5_EX2",
+    "station_id": "BTS_E5",
+    "exit_code": "2",
+    "name_th": "ทางออก 2",
+    "name_en": "Exit 2",
+    "lat": 13.7307556,
+    "lng": 100.5691467
+  },
+  {
+    "id": "BTS_E5_EX3",
+    "station_id": "BTS_E5",
+    "exit_code": "3",
+    "name_th": "ทางออก 3",
+    "name_en": "Exit 3",
+    "lat": 13.7301397,
+    "lng": 100.5703037
+  },
+  {
+    "id": "BTS_E5_EX4",
+    "station_id": "BTS_E5",
+    "exit_code": "4",
+    "name_th": "ทางออก 4",
+    "name_en": "Exit 4",
+    "lat": 13.7299998,
+    "lng": 100.5702173
+  },
+  {
+    "id": "BTS_E5_EX5",
+    "station_id": "BTS_E5",
+    "exit_code": "5",
+    "name_th": "ทางออก 5",
+    "name_en": "Exit 5",
+    "lat": 13.731259,
+    "lng": 100.5687439
+  },
+  {
+    "id": "BTS_E5_EX6",
+    "station_id": "BTS_E5",
+    "exit_code": "6",
+    "name_th": "ทางออก 6",
+    "name_en": "Exit 6",
+    "lat": 13.7312479,
+    "lng": 100.5683497
+  },
+  {
+    "id": "BTS_E6_EX1",
+    "station_id": "BTS_E6",
+    "exit_code": "1",
+    "name_th": "ทางออก 1",
+    "name_en": "ทางออก 1",
+    "lat": 13.7247292,
+    "lng": 100.5780275
+  },
+  {
+    "id": "BTS_E6_EX2",
+    "station_id": "BTS_E6",
+    "exit_code": "2",
+    "name_th": "ทางออก 2",
+    "name_en": "ทางออก 2",
+    "lat": 13.7243211,
+    "lng": 100.5782166
+  },
+  {
+    "id": "BTS_E6_EX3",
+    "station_id": "BTS_E6",
+    "exit_code": "3",
+    "name_th": "ทางออก 3",
+    "name_en": "ทางออก 3",
+    "lat": 13.724168,
+    "lng": 100.5788254
+  },
+  {
+    "id": "BTS_E6_EX4",
+    "station_id": "BTS_E6",
+    "exit_code": "4",
+    "name_th": "ทางออก 4",
+    "name_en": "ทางออก 4",
+    "lat": 13.7236411,
+    "lng": 100.5791982
+  },
+  {
+    "id": "BTS_E7_EX1",
+    "station_id": "BTS_E7",
+    "exit_code": "1",
+    "name_th": "ทางออก 1",
+    "name_en": "Exit 1",
+    "lat": 13.7199945,
+    "lng": 100.5847028
+  },
+  {
+    "id": "BTS_E7_EX2",
+    "station_id": "BTS_E7",
+    "exit_code": "2",
+    "name_th": "ทางออก 2",
+    "name_en": "Exit 2",
+    "lat": 13.7198359,
+    "lng": 100.5845513
+  },
+  {
+    "id": "BTS_E7_EX3",
+    "station_id": "BTS_E7",
+    "exit_code": "3",
+    "name_th": "ทางออก 3",
+    "name_en": "Exit 3",
+    "lat": 13.7192445,
+    "lng": 100.5857178
+  },
+  {
+    "id": "BTS_E7_EX4",
+    "station_id": "BTS_E7",
+    "exit_code": "4",
+    "name_th": "ทางออก 4",
+    "name_en": "Exit 4",
+    "lat": 13.719095,
+    "lng": 100.5855887
+  },
+  {
+    "id": "BTS_E8_EX1",
+    "station_id": "BTS_E8",
+    "exit_code": "1",
+    "name_th": "ทางออก 1",
+    "name_en": "Exit 1",
+    "lat": 13.7156204,
+    "lng": 100.5908651
+  },
+  {
+    "id": "BTS_E8_EX2",
+    "station_id": "BTS_E8",
+    "exit_code": "2",
+    "name_th": "ทางออก 2",
+    "name_en": "Exit 2",
+    "lat": 13.7154544,
+    "lng": 100.5907019
+  },
+  {
+    "id": "BTS_E8_EX3",
+    "station_id": "BTS_E8",
+    "exit_code": "3",
+    "name_th": "ทางออก 3",
+    "name_en": "Exit 3",
+    "lat": 13.7149603,
+    "lng": 100.5917921
+  },
+  {
+    "id": "BTS_E9_EX1",
+    "station_id": "BTS_E9",
+    "exit_code": "1",
+    "name_th": "ทางออก 1",
+    "name_en": "Exit 1",
+    "lat": 13.7062387,
+    "lng": 100.6009004
+  },
+  {
+    "id": "BTS_E9_EX2",
+    "station_id": "BTS_E9",
+    "exit_code": "2",
+    "name_th": "ทางออก 2",
+    "name_en": "Exit 2",
+    "lat": 13.7061171,
+    "lng": 100.6006429
+  },
+  {
+    "id": "BTS_E9_EX3",
+    "station_id": "BTS_E9",
+    "exit_code": "3",
+    "name_th": "ทางออก 3",
+    "name_en": "Exit 3",
+    "lat": 13.7049892,
+    "lng": 100.6014801
+  },
+  {
+    "id": "BTS_E9_EX4",
+    "station_id": "BTS_E9",
+    "exit_code": "4",
+    "name_th": "ทางออก 4",
+    "name_en": "Exit 4",
+    "lat": 13.7048929,
+    "lng": 100.6012494
+  },
+  {
+    "id": "BTS_E10_EX1",
+    "station_id": "BTS_E10",
+    "exit_code": "1",
+    "name_th": "ทางออก 1",
+    "name_en": "Exit 1",
+    "lat": 13.6971761,
+    "lng": 100.6052492
+  },
+  {
+    "id": "BTS_E10_EX2",
+    "station_id": "BTS_E10",
+    "exit_code": "2",
+    "name_th": "ทางออก 2",
+    "name_en": "Exit 2",
+    "lat": 13.697225,
+    "lng": 100.6049812
+  },
+  {
+    "id": "BTS_E10_EX3",
+    "station_id": "BTS_E10",
+    "exit_code": "3",
+    "name_th": "ทางออก 3",
+    "name_en": "Exit 3",
+    "lat": 13.6961788,
+    "lng": 100.6057491
+  },
+  {
+    "id": "BTS_E10_EX4",
+    "station_id": "BTS_E10",
+    "exit_code": "4",
+    "name_th": "ทางออก 4",
+    "name_en": "Exit 4",
+    "lat": 13.6960851,
+    "lng": 100.6055358
+  },
+  {
+    "id": "BTS_E10_EX5",
+    "station_id": "BTS_E10",
+    "exit_code": "5",
+    "name_th": "ทางออก 5",
+    "name_en": "Exit 5",
+    "lat": 13.6974257,
+    "lng": 100.6050332
+  },
+  {
+    "id": "BTS_E11_EX1",
+    "station_id": "BTS_E11",
+    "exit_code": "1",
+    "name_th": "ทางออก 1",
+    "name_en": "Exit 1",
+    "lat": 13.6896771,
+    "lng": 100.6089165
+  },
+  {
+    "id": "BTS_E11_EX2",
+    "station_id": "BTS_E11",
+    "exit_code": "2",
+    "name_th": "ทางออก 2",
+    "name_en": "Exit 2",
+    "lat": 13.689847,
+    "lng": 100.6085511
+  },
+  {
+    "id": "BTS_E11_EX3",
+    "station_id": "BTS_E11",
+    "exit_code": "3",
+    "name_th": "ทางออก 3",
+    "name_en": "Exit 3",
+    "lat": 13.6887422,
+    "lng": 100.6093849
+  },
+  {
+    "id": "BTS_E11_EX4",
+    "station_id": "BTS_E11",
+    "exit_code": "4",
+    "name_th": "ทางออก 4",
+    "name_en": "Exit 4",
+    "lat": 13.6886562,
+    "lng": 100.6091416
+  },
+  {
+    "id": "BTS_E11_EX5",
+    "station_id": "BTS_E11",
+    "exit_code": "5",
+    "name_th": "ทางออก 5",
+    "name_en": "Exit 5",
+    "lat": 13.6890777,
+    "lng": 100.6092131
+  },
+  {
+    "id": "BTS_E11_EX6",
+    "station_id": "BTS_E11",
+    "exit_code": "6",
+    "name_th": "ทางออก 6",
+    "name_en": "Exit 6",
+    "lat": 13.688631,
+    "lng": 100.6092946
+  },
+  {
+    "id": "BTS_E12_EX1",
+    "station_id": "BTS_E12",
+    "exit_code": "1",
+    "name_th": "ทางออก 1",
+    "name_en": "Exit 1",
+    "lat": 13.6805239,
+    "lng": 100.6098731
+  },
+  {
+    "id": "BTS_E12_EX2",
+    "station_id": "BTS_E12",
+    "exit_code": "2",
+    "name_th": "ทางออก 2",
+    "name_en": "Exit 2",
+    "lat": 13.6806074,
+    "lng": 100.6096153
+  },
+  {
+    "id": "BTS_E12_EX3",
+    "station_id": "BTS_E12",
+    "exit_code": "3",
+    "name_th": "ทางออก 3",
+    "name_en": "Exit 3",
+    "lat": 13.6791827,
+    "lng": 100.6093275
+  },
+  {
+    "id": "BTS_E12_EX4",
+    "station_id": "BTS_E12",
+    "exit_code": "4",
+    "name_th": "ทางออก 4",
+    "name_en": "Exit 4",
+    "lat": 13.6792744,
+    "lng": 100.609077
+  },
+  {
+    "id": "BTS_E12_EX5",
+    "station_id": "BTS_E12",
+    "exit_code": "5",
+    "name_th": "ทางออก 5",
+    "name_en": "Exit 5",
+    "lat": 13.680103,
+    "lng": 100.6097161
+  },
+  {
+    "id": "BTS_E13_EX1",
+    "station_id": "BTS_E13",
+    "exit_code": "1",
+    "name_th": "ทางออก 1",
+    "name_en": "Exit 1",
+    "lat": 13.6682472,
+    "lng": 100.6048668
+  },
+  {
+    "id": "BTS_E13_EX2",
+    "station_id": "BTS_E13",
+    "exit_code": "2",
+    "name_th": "ทางออก 2",
+    "name_en": "Exit 2",
+    "lat": 13.6685739,
+    "lng": 100.6047015
+  },
+  {
+    "id": "BTS_E13_EX3",
+    "station_id": "BTS_E13",
+    "exit_code": "3",
+    "name_th": "ทางออก 3",
+    "name_en": "Exit 3",
+    "lat": 13.6672828,
+    "lng": 100.604469
+  },
+  {
+    "id": "BTS_E13_EX4",
+    "station_id": "BTS_E13",
+    "exit_code": "4",
+    "name_th": "ทางออก 4",
+    "name_en": "Exit 4",
+    "lat": 13.667235,
+    "lng": 100.6041935
+  },
+  {
+    "id": "BTS_E13_EX5",
+    "station_id": "BTS_E13",
+    "exit_code": "5",
+    "name_th": "ทางออก 5",
+    "name_en": "Exit 5",
+    "lat": 13.6675512,
+    "lng": 100.6045825
+  },
+  {
+    "id": "BTS_E14_EX3",
+    "station_id": "BTS_E14",
+    "exit_code": "3",
+    "name_th": "ทางออก 3",
+    "name_en": "Exit 3",
+    "lat": 13.6605037,
+    "lng": 100.6016328
+  },
+  {
+    "id": "BTS_E14_EX4",
+    "station_id": "BTS_E14",
+    "exit_code": "4",
+    "name_th": "ทางออก 4",
+    "name_en": "Exit 4",
+    "lat": 13.660591,
+    "lng": 100.6014038
+  },
+  {
+    "id": "BTS_E15_EX1",
+    "station_id": "BTS_E15",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.64725,
+    "lng": 100.59525
+  },
+  {
+    "id": "BTS_E15_EX2",
+    "station_id": "BTS_E15",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.64675,
+    "lng": 100.59475
+  },
+  {
+    "id": "BTS_E15_EX3",
+    "station_id": "BTS_E15",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.64725,
+    "lng": 100.59475
+  },
+  {
+    "id": "BTS_E15_EX4",
+    "station_id": "BTS_E15",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.64675,
+    "lng": 100.59525
+  },
+  {
+    "id": "BTS_E16_EX1",
+    "station_id": "BTS_E16",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.63755,
+    "lng": 100.59224999999999
+  },
+  {
+    "id": "BTS_E16_EX2",
+    "station_id": "BTS_E16",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.63705,
+    "lng": 100.59175
+  },
+  {
+    "id": "BTS_E16_EX3",
+    "station_id": "BTS_E16",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.63755,
+    "lng": 100.59175
+  },
+  {
+    "id": "BTS_E16_EX4",
+    "station_id": "BTS_E16",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.63705,
+    "lng": 100.59224999999999
+  },
+  {
+    "id": "BTS_E17_EX1",
+    "station_id": "BTS_E17",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.62185,
+    "lng": 100.59035
+  },
+  {
+    "id": "BTS_E17_EX2",
+    "station_id": "BTS_E17",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.621350000000001,
+    "lng": 100.58985000000001
+  },
+  {
+    "id": "BTS_E17_EX3",
+    "station_id": "BTS_E17",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.62185,
+    "lng": 100.58985000000001
+  },
+  {
+    "id": "BTS_E17_EX4",
+    "station_id": "BTS_E17",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.621350000000001,
+    "lng": 100.59035
+  },
+  {
+    "id": "BTS_E18_EX1",
+    "station_id": "BTS_E18",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.608849999999999,
+    "lng": 100.59505
+  },
+  {
+    "id": "BTS_E18_EX2",
+    "station_id": "BTS_E18",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.60835,
+    "lng": 100.59455000000001
+  },
+  {
+    "id": "BTS_E18_EX3",
+    "station_id": "BTS_E18",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.608849999999999,
+    "lng": 100.59455000000001
+  },
+  {
+    "id": "BTS_E18_EX4",
+    "station_id": "BTS_E18",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.60835,
+    "lng": 100.59505
+  },
+  {
+    "id": "BTS_E19_EX1",
+    "station_id": "BTS_E19",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.60245,
+    "lng": 100.59734999999999
+  },
+  {
+    "id": "BTS_E19_EX2",
+    "station_id": "BTS_E19",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.60195,
+    "lng": 100.59685
+  },
+  {
+    "id": "BTS_E19_EX3",
+    "station_id": "BTS_E19",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.60245,
+    "lng": 100.59685
+  },
+  {
+    "id": "BTS_E19_EX4",
+    "station_id": "BTS_E19",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.60195,
+    "lng": 100.59734999999999
+  },
+  {
+    "id": "BTS_E20_EX1",
+    "station_id": "BTS_E20",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.59245,
+    "lng": 100.60915
+  },
+  {
+    "id": "BTS_E20_EX2",
+    "station_id": "BTS_E20",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.59195,
+    "lng": 100.60865000000001
+  },
+  {
+    "id": "BTS_E20_EX3",
+    "station_id": "BTS_E20",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.59245,
+    "lng": 100.60865000000001
+  },
+  {
+    "id": "BTS_E20_EX4",
+    "station_id": "BTS_E20",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.59195,
+    "lng": 100.60915
+  },
+  {
+    "id": "BTS_E21_EX1",
+    "station_id": "BTS_E21",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.58465,
+    "lng": 100.60815
+  },
+  {
+    "id": "BTS_E21_EX2",
+    "station_id": "BTS_E21",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.584150000000001,
+    "lng": 100.60765
+  },
+  {
+    "id": "BTS_E21_EX3",
+    "station_id": "BTS_E21",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.58465,
+    "lng": 100.60765
+  },
+  {
+    "id": "BTS_E21_EX4",
+    "station_id": "BTS_E21",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.584150000000001,
+    "lng": 100.60815
+  },
+  {
+    "id": "BTS_E22_EX1",
+    "station_id": "BTS_E22",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.57775,
+    "lng": 100.60555
+  },
+  {
+    "id": "BTS_E22_EX2",
+    "station_id": "BTS_E22",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.577250000000001,
+    "lng": 100.60505
+  },
+  {
+    "id": "BTS_E22_EX3",
+    "station_id": "BTS_E22",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.57775,
+    "lng": 100.60505
+  },
+  {
+    "id": "BTS_E22_EX4",
+    "station_id": "BTS_E22",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.577250000000001,
+    "lng": 100.60555
+  },
+  {
+    "id": "BTS_E23_EX1",
+    "station_id": "BTS_E23",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.56795,
+    "lng": 100.60794999999999
+  },
+  {
+    "id": "BTS_E23_EX2",
+    "station_id": "BTS_E23",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.567450000000001,
+    "lng": 100.60745
+  },
+  {
+    "id": "BTS_E23_EX3",
+    "station_id": "BTS_E23",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.56795,
+    "lng": 100.60745
+  },
+  {
+    "id": "BTS_E23_EX4",
+    "station_id": "BTS_E23",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.567450000000001,
+    "lng": 100.60794999999999
+  },
+  {
+    "id": "BTS_W1_EX1",
+    "station_id": "BTS_W1",
+    "exit_code": "1",
+    "name_th": "ทางออก 1",
+    "name_en": "Exit 1",
+    "lat": 13.7466334,
+    "lng": 100.5290273
+  },
+  {
+    "id": "BTS_W1_EX2",
+    "station_id": "BTS_W1",
+    "exit_code": "2",
+    "name_th": "ทางออก 2",
+    "name_en": "Exit 2",
+    "lat": 13.7465648,
+    "lng": 100.5279943
+  },
+  {
+    "id": "BTS_W1_EX3",
+    "station_id": "BTS_W1",
+    "exit_code": "3",
+    "name_th": "ทางออก 3",
+    "name_en": "Exit 3",
+    "lat": 13.7464299,
+    "lng": 100.5301614
+  },
+  {
+    "id": "BTS_W1_EX4",
+    "station_id": "BTS_W1",
+    "exit_code": "4",
+    "name_th": "ทางออก 4",
+    "name_en": "Exit 4",
+    "lat": 13.7462323,
+    "lng": 100.5298633
+  },
+  {
+    "id": "BTS_CEN_SILOM_EX1",
+    "station_id": "BTS_CEN_SILOM",
+    "exit_code": "1",
+    "name_th": "ทางออก 1",
+    "name_en": "Exit 1",
+    "lat": 13.745807,
+    "lng": 100.5335574
+  },
+  {
+    "id": "BTS_CEN_SILOM_EX2",
+    "station_id": "BTS_CEN_SILOM",
+    "exit_code": "2",
+    "name_th": "ทางออก 2",
+    "name_en": "Exit 2",
+    "lat": 13.7456708,
+    "lng": 100.5335355
+  },
+  {
+    "id": "BTS_CEN_SILOM_EX3",
+    "station_id": "BTS_CEN_SILOM",
+    "exit_code": "3",
+    "name_th": "ทางออก 3",
+    "name_en": "Exit 3",
+    "lat": 13.7457304,
+    "lng": 100.534
+  },
+  {
+    "id": "BTS_CEN_SILOM_EX4",
+    "station_id": "BTS_CEN_SILOM",
+    "exit_code": "4",
+    "name_th": "ทางออก 4",
+    "name_en": "Exit 4",
+    "lat": 13.7455931,
+    "lng": 100.5339752
+  },
+  {
+    "id": "BTS_CEN_SILOM_EX6",
+    "station_id": "BTS_CEN_SILOM",
+    "exit_code": "6",
+    "name_th": "ทางออก 6",
+    "name_en": "Exit 6",
+    "lat": 13.7454324,
+    "lng": 100.5348889
+  },
+  {
+    "id": "BTS_S1_EX1",
+    "station_id": "BTS_S1",
+    "exit_code": "1",
+    "name_th": "ทางออก 1",
+    "name_en": "Exit 1",
+    "lat": 13.7390732,
+    "lng": 100.5392996
+  },
+  {
+    "id": "BTS_S1_EX2",
+    "station_id": "BTS_S1",
+    "exit_code": "2",
+    "name_th": "ทางออก 2",
+    "name_en": "Exit 2",
+    "lat": 13.7390429,
+    "lng": 100.5395109
+  },
+  {
+    "id": "BTS_S1_EX3",
+    "station_id": "BTS_S1",
+    "exit_code": "3",
+    "name_th": "ทางออก 3",
+    "name_en": "Exit 3",
+    "lat": 13.739859,
+    "lng": 100.539419
+  },
+  {
+    "id": "BTS_S1_EX4",
+    "station_id": "BTS_S1",
+    "exit_code": "4",
+    "name_th": "ทางออก 4",
+    "name_en": "Exit 4",
+    "lat": 13.7398287,
+    "lng": 100.5396303
+  },
+  {
+    "id": "BTS_S2_EX1",
+    "station_id": "BTS_S2",
+    "exit_code": "1",
+    "name_th": "ทางออก 1",
+    "name_en": "Exit 1",
+    "lat": 13.7285202,
+    "lng": 100.5339014
+  },
+  {
+    "id": "BTS_S2_EX2",
+    "station_id": "BTS_S2",
+    "exit_code": "2",
+    "name_th": "ทางออก 2",
+    "name_en": "Exit 2",
+    "lat": 13.7282979,
+    "lng": 100.5339869
+  },
+  {
+    "id": "BTS_S2_EX3",
+    "station_id": "BTS_S2",
+    "exit_code": "3",
+    "name_th": "ทางออก 3",
+    "name_en": "Exit 3",
+    "lat": 13.7288453,
+    "lng": 100.5347942
+  },
+  {
+    "id": "BTS_S2_EX4",
+    "station_id": "BTS_S2",
+    "exit_code": "4",
+    "name_th": "ทางออก 4",
+    "name_en": "Exit 4",
+    "lat": 13.7286103,
+    "lng": 100.5348813
+  },
+  {
+    "id": "BTS_S2_EX5",
+    "station_id": "BTS_S2",
+    "exit_code": "5",
+    "name_th": "ทางออก 5",
+    "name_en": "Exit 5",
+    "lat": 13.7288058,
+    "lng": 100.5350206
+  },
+  {
+    "id": "BTS_S3_EX1",
+    "station_id": "BTS_S3",
+    "exit_code": "1",
+    "name_th": "ทางออก 1",
+    "name_en": "Exit 1",
+    "lat": 13.7230964,
+    "lng": 100.529405
+  },
+  {
+    "id": "BTS_S3_EX2",
+    "station_id": "BTS_S3",
+    "exit_code": "2",
+    "name_th": "ทางออก 2",
+    "name_en": "Exit 2",
+    "lat": 13.7233085,
+    "lng": 100.5298282
+  },
+  {
+    "id": "BTS_S3_EX3",
+    "station_id": "BTS_S3",
+    "exit_code": "3",
+    "name_th": "ทางออก 3",
+    "name_en": "Exit 3",
+    "lat": 13.723997,
+    "lng": 100.5289429
+  },
+  {
+    "id": "BTS_S3_EX4",
+    "station_id": "BTS_S3",
+    "exit_code": "4",
+    "name_th": "ทางออก 4",
+    "name_en": "Exit 4",
+    "lat": 13.7242298,
+    "lng": 100.5293679
+  },
+  {
+    "id": "BTS_S4_EX1",
+    "station_id": "BTS_S4",
+    "exit_code": "1",
+    "name_th": "ทางออก 1",
+    "name_en": "Exit 1",
+    "lat": 13.720932,
+    "lng": 100.5265412
+  },
+  {
+    "id": "BTS_S4_EX5",
+    "station_id": "BTS_S4",
+    "exit_code": "5",
+    "name_th": "ทางออก 5",
+    "name_en": "Exit 5",
+    "lat": 13.7208116,
+    "lng": 100.5261314
+  },
+  {
+    "id": "BTS_S5_EX1",
+    "station_id": "BTS_S5",
+    "exit_code": "1",
+    "name_th": "ทางออก 1",
+    "name_en": "Exit 1",
+    "lat": 13.7192597,
+    "lng": 100.5210589
+  },
+  {
+    "id": "BTS_S5_EX2",
+    "station_id": "BTS_S5",
+    "exit_code": "2",
+    "name_th": "ทางออก 2",
+    "name_en": "Exit 2",
+    "lat": 13.7190757,
+    "lng": 100.5211162
+  },
+  {
+    "id": "BTS_S5_EX3",
+    "station_id": "BTS_S5",
+    "exit_code": "3",
+    "name_th": "ทางออก 3",
+    "name_en": "Exit 3",
+    "lat": 13.7194948,
+    "lng": 100.5218426
+  },
+  {
+    "id": "BTS_S5_EX4",
+    "station_id": "BTS_S5",
+    "exit_code": "4",
+    "name_th": "ทางออก 4",
+    "name_en": "Exit 4",
+    "lat": 13.7193045,
+    "lng": 100.5219023
+  },
+  {
+    "id": "BTS_S6_EX1",
+    "station_id": "BTS_S6",
+    "exit_code": "1",
+    "name_th": "ทางออก 1",
+    "name_en": "Exit 1",
+    "lat": 13.7189841,
+    "lng": 100.5136341
+  },
+  {
+    "id": "BTS_S6_EX2",
+    "station_id": "BTS_S6",
+    "exit_code": "2",
+    "name_th": "ทางออก 2",
+    "name_en": "Exit 2",
+    "lat": 13.7188956,
+    "lng": 100.5136078
+  },
+  {
+    "id": "BTS_S6_EX3",
+    "station_id": "BTS_S6",
+    "exit_code": "3",
+    "name_th": "ทางออก 3",
+    "name_en": "Exit 3",
+    "lat": 13.7187088,
+    "lng": 100.5146856
+  },
+  {
+    "id": "BTS_S6_EX4",
+    "station_id": "BTS_S6",
+    "exit_code": "4",
+    "name_th": "ทางออก 4",
+    "name_en": "Exit 4",
+    "lat": 13.7186281,
+    "lng": 100.5146644
+  },
+  {
+    "id": "BTS_S7_EX1",
+    "station_id": "BTS_S7",
+    "exit_code": "1",
+    "name_th": "ทางออก 1",
+    "name_en": "Exit 1",
+    "lat": 13.7212357,
+    "lng": 100.5019695
+  },
+  {
+    "id": "BTS_S7_EX2",
+    "station_id": "BTS_S7",
+    "exit_code": "2",
+    "name_th": "ทางออก 2",
+    "name_en": "Exit 2",
+    "lat": 13.7206048,
+    "lng": 100.5017029
+  },
+  {
+    "id": "BTS_S7_EX3",
+    "station_id": "BTS_S7",
+    "exit_code": "3",
+    "name_th": "ทางออก 3",
+    "name_en": "Exit 3",
+    "lat": 13.7212357,
+    "lng": 100.5034064
+  },
+  {
+    "id": "BTS_S7_EX4",
+    "station_id": "BTS_S7",
+    "exit_code": "4",
+    "name_th": "ทางออก 4",
+    "name_en": "Exit 4",
+    "lat": 13.7205725,
+    "lng": 100.5033708
+  },
+  {
+    "id": "BTS_S8_EX1",
+    "station_id": "BTS_S8",
+    "exit_code": "1",
+    "name_th": "ทางออก 1",
+    "name_en": "Exit 1",
+    "lat": 13.7214051,
+    "lng": 100.4944836
+  },
+  {
+    "id": "BTS_S8_EX2",
+    "station_id": "BTS_S8",
+    "exit_code": "2",
+    "name_th": "ทางออก 2",
+    "name_en": "Exit 2",
+    "lat": 13.7207234,
+    "lng": 100.4944913
+  },
+  {
+    "id": "BTS_S8_EX3",
+    "station_id": "BTS_S8",
+    "exit_code": "3",
+    "name_th": "ทางออก 3",
+    "name_en": "Exit 3",
+    "lat": 13.721401,
+    "lng": 100.4959228
+  },
+  {
+    "id": "BTS_S8_EX4",
+    "station_id": "BTS_S8",
+    "exit_code": "4",
+    "name_th": "ทางออก 4",
+    "name_en": "Exit 4",
+    "lat": 13.7207602,
+    "lng": 100.4959314
+  },
+  {
+    "id": "BTS_S9_EX1",
+    "station_id": "BTS_S9",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.72275,
+    "lng": 100.48715
+  },
+  {
+    "id": "BTS_S9_EX2",
+    "station_id": "BTS_S9",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.72225,
+    "lng": 100.48665000000001
+  },
+  {
+    "id": "BTS_S9_EX3",
+    "station_id": "BTS_S9",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.72275,
+    "lng": 100.48665000000001
+  },
+  {
+    "id": "BTS_S9_EX4",
+    "station_id": "BTS_S9",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.72225,
+    "lng": 100.48715
+  },
+  {
+    "id": "BTS_S10_EX1",
+    "station_id": "BTS_S10",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.71445,
+    "lng": 100.47694999999999
+  },
+  {
+    "id": "BTS_S10_EX2",
+    "station_id": "BTS_S10",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.71395,
+    "lng": 100.47645
+  },
+  {
+    "id": "BTS_S10_EX3",
+    "station_id": "BTS_S10",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.71445,
+    "lng": 100.47645
+  },
+  {
+    "id": "BTS_S10_EX4",
+    "station_id": "BTS_S10",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.71395,
+    "lng": 100.47694999999999
+  },
+  {
+    "id": "BTS_S11_EX1",
+    "station_id": "BTS_S11",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.713049999999999,
+    "lng": 100.47125
+  },
+  {
+    "id": "BTS_S11_EX2",
+    "station_id": "BTS_S11",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.71255,
+    "lng": 100.47075000000001
+  },
+  {
+    "id": "BTS_S11_EX3",
+    "station_id": "BTS_S11",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.713049999999999,
+    "lng": 100.47075000000001
+  },
+  {
+    "id": "BTS_S11_EX4",
+    "station_id": "BTS_S11",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.71255,
+    "lng": 100.47125
+  },
+  {
+    "id": "BTS_S12_EX1",
+    "station_id": "BTS_S12",
+    "exit_code": "1",
+    "name_th": "ทางออก 1",
+    "name_en": "Exit 1",
+    "lat": 13.7204612,
+    "lng": 100.4577212
+  },
+  {
+    "id": "BTS_S12_EX2",
+    "station_id": "BTS_S12",
+    "exit_code": "2",
+    "name_th": "ทางออก 2",
+    "name_en": "Exit 2",
+    "lat": 13.7209289,
+    "lng": 100.4576203
+  },
+  {
+    "id": "BTS_S12_EX3",
+    "station_id": "BTS_S12",
+    "exit_code": "3",
+    "name_th": "ทางออก 3",
+    "name_en": "Exit 3",
+    "lat": 13.7203511,
+    "lng": 100.4575159
+  },
+  {
+    "id": "BTS_S12_EX4",
+    "station_id": "BTS_S12",
+    "exit_code": "4",
+    "name_th": "ทางออก 4",
+    "name_en": "Exit 4",
+    "lat": 13.7206726,
+    "lng": 100.4574252
+  },
+  {
+    "id": "BTS_G1_EX1",
+    "station_id": "BTS_G1",
+    "exit_code": "1",
+    "name_th": "ทางออก 1",
+    "name_en": "Exit 1",
+    "lat": 13.7212357,
+    "lng": 100.5019695
+  },
+  {
+    "id": "BTS_G1_EX2",
+    "station_id": "BTS_G1",
+    "exit_code": "2",
+    "name_th": "ทางออก 2",
+    "name_en": "Exit 2",
+    "lat": 13.7206048,
+    "lng": 100.5017029
+  },
+  {
+    "id": "BTS_G1_EX3",
+    "station_id": "BTS_G1",
+    "exit_code": "3",
+    "name_th": "ทางออก 3",
+    "name_en": "Exit 3",
+    "lat": 13.7212357,
+    "lng": 100.5034064
+  },
+  {
+    "id": "BTS_G1_EX4",
+    "station_id": "BTS_G1",
+    "exit_code": "4",
+    "name_th": "ทางออก 4",
+    "name_en": "Exit 4",
+    "lat": 13.7205725,
+    "lng": 100.5033708
+  },
+  {
+    "id": "BTS_G2_EX1",
+    "station_id": "BTS_G2",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.72665,
+    "lng": 100.50945
+  },
+  {
+    "id": "BTS_G2_EX2",
+    "station_id": "BTS_G2",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.72615,
+    "lng": 100.50895000000001
+  },
+  {
+    "id": "BTS_G2_EX3",
+    "station_id": "BTS_G2",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.72665,
+    "lng": 100.50895000000001
+  },
+  {
+    "id": "BTS_G2_EX4",
+    "station_id": "BTS_G2",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.72615,
+    "lng": 100.50945
+  },
+  {
+    "id": "BTS_G3_EX1",
+    "station_id": "BTS_G3",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.73055,
+    "lng": 100.50795
+  },
+  {
+    "id": "BTS_G3_EX2",
+    "station_id": "BTS_G3",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.73005,
+    "lng": 100.50745
+  },
+  {
+    "id": "BTS_G3_EX3",
+    "station_id": "BTS_G3",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.73055,
+    "lng": 100.50745
+  },
+  {
+    "id": "BTS_G3_EX4",
+    "station_id": "BTS_G3",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.73005,
+    "lng": 100.50795
+  },
+  {
+    "id": "MRT_BL01_EX1",
+    "station_id": "MRT_BL01",
+    "exit_code": "1",
+    "name_th": "ทางออก 1",
+    "name_en": "Exit 1",
+    "lat": 13.7297714,
+    "lng": 100.4745412
+  },
+  {
+    "id": "MRT_BL01_EX2A",
+    "station_id": "MRT_BL01",
+    "exit_code": "2A",
+    "name_th": "ทางออก 2A",
+    "name_en": "Exit 2A",
+    "lat": 13.7291662,
+    "lng": 100.4747002
+  },
+  {
+    "id": "MRT_BL01_EX2B",
+    "station_id": "MRT_BL01",
+    "exit_code": "2B",
+    "name_th": "ทางออก 2B",
+    "name_en": "Exit 2B",
+    "lat": 13.72904,
+    "lng": 100.474148
+  },
+  {
+    "id": "MRT_BL01_EX3",
+    "station_id": "MRT_BL01",
+    "exit_code": "3",
+    "name_th": "ทางออก 3",
+    "name_en": "Exit 3",
+    "lat": 13.7292823,
+    "lng": 100.4732341
+  },
+  {
+    "id": "MRT_BL01_EX4",
+    "station_id": "MRT_BL01",
+    "exit_code": "4",
+    "name_th": "ทางออก 4",
+    "name_en": "Exit 4",
+    "lat": 13.7301242,
+    "lng": 100.4733891
+  },
+  {
+    "id": "MRT_BL02_EX1",
+    "station_id": "MRT_BL02",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.75075,
+    "lng": 100.47335
+  },
+  {
+    "id": "MRT_BL02_EX2",
+    "station_id": "MRT_BL02",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.750250000000001,
+    "lng": 100.47285000000001
+  },
+  {
+    "id": "MRT_BL02_EX3",
+    "station_id": "MRT_BL02",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.75075,
+    "lng": 100.47285000000001
+  },
+  {
+    "id": "MRT_BL02_EX4",
+    "station_id": "MRT_BL02",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.750250000000001,
+    "lng": 100.47335
+  },
+  {
+    "id": "MRT_BL03_EX1",
+    "station_id": "MRT_BL03",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.76025,
+    "lng": 100.47075
+  },
+  {
+    "id": "MRT_BL03_EX2",
+    "station_id": "MRT_BL03",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.75975,
+    "lng": 100.47025000000001
+  },
+  {
+    "id": "MRT_BL03_EX3",
+    "station_id": "MRT_BL03",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.76025,
+    "lng": 100.47025000000001
+  },
+  {
+    "id": "MRT_BL03_EX4",
+    "station_id": "MRT_BL03",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.75975,
+    "lng": 100.47075
+  },
+  {
+    "id": "MRT_BL04_EX1",
+    "station_id": "MRT_BL04",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.763549999999999,
+    "lng": 100.47345
+  },
+  {
+    "id": "MRT_BL04_EX2",
+    "station_id": "MRT_BL04",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.76305,
+    "lng": 100.47295000000001
+  },
+  {
+    "id": "MRT_BL04_EX3",
+    "station_id": "MRT_BL04",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.763549999999999,
+    "lng": 100.47295000000001
+  },
+  {
+    "id": "MRT_BL04_EX4",
+    "station_id": "MRT_BL04",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.76305,
+    "lng": 100.47345
+  },
+  {
+    "id": "MRT_BL05_EX1",
+    "station_id": "MRT_BL05",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.77755,
+    "lng": 100.48545
+  },
+  {
+    "id": "MRT_BL05_EX2",
+    "station_id": "MRT_BL05",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.777050000000001,
+    "lng": 100.48495000000001
+  },
+  {
+    "id": "MRT_BL05_EX3",
+    "station_id": "MRT_BL05",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.77755,
+    "lng": 100.48495000000001
+  },
+  {
+    "id": "MRT_BL05_EX4",
+    "station_id": "MRT_BL05",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.777050000000001,
+    "lng": 100.48545
+  },
+  {
+    "id": "MRT_BL06_EX1",
+    "station_id": "MRT_BL06",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.78305,
+    "lng": 100.49605
+  },
+  {
+    "id": "MRT_BL06_EX2",
+    "station_id": "MRT_BL06",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.78255,
+    "lng": 100.49555000000001
+  },
+  {
+    "id": "MRT_BL06_EX3",
+    "station_id": "MRT_BL06",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.78305,
+    "lng": 100.49555000000001
+  },
+  {
+    "id": "MRT_BL06_EX4",
+    "station_id": "MRT_BL06",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.78255,
+    "lng": 100.49605
+  },
+  {
+    "id": "MRT_BL07_EX1",
+    "station_id": "MRT_BL07",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.79275,
+    "lng": 100.50515
+  },
+  {
+    "id": "MRT_BL07_EX2",
+    "station_id": "MRT_BL07",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.792250000000001,
+    "lng": 100.50465000000001
+  },
+  {
+    "id": "MRT_BL07_EX3",
+    "station_id": "MRT_BL07",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.79275,
+    "lng": 100.50465000000001
+  },
+  {
+    "id": "MRT_BL07_EX4",
+    "station_id": "MRT_BL07",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.792250000000001,
+    "lng": 100.50515
+  },
+  {
+    "id": "MRT_BL08_EX1",
+    "station_id": "MRT_BL08",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.79915,
+    "lng": 100.50994999999999
+  },
+  {
+    "id": "MRT_BL08_EX2",
+    "station_id": "MRT_BL08",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.79865,
+    "lng": 100.50945
+  },
+  {
+    "id": "MRT_BL08_EX3",
+    "station_id": "MRT_BL08",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.79915,
+    "lng": 100.50945
+  },
+  {
+    "id": "MRT_BL08_EX4",
+    "station_id": "MRT_BL08",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.79865,
+    "lng": 100.50994999999999
+  },
+  {
+    "id": "MRT_BL09_EX1",
+    "station_id": "MRT_BL09",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.80665,
+    "lng": 100.52114999999999
+  },
+  {
+    "id": "MRT_BL09_EX2",
+    "station_id": "MRT_BL09",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.80615,
+    "lng": 100.52065
+  },
+  {
+    "id": "MRT_BL09_EX3",
+    "station_id": "MRT_BL09",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.80665,
+    "lng": 100.52065
+  },
+  {
+    "id": "MRT_BL09_EX4",
+    "station_id": "MRT_BL09",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.80615,
+    "lng": 100.52114999999999
+  },
+  {
+    "id": "MRT_BL10_EX1",
+    "station_id": "MRT_BL10",
+    "exit_code": "1",
+    "name_th": "ทางออก 1",
+    "name_en": "Exit 1",
+    "lat": 13.8061893,
+    "lng": 100.5299858
+  },
+  {
+    "id": "MRT_BL10_EX2",
+    "station_id": "MRT_BL10",
+    "exit_code": "2",
+    "name_th": "ทางออก 2",
+    "name_en": "Exit 2",
+    "lat": 13.8068046,
+    "lng": 100.5306665
+  },
+  {
+    "id": "MRT_BL10_EX3",
+    "station_id": "MRT_BL10",
+    "exit_code": "3",
+    "name_th": "ทางออก 3",
+    "name_en": "Exit 3",
+    "lat": 13.8067574,
+    "lng": 100.5310918
+  },
+  {
+    "id": "MRT_BL10_EX4",
+    "station_id": "MRT_BL10",
+    "exit_code": "4",
+    "name_th": "ทางออก 4",
+    "name_en": "Exit 4",
+    "lat": 13.8059775,
+    "lng": 100.5315492
+  },
+  {
+    "id": "MRT_BL11_EX1",
+    "station_id": "MRT_BL11",
+    "exit_code": "1",
+    "name_th": "ทางออก 1",
+    "name_en": "Exit 1",
+    "lat": 13.8028264,
+    "lng": 100.5390509
+  },
+  {
+    "id": "MRT_BL11_EX2",
+    "station_id": "MRT_BL11",
+    "exit_code": "2",
+    "name_th": "ทางออก 2",
+    "name_en": "Exit 2",
+    "lat": 13.8033283,
+    "lng": 100.5393218
+  },
+  {
+    "id": "MRT_BL12_EX1",
+    "station_id": "MRT_BL12",
+    "exit_code": "1",
+    "name_th": "ทางออก 1",
+    "name_en": "Exit 1",
+    "lat": 13.7980503,
+    "lng": 100.5475995
+  },
+  {
+    "id": "MRT_BL12_EX3",
+    "station_id": "MRT_BL12",
+    "exit_code": "3",
+    "name_th": "ทางออก 3",
+    "name_en": "Exit 3",
+    "lat": 13.7974563,
+    "lng": 100.5476263
+  },
+  {
+    "id": "MRT_BL13_EX1",
+    "station_id": "MRT_BL13",
+    "exit_code": "1",
+    "name_th": "ทางออก 1",
+    "name_en": "Exit 1",
+    "lat": 13.80239,
+    "lng": 100.5533243
+  },
+  {
+    "id": "MRT_BL13_EX2",
+    "station_id": "MRT_BL13",
+    "exit_code": "2",
+    "name_th": "ทางออก 2",
+    "name_en": "Exit 2",
+    "lat": 13.8019911,
+    "lng": 100.5535992
+  },
+  {
+    "id": "MRT_BL13_EX3",
+    "station_id": "MRT_BL13",
+    "exit_code": "3",
+    "name_th": "ทางออก 3",
+    "name_en": "Exit 3",
+    "lat": 13.8030994,
+    "lng": 100.5537443
+  },
+  {
+    "id": "MRT_BL13_EX4",
+    "station_id": "MRT_BL13",
+    "exit_code": "4",
+    "name_th": "ทางออก 4",
+    "name_en": "Exit 4",
+    "lat": 13.8027226,
+    "lng": 100.5540326
+  },
+  {
+    "id": "MRT_BL14_EX1",
+    "station_id": "MRT_BL14",
+    "exit_code": "1",
+    "name_th": "ทางออก 1",
+    "name_en": "Exit 1",
+    "lat": 13.8124295,
+    "lng": 100.5618436
+  },
+  {
+    "id": "MRT_BL14_EX2",
+    "station_id": "MRT_BL14",
+    "exit_code": "2",
+    "name_th": "ทางออก 2",
+    "name_en": "Exit 2",
+    "lat": 13.8129796,
+    "lng": 100.5608394
+  },
+  {
+    "id": "MRT_BL14_EX3",
+    "station_id": "MRT_BL14",
+    "exit_code": "3",
+    "name_th": "ทางออก 3",
+    "name_en": "Exit 3",
+    "lat": 13.8142455,
+    "lng": 100.5601597
+  },
+  {
+    "id": "MRT_BL14_EX4",
+    "station_id": "MRT_BL14",
+    "exit_code": "4",
+    "name_th": "ทางออก 4",
+    "name_en": "Exit 4",
+    "lat": 13.8135,
+    "lng": 100.560764
+  },
+  {
+    "id": "MRT_BL14_EX5",
+    "station_id": "MRT_BL14",
+    "exit_code": "5",
+    "name_th": "ทางออก 5",
+    "name_en": "Exit 5",
+    "lat": 13.8126046,
+    "lng": 100.5623157
+  },
+  {
+    "id": "MRT_BL15_EX1",
+    "station_id": "MRT_BL15",
+    "exit_code": "1",
+    "name_th": "ทางออก 1",
+    "name_en": "Exit 1",
+    "lat": 13.8056825,
+    "lng": 100.5739535
+  },
+  {
+    "id": "MRT_BL15_EX4",
+    "station_id": "MRT_BL15",
+    "exit_code": "4",
+    "name_th": "MRT ลาดพร้าว",
+    "name_en": "MRT Lat Phrao MRT",
+    "lat": 13.806134,
+    "lng": 100.5740746
+  },
+  {
+    "id": "MRT_BL16_EX1",
+    "station_id": "MRT_BL16",
+    "exit_code": "1",
+    "name_th": "ทางออก 1",
+    "name_en": "Exit 1",
+    "lat": 13.7983186,
+    "lng": 100.5743514
+  },
+  {
+    "id": "MRT_BL16_EX2",
+    "station_id": "MRT_BL16",
+    "exit_code": "2",
+    "name_th": "ทางออก 2",
+    "name_en": "Exit 2",
+    "lat": 13.7994745,
+    "lng": 100.5744193
+  },
+  {
+    "id": "MRT_BL16_EX3",
+    "station_id": "MRT_BL16",
+    "exit_code": "3",
+    "name_th": "ทางออก 3",
+    "name_en": "Exit 3",
+    "lat": 13.7996209,
+    "lng": 100.5749147
+  },
+  {
+    "id": "MRT_BL16_EX4",
+    "station_id": "MRT_BL16",
+    "exit_code": "4",
+    "name_th": "ทางออก 4",
+    "name_en": "Exit 4",
+    "lat": 13.7985217,
+    "lng": 100.5748637
+  },
+  {
+    "id": "MRT_BL17_EX1",
+    "station_id": "MRT_BL17",
+    "exit_code": "1",
+    "name_th": "ทางออก 1",
+    "name_en": "Exit 1",
+    "lat": 13.7904044,
+    "lng": 100.5739226
+  },
+  {
+    "id": "MRT_BL17_EX2",
+    "station_id": "MRT_BL17",
+    "exit_code": "2",
+    "name_th": "ทางออก 2",
+    "name_en": "Exit 2",
+    "lat": 13.7906043,
+    "lng": 100.5744794
+  },
+  {
+    "id": "MRT_BL17_EX3",
+    "station_id": "MRT_BL17",
+    "exit_code": "3",
+    "name_th": "ทางออก 3",
+    "name_en": "Exit 3",
+    "lat": 13.7890991,
+    "lng": 100.5743822
+  },
+  {
+    "id": "MRT_BL17_EX4",
+    "station_id": "MRT_BL17",
+    "exit_code": "4",
+    "name_th": "ทางออก 4",
+    "name_en": "Exit 4",
+    "lat": 13.7887969,
+    "lng": 100.5739152
+  },
+  {
+    "id": "MRT_BL18_EX1",
+    "station_id": "MRT_BL18",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.781049999999999,
+    "lng": 100.57605
+  },
+  {
+    "id": "MRT_BL18_EX2",
+    "station_id": "MRT_BL18",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.78055,
+    "lng": 100.57555
+  },
+  {
+    "id": "MRT_BL18_EX3",
+    "station_id": "MRT_BL18",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.781049999999999,
+    "lng": 100.57555
+  },
+  {
+    "id": "MRT_BL18_EX4",
+    "station_id": "MRT_BL18",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.78055,
+    "lng": 100.57605
+  },
+  {
+    "id": "MRT_BL19_EX1",
+    "station_id": "MRT_BL19",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.76835,
+    "lng": 100.56885
+  },
+  {
+    "id": "MRT_BL19_EX2",
+    "station_id": "MRT_BL19",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.767850000000001,
+    "lng": 100.56835000000001
+  },
+  {
+    "id": "MRT_BL19_EX3",
+    "station_id": "MRT_BL19",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.76835,
+    "lng": 100.56835000000001
+  },
+  {
+    "id": "MRT_BL19_EX4",
+    "station_id": "MRT_BL19",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.767850000000001,
+    "lng": 100.56885
+  },
+  {
+    "id": "MRT_BL20_EX1",
+    "station_id": "MRT_BL20",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.757449999999999,
+    "lng": 100.56554999999999
+  },
+  {
+    "id": "MRT_BL20_EX2",
+    "station_id": "MRT_BL20",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.75695,
+    "lng": 100.56505
+  },
+  {
+    "id": "MRT_BL20_EX3",
+    "station_id": "MRT_BL20",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.757449999999999,
+    "lng": 100.56505
+  },
+  {
+    "id": "MRT_BL20_EX4",
+    "station_id": "MRT_BL20",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.75695,
+    "lng": 100.56554999999999
+  },
+  {
+    "id": "MRT_BL21_EX1",
+    "station_id": "MRT_BL21",
+    "exit_code": "1",
+    "name_th": "ทางออก 1",
+    "name_en": "Exit 1",
+    "lat": 13.7494793,
+    "lng": 100.5637232
+  },
+  {
+    "id": "MRT_BL21_EX2",
+    "station_id": "MRT_BL21",
+    "exit_code": "2",
+    "name_th": "ทางออก 2",
+    "name_en": "Exit 2",
+    "lat": 13.7487035,
+    "lng": 100.5631423
+  },
+  {
+    "id": "MRT_BL21_EX3",
+    "station_id": "MRT_BL21",
+    "exit_code": "3",
+    "name_th": "ทางออก 3",
+    "name_en": "Exit 3",
+    "lat": 13.7495667,
+    "lng": 100.56332
+  },
+  {
+    "id": "MRT_BL22_EX1",
+    "station_id": "MRT_BL22",
+    "exit_code": "1",
+    "name_th": "ทางออก 1",
+    "name_en": "Exit 1",
+    "lat": 13.738532,
+    "lng": 100.5614678
+  },
+  {
+    "id": "MRT_BL22_EX2",
+    "station_id": "MRT_BL22",
+    "exit_code": "2",
+    "name_th": "ทางออก 2",
+    "name_en": "Exit 2",
+    "lat": 13.7368144,
+    "lng": 100.5615551
+  },
+  {
+    "id": "MRT_BL22_EX3",
+    "station_id": "MRT_BL22",
+    "exit_code": "3",
+    "name_th": "ทางออก 3",
+    "name_en": "Exit 3",
+    "lat": 13.7369204,
+    "lng": 100.560787
+  },
+  {
+    "id": "MRT_BL22_EX4",
+    "station_id": "MRT_BL22",
+    "exit_code": "4",
+    "name_th": "ทางออก 4",
+    "name_en": "Exit 4",
+    "lat": 13.7370017,
+    "lng": 100.5602019
+  },
+  {
+    "id": "MRT_BL22_EX5",
+    "station_id": "MRT_BL22",
+    "exit_code": "5",
+    "name_th": "ทางออก 5",
+    "name_en": "Exit 5",
+    "lat": 13.7374846,
+    "lng": 100.5597356
+  },
+  {
+    "id": "MRT_BL22_EX6",
+    "station_id": "MRT_BL22",
+    "exit_code": "6",
+    "name_th": "ทางออก 6",
+    "name_en": "Exit 6",
+    "lat": 13.7366465,
+    "lng": 100.5609508
+  },
+  {
+    "id": "MRT_BL23_EX1",
+    "station_id": "MRT_BL23",
+    "exit_code": "1",
+    "name_th": "ทางออก 1",
+    "name_en": "Exit 1",
+    "lat": 13.7216639,
+    "lng": 100.5598385
+  },
+  {
+    "id": "MRT_BL23_EX2",
+    "station_id": "MRT_BL23",
+    "exit_code": "2",
+    "name_th": "ทางออก 2",
+    "name_en": "Exit 2",
+    "lat": 13.7219956,
+    "lng": 100.5594327
+  },
+  {
+    "id": "MRT_BL23_EX3",
+    "station_id": "MRT_BL23",
+    "exit_code": "3",
+    "name_th": "ทางออก 3",
+    "name_en": "Exit 3",
+    "lat": 13.7235509,
+    "lng": 100.5599719
+  },
+  {
+    "id": "MRT_BL23_EX4",
+    "station_id": "MRT_BL23",
+    "exit_code": "4",
+    "name_th": "ทางออก 4",
+    "name_en": "Exit 4",
+    "lat": 13.7235529,
+    "lng": 100.5604361
+  },
+  {
+    "id": "MRT_BL24_EX1",
+    "station_id": "MRT_BL24",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.723949999999999,
+    "lng": 100.55645
+  },
+  {
+    "id": "MRT_BL24_EX2",
+    "station_id": "MRT_BL24",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.72345,
+    "lng": 100.55595000000001
+  },
+  {
+    "id": "MRT_BL24_EX3",
+    "station_id": "MRT_BL24",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.723949999999999,
+    "lng": 100.55595000000001
+  },
+  {
+    "id": "MRT_BL24_EX4",
+    "station_id": "MRT_BL24",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.72345,
+    "lng": 100.55645
+  },
+  {
+    "id": "MRT_BL25_EX1",
+    "station_id": "MRT_BL25",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.72335,
+    "lng": 100.54875
+  },
+  {
+    "id": "MRT_BL25_EX2",
+    "station_id": "MRT_BL25",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.722850000000001,
+    "lng": 100.54825000000001
+  },
+  {
+    "id": "MRT_BL25_EX3",
+    "station_id": "MRT_BL25",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.72335,
+    "lng": 100.54825000000001
+  },
+  {
+    "id": "MRT_BL25_EX4",
+    "station_id": "MRT_BL25",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.722850000000001,
+    "lng": 100.54875
+  },
+  {
+    "id": "MRT_BL26_EX1",
+    "station_id": "MRT_BL26",
+    "exit_code": "1",
+    "name_th": "ทางออก 1",
+    "name_en": "Exit 1",
+    "lat": 13.7285202,
+    "lng": 100.5339014
+  },
+  {
+    "id": "MRT_BL26_EX2",
+    "station_id": "MRT_BL26",
+    "exit_code": "2",
+    "name_th": "ทางออก 2",
+    "name_en": "Exit 2",
+    "lat": 13.7282979,
+    "lng": 100.5339869
+  },
+  {
+    "id": "MRT_BL26_EX3",
+    "station_id": "MRT_BL26",
+    "exit_code": "3",
+    "name_th": "ทางออก 3",
+    "name_en": "Exit 3",
+    "lat": 13.7288453,
+    "lng": 100.5347942
+  },
+  {
+    "id": "MRT_BL26_EX4",
+    "station_id": "MRT_BL26",
+    "exit_code": "4",
+    "name_th": "ทางออก 4",
+    "name_en": "Exit 4",
+    "lat": 13.7286103,
+    "lng": 100.5348813
+  },
+  {
+    "id": "MRT_BL26_EX5",
+    "station_id": "MRT_BL26",
+    "exit_code": "5",
+    "name_th": "ทางออก 5",
+    "name_en": "Exit 5",
+    "lat": 13.7288058,
+    "lng": 100.5350206
+  },
+  {
+    "id": "MRT_BL27_EX1",
+    "station_id": "MRT_BL27",
+    "exit_code": "1",
+    "name_th": "ทางออก 1",
+    "name_en": "Exit 1",
+    "lat": 13.7322917,
+    "lng": 100.5293921
+  },
+  {
+    "id": "MRT_BL27_EX2",
+    "station_id": "MRT_BL27",
+    "exit_code": "2",
+    "name_th": "ทางออก 2",
+    "name_en": "Exit 2",
+    "lat": 13.7328626,
+    "lng": 100.5294549
+  },
+  {
+    "id": "MRT_BL27_EX2/1",
+    "station_id": "MRT_BL27",
+    "exit_code": "2/1",
+    "name_th": "ทางออก 2/1",
+    "name_en": "Exit 2/1",
+    "lat": 13.7335516,
+    "lng": 100.5284606
+  },
+  {
+    "id": "MRT_BL28_EX1",
+    "station_id": "MRT_BL28",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.739049999999999,
+    "lng": 100.51504999999999
+  },
+  {
+    "id": "MRT_BL28_EX2",
+    "station_id": "MRT_BL28",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.73855,
+    "lng": 100.51455
+  },
+  {
+    "id": "MRT_BL28_EX3",
+    "station_id": "MRT_BL28",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.739049999999999,
+    "lng": 100.51455
+  },
+  {
+    "id": "MRT_BL28_EX4",
+    "station_id": "MRT_BL28",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.73855,
+    "lng": 100.51504999999999
+  },
+  {
+    "id": "MRT_BL29_EX1",
+    "station_id": "MRT_BL29",
+    "exit_code": "1",
+    "name_th": "ทางออก 1",
+    "name_en": "Exit 1",
+    "lat": 13.7418225,
+    "lng": 100.5102961
+  },
+  {
+    "id": "MRT_BL29_EX2",
+    "station_id": "MRT_BL29",
+    "exit_code": "2",
+    "name_th": "ทางออก 2",
+    "name_en": "Exit 2",
+    "lat": 13.7421792,
+    "lng": 100.5098497
+  },
+  {
+    "id": "MRT_BL30_EX1",
+    "station_id": "MRT_BL30",
+    "exit_code": "1",
+    "name_th": "ทางออก 1",
+    "name_en": "Exit 1",
+    "lat": 13.7470893,
+    "lng": 100.5030409
+  },
+  {
+    "id": "MRT_BL30_EX2",
+    "station_id": "MRT_BL30",
+    "exit_code": "2",
+    "name_th": "ทางออก 2",
+    "name_en": "Exit 2",
+    "lat": 13.7471153,
+    "lng": 100.5021247
+  },
+  {
+    "id": "MRT_BL30_EX3",
+    "station_id": "MRT_BL30",
+    "exit_code": "3",
+    "name_th": "ทางออก 3",
+    "name_en": "Exit 3",
+    "lat": 13.7471388,
+    "lng": 100.5017096
+  },
+  {
+    "id": "MRT_BL31_EX1",
+    "station_id": "MRT_BL31",
+    "exit_code": "1",
+    "name_th": "ทางออก 1",
+    "name_en": "Exit 1",
+    "lat": 13.7444969,
+    "lng": 100.4943522
+  },
+  {
+    "id": "MRT_BL31_EX2",
+    "station_id": "MRT_BL31",
+    "exit_code": "2",
+    "name_th": "ทางออก 2",
+    "name_en": "Exit 2",
+    "lat": 13.744748,
+    "lng": 100.4946569
+  },
+  {
+    "id": "MRT_BL31_EX3",
+    "station_id": "MRT_BL31",
+    "exit_code": "3",
+    "name_th": "ทางออก 3",
+    "name_en": "Exit 3",
+    "lat": 13.7438623,
+    "lng": 100.4947693
+  },
+  {
+    "id": "MRT_BL31_EX4",
+    "station_id": "MRT_BL31",
+    "exit_code": "4",
+    "name_th": "ทางออก 4",
+    "name_en": "Exit 4",
+    "lat": 13.7432176,
+    "lng": 100.4952668
+  },
+  {
+    "id": "MRT_BL31_EX5",
+    "station_id": "MRT_BL31",
+    "exit_code": "5",
+    "name_th": "ทางออก 5",
+    "name_en": "Exit 5",
+    "lat": 13.7425512,
+    "lng": 100.4946162
+  },
+  {
+    "id": "MRT_BL32_EX1",
+    "station_id": "MRT_BL32",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.74795,
+    "lng": 100.48804999999999
+  },
+  {
+    "id": "MRT_BL32_EX2",
+    "station_id": "MRT_BL32",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.74745,
+    "lng": 100.48755
+  },
+  {
+    "id": "MRT_BL32_EX3",
+    "station_id": "MRT_BL32",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.74795,
+    "lng": 100.48755
+  },
+  {
+    "id": "MRT_BL32_EX4",
+    "station_id": "MRT_BL32",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.74745,
+    "lng": 100.48804999999999
+  },
+  {
+    "id": "MRT_BL33_EX1",
+    "station_id": "MRT_BL33",
+    "exit_code": "1",
+    "name_th": "ทางออก 1",
+    "name_en": "Exit 1",
+    "lat": 13.7297714,
+    "lng": 100.4745412
+  },
+  {
+    "id": "MRT_BL33_EX2A",
+    "station_id": "MRT_BL33",
+    "exit_code": "2A",
+    "name_th": "ทางออก 2A",
+    "name_en": "Exit 2A",
+    "lat": 13.7291662,
+    "lng": 100.4747002
+  },
+  {
+    "id": "MRT_BL33_EX2B",
+    "station_id": "MRT_BL33",
+    "exit_code": "2B",
+    "name_th": "ทางออก 2B",
+    "name_en": "Exit 2B",
+    "lat": 13.72904,
+    "lng": 100.474148
+  },
+  {
+    "id": "MRT_BL33_EX3",
+    "station_id": "MRT_BL33",
+    "exit_code": "3",
+    "name_th": "ทางออก 3",
+    "name_en": "Exit 3",
+    "lat": 13.7292823,
+    "lng": 100.4732341
+  },
+  {
+    "id": "MRT_BL33_EX4",
+    "station_id": "MRT_BL33",
+    "exit_code": "4",
+    "name_th": "ทางออก 4",
+    "name_en": "Exit 4",
+    "lat": 13.7301242,
+    "lng": 100.4733891
+  },
+  {
+    "id": "MRT_BL34_EX1",
+    "station_id": "MRT_BL34",
+    "exit_code": "1",
+    "name_th": "ทางออก 1",
+    "name_en": "Exit 1",
+    "lat": 13.7246479,
+    "lng": 100.4654548
+  },
+  {
+    "id": "MRT_BL34_EX2",
+    "station_id": "MRT_BL34",
+    "exit_code": "2",
+    "name_th": "ทางออก 2",
+    "name_en": "Exit 2",
+    "lat": 13.7242171,
+    "lng": 100.4646779
+  },
+  {
+    "id": "MRT_BL34_EX3",
+    "station_id": "MRT_BL34",
+    "exit_code": "3",
+    "name_th": "ทางออก 3",
+    "name_en": "Exit 3",
+    "lat": 13.7245467,
+    "lng": 100.4646707
+  },
+  {
+    "id": "MRT_BL34_EX4",
+    "station_id": "MRT_BL34",
+    "exit_code": "4",
+    "name_th": "ทางออก 4",
+    "name_en": "Exit 4",
+    "lat": 13.7247669,
+    "lng": 100.4651324
+  },
+  {
+    "id": "MRT_BL35_EX1",
+    "station_id": "MRT_BL35",
+    "exit_code": "1",
+    "name_th": "ทางออก 1",
+    "name_en": "Exit 1",
+    "lat": 13.7204612,
+    "lng": 100.4577212
+  },
+  {
+    "id": "MRT_BL35_EX2",
+    "station_id": "MRT_BL35",
+    "exit_code": "2",
+    "name_th": "ทางออก 2",
+    "name_en": "Exit 2",
+    "lat": 13.7209289,
+    "lng": 100.4576203
+  },
+  {
+    "id": "MRT_BL35_EX3",
+    "station_id": "MRT_BL35",
+    "exit_code": "3",
+    "name_th": "ทางออก 3",
+    "name_en": "Exit 3",
+    "lat": 13.7203511,
+    "lng": 100.4575159
+  },
+  {
+    "id": "MRT_BL35_EX4",
+    "station_id": "MRT_BL35",
+    "exit_code": "4",
+    "name_th": "ทางออก 4",
+    "name_en": "Exit 4",
+    "lat": 13.7206726,
+    "lng": 100.4574252
+  },
+  {
+    "id": "MRT_BL36_EX1",
+    "station_id": "MRT_BL36",
+    "exit_code": "1",
+    "name_th": "ทางออก 1",
+    "name_en": "Exit 1",
+    "lat": 13.7155499,
+    "lng": 100.4449687
+  },
+  {
+    "id": "MRT_BL36_EX2",
+    "station_id": "MRT_BL36",
+    "exit_code": "2",
+    "name_th": "ทางออก 2",
+    "name_en": "Exit 2",
+    "lat": 13.7158224,
+    "lng": 100.4458307
+  },
+  {
+    "id": "MRT_BL36_EX3",
+    "station_id": "MRT_BL36",
+    "exit_code": "3",
+    "name_th": "ทางออก 3",
+    "name_en": "Exit 3",
+    "lat": 13.7155413,
+    "lng": 100.4458396
+  },
+  {
+    "id": "MRT_BL36_EX4",
+    "station_id": "MRT_BL36",
+    "exit_code": "4",
+    "name_th": "ทางออก 4",
+    "name_en": "Exit 4",
+    "lat": 13.7152995,
+    "lng": 100.4451426
+  },
+  {
+    "id": "MRT_BL37_EX1",
+    "station_id": "MRT_BL37",
+    "exit_code": "1",
+    "name_th": "ทางออก 1",
+    "name_en": "Exit 1",
+    "lat": 13.7127917,
+    "lng": 100.4346935
+  },
+  {
+    "id": "MRT_BL37_EX2",
+    "station_id": "MRT_BL37",
+    "exit_code": "2",
+    "name_th": "ทางออก 2",
+    "name_en": "Exit 2",
+    "lat": 13.712729,
+    "lng": 100.4340071
+  },
+  {
+    "id": "MRT_BL37_EX3",
+    "station_id": "MRT_BL37",
+    "exit_code": "3",
+    "name_th": "ทางออก 3",
+    "name_en": "Exit 3",
+    "lat": 13.7130112,
+    "lng": 100.4339684
+  },
+  {
+    "id": "MRT_BL37_EX4",
+    "station_id": "MRT_BL37",
+    "exit_code": "4",
+    "name_th": "ทางออก 4",
+    "name_en": "Exit 4",
+    "lat": 13.7130614,
+    "lng": 100.4346698
+  },
+  {
+    "id": "MRT_BL38_EX1",
+    "station_id": "MRT_BL38",
+    "exit_code": "1",
+    "name_th": "ทางออก 1",
+    "name_en": "Exit 1",
+    "lat": 13.7110218,
+    "lng": 100.409777
+  },
+  {
+    "id": "MRT_BL38_EX2",
+    "station_id": "MRT_BL38",
+    "exit_code": "2",
+    "name_th": "ทางออก 2",
+    "name_en": "Exit 2",
+    "lat": 13.7107325,
+    "lng": 100.4097857
+  },
+  {
+    "id": "MRT_BL38_EX3",
+    "station_id": "MRT_BL38",
+    "exit_code": "3",
+    "name_th": "ทางออก 3",
+    "name_en": "Exit 3",
+    "lat": 13.7106958,
+    "lng": 100.4090932
+  },
+  {
+    "id": "MRT_BL38_EX4",
+    "station_id": "MRT_BL38",
+    "exit_code": "4",
+    "name_th": "ทางออก 4",
+    "name_en": "Exit 4",
+    "lat": 13.7110091,
+    "lng": 100.4090728
+  },
+  {
+    "id": "MRT_PP01_EX1",
+    "station_id": "MRT_PP01",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.89265,
+    "lng": 100.40854999999999
+  },
+  {
+    "id": "MRT_PP01_EX2",
+    "station_id": "MRT_PP01",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.89215,
+    "lng": 100.40805
+  },
+  {
+    "id": "MRT_PP01_EX3",
+    "station_id": "MRT_PP01",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.89265,
+    "lng": 100.40805
+  },
+  {
+    "id": "MRT_PP01_EX4",
+    "station_id": "MRT_PP01",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.89215,
+    "lng": 100.40854999999999
+  },
+  {
+    "id": "MRT_PP02_EX1",
+    "station_id": "MRT_PP02",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.88125,
+    "lng": 100.40955
+  },
+  {
+    "id": "MRT_PP02_EX2",
+    "station_id": "MRT_PP02",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.88075,
+    "lng": 100.40905000000001
+  },
+  {
+    "id": "MRT_PP02_EX3",
+    "station_id": "MRT_PP02",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.88125,
+    "lng": 100.40905000000001
+  },
+  {
+    "id": "MRT_PP02_EX4",
+    "station_id": "MRT_PP02",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.88075,
+    "lng": 100.40955
+  },
+  {
+    "id": "MRT_PP03_EX1",
+    "station_id": "MRT_PP03",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.879249999999999,
+    "lng": 100.41725
+  },
+  {
+    "id": "MRT_PP03_EX2",
+    "station_id": "MRT_PP03",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.87875,
+    "lng": 100.41675000000001
+  },
+  {
+    "id": "MRT_PP03_EX3",
+    "station_id": "MRT_PP03",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.879249999999999,
+    "lng": 100.41675000000001
+  },
+  {
+    "id": "MRT_PP03_EX4",
+    "station_id": "MRT_PP03",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.87875,
+    "lng": 100.41725
+  },
+  {
+    "id": "MRT_PP04_EX1",
+    "station_id": "MRT_PP04",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.87605,
+    "lng": 100.43405
+  },
+  {
+    "id": "MRT_PP04_EX2",
+    "station_id": "MRT_PP04",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.87555,
+    "lng": 100.43355000000001
+  },
+  {
+    "id": "MRT_PP04_EX3",
+    "station_id": "MRT_PP04",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.87605,
+    "lng": 100.43355000000001
+  },
+  {
+    "id": "MRT_PP04_EX4",
+    "station_id": "MRT_PP04",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.87555,
+    "lng": 100.43405
+  },
+  {
+    "id": "MRT_PP05_EX1",
+    "station_id": "MRT_PP05",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.873249999999999,
+    "lng": 100.44425
+  },
+  {
+    "id": "MRT_PP05_EX2",
+    "station_id": "MRT_PP05",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.87275,
+    "lng": 100.44375000000001
+  },
+  {
+    "id": "MRT_PP05_EX3",
+    "station_id": "MRT_PP05",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.873249999999999,
+    "lng": 100.44375000000001
+  },
+  {
+    "id": "MRT_PP05_EX4",
+    "station_id": "MRT_PP05",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.87275,
+    "lng": 100.44425
+  },
+  {
+    "id": "MRT_PP06_EX1",
+    "station_id": "MRT_PP06",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.87225,
+    "lng": 100.45625
+  },
+  {
+    "id": "MRT_PP06_EX2",
+    "station_id": "MRT_PP06",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.87175,
+    "lng": 100.45575000000001
+  },
+  {
+    "id": "MRT_PP06_EX3",
+    "station_id": "MRT_PP06",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.87225,
+    "lng": 100.45575000000001
+  },
+  {
+    "id": "MRT_PP06_EX4",
+    "station_id": "MRT_PP06",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.87175,
+    "lng": 100.45625
+  },
+  {
+    "id": "MRT_PP07_EX1",
+    "station_id": "MRT_PP07",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.87075,
+    "lng": 100.46705
+  },
+  {
+    "id": "MRT_PP07_EX2",
+    "station_id": "MRT_PP07",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.87025,
+    "lng": 100.46655000000001
+  },
+  {
+    "id": "MRT_PP07_EX3",
+    "station_id": "MRT_PP07",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.87075,
+    "lng": 100.46655000000001
+  },
+  {
+    "id": "MRT_PP07_EX4",
+    "station_id": "MRT_PP07",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.87025,
+    "lng": 100.46705
+  },
+  {
+    "id": "MRT_PP08_EX1",
+    "station_id": "MRT_PP08",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.86605,
+    "lng": 100.47855
+  },
+  {
+    "id": "MRT_PP08_EX2",
+    "station_id": "MRT_PP08",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.86555,
+    "lng": 100.47805000000001
+  },
+  {
+    "id": "MRT_PP08_EX3",
+    "station_id": "MRT_PP08",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.86605,
+    "lng": 100.47805000000001
+  },
+  {
+    "id": "MRT_PP08_EX4",
+    "station_id": "MRT_PP08",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.86555,
+    "lng": 100.47855
+  },
+  {
+    "id": "MRT_PP09_EX1",
+    "station_id": "MRT_PP09",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.862449999999999,
+    "lng": 100.49324999999999
+  },
+  {
+    "id": "MRT_PP09_EX2",
+    "station_id": "MRT_PP09",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.86195,
+    "lng": 100.49275
+  },
+  {
+    "id": "MRT_PP09_EX3",
+    "station_id": "MRT_PP09",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.862449999999999,
+    "lng": 100.49275
+  },
+  {
+    "id": "MRT_PP09_EX4",
+    "station_id": "MRT_PP09",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.86195,
+    "lng": 100.49324999999999
+  },
+  {
+    "id": "MRT_PP10_EX1",
+    "station_id": "MRT_PP10",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.86125,
+    "lng": 100.50524999999999
+  },
+  {
+    "id": "MRT_PP10_EX2",
+    "station_id": "MRT_PP10",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.860750000000001,
+    "lng": 100.50475
+  },
+  {
+    "id": "MRT_PP10_EX3",
+    "station_id": "MRT_PP10",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.86125,
+    "lng": 100.50475
+  },
+  {
+    "id": "MRT_PP10_EX4",
+    "station_id": "MRT_PP10",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.860750000000001,
+    "lng": 100.50524999999999
+  },
+  {
+    "id": "MRT_PP11_EX1",
+    "station_id": "MRT_PP11",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.86045,
+    "lng": 100.51344999999999
+  },
+  {
+    "id": "MRT_PP11_EX2",
+    "station_id": "MRT_PP11",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.859950000000001,
+    "lng": 100.51295
+  },
+  {
+    "id": "MRT_PP11_EX3",
+    "station_id": "MRT_PP11",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.86045,
+    "lng": 100.51295
+  },
+  {
+    "id": "MRT_PP11_EX4",
+    "station_id": "MRT_PP11",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.859950000000001,
+    "lng": 100.51344999999999
+  },
+  {
+    "id": "MRT_PP12_EX1",
+    "station_id": "MRT_PP12",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.85225,
+    "lng": 100.52525
+  },
+  {
+    "id": "MRT_PP12_EX2",
+    "station_id": "MRT_PP12",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.851750000000001,
+    "lng": 100.52475000000001
+  },
+  {
+    "id": "MRT_PP12_EX3",
+    "station_id": "MRT_PP12",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.85225,
+    "lng": 100.52475000000001
+  },
+  {
+    "id": "MRT_PP12_EX4",
+    "station_id": "MRT_PP12",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.851750000000001,
+    "lng": 100.52525
+  },
+  {
+    "id": "MRT_PP13_EX1",
+    "station_id": "MRT_PP13",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.84325,
+    "lng": 100.53125
+  },
+  {
+    "id": "MRT_PP13_EX2",
+    "station_id": "MRT_PP13",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.84275,
+    "lng": 100.53075000000001
+  },
+  {
+    "id": "MRT_PP13_EX3",
+    "station_id": "MRT_PP13",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.84325,
+    "lng": 100.53075000000001
+  },
+  {
+    "id": "MRT_PP13_EX4",
+    "station_id": "MRT_PP13",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.84275,
+    "lng": 100.53125
+  },
+  {
+    "id": "MRT_PP14_EX1",
+    "station_id": "MRT_PP14",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.83005,
+    "lng": 100.52685
+  },
+  {
+    "id": "MRT_PP14_EX2",
+    "station_id": "MRT_PP14",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.829550000000001,
+    "lng": 100.52635000000001
+  },
+  {
+    "id": "MRT_PP14_EX3",
+    "station_id": "MRT_PP14",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.83005,
+    "lng": 100.52635000000001
+  },
+  {
+    "id": "MRT_PP14_EX4",
+    "station_id": "MRT_PP14",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.829550000000001,
+    "lng": 100.52685
+  },
+  {
+    "id": "MRT_PP15_EX1",
+    "station_id": "MRT_PP15",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.82045,
+    "lng": 100.53285
+  },
+  {
+    "id": "MRT_PP15_EX2",
+    "station_id": "MRT_PP15",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.81995,
+    "lng": 100.53235000000001
+  },
+  {
+    "id": "MRT_PP15_EX3",
+    "station_id": "MRT_PP15",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.82045,
+    "lng": 100.53235000000001
+  },
+  {
+    "id": "MRT_PP15_EX4",
+    "station_id": "MRT_PP15",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.81995,
+    "lng": 100.53285
+  },
+  {
+    "id": "MRT_PP16_EX1",
+    "station_id": "MRT_PP16",
+    "exit_code": "1",
+    "name_th": "ทางออก 1",
+    "name_en": "Exit 1",
+    "lat": 13.8061893,
+    "lng": 100.5299858
+  },
+  {
+    "id": "MRT_PP16_EX2",
+    "station_id": "MRT_PP16",
+    "exit_code": "2",
+    "name_th": "ทางออก 2",
+    "name_en": "Exit 2",
+    "lat": 13.8068046,
+    "lng": 100.5306665
+  },
+  {
+    "id": "MRT_PP16_EX3",
+    "station_id": "MRT_PP16",
+    "exit_code": "3",
+    "name_th": "ทางออก 3",
+    "name_en": "Exit 3",
+    "lat": 13.8067574,
+    "lng": 100.5310918
+  },
+  {
+    "id": "MRT_PP16_EX4",
+    "station_id": "MRT_PP16",
+    "exit_code": "4",
+    "name_th": "ทางออก 4",
+    "name_en": "Exit 4",
+    "lat": 13.8059775,
+    "lng": 100.5315492
+  },
+  {
+    "id": "MRT_YL01_EX1",
+    "station_id": "MRT_YL01",
+    "exit_code": "1",
+    "name_th": "ทางออก 1",
+    "name_en": "Exit 1",
+    "lat": 13.8056825,
+    "lng": 100.5739535
+  },
+  {
+    "id": "MRT_YL01_EX4",
+    "station_id": "MRT_YL01",
+    "exit_code": "4",
+    "name_th": "MRT ลาดพร้าว",
+    "name_en": "MRT Lat Phrao MRT",
+    "lat": 13.806134,
+    "lng": 100.5740746
+  },
+  {
+    "id": "MRT_YL02_EX1",
+    "station_id": "MRT_YL02",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.816849999999999,
+    "lng": 100.58444999999999
+  },
+  {
+    "id": "MRT_YL02_EX2",
+    "station_id": "MRT_YL02",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.81635,
+    "lng": 100.58395
+  },
+  {
+    "id": "MRT_YL02_EX3",
+    "station_id": "MRT_YL02",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.816849999999999,
+    "lng": 100.58395
+  },
+  {
+    "id": "MRT_YL02_EX4",
+    "station_id": "MRT_YL02",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.81635,
+    "lng": 100.58444999999999
+  },
+  {
+    "id": "MRT_YL03_EX1",
+    "station_id": "MRT_YL03",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.808549999999999,
+    "lng": 100.59044999999999
+  },
+  {
+    "id": "MRT_YL03_EX2",
+    "station_id": "MRT_YL03",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.80805,
+    "lng": 100.58995
+  },
+  {
+    "id": "MRT_YL03_EX3",
+    "station_id": "MRT_YL03",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.808549999999999,
+    "lng": 100.58995
+  },
+  {
+    "id": "MRT_YL03_EX4",
+    "station_id": "MRT_YL03",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.80805,
+    "lng": 100.59044999999999
+  },
+  {
+    "id": "MRT_YL04_EX1",
+    "station_id": "MRT_YL04",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.80125,
+    "lng": 100.60125
+  },
+  {
+    "id": "MRT_YL04_EX2",
+    "station_id": "MRT_YL04",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.80075,
+    "lng": 100.60075
+  },
+  {
+    "id": "MRT_YL04_EX3",
+    "station_id": "MRT_YL04",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.80125,
+    "lng": 100.60075
+  },
+  {
+    "id": "MRT_YL04_EX4",
+    "station_id": "MRT_YL04",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.80075,
+    "lng": 100.60125
+  },
+  {
+    "id": "MRT_YL05_EX1",
+    "station_id": "MRT_YL05",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.796249999999999,
+    "lng": 100.61025
+  },
+  {
+    "id": "MRT_YL05_EX2",
+    "station_id": "MRT_YL05",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.79575,
+    "lng": 100.60975
+  },
+  {
+    "id": "MRT_YL05_EX3",
+    "station_id": "MRT_YL05",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.796249999999999,
+    "lng": 100.60975
+  },
+  {
+    "id": "MRT_YL05_EX4",
+    "station_id": "MRT_YL05",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.79575,
+    "lng": 100.61025
+  },
+  {
+    "id": "MRT_YL06_EX1",
+    "station_id": "MRT_YL06",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.790249999999999,
+    "lng": 100.62025
+  },
+  {
+    "id": "MRT_YL06_EX2",
+    "station_id": "MRT_YL06",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.78975,
+    "lng": 100.61975000000001
+  },
+  {
+    "id": "MRT_YL06_EX3",
+    "station_id": "MRT_YL06",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.790249999999999,
+    "lng": 100.61975000000001
+  },
+  {
+    "id": "MRT_YL06_EX4",
+    "station_id": "MRT_YL06",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.78975,
+    "lng": 100.62025
+  },
+  {
+    "id": "MRT_YL07_EX1",
+    "station_id": "MRT_YL07",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.783249999999999,
+    "lng": 100.62925
+  },
+  {
+    "id": "MRT_YL07_EX2",
+    "station_id": "MRT_YL07",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.78275,
+    "lng": 100.62875000000001
+  },
+  {
+    "id": "MRT_YL07_EX3",
+    "station_id": "MRT_YL07",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.783249999999999,
+    "lng": 100.62875000000001
+  },
+  {
+    "id": "MRT_YL07_EX4",
+    "station_id": "MRT_YL07",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.78275,
+    "lng": 100.62925
+  },
+  {
+    "id": "MRT_YL08_EX1",
+    "station_id": "MRT_YL08",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.769449999999999,
+    "lng": 100.63985
+  },
+  {
+    "id": "MRT_YL08_EX2",
+    "station_id": "MRT_YL08",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.76895,
+    "lng": 100.63935000000001
+  },
+  {
+    "id": "MRT_YL08_EX3",
+    "station_id": "MRT_YL08",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.769449999999999,
+    "lng": 100.63935000000001
+  },
+  {
+    "id": "MRT_YL08_EX4",
+    "station_id": "MRT_YL08",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.76895,
+    "lng": 100.63985
+  },
+  {
+    "id": "MRT_YL09_EX1",
+    "station_id": "MRT_YL09",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.76325,
+    "lng": 100.64325
+  },
+  {
+    "id": "MRT_YL09_EX2",
+    "station_id": "MRT_YL09",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.76275,
+    "lng": 100.64275
+  },
+  {
+    "id": "MRT_YL09_EX3",
+    "station_id": "MRT_YL09",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.76325,
+    "lng": 100.64275
+  },
+  {
+    "id": "MRT_YL09_EX4",
+    "station_id": "MRT_YL09",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.76275,
+    "lng": 100.64325
+  },
+  {
+    "id": "MRT_YL10_EX1",
+    "station_id": "MRT_YL10",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.75565,
+    "lng": 100.64774999999999
+  },
+  {
+    "id": "MRT_YL10_EX2",
+    "station_id": "MRT_YL10",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.75515,
+    "lng": 100.64725
+  },
+  {
+    "id": "MRT_YL10_EX3",
+    "station_id": "MRT_YL10",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.75565,
+    "lng": 100.64725
+  },
+  {
+    "id": "MRT_YL10_EX4",
+    "station_id": "MRT_YL10",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.75515,
+    "lng": 100.64774999999999
+  },
+  {
+    "id": "MRT_YL11_EX1",
+    "station_id": "MRT_YL11",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.738249999999999,
+    "lng": 100.64524999999999
+  },
+  {
+    "id": "MRT_YL11_EX2",
+    "station_id": "MRT_YL11",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.73775,
+    "lng": 100.64475
+  },
+  {
+    "id": "MRT_YL11_EX3",
+    "station_id": "MRT_YL11",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.738249999999999,
+    "lng": 100.64475
+  },
+  {
+    "id": "MRT_YL11_EX4",
+    "station_id": "MRT_YL11",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.73775,
+    "lng": 100.64524999999999
+  },
+  {
+    "id": "MRT_YL12_EX1",
+    "station_id": "MRT_YL12",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.72555,
+    "lng": 100.64205
+  },
+  {
+    "id": "MRT_YL12_EX2",
+    "station_id": "MRT_YL12",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.725050000000001,
+    "lng": 100.64155000000001
+  },
+  {
+    "id": "MRT_YL12_EX3",
+    "station_id": "MRT_YL12",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.72555,
+    "lng": 100.64155000000001
+  },
+  {
+    "id": "MRT_YL12_EX4",
+    "station_id": "MRT_YL12",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.725050000000001,
+    "lng": 100.64205
+  },
+  {
+    "id": "MRT_YL13_EX1",
+    "station_id": "MRT_YL13",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.716249999999999,
+    "lng": 100.63825
+  },
+  {
+    "id": "MRT_YL13_EX2",
+    "station_id": "MRT_YL13",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.71575,
+    "lng": 100.63775000000001
+  },
+  {
+    "id": "MRT_YL13_EX3",
+    "station_id": "MRT_YL13",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.716249999999999,
+    "lng": 100.63775000000001
+  },
+  {
+    "id": "MRT_YL13_EX4",
+    "station_id": "MRT_YL13",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.71575,
+    "lng": 100.63825
+  },
+  {
+    "id": "MRT_YL14_EX1",
+    "station_id": "MRT_YL14",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.70725,
+    "lng": 100.63425
+  },
+  {
+    "id": "MRT_YL14_EX2",
+    "station_id": "MRT_YL14",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.706750000000001,
+    "lng": 100.63375
+  },
+  {
+    "id": "MRT_YL14_EX3",
+    "station_id": "MRT_YL14",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.70725,
+    "lng": 100.63375
+  },
+  {
+    "id": "MRT_YL14_EX4",
+    "station_id": "MRT_YL14",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.706750000000001,
+    "lng": 100.63425
+  },
+  {
+    "id": "MRT_YL15_EX1",
+    "station_id": "MRT_YL15",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.69825,
+    "lng": 100.62925
+  },
+  {
+    "id": "MRT_YL15_EX2",
+    "station_id": "MRT_YL15",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.697750000000001,
+    "lng": 100.62875000000001
+  },
+  {
+    "id": "MRT_YL15_EX3",
+    "station_id": "MRT_YL15",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.69825,
+    "lng": 100.62875000000001
+  },
+  {
+    "id": "MRT_YL15_EX4",
+    "station_id": "MRT_YL15",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.697750000000001,
+    "lng": 100.62925
+  },
+  {
+    "id": "MRT_YL16_EX1",
+    "station_id": "MRT_YL16",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.690249999999999,
+    "lng": 100.62325
+  },
+  {
+    "id": "MRT_YL16_EX2",
+    "station_id": "MRT_YL16",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.68975,
+    "lng": 100.62275000000001
+  },
+  {
+    "id": "MRT_YL16_EX3",
+    "station_id": "MRT_YL16",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.690249999999999,
+    "lng": 100.62275000000001
+  },
+  {
+    "id": "MRT_YL16_EX4",
+    "station_id": "MRT_YL16",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.68975,
+    "lng": 100.62325
+  },
+  {
+    "id": "MRT_YL17_EX1",
+    "station_id": "MRT_YL17",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.68325,
+    "lng": 100.61824999999999
+  },
+  {
+    "id": "MRT_YL17_EX2",
+    "station_id": "MRT_YL17",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.68275,
+    "lng": 100.61775
+  },
+  {
+    "id": "MRT_YL17_EX3",
+    "station_id": "MRT_YL17",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.68325,
+    "lng": 100.61775
+  },
+  {
+    "id": "MRT_YL17_EX4",
+    "station_id": "MRT_YL17",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.68275,
+    "lng": 100.61824999999999
+  },
+  {
+    "id": "MRT_YL18_EX1",
+    "station_id": "MRT_YL18",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.67625,
+    "lng": 100.61325
+  },
+  {
+    "id": "MRT_YL18_EX2",
+    "station_id": "MRT_YL18",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.67575,
+    "lng": 100.61275
+  },
+  {
+    "id": "MRT_YL18_EX3",
+    "station_id": "MRT_YL18",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.67625,
+    "lng": 100.61275
+  },
+  {
+    "id": "MRT_YL18_EX4",
+    "station_id": "MRT_YL18",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.67575,
+    "lng": 100.61325
+  },
+  {
+    "id": "MRT_YL19_EX1",
+    "station_id": "MRT_YL19",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.668249999999999,
+    "lng": 100.60825
+  },
+  {
+    "id": "MRT_YL19_EX2",
+    "station_id": "MRT_YL19",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.66775,
+    "lng": 100.60775000000001
+  },
+  {
+    "id": "MRT_YL19_EX3",
+    "station_id": "MRT_YL19",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.668249999999999,
+    "lng": 100.60775000000001
+  },
+  {
+    "id": "MRT_YL19_EX4",
+    "station_id": "MRT_YL19",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.66775,
+    "lng": 100.60825
+  },
+  {
+    "id": "MRT_YL20_EX1",
+    "station_id": "MRT_YL20",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.661249999999999,
+    "lng": 100.60425
+  },
+  {
+    "id": "MRT_YL20_EX2",
+    "station_id": "MRT_YL20",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.66075,
+    "lng": 100.60375
+  },
+  {
+    "id": "MRT_YL20_EX3",
+    "station_id": "MRT_YL20",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.661249999999999,
+    "lng": 100.60375
+  },
+  {
+    "id": "MRT_YL20_EX4",
+    "station_id": "MRT_YL20",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.66075,
+    "lng": 100.60425
+  },
+  {
+    "id": "MRT_YL21_EX1",
+    "station_id": "MRT_YL21",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.65625,
+    "lng": 100.59925
+  },
+  {
+    "id": "MRT_YL21_EX2",
+    "station_id": "MRT_YL21",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.655750000000001,
+    "lng": 100.59875000000001
+  },
+  {
+    "id": "MRT_YL21_EX3",
+    "station_id": "MRT_YL21",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.65625,
+    "lng": 100.59875000000001
+  },
+  {
+    "id": "MRT_YL21_EX4",
+    "station_id": "MRT_YL21",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.655750000000001,
+    "lng": 100.59925
+  },
+  {
+    "id": "MRT_YL22_EX1",
+    "station_id": "MRT_YL22",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.652249999999999,
+    "lng": 100.59625
+  },
+  {
+    "id": "MRT_YL22_EX2",
+    "station_id": "MRT_YL22",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.65175,
+    "lng": 100.59575000000001
+  },
+  {
+    "id": "MRT_YL22_EX3",
+    "station_id": "MRT_YL22",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.652249999999999,
+    "lng": 100.59575000000001
+  },
+  {
+    "id": "MRT_YL22_EX4",
+    "station_id": "MRT_YL22",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.65175,
+    "lng": 100.59625
+  },
+  {
+    "id": "MRT_YL23_EX1",
+    "station_id": "MRT_YL23",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.64725,
+    "lng": 100.59525
+  },
+  {
+    "id": "MRT_YL23_EX2",
+    "station_id": "MRT_YL23",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.64675,
+    "lng": 100.59475
+  },
+  {
+    "id": "MRT_YL23_EX3",
+    "station_id": "MRT_YL23",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.64725,
+    "lng": 100.59475
+  },
+  {
+    "id": "MRT_YL23_EX4",
+    "station_id": "MRT_YL23",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.64675,
+    "lng": 100.59525
+  },
+  {
+    "id": "ARL_A8_EX1",
+    "station_id": "ARL_A8",
+    "exit_code": "1",
+    "name_th": "ทางออก 1",
+    "name_en": "Exit 1",
+    "lat": 13.7563967,
+    "lng": 100.5333659
+  },
+  {
+    "id": "ARL_A8_EX2",
+    "station_id": "ARL_A8",
+    "exit_code": "2",
+    "name_th": "ทางออก 2",
+    "name_en": "Exit 2",
+    "lat": 13.7562778,
+    "lng": 100.5336028
+  },
+  {
+    "id": "ARL_A8_EX3",
+    "station_id": "ARL_A8",
+    "exit_code": "3",
+    "name_th": "ทางออก 3",
+    "name_en": "Exit 3",
+    "lat": 13.7576539,
+    "lng": 100.5340701
+  },
+  {
+    "id": "ARL_A8_EX4",
+    "station_id": "ARL_A8",
+    "exit_code": "4",
+    "name_th": "ทางออก 4",
+    "name_en": "Exit 4",
+    "lat": 13.7575267,
+    "lng": 100.5344392
+  },
+  {
+    "id": "ARL_A8_EX5",
+    "station_id": "ARL_A8",
+    "exit_code": "5",
+    "name_th": "ทางออก 5",
+    "name_en": "Exit 5",
+    "lat": 13.75693,
+    "lng": 100.533926
+  },
+  {
+    "id": "ARL_A7_EX1",
+    "station_id": "ARL_A7",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.75535,
+    "lng": 100.54235
+  },
+  {
+    "id": "ARL_A7_EX2",
+    "station_id": "ARL_A7",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.754850000000001,
+    "lng": 100.54185000000001
+  },
+  {
+    "id": "ARL_A7_EX3",
+    "station_id": "ARL_A7",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.75535,
+    "lng": 100.54185000000001
+  },
+  {
+    "id": "ARL_A7_EX4",
+    "station_id": "ARL_A7",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.754850000000001,
+    "lng": 100.54235
+  },
+  {
+    "id": "ARL_A6_EX1",
+    "station_id": "ARL_A6",
+    "exit_code": "1",
+    "name_th": "ทางออก 1",
+    "name_en": "Exit 1",
+    "lat": 13.7494793,
+    "lng": 100.5637232
+  },
+  {
+    "id": "ARL_A6_EX2",
+    "station_id": "ARL_A6",
+    "exit_code": "2",
+    "name_th": "ทางออก 2",
+    "name_en": "Exit 2",
+    "lat": 13.7487035,
+    "lng": 100.5631423
+  },
+  {
+    "id": "ARL_A6_EX3",
+    "station_id": "ARL_A6",
+    "exit_code": "3",
+    "name_th": "ทางออก 3",
+    "name_en": "Exit 3",
+    "lat": 13.7495667,
+    "lng": 100.56332
+  },
+  {
+    "id": "ARL_A5_EX1",
+    "station_id": "ARL_A5",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.74325,
+    "lng": 100.60034999999999
+  },
+  {
+    "id": "ARL_A5_EX2",
+    "station_id": "ARL_A5",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.742750000000001,
+    "lng": 100.59985
+  },
+  {
+    "id": "ARL_A5_EX3",
+    "station_id": "ARL_A5",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.74325,
+    "lng": 100.59985
+  },
+  {
+    "id": "ARL_A5_EX4",
+    "station_id": "ARL_A5",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.742750000000001,
+    "lng": 100.60034999999999
+  },
+  {
+    "id": "ARL_A4_EX1",
+    "station_id": "ARL_A4",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.738249999999999,
+    "lng": 100.64524999999999
+  },
+  {
+    "id": "ARL_A4_EX2",
+    "station_id": "ARL_A4",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.73775,
+    "lng": 100.64475
+  },
+  {
+    "id": "ARL_A4_EX3",
+    "station_id": "ARL_A4",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.738249999999999,
+    "lng": 100.64475
+  },
+  {
+    "id": "ARL_A4_EX4",
+    "station_id": "ARL_A4",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.73775,
+    "lng": 100.64524999999999
+  },
+  {
+    "id": "ARL_A3_EX1",
+    "station_id": "ARL_A3",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.73195,
+    "lng": 100.67524999999999
+  },
+  {
+    "id": "ARL_A3_EX2",
+    "station_id": "ARL_A3",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.73145,
+    "lng": 100.67475
+  },
+  {
+    "id": "ARL_A3_EX3",
+    "station_id": "ARL_A3",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.73195,
+    "lng": 100.67475
+  },
+  {
+    "id": "ARL_A3_EX4",
+    "station_id": "ARL_A3",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.73145,
+    "lng": 100.67524999999999
+  },
+  {
+    "id": "ARL_A2_EX1",
+    "station_id": "ARL_A2",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.72785,
+    "lng": 100.74884999999999
+  },
+  {
+    "id": "ARL_A2_EX2",
+    "station_id": "ARL_A2",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.727350000000001,
+    "lng": 100.74835
+  },
+  {
+    "id": "ARL_A2_EX3",
+    "station_id": "ARL_A2",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.72785,
+    "lng": 100.74835
+  },
+  {
+    "id": "ARL_A2_EX4",
+    "station_id": "ARL_A2",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.727350000000001,
+    "lng": 100.74884999999999
+  },
+  {
+    "id": "ARL_A1_EX1",
+    "station_id": "ARL_A1",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (ฝั่งเหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.68985,
+    "lng": 100.75035
+  },
+  {
+    "id": "ARL_A1_EX2",
+    "station_id": "ARL_A1",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ฝั่งใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.689350000000001,
+    "lng": 100.74985000000001
+  },
+  {
+    "id": "ARL_A1_EX3",
+    "station_id": "ARL_A1",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
+    "name_en": "Exit 3 (West)",
+    "lat": 13.68985,
+    "lng": 100.74985000000001
+  },
+  {
+    "id": "ARL_A1_EX4",
+    "station_id": "ARL_A1",
+    "exit_code": "4",
+    "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
+    "name_en": "Exit 4 (East)",
+    "lat": 13.689350000000001,
+    "lng": 100.75035
+  }
+]
