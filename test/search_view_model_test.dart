@@ -128,7 +128,7 @@ void main() {
   });
 
   group('SearchViewModel Route Segment Tests', () {
-    test('Should calculate transfer route and segments successfully', () {
+    test('Should calculate transfer route and segments successfully', () async {
       final repo = MockSearchTransitRepository();
       final container = ProviderContainer(
         overrides: [
@@ -141,8 +141,8 @@ void main() {
       final stationD = repo.getStation('MRT_D')!;
 
       // Act
-      searchVm.setOrigin(stationA);
-      searchVm.setDestination(stationD);
+      await searchVm.setOrigin(stationA);
+      await searchVm.setDestination(stationD);
 
       // Assert
       final state = container.read(searchViewModelProvider);
@@ -164,7 +164,7 @@ void main() {
       expect(result.segments[1].toStation.id, equals('MRT_D'));
     });
 
-    test('Should handle swap and calculate routes without throwing errors', () {
+    test('Should handle swap and calculate routes without throwing errors', () async {
       final repo = MockSearchTransitRepository();
       final container = ProviderContainer(
         overrides: [
@@ -177,8 +177,8 @@ void main() {
       final stationD = repo.getStation('MRT_D')!;
 
       // Act
-      searchVm.setOrigin(stationA);
-      searchVm.setDestination(stationD);
+      await searchVm.setOrigin(stationA);
+      await searchVm.setDestination(stationD);
       
       // Swap Origin and Destination
       searchVm.swapStations();
@@ -207,7 +207,7 @@ void main() {
       expect(result.segments[1].toStation.id, equals('BTS_A'));
     });
 
-    test('Should support selecting recommended and saver route types', () {
+    test('Should support selecting recommended and saver route types', () async {
       final repo = MockSearchTransitRepository();
       final container = ProviderContainer(
         overrides: [
@@ -220,8 +220,8 @@ void main() {
       final stationD = repo.getStation('MRT_D')!;
 
       // Act
-      searchVm.setOrigin(stationA);
-      searchVm.setDestination(stationD);
+      await searchVm.setOrigin(stationA);
+      await searchVm.setDestination(stationD);
 
       // Assert initial state
       var state = container.read(searchViewModelProvider);

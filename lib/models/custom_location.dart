@@ -1,4 +1,5 @@
 import 'searchable_item.dart';
+import 'package:latlong2/latlong.dart';
 
 /// Represents a custom coordinate or place from the map pin, GPS, or online search
 class CustomLocation extends SearchableItem {
@@ -16,6 +17,14 @@ class CustomLocation extends SearchableItem {
   final double lat;
   @override
   final double lng;
+  
+  @override
+  final double routeLat;
+
+  @override
+  final double routeLng;
+
+  final List<LatLng>? walkingPath;
 
   const CustomLocation({
     required this.id,
@@ -25,5 +34,35 @@ class CustomLocation extends SearchableItem {
     required this.walkingMinutes,
     required this.lat,
     required this.lng,
-  });
+    double? routeLat,
+    double? routeLng,
+    this.walkingPath,
+  }) : routeLat = routeLat ?? lat,
+       routeLng = routeLng ?? lng;
+
+  CustomLocation copyWith({
+    String? id,
+    String? nameTh,
+    String? nameEn,
+    String? nearestStationId,
+    double? walkingMinutes,
+    double? lat,
+    double? lng,
+    double? routeLat,
+    double? routeLng,
+    List<LatLng>? walkingPath,
+  }) {
+    return CustomLocation(
+      id: id ?? this.id,
+      nameTh: nameTh ?? this.nameTh,
+      nameEn: nameEn ?? this.nameEn,
+      nearestStationId: nearestStationId ?? this.nearestStationId,
+      walkingMinutes: walkingMinutes ?? this.walkingMinutes,
+      lat: lat ?? this.lat,
+      lng: lng ?? this.lng,
+      routeLat: routeLat ?? this.routeLat,
+      routeLng: routeLng ?? this.routeLng,
+      walkingPath: walkingPath ?? this.walkingPath,
+    );
+  }
 }
