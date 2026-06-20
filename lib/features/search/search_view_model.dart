@@ -124,22 +124,59 @@ class SearchViewModel extends _$SearchViewModel {
     }
   }
 
+  /// Resolve a CustomLocation to find true entrance and path
+  Future<SearchableItem> _resolveItem(SearchableItem item) async {
+    if (item is! CustomLocation) return item;
+    
+    state = state.copyWith(isCalculating: true, clearError: true);
+    final repo = ref.read(transitRepositoryProvider);
+    
+    // First, try matching with local landmarks (like MBK Center) by name to use curated entrances
+    final queryLower = item.nameTh.toLowerCase();
+    for (final l in repo.landmarks) {
+      if (l.nameTh.toLowerCase() == queryLower || 
+          l.nameEn.toLowerCase() == item.nameEn.toLowerCase() ||
+          l.nameTh.toLowerCase().contains(queryLower)) {
+        return l; // Return the perfectly curated local landmark instead
+      }
+    }
+
+    // Second, snap to a local landmark if the coordinates are extremely close (e.g., within 250 meters)
+    // This catches aliases like "MBK", "มาบุญครอง", or user tapping on the map near the mall.
+    for (final l in repo.landmarks) {
+      final dist = Geolocator.distanceBetween(item.lat, item.lng, l.lat, l.lng);
+      if (dist <= 250.0) {
+        return l; // Snap to perfectly curated local landmark
+      }
+    }
+
+    // Deep resolve via Overpass + OSRM
+    final resolved = await repo.resolveOnlinePlaceAsync(item);
+    return resolved ?? item;
+  }
+
   /// Set origin station or place
-  void setOrigin(SearchableItem station) {
+  Future<void> setOrigin(SearchableItem station) async {
+    final resolved = await _resolveItem(station);
+    if (!_mounted) return;
     state = state.copyWith(
-      origin: station,
+      origin: resolved,
       clearRoute: true,
       clearError: true,
+      isCalculating: false,
     );
     _tryCalculateRoute();
   }
 
   /// Set destination station or place
-  void setDestination(SearchableItem station) {
+  Future<void> setDestination(SearchableItem station) async {
+    final resolved = await _resolveItem(station);
+    if (!_mounted) return;
     state = state.copyWith(
-      destination: station,
+      destination: resolved,
       clearRoute: true,
       clearError: true,
+      isCalculating: false,
     );
     _tryCalculateRoute();
   }
@@ -240,13 +277,25 @@ class SearchViewModel extends _$SearchViewModel {
           }
         }
 
-        exit ??= st?.findClosestExit(repo.exits, destination.lat, destination.lng);
-        walkingPath ??= [LatLng(origin.lat, origin.lng), LatLng(destination.lat, destination.lng)];
+        exit ??= st?.findClosestExit(repo.exits, destination.routeLat, destination.routeLng);
+        walkingPath ??= [LatLng(origin.routeLat, origin.routeLng), LatLng(destination.routeLat, destination.routeLng)];
+
+        String direction = t.routeResult.walkToDestination;
+        String? instructionsTh;
+        String? instructionsEn;
+        if (lm != null && st != null && lm.alternativeWalks != null && lm.alternativeWalks!.containsKey(st.id)) {
+          final sw = lm.alternativeWalks![st.id]!;
+          instructionsTh = sw.instructionsTh;
+          instructionsEn = sw.instructionsEn;
+          if (instructionsTh != null) {
+            direction = instructionsTh;
+          }
+        }
 
         final walkSegment = RouteSegment(
           lineId: 'WALK',
           lineName: 'Walk',
-          direction: 'Walk to destination',
+          direction: direction,
           boundIndex: 0,
           fromStation: origin,
           toStation: destination,
@@ -256,6 +305,8 @@ class SearchViewModel extends _$SearchViewModel {
           standardFareThb: 0,
           walkingPath: walkingPath,
           exit: exit,
+          instructionsTh: instructionsTh,
+          instructionsEn: instructionsEn,
         );
 
         routeResult = RouteResult(
@@ -337,10 +388,10 @@ class SearchViewModel extends _$SearchViewModel {
     final originStationId = origin.nearestStationId ?? origin.id;
     final destinationStationId = destination.nearestStationId ?? destination.id;
 
-    final destLat = destination.lat;
-    final destLng = destination.lng;
-    final originLat = origin.lat;
-    final originLng = origin.lng;
+    final destLat = destination.routeLat;
+    final destLng = destination.routeLng;
+    final originLat = origin.routeLat;
+    final originLng = origin.routeLng;
 
     final candidateDestStations = <Station>[];
     for (final station in repo.stations) {
@@ -450,9 +501,10 @@ class SearchViewModel extends _$SearchViewModel {
     final segments = <RouteSegment>[];
     final transfers = <TransferStep>[];
     final cardState = ref.read(userCardsProvider);
+    final t = ref.read(translationsProvider);
 
     // ─── 1. If Origin requires walking, add initial Walk Segment ───
-    if (origin.nearestStationId != null) {
+    if (origin.nearestStationId != null && origin.id != origin.nearestStationId) {
       final nearestStation = repo.getStation(origin.nearestStationId!) as Station?;
       if (nearestStation != null) {
         StationExit? exit;
@@ -486,21 +538,39 @@ class SearchViewModel extends _$SearchViewModel {
             final walk = originLandmark.alternativeWalks![nearestStation.id]!;
             walkingPath = walk.walkingPath;
             walkingMinutes = walk.walkingMinutes;
-            final exits = repo.getExitsForStation(nearestStation.id);
-            exit = exits.firstWhere(
-              (e) => e.exitCode == walk.exitCode,
-              orElse: () => nearestStation.findClosestExit(repo.exits, originLandmark!.routeLat, originLandmark.routeLng),
-            );
+            if (walk.exitCode.isNotEmpty) {
+              final exits = repo.getExitsForStation(nearestStation.id);
+              exit = exits.firstWhere(
+                (e) => e.exitCode == walk.exitCode,
+                orElse: () => nearestStation.findClosestExit(repo.exits, originLandmark!.routeLat, originLandmark.routeLng),
+              );
+            }
           }
         }
+      
+      if (origin is CustomLocation && origin.walkingPath != null) {
+        walkingPath = origin.walkingPath;
+      }
 
-        exit ??= nearestStation.findClosestExit(repo.exits, originLandmark?.routeLat ?? origin.lat, originLandmark?.routeLng ?? origin.lng);
-        walkingPath ??= [LatLng(originLandmark?.routeLat ?? origin.lat, originLandmark?.routeLng ?? origin.lng), LatLng(exit.lat, exit.lng)];
+        exit ??= nearestStation.findClosestExit(repo.exits, origin.routeLat, origin.routeLng);
+        walkingPath ??= [LatLng(origin.routeLat, origin.routeLng), LatLng(exit.lat, exit.lng)];
+
+        String direction = t.routeResult.walkToStation;
+        String? instructionsTh;
+        String? instructionsEn;
+        if (originLandmark != null && originLandmark.alternativeWalks != null && originLandmark.alternativeWalks!.containsKey(nearestStation.id)) {
+          final walk = originLandmark.alternativeWalks![nearestStation.id]!;
+          instructionsTh = walk.instructionsTh;
+          instructionsEn = walk.instructionsEn;
+          if (instructionsTh != null) {
+            direction = instructionsTh;
+          }
+        }
 
         segments.add(RouteSegment(
           lineId: 'WALK',
           lineName: 'Walk',
-          direction: 'Walk to station',
+          direction: direction,
           boundIndex: 0,
           fromStation: origin,
           toStation: nearestStation,
@@ -510,6 +580,8 @@ class SearchViewModel extends _$SearchViewModel {
           standardFareThb: 0,
           walkingPath: walkingPath,
           exit: exit,
+          instructionsTh: instructionsTh,
+          instructionsEn: instructionsEn,
         ));
       }
     }
@@ -665,7 +737,7 @@ class SearchViewModel extends _$SearchViewModel {
     }
 
     // ─── 2. If Destination requires walking, add final Walk Segment ───
-    if (destination.nearestStationId != null) {
+    if (destination.nearestStationId != null && destination.id != destination.nearestStationId) {
       final nearestStation = repo.getStation(destination.nearestStationId!) as Station?;
       if (nearestStation != null) {
         StationExit? exit;
@@ -699,21 +771,39 @@ class SearchViewModel extends _$SearchViewModel {
             final walk = destLandmark.alternativeWalks![nearestStation.id]!;
             walkingPath = walk.walkingPath;
             walkingMinutes = walk.walkingMinutes;
-            final exits = repo.getExitsForStation(nearestStation.id);
-            exit = exits.firstWhere(
-              (e) => e.exitCode == walk.exitCode,
-              orElse: () => nearestStation.findClosestExit(repo.exits, destLandmark!.routeLat, destLandmark.routeLng),
-            );
+            if (walk.exitCode.isNotEmpty) {
+              final exits = repo.getExitsForStation(nearestStation.id);
+              exit = exits.firstWhere(
+                (e) => e.exitCode == walk.exitCode,
+                orElse: () => nearestStation.findClosestExit(repo.exits, destLandmark!.routeLat, destLandmark.routeLng),
+              );
+            }
           }
         }
+      
+      if (destination is CustomLocation && destination.walkingPath != null) {
+        walkingPath = destination.walkingPath;
+      }
 
-        exit ??= nearestStation.findClosestExit(repo.exits, destLandmark?.routeLat ?? destination.lat, destLandmark?.routeLng ?? destination.lng);
-        walkingPath ??= [LatLng(exit.lat, exit.lng), LatLng(destLandmark?.routeLat ?? destination.lat, destLandmark?.routeLng ?? destination.lng)];
+        exit ??= nearestStation.findClosestExit(repo.exits, destination.routeLat, destination.routeLng);
+        walkingPath ??= [LatLng(exit.lat, exit.lng), LatLng(destination.routeLat, destination.routeLng)];
+
+        String direction = t.routeResult.walkToDestination;
+        String? instructionsTh;
+        String? instructionsEn;
+        if (destLandmark != null && destLandmark.alternativeWalks != null && destLandmark.alternativeWalks!.containsKey(nearestStation.id)) {
+          final walk = destLandmark.alternativeWalks![nearestStation.id]!;
+          instructionsTh = walk.instructionsTh;
+          instructionsEn = walk.instructionsEn;
+          if (instructionsTh != null) {
+            direction = instructionsTh;
+          }
+        }
 
         segments.add(RouteSegment(
           lineId: 'WALK',
           lineName: 'Walk',
-          direction: 'Walk to destination',
+          direction: direction,
           boundIndex: 0,
           fromStation: nearestStation,
           toStation: destination,
@@ -723,6 +813,8 @@ class SearchViewModel extends _$SearchViewModel {
           standardFareThb: 0,
           walkingPath: walkingPath,
           exit: exit,
+          instructionsTh: instructionsTh,
+          instructionsEn: instructionsEn,
         ));
       }
     }
@@ -818,10 +910,10 @@ class SearchViewModel extends _$SearchViewModel {
         }
 
         double fLat, fLng, tLat, tLng;
-        final fromRouteLat = (lm != null && from.id == lm.id) ? lm.routeLat : from.lat;
-        final fromRouteLng = (lm != null && from.id == lm.id) ? lm.routeLng : from.lng;
-        final toRouteLat = (lm != null && to.id == lm.id) ? lm.routeLat : to.lat;
-        final toRouteLng = (lm != null && to.id == lm.id) ? lm.routeLng : to.lng;
+        final fromRouteLat = from.routeLat;
+        final fromRouteLng = from.routeLng;
+        final toRouteLat = to.routeLat;
+        final toRouteLng = to.routeLng;
 
         if (segment.exit != null) {
           if (from is Station) {
@@ -878,6 +970,8 @@ class SearchViewModel extends _$SearchViewModel {
           standardFareThb: segment.standardFareThb,
           walkingPath: path,
           exit: segment.exit,
+          instructionsTh: segment.instructionsTh,
+          instructionsEn: segment.instructionsEn,
         ));
         modified = true;
       } else {

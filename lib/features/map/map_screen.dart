@@ -1,12 +1,14 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'dart:ui' as ui;
+import 'dart:math' as math;
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/transit_colors.dart';
 import '../../models/station.dart';
+import '../../models/landmark.dart';
 import '../../models/custom_location.dart';
 import '../../models/crowd_report.dart';
 import '../../models/route_result.dart';
@@ -153,14 +155,17 @@ class _MapScreenState extends ConsumerState<MapScreen> {
 
   void _fitRouteBounds(RouteResult routeResult) {
     final points = <LatLng>[];
-    points.add(LatLng(routeResult.origin.lat, routeResult.origin.lng));
-    points.add(LatLng(routeResult.destination.lat, routeResult.destination.lng));
+    final originLat = routeResult.origin is Landmark ? (routeResult.origin as Landmark).routeLat : routeResult.origin.lat;
+    final originLng = routeResult.origin is Landmark ? (routeResult.origin as Landmark).routeLng : routeResult.origin.lng;
+    points.add(LatLng(originLat, originLng));
+
+    final destLat = routeResult.destination is Landmark ? (routeResult.destination as Landmark).routeLat : routeResult.destination.lat;
+    final destLng = routeResult.destination is Landmark ? (routeResult.destination as Landmark).routeLng : routeResult.destination.lng;
+    points.add(LatLng(destLat, destLng));
 
     for (final segment in routeResult.segments) {
       if (segment.lineId == 'WALK' && segment.walkingPath != null && segment.walkingPath!.isNotEmpty) {
-        if (kDebugMode) {
-          points.addAll(segment.walkingPath!);
-        }
+        points.addAll(segment.walkingPath!);
       } else {
         points.add(LatLng(segment.fromStation.lat, segment.fromStation.lng));
         points.add(LatLng(segment.toStation.lat, segment.toStation.lng));
@@ -248,6 +253,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final t = ref.watch(translationsProvider);
     final transitRepo = ref.watch(transitRepositoryProvider);
     final favoritesRepo = ref.watch(favoritesRepositoryProvider);
     final routeResult = ref.watch(searchViewModelProvider.select((s) => s.routeResult));
@@ -267,9 +273,6 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         // Highlight ONLY the active route
         for (final segment in routeResult.segments) {
           final isWalk = segment.lineId == 'WALK';
-          if (isWalk && !kDebugMode) {
-            continue;
-          }
           final points = <LatLng>[];
           if (isWalk && segment.walkingPath != null && segment.walkingPath!.isNotEmpty) {
             points.addAll(segment.walkingPath!);
@@ -419,7 +422,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
               width: 32,
               height: 32,
               child: Tooltip(
-                message: localeCode == 'en' ? 'Exit ${exit.exitCode}' : 'ทางออก ${exit.exitCode}',
+                message: t.routeResult.exitLabel(exit.exitCode),
                 child: Container(
                   decoration: BoxDecoration(
                     color: Colors.orange.shade800,
@@ -452,9 +455,11 @@ class _MapScreenState extends ConsumerState<MapScreen> {
 
         // Add custom origin/destination pins
         // Origin Pin (Green)
+        final originLat = routeResult.origin.routeLat;
+        final originLng = routeResult.origin.routeLng;
         newMarkers.add(
           Marker(
-            point: LatLng(routeResult.origin.lat, routeResult.origin.lng),
+            point: LatLng(originLat, originLng),
             width: 40,
             height: 44,
             alignment: Alignment.topCenter,
@@ -469,9 +474,11 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         );
 
         // Destination Pin (Red)
+        final destLat = routeResult.destination.routeLat;
+        final destLng = routeResult.destination.routeLng;
         newMarkers.add(
           Marker(
-            point: LatLng(routeResult.destination.lat, routeResult.destination.lng),
+            point: LatLng(destLat, destLng),
             width: 40,
             height: 44,
             alignment: Alignment.topCenter,
@@ -484,6 +491,81 @@ class _MapScreenState extends ConsumerState<MapScreen> {
             ),
           ),
         );
+
+        // Add walking path direction markers
+        for (final segment in routeResult.segments) {
+          if (segment.lineId == 'WALK' && segment.walkingPath != null && segment.walkingPath!.isNotEmpty) {
+            final path = segment.walkingPath!;
+            for (int idx = 0; idx < path.length - 1; idx++) {
+              final p1 = path[idx];
+              final p2 = path[idx + 1];
+              final dist = Geolocator.distanceBetween(
+                p1.latitude, p1.longitude,
+                p2.latitude, p2.longitude,
+              );
+              if (dist > 10.0) {
+                final midpoint = LatLng(
+                  (p1.latitude + p2.latitude) / 2,
+                  (p1.longitude + p2.longitude) / 2,
+                );
+                
+                // Calculate bearing in radians
+                final lat1 = p1.latitude * math.pi / 180.0;
+                final lon1 = p1.longitude * math.pi / 180.0;
+                final lat2 = p2.latitude * math.pi / 180.0;
+                final lon2 = p2.longitude * math.pi / 180.0;
+                final dLon = lon2 - lon1;
+                final y = math.sin(dLon) * math.cos(lat2);
+                final x = math.cos(lat1) * math.sin(lat2) -
+                    math.sin(lat1) * math.cos(lat2) * math.cos(dLon);
+                final bearing = math.atan2(y, x);
+
+                newMarkers.add(
+                  Marker(
+                    point: midpoint,
+                    width: 20,
+                    height: 20,
+                    child: IgnorePointer(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: theme.brightness == Brightness.dark 
+                              ? Colors.black 
+                              : Colors.white,
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: theme.brightness == Brightness.dark
+                                ? Colors.white30
+                                : Colors.black12,
+                            width: 1.0,
+                          ),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Colors.black12,
+                              blurRadius: 2,
+                              offset: Offset(0, 1),
+                            ),
+                          ],
+                        ),
+                        child: Center(
+                          child: Transform.rotate(
+                            angle: bearing,
+                            child: Icon(
+                              Icons.arrow_upward_rounded,
+                              size: 11,
+                              color: theme.brightness == Brightness.dark
+                                  ? Colors.white
+                                  : Colors.black,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              }
+            }
+          }
+        }
       } else {
         // Show all stations
       for (final station in transitRepo.stations) {
@@ -591,8 +673,6 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         ),
       );
     }
-
-    final t = ref.watch(translationsProvider);
 
     final isBottomCardVisible = _selectedStation != null ||
         _customSelectedLocation != null ||

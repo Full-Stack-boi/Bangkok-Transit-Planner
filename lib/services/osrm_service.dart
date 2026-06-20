@@ -1,0 +1,67 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:latlong2/latlong.dart';
+
+class OsrmRouteResult {
+  final double distanceMeters;
+  final double durationSeconds;
+  final List<LatLng>? coordinates;
+
+  OsrmRouteResult({
+    required this.distanceMeters,
+    required this.durationSeconds,
+    this.coordinates,
+  });
+}
+
+class OsrmService {
+  static const String _baseUrl = 'http://router.project-osrm.org/route/v1/foot';
+
+  /// Calculate walking route between two coordinates.
+  /// If [fetchGeometry] is true, the response includes polyline coordinates.
+  Future<OsrmRouteResult?> getWalkingRoute(
+    double lat1,
+    double lon1,
+    double lat2,
+    double lon2, {
+    bool fetchGeometry = false,
+  }) async {
+    try {
+      final url = Uri.parse(
+        '$_baseUrl/$lon1,$lat1;$lon2,$lat2?overview=full&geometries=geojson&steps=false',
+      );
+
+      final response = await http.get(
+        url,
+        headers: {'User-Agent': 'BkkTransitPlanner/1.0'},
+      ).timeout(const Duration(seconds: 5));
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['code'] == 'Ok' && data['routes'] != null && data['routes'].isNotEmpty) {
+          final route = data['routes'][0];
+          final distance = (route['distance'] as num).toDouble();
+          final duration = (route['duration'] as num).toDouble();
+
+          List<LatLng>? parsedCoords;
+          if (fetchGeometry && route['geometry'] != null) {
+            final coordsList = route['geometry']['coordinates'] as List;
+            parsedCoords = coordsList.map((c) {
+              return LatLng((c[1] as num).toDouble(), (c[0] as num).toDouble());
+            }).toList();
+          }
+
+          return OsrmRouteResult(
+            distanceMeters: distance,
+            durationSeconds: duration,
+            coordinates: parsedCoords,
+          );
+        }
+      }
+      return null;
+    } catch (e) {
+      print('OSRM error: $e');
+      return null;
+    }
+  }
+}

@@ -18,6 +18,8 @@ class RouteSegment {
   final int standardFareThb; // Standard fare (without discount)
   final List<LatLng>? walkingPath;
   final StationExit? exit;
+  final String? instructionsTh;
+  final String? instructionsEn;
 
   const RouteSegment({
     required this.lineId,
@@ -33,6 +35,8 @@ class RouteSegment {
     required this.standardFareThb,
     this.walkingPath,
     this.exit,
+    this.instructionsTh,
+    this.instructionsEn,
   });
 
   /// Total stations including origin and destination
