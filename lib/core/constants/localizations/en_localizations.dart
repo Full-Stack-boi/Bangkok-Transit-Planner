@@ -180,6 +180,12 @@ class EnglishRouteResult implements BaseRouteResult {
   String get walkTo => 'Walk to';
   @override
   String get fromLabel => 'From';
+  @override
+  String exitLabel(String exitCode) => 'Exit $exitCode';
+  @override
+  String get walkToStation => 'Walk to station';
+  @override
+  String get walkToDestination => 'Walk to destination';
 }
 
 class EnglishErrors implements BaseErrors {
@@ -267,6 +273,12 @@ class EnglishTransfers implements BaseTransfers {
   String get transferSamrong => 'Walk via skywalk connection link to the other line · Walk ~2 min';
   @override
   String get transferHuamak => 'Walk via skywalk transfer bridge to the other line · Walk ~2 min';
+  @override
+  String transferAsokSukhumvit(String targetStation) => 'Take Exit 3 to connect to $targetStation Station · Walk ~2 min';
+  @override
+  String transferSilomSaladaeng(String targetStation, String exitNum) => 'Take Exit $exitNum to connect to $targetStation Station · Walk ~3 min';
+  @override
+  String transferMoChitChatuchak(String targetStation, String exits) => 'Take Exit $exits to connect to $targetStation Station · Walk ~2 min';
   @override
   String interchangeWalk(int time) => 'Transfer · Walk ~$time min';
   @override

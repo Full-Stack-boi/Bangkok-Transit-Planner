@@ -180,6 +180,12 @@ class ThaiRouteResult implements BaseRouteResult {
   String get walkTo => 'เดินเท้าไปยัง';
   @override
   String get fromLabel => 'จาก';
+  @override
+  String exitLabel(String exitCode) => 'ทางออก $exitCode';
+  @override
+  String get walkToStation => 'เดินไปสถานี';
+  @override
+  String get walkToDestination => 'เดินไปยังจุดหมาย';
 }
 
 class ThaiErrors implements BaseErrors {
@@ -267,6 +273,12 @@ class ThaiTransfers implements BaseTransfers {
   String get transferSamrong => 'เดินผ่านทางเชื่อมสกายวอล์คเปลี่ยนชานชาลายกระดับ · เดิน ~2 นาที';
   @override
   String get transferHuamak => 'เดินผ่านทางเชื่อมสกายวอล์คเพื่อเปลี่ยนสาย · เดิน ~2 นาที';
+  @override
+  String transferAsokSukhumvit(String targetStation) => 'ออกทางออก 3 เพื่อเชื่อมต่อไปยังสถานี$targetStation · เดิน ~2 นาที';
+  @override
+  String transferSilomSaladaeng(String targetStation, String exitNum) => 'ออกทางออก $exitNum เพื่อเชื่อมต่อไปยังสถานี$targetStation · เดิน ~3 นาที';
+  @override
+  String transferMoChitChatuchak(String targetStation, String exits) => 'ออกทางออก $exits เพื่อเชื่อมต่อไปยังสถานี$targetStation · เดิน ~2 นาที';
   @override
   String interchangeWalk(int time) => 'เปลี่ยนสาย · เดิน ~$time นาที';
   @override

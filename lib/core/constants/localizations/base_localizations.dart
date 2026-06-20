@@ -96,6 +96,9 @@ abstract class BaseRouteResult {
   String get routeSaver;
   String get walkTo;
   String get fromLabel;
+  String exitLabel(String exitCode);
+  String get walkToStation;
+  String get walkToDestination;
 }
 
 abstract class BaseErrors {
@@ -134,6 +137,9 @@ abstract class BaseTransfers {
   String get transferPhayathai;
   String get transferSamrong;
   String get transferHuamak;
+  String transferAsokSukhumvit(String targetStation);
+  String transferSilomSaladaeng(String targetStation, String exitNum);
+  String transferMoChitChatuchak(String targetStation, String exits);
   String interchangeWalk(int time);
   String interchangeLevels(int time);
 }
