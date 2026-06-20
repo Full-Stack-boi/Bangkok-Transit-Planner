@@ -5,13 +5,19 @@ import 'package:geolocator/geolocator.dart';
 import '../models/station.dart';
 import '../models/line.dart';
 import '../models/landmark.dart';
-import '../models/custom_location.dart';
-import '../models/searchable_item.dart';
 import '../models/station_exit.dart';
 import '../services/dijkstra_planner.dart';
+import '../services/osrm_service.dart';
+import '../services/overpass_service.dart';
+import 'package:latlong2/latlong.dart';
+import '../models/custom_location.dart';
+import '../models/searchable_item.dart';
 
 /// Repository for loading and accessing static transit data
 class TransitRepository {
+  final OsrmService _osrmService = OsrmService();
+  final OverpassService _overpassService = OverpassService();
+
   List<Station>? _stations;
   List<TransitLine>? _lines;
   List<Landmark>? _landmarks;
@@ -110,22 +116,35 @@ class TransitRepository {
     // Add edges between consecutive stations on each line
     for (final line in _lines!) {
       for (int i = 0; i < line.stationIds.length - 1; i++) {
-        _graph!.addEdge(
-          line.stationIds[i],
-          line.stationIds[i + 1],
-          line.id,
-          weight: 2.0, // ~2 min between stations
-        );
+        final s1 = getStation(line.stationIds[i]);
+        final s2 = getStation(line.stationIds[i + 1]);
+        if (s1 != null && s2 != null) {
+          final dist = Geolocator.distanceBetween(s1.lat, s1.lng, s2.lat, s2.lng);
+          // Average transit speed ~35 km/h -> ~583 m/min. Add 0.5 min for dwell time.
+          final weight = (dist / 583.0) + 0.5;
+          _graph!.addEdge(
+            line.stationIds[i],
+            line.stationIds[i + 1],
+            line.id,
+            weight: weight,
+          );
+        }
       }
 
       // For loop lines (MRT Blue), connect last to first
       if (line.isLoop && line.stationIds.length > 2) {
-        _graph!.addEdge(
-          line.stationIds.last,
-          line.stationIds.first,
-          line.id,
-          weight: 2.0,
-        );
+        final s1 = getStation(line.stationIds.last);
+        final s2 = getStation(line.stationIds.first);
+        if (s1 != null && s2 != null) {
+          final dist = Geolocator.distanceBetween(s1.lat, s1.lng, s2.lat, s2.lng);
+          final weight = (dist / 583.0) + 0.5;
+          _graph!.addEdge(
+            line.stationIds.last,
+            line.stationIds.first,
+            line.id,
+            weight: weight,
+          );
+        }
       }
     }
 
@@ -133,21 +152,24 @@ class TransitRepository {
     for (final station in _stations!) {
       for (final interchangeId in station.interchange) {
         final target = getStation(interchangeId);
-        double walkMin = 5.0;
-        if (target != null && target.nameEn == station.nameEn) {
-          if (station.id.startsWith('BTS_CEN') ||
-              station.id.startsWith('MRT_BL01') ||
-              station.id.startsWith('MRT_BL33')) {
-            walkMin = 1.0; // Same station platform transfer (Siam or Tha Phra)
-          } else {
-            walkMin = 2.0; // Same-name adjacent station connection (e.g. Phaya Thai BTS/ARL, Lat Phrao Blue/Yellow)
+        if (target != null) {
+          final dist = Geolocator.distanceBetween(station.lat, station.lng, target.lat, target.lng);
+          // Base wait time of 2.0 mins + walking time (80 meters/min)
+          // If distance is 0 (e.g. cross-platform transfer like Siam), walking time is 0.
+          // Minimum transfer time is clamped to 1.0 minute for realism.
+          double walkMin = (dist / 80.0) + 2.0;
+          
+          // Special case: Exact same coordinates (cross-platform transfer)
+          if (dist < 10) {
+            walkMin = 1.0; 
           }
+          
+          _graph!.addTransferEdge(
+            station.id,
+            interchangeId,
+            walkingMinutes: walkMin,
+          );
         }
-        _graph!.addTransferEdge(
-          station.id,
-          interchangeId,
-          walkingMinutes: walkMin,
-        );
       }
     }
   }
@@ -264,7 +286,7 @@ class TransitRepository {
           }
 
           // Find nearest station
-          final nearest = _findNearestStation(lat, lon);
+          final nearest = findNearestStation(lat, lon);
           if (nearest != null) {
             final dist = Geolocator.distanceBetween(lat, lon, nearest.lat, nearest.lng);
             // Limit results to locations within 12 km of a transit station to filter out far-away provinces
@@ -294,7 +316,63 @@ class TransitRepository {
     return [];
   }
 
-  Station? _findNearestStation(double lat, double lon) {
+  /// Resolves the best entrance for a CustomLocation using Overpass and OSRM
+  Future<CustomLocation?> resolveOnlinePlaceAsync(CustomLocation place) async {
+    // 1. Fetch entrances around the centroid
+    final entrances = await _overpassService.findEntrances(place.lat, place.lng);
+    
+    if (entrances.isEmpty) {
+      // Fallback: use the centroid itself if no entrances found
+      final result = await findTrueNearestStationAsync(place.lat, place.lng);
+      if (result != null) {
+        return place.copyWith(
+          nearestStationId: result.station.id,
+          walkingMinutes: result.osrmResult?.durationSeconds != null ? (result.osrmResult!.durationSeconds / 60.0).clamp(1.0, 30.0) : place.walkingMinutes,
+          walkingPath: result.osrmResult?.coordinates,
+        );
+      }
+      return place;
+    }
+
+    // 2. We have entrances. Find the one that gives the shortest OSRM path to any station.
+    // To avoid too many calls, limit to top 10 entrances closest to the centroid by straight line.
+    entrances.sort((a, b) => 
+      Geolocator.distanceBetween(place.lat, place.lng, a.latitude, a.longitude)
+      .compareTo(Geolocator.distanceBetween(place.lat, place.lng, b.latitude, b.longitude))
+    );
+    final topEntrances = entrances.take(10).toList();
+
+    ({Station station, OsrmRouteResult? osrmResult})? bestMatch;
+    double shortestDuration = double.infinity;
+    LatLng? bestEntrance;
+
+    for (final entrance in topEntrances) {
+      final result = await findTrueNearestStationAsync(entrance.latitude, entrance.longitude);
+      if (result?.osrmResult != null) {
+        final duration = result!.osrmResult!.durationSeconds.toDouble();
+        if (duration < shortestDuration) {
+          shortestDuration = duration;
+          bestMatch = result;
+          bestEntrance = entrance;
+        }
+      }
+    }
+
+    if (bestMatch != null && bestEntrance != null) {
+      // We found a valid route via an entrance!
+      return place.copyWith(
+        lat: bestEntrance.latitude,
+        lng: bestEntrance.longitude,
+        nearestStationId: bestMatch.station.id,
+        walkingMinutes: (bestMatch.osrmResult!.durationSeconds / 60.0).clamp(1.0, 30.0),
+        walkingPath: bestMatch.osrmResult!.coordinates,
+      );
+    }
+
+    return place;
+  }
+
+  Station? findNearestStation(double lat, double lon) {
     if (_stations == null || _stations!.isEmpty) return null;
 
     Station? closest;
@@ -308,5 +386,46 @@ class TransitRepository {
       }
     }
     return closest;
+  }
+
+  /// Finds the truly nearest station using OSRM walking paths for the top candidate stations.
+  Future<({Station station, OsrmRouteResult? osrmResult})?> findTrueNearestStationAsync(double lat, double lon) async {
+    if (_stations == null || _stations!.isEmpty) return null;
+
+    // 1. Find top 3 nearest stations by straight-line distance
+    final List<MapEntry<Station, double>> candidates = _stations!.map((station) {
+      final dist = Geolocator.distanceBetween(lat, lon, station.lat, station.lng);
+      return MapEntry(station, dist);
+    }).toList();
+
+    // Sort by straight line distance
+    candidates.sort((a, b) => a.value.compareTo(b.value));
+    
+    // Take top 3 closest by straight line
+    final topCandidates = candidates.take(3).map((e) => e.key).toList();
+
+    Station? bestStation;
+    OsrmRouteResult? bestOsrmResult;
+    double minWalkDuration = double.infinity;
+
+    // 2. Query OSRM for true walking duration
+    for (final station in topCandidates) {
+      final osrmResult = await _osrmService.getWalkingRoute(lat, lon, station.lat, station.lng, fetchGeometry: true);
+      
+      if (osrmResult != null) {
+        if (osrmResult.durationSeconds < minWalkDuration) {
+          minWalkDuration = osrmResult.durationSeconds;
+          bestStation = station;
+          bestOsrmResult = osrmResult;
+        }
+      }
+    }
+
+    // Fallback to straight-line if OSRM fails for all
+    if (bestStation == null) {
+      return (station: topCandidates.first, osrmResult: null);
+    }
+
+    return (station: bestStation, osrmResult: bestOsrmResult);
   }
 }

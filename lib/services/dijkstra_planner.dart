@@ -125,17 +125,8 @@ class TransitGraph {
       for (final edge in getEdges(current.stationId)) {
         if (visited.contains(edge.toId)) continue;
 
-        // Add a small penalty for transfers to prefer direct routes
-        double penalty = 0;
-        if (prevEdge[current.stationId] != null &&
-            prevEdge[current.stationId]!.lineId != edge.lineId &&
-            edge.lineId != 'TRANSFER' &&
-            prevEdge[current.stationId]!.lineId != 'TRANSFER') {
-          penalty = 3.0; // 3 min penalty for unnecessary line changes
-        }
-
         final currentDist = dist[current.stationId] ?? double.infinity;
-        final newDist = currentDist + edge.weight + penalty;
+        final newDist = currentDist + edge.weight;
         final edgeToDist = dist[edge.toId] ?? double.infinity;
         
         if (newDist < edgeToDist) {
@@ -165,7 +156,6 @@ class TransitGraph {
       ));
       current = prev[current];
     }
-    path.reversed;
 
     return DijkstraResult(
       path: path.reversed.toList(),
