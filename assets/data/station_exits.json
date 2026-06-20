@@ -936,6 +936,15 @@
     "lng": 100.5440295
   },
   {
+    "id": "BTS_E1_EX6",
+    "station_id": "BTS_E1",
+    "exit_code": "6",
+    "name_th": "ทางออก 6",
+    "name_en": "Exit 6",
+    "lat": 13.744213,
+    "lng": 100.541899
+  },
+  {
     "id": "BTS_E2_EX1",
     "station_id": "BTS_E2",
     "exit_code": "1",
