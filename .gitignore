@@ -61,3 +61,6 @@ app.*.map.json
 
 # Avoid committing local SQL files
 /assets/data/*.sql
+
+# Avoid committing large generated binary map bundles
+/assets/map_tiles.bundle

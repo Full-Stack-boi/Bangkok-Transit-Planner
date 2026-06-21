@@ -46,7 +46,13 @@ Model (pure Dart, immutable)
 ## Getting Started
 
 ```bash
+# 1. ติดตั้ง Dependencies
 flutter pub get
+
+# 2. ดาวน์โหลดและสร้างไพล์แผนที่ออฟไลน์ (จำเป็นต้องทำก่อนรันแอปเนื่องจากไฟล์ .bundle ถูกละเว้นใน .gitignore)
+python bin/generate_bundle.py
+
+# 3. รันแอป
 flutter run
 ```
 
