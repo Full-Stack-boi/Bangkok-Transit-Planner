@@ -77,74 +77,68 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   Future<void> _initOfflineMap() async {
     try {
       await CachedTileProvider.getCachePath();
-      if (mounted) {
-        final prefs = await SharedPreferences.getInstance();
-        final isPrefetched = prefs.getBool('map_prefetch_completed') ?? false;
-
-        if (!isPrefetched) {
-          final stations = ref.read(transitRepositoryProvider).stations;
-          // Prefetch tiles in background (non-blocking)
-          CachedTileProvider.prefetchBangkokTiles(
-            stations,
-            onStart: (total) {
-              ref.read(mapPrefetchProvider.notifier).startPrefetch(total);
-            },
-            onProgress: (current, success, cached, error) {
-              ref.read(mapPrefetchProvider.notifier).updateProgress(
-                    current: current,
-                    success: success,
-                    cached: cached,
-                    error: error,
-                  );
-            },
-            onFinish: (completed, lostConnection) async {
-              if (completed) {
-                ref.read(mapPrefetchProvider.notifier).finishPrefetch();
-                // Clear cache and rebuild map when prefetch completes to immediately show high-res tiles
-                PaintingBinding.instance.imageCache.clear();
-                PaintingBinding.instance.imageCache.clearLiveImages();
-                if (mounted) {
-                  setState(() {});
-                }
-                try {
-                  final prefs = await SharedPreferences.getInstance();
-                  await prefs.setBool('map_prefetch_completed', true);
-                } catch (e) {
-                  print('Failed to save prefetching completion status: $e');
-                }
-              } else {
-                ref.read(mapPrefetchProvider.notifier).pausePrefetch();
-                if (lostConnection && mounted) {
-                  final t = ref.read(translationsProvider);
-                  ScaffoldMessenger.of(context).clearSnackBars();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Row(
-                        children: [
-                          const Icon(Icons.cloud_off_rounded, color: Colors.white),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Text(
-                              t.errors.errorNoInternet,
-                              style: const TextStyle(color: Colors.white),
-                            ),
-                          ),
-                        ],
-                      ),
-                      behavior: SnackBarBehavior.floating,
-                      backgroundColor: Colors.redAccent,
-                      duration: const Duration(seconds: 4),
-                    ),
-                  );
-                }
-              }
-            },
-          );
-        }
-      }
     } catch (e) {
-      print('Failed to initialize offline map prefetching: $e');
+      print('Failed to initialize offline map: $e');
     }
+  }
+
+  void _startMapPrefetch() {
+    final stations = ref.read(transitRepositoryProvider).stations;
+    CachedTileProvider.prefetchBangkokTiles(
+      stations,
+      onStart: (total) {
+        ref.read(mapPrefetchProvider.notifier).startPrefetch(total);
+      },
+      onProgress: (current, success, cached, error) {
+        ref.read(mapPrefetchProvider.notifier).updateProgress(
+              current: current,
+              success: success,
+              cached: cached,
+              error: error,
+            );
+      },
+      onFinish: (completed, lostConnection) async {
+        if (completed) {
+          ref.read(mapPrefetchProvider.notifier).finishPrefetch();
+          PaintingBinding.instance.imageCache.clear();
+          PaintingBinding.instance.imageCache.clearLiveImages();
+          if (mounted) {
+            setState(() {});
+          }
+          try {
+            final prefs = await SharedPreferences.getInstance();
+            await prefs.setBool('map_prefetch_completed_v6_greater', true);
+          } catch (e) {
+            print('Failed to save prefetching completion status: $e');
+          }
+        } else {
+          ref.read(mapPrefetchProvider.notifier).pausePrefetch();
+          if (lostConnection && mounted) {
+            final t = ref.read(translationsProvider);
+            ScaffoldMessenger.of(context).clearSnackBars();
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Row(
+                  children: [
+                    const Icon(Icons.cloud_off_rounded, color: Colors.white),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        t.errors.errorNoInternet,
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ],
+                ),
+                behavior: SnackBarBehavior.floating,
+                backgroundColor: Colors.redAccent,
+                duration: const Duration(seconds: 4),
+              ),
+            );
+          }
+        }
+      },
+    );
   }
 
   @override
@@ -692,6 +686,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                 child: FlutterMap(
                   mapController: _mapController,
                   options: MapOptions(
+                    backgroundColor: themeBrightness == Brightness.dark
+                        ? const Color(0xFF111111)
+                        : const Color(0xFFE4E3DF),
                     initialCenter: const LatLng(13.7563, 100.5018),
                     initialZoom: 12.0,
                     minZoom: 10.5,
@@ -1707,7 +1704,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                 setState(() {
                   _isPrefetchExpanded = true;
                 });
-                _initOfflineMap();
+                _startMapPrefetch();
               } else {
                 if (!_isPrefetchExpanded) {
                   // If collapsed but downloading, tapping expands it

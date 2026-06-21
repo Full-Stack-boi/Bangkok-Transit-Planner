@@ -1,7 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:bkk_transit_planner/repositories/transit_repository.dart';
 import 'package:bkk_transit_planner/models/custom_location.dart';
-import 'package:bkk_transit_planner/models/landmark.dart';
 
 void main() {
   test('Test resolveItem logic', () async {
@@ -10,7 +9,7 @@ void main() {
     await repo.initialize();
     
     print('Landmarks loaded: ${repo.landmarks.length}');
-    final l = repo.landmarks.firstWhere((x) => x.id == 'LM_MBK') as Landmark;
+    final l = repo.landmarks.firstWhere((x) => x.id == 'LM_MBK');
     print('MBK local nameEn: ${l.nameEn}');
     
     final item = CustomLocation(

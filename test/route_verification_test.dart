@@ -1,8 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:bkk_transit_planner/providers/providers.dart';
-import 'package:bkk_transit_planner/models/landmark.dart';
-import 'package:bkk_transit_planner/models/station.dart';
 import 'package:bkk_transit_planner/features/search/search_view_model.dart';
 
 void main() {
@@ -15,7 +13,7 @@ void main() {
     await repo.initialize();
     
     // 1. Find Siam Station (BTS_CEN) and MBK Center (LM_MBK)
-    final siamStation = repo.getStation('BTS_CEN') as Station?;
+    final siamStation = repo.getStation('BTS_CEN');
     final mbkLandmark = repo.landmarks.firstWhere((l) => l.id == 'LM_MBK');
     
     expect(siamStation, isNotNull);
@@ -87,7 +85,7 @@ void main() {
     final repo = container.read(transitRepositoryProvider);
     await repo.initialize();
     
-    final w1Station = repo.getStation('BTS_W1') as Station?;
+    final w1Station = repo.getStation('BTS_W1');
     final mbkLandmark = repo.landmarks.firstWhere((l) => l.id == 'LM_MBK');
     
     expect(w1Station, isNotNull);
@@ -142,7 +140,7 @@ void main() {
     final repo = container.read(transitRepositoryProvider);
     await repo.initialize();
     
-    final g2Station = repo.getStation('BTS_G2') as Station?;
+    final g2Station = repo.getStation('BTS_G2');
     final iconsiamLandmark = repo.landmarks.firstWhere((l) => l.id == 'LM_ICONSIAM');
     
     expect(g2Station, isNotNull);
@@ -196,7 +194,7 @@ void main() {
     final repo = container.read(transitRepositoryProvider);
     await repo.initialize();
     
-    final e1Station = repo.getStation('BTS_E1') as Station?;
+    final e1Station = repo.getStation('BTS_E1');
     final centralWorldLandmark = repo.landmarks.firstWhere((l) => l.id == 'LM_CENTRALWORLD');
     
     expect(e1Station, isNotNull);
@@ -224,7 +222,7 @@ void main() {
     final repo = container.read(transitRepositoryProvider);
     await repo.initialize();
     
-    final e5Station = repo.getStation('BTS_E5') as Station?;
+    final e5Station = repo.getStation('BTS_E5');
     final emSphereLandmark = repo.landmarks.firstWhere((l) => l.id == 'LM_EMSPHERE');
     
     expect(e5Station, isNotNull);
@@ -253,8 +251,8 @@ void main() {
     final repo = container.read(transitRepositoryProvider);
     await repo.initialize();
     
-    final cenStation = repo.getStation('BTS_CEN') as Station?;
-    final w1Station = repo.getStation('BTS_W1') as Station?;
+    final cenStation = repo.getStation('BTS_CEN');
+    final w1Station = repo.getStation('BTS_W1');
     final paragonLandmark = repo.landmarks.firstWhere((l) => l.id == 'LM_PARAGON');
     
     expect(cenStation, isNotNull);

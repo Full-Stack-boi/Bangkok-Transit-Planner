@@ -2,8 +2,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../providers/providers.dart';
 import '../auth/login_screen.dart';
+import '../map/cached_tile_provider.dart';
 import '../../core/constants/translation_helper.dart';
 
 /// Settings screen supporting interactive Theme and Language selection
@@ -131,6 +133,91 @@ class SettingsScreen extends ConsumerWidget {
               subtitle: Text(getLanguageText(localeCode)),
               trailing: const Icon(Icons.chevron_right),
               onTap: showLanguageDialog,
+            ),
+          ),
+          const SizedBox(height: 8),
+
+          // Offline Map Option (Manual check/download updates)
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.map_rounded),
+              title: Text(localeCode == 'th' ? 'อัปเดตแผนที่ออฟไลน์' : 'Offline Map Updates'),
+              subtitle: Text(localeCode == 'th' ? 'ตรวจสอบและดาวน์โหลดการอัปเดตเพิ่มเติม' : 'Check and download additional updates'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder: (dialogContext) => AlertDialog(
+                    title: Text(localeCode == 'th' ? 'ดาวน์โหลดแผนที่อัปเดตใหม่' : 'Download Map Updates'),
+                    content: Text(localeCode == 'th'
+                      ? 'คุณต้องการเริ่มดาวน์โหลดข้อมูลแผนที่อัพเดทล่าสุดจากเน็ตเวิร์กหรือไม่? (ขนาดดาวน์โหลดขึ้นอยู่กับจำนวนรูปภาพที่มีการปรับปรุง)'
+                      : 'Do you want to start downloading the latest map updates from the network? (Download size depends on the number of updated tiles)'),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(dialogContext),
+                        child: Text(localeCode == 'th' ? 'ยกเลิก' : 'Cancel'),
+                      ),
+                      ElevatedButton(
+                        onPressed: () async {
+                          Navigator.pop(dialogContext);
+
+                          // Mark prefetch as NOT completed in SharedPreferences so it will run
+                          final prefs = await SharedPreferences.getInstance();
+                          await prefs.setBool('map_prefetch_completed_v6_greater', false);
+
+                          // Clear the pause flag
+                          CachedTileProvider.isPaused = false;
+
+                          // Let's get the stations from the transit repository provider
+                          final stations = ref.read(transitRepositoryProvider).stations;
+
+                          // Set prefetch state in riverpod
+                          ref.read(mapPrefetchProvider.notifier).startPrefetch(6914);
+
+                          // Start downloading
+                          CachedTileProvider.prefetchBangkokTiles(
+                            stations,
+                            onStart: (total) {
+                              ref.read(mapPrefetchProvider.notifier).startPrefetch(total);
+                            },
+                            onProgress: (current, success, cached, error) {
+                              ref.read(mapPrefetchProvider.notifier).updateProgress(
+                                    current: current,
+                                    success: success,
+                                    cached: cached,
+                                    error: error,
+                                  );
+                            },
+                            onFinish: (completed, lostConnection) async {
+                              if (completed) {
+                                ref.read(mapPrefetchProvider.notifier).finishPrefetch();
+                                PaintingBinding.instance.imageCache.clear();
+                                PaintingBinding.instance.imageCache.clearLiveImages();
+                                final p = await SharedPreferences.getInstance();
+                                await p.setBool('map_prefetch_completed_v6_greater', true);
+                              } else {
+                                ref.read(mapPrefetchProvider.notifier).pausePrefetch();
+                              }
+                            },
+                          );
+
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(localeCode == 'th'
+                                  ? 'เริ่มดาวน์โหลดการอัปเดตแผนที่แล้ว คุณสามารถดูความคืบหน้าได้ที่หน้าจอแผนที่'
+                                  : 'Map update download started. You can monitor the progress on the Map screen.'),
+                                behavior: SnackBarBehavior.floating,
+                              ),
+                            );
+                          }
+                        },
+                        child: Text(localeCode == 'th' ? 'ดาวน์โหลด' : 'Download'),
+                      ),
+                    ],
+                  ),
+                );
+              },
             ),
           ),
           const SizedBox(height: 8),

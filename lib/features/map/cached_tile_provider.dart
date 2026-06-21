@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter/services.dart' show rootBundle;
 import '../../models/station.dart';
 
 /// Custom tile provider that caches map tiles locally on disk and uses
@@ -19,7 +20,7 @@ class CachedTileProvider extends TileProvider {
   static String? _resolvedCachePath;
   static bool _isPrefetching = false;
   static bool isPaused = false;
-  static final Map<String, String> _hashCache = {};
+  static const String _bundleVersion = '2026-06-21-v3';
 
   /// Get the local cache directory path for map tiles
   static Future<String> getCachePath() async {
@@ -27,7 +28,77 @@ class CachedTileProvider extends TileProvider {
     if (_resolvedCachePath != null) return _resolvedCachePath!;
     final supportDir = await getApplicationSupportDirectory();
     _resolvedCachePath = '${supportDir.path}/map_tiles';
+    
+    final bundleFile = File('$_resolvedCachePath/map_tiles.bundle');
+    final versionFile = File('$_resolvedCachePath/map_tiles.bundle.ver');
+    
+    bool needsCopy = false;
+    if (!await bundleFile.exists()) {
+      needsCopy = true;
+    } else {
+      if (!await versionFile.exists()) {
+        needsCopy = true;
+      } else {
+        final cachedVersion = await versionFile.readAsString();
+        if (cachedVersion.trim() != _bundleVersion) {
+          needsCopy = true;
+        }
+      }
+    }
+    
+    if (needsCopy) {
+      print('[MapCache] Bundle needs copy or update. Copying from assets...');
+      try {
+        await copyBundleAsset('assets/map_tiles.bundle', bundleFile.path);
+        await versionFile.parent.create(recursive: true);
+        await versionFile.writeAsString(_bundleVersion, flush: true);
+      } catch (e) {
+        print('[MapCache] Failed to copy/update bundle: $e');
+      }
+    }
+    
+    // Auto initialize MapBundleManager once target directory path is resolved
+    await MapBundleManager.instance.init(bundleFile.path);
+    
     return _resolvedCachePath!;
+  }
+
+  /// Generates a stable and readable folder name from a URL template.
+  /// Using String.hashCode is unstable for persistent storage because it can
+  /// change across runs, compilations, or platform environments.
+  static String getFolderHash(String urlTemplate) {
+    if (urlTemplate.contains('dark_all')) {
+      return 'dark_all';
+    } else if (urlTemplate.contains('voyager') || urlTemplate.contains('rastertiles')) {
+      return 'voyager';
+    } else {
+      // Fallback: sanitize URL template to make it a safe directory name
+      return urlTemplate
+          .replaceAll('://', '_')
+          .replaceAll('/', '_')
+          .replaceAll('{', '')
+          .replaceAll('}', '')
+          .replaceAll('.', '_')
+          .replaceAll(RegExp(r'[^a-zA-Z0-9_]'), '');
+    }
+  }
+
+  /// Copies the map tiles bundle binary asset directly to the local disk cache
+  static Future<void> copyBundleAsset(String assetPath, String targetPath) async {
+    try {
+      print('[MapCache] Copying map tiles bundle from $assetPath to $targetPath...');
+      final file = File(targetPath);
+      await file.parent.create(recursive: true);
+
+      final data = await rootBundle.load(assetPath);
+      final bytes = data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
+
+      await file.writeAsBytes(bytes, flush: true);
+      print('[MapCache] Bundle asset copied successfully (${bytes.length} bytes).');
+    } catch (e) {
+      print('[MapCache] Failed to copy bundle asset: $e');
+      rethrow;
+    }
   }
 
   @override
@@ -36,15 +107,20 @@ class CachedTileProvider extends TileProvider {
     if (kIsWeb) {
       return NetworkImage(url);
     }
-    final folderHash = _hashCache.putIfAbsent(options.urlTemplate ?? 'default', () => (options.urlTemplate ?? 'default').hashCode.toString());
+    final folderHash = getFolderHash(options.urlTemplate ?? 'default');
     final cacheDir = _resolvedCachePath;
     if (cacheDir == null) {
       // Safe fallback if not initialized
       return NetworkImage(url);
     }
     
-    final tileFile = File('$cacheDir/$folderHash/${coordinates.z}/${coordinates.x}/${coordinates.y}.png');
-    final metaFile = File('$cacheDir/$folderHash/${coordinates.z}/${coordinates.x}/${coordinates.y}.meta');
+    // Writable updates go to updates/ folder. The bundle provides base tiles.
+    final tileFile = File('$cacheDir/updates/$folderHash/${coordinates.z}/${coordinates.x}/${coordinates.y}.png');
+    final metaFile = File('$cacheDir/updates/$folderHash/${coordinates.z}/${coordinates.x}/${coordinates.y}.meta');
+
+    if (kDebugMode) {
+      print('[MapTile] getImage URL: $url, Path: ${tileFile.path}');
+    }
 
     return CachedTileImageProvider(
       url: url,
@@ -99,39 +175,41 @@ class CachedTileProvider extends TileProvider {
       final cacheDir = await getCachePath();
       print('[Prefetch] Starting background map prefetch for ${stations.length} stations in Bangkok...');
 
-      // Bounding box of Bangkok to double check coordinates are in range
-      // Lat: 13.50 to 14.10, Lng: 100.30 to 100.80
-      const minLat = 13.50;
-      const maxLat = 14.10;
-      const minLng = 100.30;
-      const maxLng = 100.80;
+      // Three-tier bounding box definitions
+      const bMinLat = 13.10;
+      const bMaxLat = 14.70;
+      const bMinLng = 99.50;
+      const bMaxLng = 101.50;
+      
+      const tMinLat = 13.51;
+      const tMaxLat = 13.99;
+      const tMinLng = 100.35;
+      const tMaxLng = 100.81;
 
-      // Define url templates and folders we want to cache
+      final double devicePixelRatio = ui.PlatformDispatcher.instance.views.isNotEmpty
+          ? ui.PlatformDispatcher.instance.views.first.devicePixelRatio
+          : 1.0;
+      final String rValue = devicePixelRatio > 1.0 ? '@2x' : '';
+
       final targets = [
-        // Dark Mode tiles
         {
-          'template': 'https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png',
-          'hash': 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png'.hashCode.toString(),
+          'template': 'https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}$rValue.png',
+          'hash': getFolderHash('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'),
         },
-        // Light Mode tiles
         {
-          'template': 'https://a.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png',
-          'hash': 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png'.hashCode.toString(),
+          'template': 'https://a.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}$rValue.png',
+          'hash': getFolderHash('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png'),
         }
       ];
 
-      // Calculate all distinct tiles we need to download
-      // Key format: "hash:z:x:y"
       final tilesToFetch = <String>{};
 
-      // Pre-fetch zoom 10 to 13 for full Bangkok bounding box coverage
-      // This ensures that when fitting route bounds (which typically zooms to levels 11-13),
-      // the entire path is pre-rendered and cached.
-      for (int z = 10; z <= 13; z++) {
-        final xMin = lonToTileX(minLng, z);
-        final xMax = lonToTileX(maxLng, z);
-        final yMin = latToTileY(maxLat, z); // y is inverted for lat
-        final yMax = latToTileY(minLat, z);
+      // 1. Broad BBox Low Zooms (10-12)
+      for (int z = 10; z <= 12; z++) {
+        final xMin = lonToTileX(bMinLng, z);
+        final xMax = lonToTileX(bMaxLng, z);
+        final yMin = latToTileY(bMaxLat, z);
+        final yMax = latToTileY(bMinLat, z);
         for (int tx = xMin; tx <= xMax; tx++) {
           for (int ty = yMin; ty <= yMax; ty++) {
             for (final target in targets) {
@@ -141,28 +219,32 @@ class CachedTileProvider extends TileProvider {
         }
       }
 
+      // 2. Transit BBox Medium/High Zooms (13-15)
+      for (int z = 13; z <= 15; z++) {
+        final xMin = lonToTileX(tMinLng, z);
+        final xMax = lonToTileX(tMaxLng, z);
+        final yMin = latToTileY(tMaxLat, z);
+        final yMax = latToTileY(tMinLat, z);
+        for (int tx = xMin; tx <= xMax; tx++) {
+          for (int ty = yMin; ty <= yMax; ty++) {
+            for (final target in targets) {
+              tilesToFetch.add('${target['hash']}:$z:$tx:$ty:${target['template']}');
+            }
+          }
+        }
+      }
+
+      // 3. Station Centers Zoom (16-17)
       for (final station in stations) {
-        // Guard coordinates
-        if (station.lat < minLat || station.lat > maxLat || station.lng < minLng || station.lng > maxLng) {
+        if (station.lat < bMinLat || station.lat > bMaxLat || station.lng < bMinLng || station.lng > bMaxLng) {
           continue;
         }
 
-        // Prefetch zoom levels 12 to 15
-        for (int z = 12; z <= 15; z++) {
-          final x = lonToTileX(station.lng, z);
-          final y = latToTileY(station.lat, z);
-
-          // Add padding of 1 tile surrounding the station to cover panning
-          final pad = (z >= 14) ? 1 : 0; // Only pad at closer zoom levels to save bandwidth
-          for (int dx = -pad; dx <= pad; dx++) {
-            for (int dy = -pad; dy <= pad; dy++) {
-              final tx = x + dx;
-              final ty = y + dy;
-
-              for (final target in targets) {
-                tilesToFetch.add('${target['hash']}:$z:$tx:$ty:${target['template']}');
-              }
-            }
+        for (int z in [16, 17]) {
+          final tx = lonToTileX(station.lng, z);
+          final ty = latToTileY(station.lat, z);
+          for (final target in targets) {
+            tilesToFetch.add('${target['hash']}:$z:$tx:$ty:${target['template']}');
           }
         }
       }
@@ -176,63 +258,67 @@ class CachedTileProvider extends TileProvider {
       int index = 0;
       int consecutiveNetworkErrors = 0;
 
-      // Download tiles sequentially in the background to avoid rate limits
+      final workerSemaphore = _Semaphore(12); // Up to 12 concurrent workers
+      final List<Future<void>> tasks = [];
+
       for (final tileInfo in tilesToFetch) {
         if (isPaused) {
           break;
         }
-        index++;
-        final parts = tileInfo.split(':');
-        final folderHash = parts[0];
-        final z = int.parse(parts[1]);
-        final x = int.parse(parts[2]);
-        final y = int.parse(parts[3]);
-        // Reconstruct template URL
-        final urlTemplate = parts.sublist(4).join(':');
-        
-        final url = urlTemplate
-            .replaceAll('{z}', z.toString())
-            .replaceAll('{x}', x.toString())
-            .replaceAll('{y}', y.toString());
+        await workerSemaphore.acquire();
+        tasks.add(Future(() async {
+          try {
+            if (isPaused) return;
 
-        final tileFile = File('$cacheDir/$folderHash/$z/$x/$y.png');
-        final metaFile = File('$cacheDir/$folderHash/$z/$x/$y.meta');
+            final parts = tileInfo.split(':');
+            final folderHash = parts[0];
+            final z = int.parse(parts[1]);
+            final x = int.parse(parts[2]);
+            final y = int.parse(parts[3]);
+            final urlTemplate = parts.sublist(4).join(':');
 
-        try {
-          if (await tileFile.exists()) {
-            cachedCount++;
-            // NOTE: do NOT reset consecutiveNetworkErrors here.
-            // A cached tile proves nothing about internet availability.
-          } else {
-            // Download fresh tile
-            final status = await _downloadTileStatus(url, tileFile, metaFile);
-            if (status == _tileSuccess || status == _tileUnmodified) {
-              successCount++;
-              consecutiveNetworkErrors = 0; // Live download succeeded → internet is up
-            } else if (status == _tileErrorHttp) {
-              errorCount++;
-              consecutiveNetworkErrors = 0; // HTTP error (e.g. 400/404) → server replied → internet is up
-            } else if (status == _tileErrorNetwork) {
-              errorCount++;
-              consecutiveNetworkErrors++;
-              if (consecutiveNetworkErrors >= 3) {
-                print('[Prefetch] Lost internet connection (3 consecutive network errors). Pausing prefetch.');
-                isPaused = true;
-                lostConnection = true;
-                break;
+            final url = urlTemplate
+                .replaceAll('{z}', z.toString())
+                .replaceAll('{x}', x.toString())
+                .replaceAll('{y}', y.toString());
+
+            final tileFile = File('$cacheDir/$folderHash/$z/$x/$y.png');
+            final metaFile = File('$cacheDir/$folderHash/$z/$x/$y.meta');
+
+            if (await tileFile.exists() || MapBundleManager.instance.hasTile(folderHash, z, x, y)) {
+              cachedCount++;
+            } else {
+              final status = await _downloadTileStatus(url, tileFile, metaFile);
+              if (status == _tileSuccess || status == _tileUnmodified) {
+                successCount++;
+                consecutiveNetworkErrors = 0;
+              } else if (status == _tileErrorHttp) {
+                errorCount++;
+                consecutiveNetworkErrors = 0;
+              } else if (status == _tileErrorNetwork) {
+                errorCount++;
+                consecutiveNetworkErrors++;
+                if (consecutiveNetworkErrors >= 3) {
+                  print('[Prefetch] Lost internet connection (3 consecutive network errors). Pausing prefetch.');
+                  isPaused = true;
+                  lostConnection = true;
+                }
               }
             }
+          } catch (e) {
+            errorCount++;
+          } finally {
+            index++;
+            onProgress?.call(index, successCount, cachedCount, errorCount);
+            if (index % 100 == 0 || index == tilesToFetch.length) {
+              print('[Prefetch] Progress: $index/${tilesToFetch.length} (Cached: $cachedCount, Downloaded: $successCount, Fail: $errorCount)');
+            }
+            workerSemaphore.release();
           }
-        } catch (e) {
-          errorCount++;
-        }
-
-        onProgress?.call(index, successCount, cachedCount, errorCount);
-
-        if (index % 100 == 0) {
-          print('[Prefetch] Progress: $index/${tilesToFetch.length} (Cached: $cachedCount, Downloaded: $successCount, Fail: $errorCount)');
-        }
+        }));
       }
+
+      await Future.wait(tasks);
 
       print('[Prefetch] Finished. Total: ${tilesToFetch.length}, Cached/Verified: $cachedCount, New Downloaded: $successCount, Errors: $errorCount');
       if (!isPaused && index == tilesToFetch.length) {
@@ -342,7 +428,6 @@ class CachedTileImageProvider extends ImageProvider<CachedTileImageProvider> {
   final int y;
   final String cacheDir;
   final String folderHash;
-  static ui.ImmutableBuffer? _fallbackBuffer;
 
   CachedTileImageProvider({
     required this.url,
@@ -373,49 +458,94 @@ class CachedTileImageProvider extends ImageProvider<CachedTileImageProvider> {
     Completer<ImageInfo> completer,
   ) async {
     try {
+      // 1. Check updates folder (loose downloaded tiles) first
       final fileExists = await key.tileFile.exists();
+      if (kDebugMode) {
+        print('[MapTile] Loading tile (${key.z}, ${key.x}, ${key.y}). Loose file exists: $fileExists, Path: ${key.tileFile.path}');
+      }
 
       if (fileExists) {
-        // 1. Read cached image bytes from disk
-        final Uint8List bytes = await key.tileFile.readAsBytes();
-        
-        // 2. Trigger asynchronous background check with server (no UI blocking)
-        _validateCacheInBackground(key);
-        
-        // 3. Return decoded image instantly from cache
-        final codec = await decode(await ui.ImmutableBuffer.fromUint8List(bytes));
-        final frame = await codec.getNextFrame();
-        completer.complete(ImageInfo(image: frame.image, scale: 1.0));
-        return;
-      } else {
-        // 1. No cache exists. Must perform a blocking network request.
-        final bytes = await _downloadTile(key);
-        if (bytes != null) {
+        final length = await key.tileFile.length();
+        if (length == 0) {
+          try {
+            await key.tileFile.delete();
+          } catch (_) {}
+        } else {
+          final Uint8List bytes = await key.tileFile.readAsBytes();
+          _validateCacheInBackground(key);
+          
+          try {
+            final codec = await decode(await ui.ImmutableBuffer.fromUint8List(bytes));
+            final frame = await codec.getNextFrame();
+            completer.complete(ImageInfo(image: frame.image, scale: 1.0));
+            if (kDebugMode) {
+              print('[MapTile] Successfully decoded tile (${key.z}, ${key.x}, ${key.y}) from updates folder.');
+            }
+            return;
+          } catch (e, stackTrace) {
+            print('[MapTile] Error decoding tile (${key.z}, ${key.x}, ${key.y}) from updates: $e\n$stackTrace');
+            try {
+              await key.tileFile.delete();
+            } catch (_) {}
+          }
+        }
+      }
+
+      // 2. Check binary bundle second
+      final bundleBytes = await MapBundleManager.instance.readTile(key.folderHash, key.z, key.x, key.y);
+      if (bundleBytes != null && bundleBytes.isNotEmpty) {
+        try {
+          final codec = await decode(await ui.ImmutableBuffer.fromUint8List(bundleBytes));
+          final frame = await codec.getNextFrame();
+          completer.complete(ImageInfo(image: frame.image, scale: 1.0));
+          if (kDebugMode) {
+            print('[MapTile] Successfully decoded tile (${key.z}, ${key.x}, ${key.y}) from bundle.');
+          }
+          return;
+        } catch (e, stackTrace) {
+          print('[MapTile] Error decoding tile (${key.z}, ${key.x}, ${key.y}) from bundle: $e\n$stackTrace');
+        }
+      }
+
+      // 3. Cache miss: Perform network request
+      if (kDebugMode) {
+        print('[MapTile] Cache miss for tile (${key.z}, ${key.x}, ${key.y}). Fetching from network: ${key.url}');
+      }
+      final bytes = await _downloadTile(key);
+      if (bytes != null && bytes.isNotEmpty) {
+        try {
           final codec = await decode(await ui.ImmutableBuffer.fromUint8List(bytes));
           final frame = await codec.getNextFrame();
           completer.complete(ImageInfo(image: frame.image, scale: 1.0));
+          if (kDebugMode) {
+            print('[MapTile] Successfully decoded tile (${key.z}, ${key.x}, ${key.y}) from network.');
+          }
           return;
-        }
-
-        // 2. Fallback: try to find and crop/scale from an ancestor tile on disk
-        final fallbackImage = await _fallbackFromAncestor(key);
-        if (fallbackImage != null) {
-          completer.complete(ImageInfo(image: fallbackImage, scale: 1.0));
-          return;
+        } catch (e, stackTrace) {
+          print('[MapTile] Error decoding tile (${key.z}, ${key.x}, ${key.y}) from network: $e\n$stackTrace');
         }
       }
-    } catch (e) {
-      print('Error loading tile image: $e');
+
+      // 4. Fallback: try to crop/scale from an ancestor tile in the updates folder
+      if (kDebugMode) {
+        print('[MapTile] Attempting ancestor fallback for tile (${key.z}, ${key.x}, ${key.y})...');
+      }
+      final fallbackImage = await _fallbackFromAncestor(key);
+      if (fallbackImage != null) {
+        completer.complete(ImageInfo(image: fallbackImage, scale: 1.0));
+        return;
+      }
+    } catch (e, stackTrace) {
+      print('[MapTile] Error in _loadAsync for tile (${key.z}, ${key.x}, ${key.y}): $e\n$stackTrace');
     }
 
-    // 3. Fallback: transparent 1x1 png if everything fails (so map doesn't break)
+    // 5. Hard fallback: transparent 1x1 png
     try {
-      _fallbackBuffer ??= await ui.ImmutableBuffer.fromUint8List(_kTransparentImageBytes);
-      final codec = await decode(_fallbackBuffer!);
+      final codec = await ui.instantiateImageCodec(_kTransparentImageBytes);
       final frame = await codec.getNextFrame();
       completer.complete(ImageInfo(image: frame.image, scale: 1.0));
-    } catch (e) {
-      completer.completeError(e);
+    } catch (e, stackTrace) {
+      completer.completeError(e, stackTrace);
     }
   }
 
@@ -576,3 +706,126 @@ final Uint8List _kTransparentImageBytes = Uint8List.fromList([
   0x05, 0x00, 0x01, 0x0D, 0x0A, 0x2D, 0xB4, 0x00, 0x00, 0x00, 0x00, 0x49,
   0x45, 0x4E, 0x44, 0xAE, 0x42, 0x60, 0x82
 ]);
+
+/// Manages random access reads from the compressed binary bundle `map_tiles.bundle`
+class MapBundleManager {
+  static final MapBundleManager instance = MapBundleManager._();
+  MapBundleManager._();
+
+  RandomAccessFile? _bundleFile;
+  final Map<String, List<int>> _index = {};
+  bool _initialized = false;
+  final _FutureChain _lock = _FutureChain();
+
+  Future<void> init(String bundlePath) async {
+    if (_initialized) return;
+    try {
+      final file = File(bundlePath);
+      if (!await file.exists()) {
+        print('[MapBundle] Bundle file not found at $bundlePath. App will fall back to network.');
+        return;
+      }
+      _bundleFile = await file.open(mode: FileMode.read);
+      
+      final int fileLength = await file.length();
+      if (fileLength < 4) {
+        print('[MapBundle] Corrupt bundle: file too short.');
+        return;
+      }
+      
+      // Read last 4 bytes to get the index offset pointer
+      await _bundleFile!.setPosition(fileLength - 4);
+      final offsetBytes = await _bundleFile!.read(4);
+      if (offsetBytes.length != 4) {
+        print('[MapBundle] Corrupt bundle: failed to read index offset pointer.');
+        return;
+      }
+      final int indexOffset = ByteData.sublistView(Uint8List.fromList(offsetBytes)).getUint32(0, Endian.big);
+      
+      // Seek to indexOffset and read the compressed index
+      final int indexLength = fileLength - 4 - indexOffset;
+      if (indexLength <= 0 || indexOffset < 0 || indexOffset >= fileLength) {
+        print('[MapBundle] Corrupt bundle: invalid index offset ($indexOffset) or length ($indexLength).');
+        return;
+      }
+      
+      await _bundleFile!.setPosition(indexOffset);
+      final compressedBytes = await _bundleFile!.read(indexLength);
+      if (compressedBytes.length != indexLength) {
+        print('[MapBundle] Corrupt bundle: failed to read compressed index data.');
+        return;
+      }
+      
+      // Decompress index
+      final decompressedBytes = gzip.decode(compressedBytes);
+      final jsonStr = utf8.decode(decompressedBytes);
+      final Map<String, dynamic> rawMap = jsonDecode(jsonStr);
+      
+      rawMap.forEach((key, value) {
+        if (value is List) {
+          _index[key] = List<int>.from(value);
+        }
+      });
+      
+      _initialized = true;
+      print('[MapBundle] Initialized successfully. Loaded ${_index.length} tile references.');
+    } catch (e, stackTrace) {
+      print('[MapBundle] Initialization failed: $e\n$stackTrace');
+      await close();
+    }
+  }
+
+  bool hasTile(String folderHash, int z, int x, int y) {
+    if (!_initialized) return false;
+    final key = '$folderHash/$z/$x/$y.webp';
+    return _index.containsKey(key);
+  }
+
+  Future<Uint8List?> readTile(String folderHash, int z, int x, int y) async {
+    if (!_initialized || _bundleFile == null) return null;
+    final key = '$folderHash/$z/$x/$y.webp';
+    final range = _index[key];
+    if (range == null) return null;
+    
+    final int offset = range[0];
+    final int length = range[1];
+    
+    try {
+      // Synchronize sets and reads to prevent race conditions on RandomAccessFile position
+      return await _lock.synchronized(() async {
+        await _bundleFile!.setPosition(offset);
+        final bytes = await _bundleFile!.read(length);
+        return bytes;
+      });
+    } catch (e, stackTrace) {
+      print('[MapBundle] Error reading tile $key from bundle: $e\n$stackTrace');
+      return null;
+    }
+  }
+
+  Future<void> close() async {
+    _initialized = false;
+    _index.clear();
+    try {
+      await _bundleFile?.close();
+    } catch (_) {}
+    _bundleFile = null;
+  }
+}
+
+class _FutureChain {
+  Future<void> _chain = Future.value();
+  
+  Future<T> synchronized<T>(Future<T> Function() action) {
+    final completer = Completer<T>();
+    _chain = _chain.then((_) async {
+      try {
+        final result = await action();
+        completer.complete(result);
+      } catch (e, s) {
+        completer.completeError(e, s);
+      }
+    });
+    return completer.future;
+  }
+}
