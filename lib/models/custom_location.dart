@@ -25,6 +25,7 @@ class CustomLocation extends SearchableItem {
   final double routeLng;
 
   final List<LatLng>? walkingPath;
+  final List<LatLng>? entrances;
 
   const CustomLocation({
     required this.id,
@@ -37,6 +38,7 @@ class CustomLocation extends SearchableItem {
     double? routeLat,
     double? routeLng,
     this.walkingPath,
+    this.entrances,
   }) : routeLat = routeLat ?? lat,
        routeLng = routeLng ?? lng;
 
@@ -51,6 +53,7 @@ class CustomLocation extends SearchableItem {
     double? routeLat,
     double? routeLng,
     List<LatLng>? walkingPath,
+    List<LatLng>? entrances,
   }) {
     return CustomLocation(
       id: id ?? this.id,
@@ -63,6 +66,7 @@ class CustomLocation extends SearchableItem {
       routeLat: routeLat ?? this.routeLat,
       routeLng: routeLng ?? this.routeLng,
       walkingPath: walkingPath ?? this.walkingPath,
+      entrances: entrances ?? this.entrances,
     );
   }
 }

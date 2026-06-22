@@ -294,8 +294,10 @@ class TransitRepository {
               // Walking minutes based on 80 meters/minute, capped between 1 and 30 mins
               final walkMin = (dist / 80.0).clamp(1.0, 30.0);
 
+              final osmType = properties['osm_type'] as String? ?? 'N';
+              final osmId = properties['osm_id'] ?? DateTime.now().millisecondsSinceEpoch;
               results.add(CustomLocation(
-                id: 'OSM_${properties['osm_id'] ?? DateTime.now().millisecondsSinceEpoch}',
+                id: 'OSM_${osmType}_$osmId',
                 nameTh: name,
                 nameEn: name,
                 nearestStationId: nearest.id,
@@ -318,8 +320,28 @@ class TransitRepository {
 
   /// Resolves the best entrance for a CustomLocation using Overpass and OSRM
   Future<CustomLocation?> resolveOnlinePlaceAsync(CustomLocation place) async {
-    // 1. Fetch entrances around the centroid
-    final entrances = await _overpassService.findEntrances(place.lat, place.lng, radius: 800.0);
+    // 1. Fetch entrances around the centroid (or use existing if provided)
+    final List<LatLng> entrances;
+    if (place.entrances != null && place.entrances!.isNotEmpty) {
+      entrances = List<LatLng>.from(place.entrances!);
+    } else {
+      String? osmType;
+      int? osmId;
+      if (place.id.startsWith('OSM_')) {
+        final parts = place.id.split('_');
+        if (parts.length == 3) {
+          osmType = parts[1];
+          osmId = int.tryParse(parts[2]);
+        }
+      }
+      entrances = await _overpassService.findEntrances(
+        place.lat,
+        place.lng,
+        radius: 800.0,
+        osmType: osmType,
+        osmId: osmId,
+      );
+    }
     
     if (entrances.isEmpty) {
       // Fallback: use the centroid itself if no entrances found
@@ -366,6 +388,7 @@ class TransitRepository {
         nearestStationId: bestMatch.station.id,
         walkingMinutes: (bestMatch.osrmResult!.durationSeconds / 60.0).clamp(1.0, 30.0),
         walkingPath: bestMatch.osrmResult!.coordinates,
+        entrances: entrances,
       );
     }
 

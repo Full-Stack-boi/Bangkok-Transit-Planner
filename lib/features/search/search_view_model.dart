@@ -216,8 +216,180 @@ class SearchViewModel extends _$SearchViewModel {
       final repo = ref.read(transitRepositoryProvider);
       final fareService = ref.read(fareServiceProvider);
 
-      final originStationId = origin.nearestStationId ?? origin.id;
-      final destinationStationId = destination.nearestStationId ?? destination.id;
+      var resolvedOrigin = origin;
+      var resolvedDestination = destination;
+
+      // Dynamic entrance & station resolution for large destination
+      if (destination is CustomLocation && destination.entrances != null && destination.entrances!.isNotEmpty) {
+        final originStationId = origin.nearestStationId ?? origin.id;
+        
+        final candidateStations = <String, LatLng>{};
+        for (final entrance in destination.entrances!) {
+          final nearest = repo.findNearestStation(entrance.latitude, entrance.longitude);
+          if (nearest != null) {
+            final existing = candidateStations[nearest.id];
+            if (existing == null) {
+              candidateStations[nearest.id] = entrance;
+            } else {
+              final dNew = Geolocator.distanceBetween(entrance.latitude, entrance.longitude, nearest.lat, nearest.lng);
+              final dExisting = Geolocator.distanceBetween(existing.latitude, existing.longitude, nearest.lat, nearest.lng);
+              if (dNew < dExisting) {
+                candidateStations[nearest.id] = entrance;
+              }
+            }
+          }
+        }
+        
+        double minTotalTime = double.infinity;
+        String bestStationId = destination.nearestStationId;
+        LatLng? bestEntrance;
+        
+        for (final entry in candidateStations.entries) {
+          final stationId = entry.key;
+          final entrance = entry.value;
+          
+          if (originStationId == stationId) {
+            final walkDist = Geolocator.distanceBetween(entrance.latitude, entrance.longitude, origin.routeLat, origin.routeLng);
+            final walkMinutes = walkDist / 80.0;
+            if (walkMinutes < minTotalTime) {
+              minTotalTime = walkMinutes;
+              bestStationId = stationId;
+              bestEntrance = entrance;
+            }
+            final route = repo.findRoute(originStationId, stationId);
+            if (route != null) {
+              final transitMinutes = route.totalWeight;
+              final station = repo.getStation(stationId);
+              final walkDist = station != null 
+                ? Geolocator.distanceBetween(entrance.latitude, entrance.longitude, station.lat, station.lng)
+                : 0.0;
+              final walkMinutes = walkDist / 80.0;
+              final totalTime = transitMinutes + walkMinutes;
+              
+              if (totalTime < minTotalTime) {
+                minTotalTime = totalTime;
+                bestStationId = stationId;
+                bestEntrance = entrance;
+              }
+            }
+          }
+        }
+        
+        if (bestEntrance != null) {
+          resolvedDestination = (resolvedDestination as CustomLocation).copyWith(
+            routeLat: bestEntrance.latitude,
+            routeLng: bestEntrance.longitude,
+            nearestStationId: bestStationId,
+          );
+        }
+      }
+
+      // Dynamic entrance & station resolution for large origin
+      if (origin is CustomLocation && origin.entrances != null && origin.entrances!.isNotEmpty) {
+        final destStationId = resolvedDestination.nearestStationId ?? resolvedDestination.id;
+        
+        final candidateStations = <String, LatLng>{};
+        for (final entrance in origin.entrances!) {
+          final nearest = repo.findNearestStation(entrance.latitude, entrance.longitude);
+          if (nearest != null) {
+            final existing = candidateStations[nearest.id];
+            if (existing == null) {
+              candidateStations[nearest.id] = entrance;
+            } else {
+              final dNew = Geolocator.distanceBetween(entrance.latitude, entrance.longitude, nearest.lat, nearest.lng);
+              final dExisting = Geolocator.distanceBetween(existing.latitude, existing.longitude, nearest.lat, nearest.lng);
+              if (dNew < dExisting) {
+                candidateStations[nearest.id] = entrance;
+              }
+            }
+          }
+        }
+        
+        double minTotalTime = double.infinity;
+        String bestStationId = origin.nearestStationId;
+        LatLng? bestEntrance;
+        
+        for (final entry in candidateStations.entries) {
+          final stationId = entry.key;
+          final entrance = entry.value;
+          
+          if (destStationId == stationId) {
+            final walkDist = Geolocator.distanceBetween(entrance.latitude, entrance.longitude, resolvedDestination.routeLat, resolvedDestination.routeLng);
+            final walkMinutes = walkDist / 80.0;
+            if (walkMinutes < minTotalTime) {
+              minTotalTime = walkMinutes;
+              bestStationId = stationId;
+              bestEntrance = entrance;
+            }
+          } else {
+            final route = repo.findRoute(stationId, destStationId);
+            if (route != null) {
+              final transitMinutes = route.totalWeight;
+              final station = repo.getStation(stationId);
+              final walkDist = station != null 
+                ? Geolocator.distanceBetween(entrance.latitude, entrance.longitude, station.lat, station.lng)
+                : 0.0;
+              final walkMinutes = walkDist / 80.0;
+              final totalTime = transitMinutes + walkMinutes;
+              
+              if (totalTime < minTotalTime) {
+                minTotalTime = totalTime;
+                bestStationId = stationId;
+                bestEntrance = entrance;
+              }
+            }
+          }
+        }
+        
+        if (bestEntrance != null) {
+          resolvedOrigin = (resolvedOrigin as CustomLocation).copyWith(
+            routeLat: bestEntrance.latitude,
+            routeLng: bestEntrance.longitude,
+            nearestStationId: bestStationId,
+          );
+        }
+      }
+
+      final originStationId = resolvedOrigin.nearestStationId ?? resolvedOrigin.id;
+      final destinationStationId = resolvedDestination.nearestStationId ?? resolvedDestination.id;
+
+      // In case they resolved to the same station, run exit-to-entrance optimization
+      if (originStationId == destinationStationId) {
+        if (resolvedDestination is CustomLocation && resolvedDestination.entrances != null && resolvedDestination.entrances!.isNotEmpty) {
+          double minDist = double.infinity;
+          LatLng? bestEntrance;
+          for (final entrance in resolvedDestination.entrances!) {
+            final dist = Geolocator.distanceBetween(entrance.latitude, entrance.longitude, resolvedOrigin.routeLat, resolvedOrigin.routeLng);
+            if (dist < minDist) {
+              minDist = dist;
+              bestEntrance = entrance;
+            }
+          }
+          if (bestEntrance != null) {
+            resolvedDestination = (resolvedDestination as CustomLocation).copyWith(
+              routeLat: bestEntrance.latitude,
+              routeLng: bestEntrance.longitude,
+            );
+          }
+        }
+        if (resolvedOrigin is CustomLocation && resolvedOrigin.entrances != null && resolvedOrigin.entrances!.isNotEmpty) {
+          double minDist = double.infinity;
+          LatLng? bestEntrance;
+          for (final entrance in resolvedOrigin.entrances!) {
+            final dist = Geolocator.distanceBetween(entrance.latitude, entrance.longitude, resolvedDestination.routeLat, resolvedDestination.routeLng);
+            if (dist < minDist) {
+              minDist = dist;
+              bestEntrance = entrance;
+            }
+          }
+          if (bestEntrance != null) {
+            resolvedOrigin = (resolvedOrigin as CustomLocation).copyWith(
+              routeLat: bestEntrance.latitude,
+              routeLng: bestEntrance.longitude,
+            );
+          }
+        }
+      }
 
       RouteResult routeResult;
 
@@ -225,26 +397,26 @@ class SearchViewModel extends _$SearchViewModel {
         // Direct walk scenario (e.g. between landmarks near same station, or landmark and its station)
         StationExit? exit;
         List<LatLng>? walkingPath;
-        double walkMinutes = (origin.walkingMinutes ?? 0.0) + (destination.walkingMinutes ?? 0.0);
+        double walkMinutes = (resolvedOrigin.walkingMinutes ?? 0.0) + (resolvedDestination.walkingMinutes ?? 0.0);
 
         Landmark? lm;
         Station? st;
-        if (origin is Landmark) {
-          lm = origin;
+        if (resolvedOrigin is Landmark) {
+          lm = resolvedOrigin as Landmark;
           st = repo.getStation(destinationStationId);
-        } else if (destination is Landmark) {
-          lm = destination;
+        } else if (resolvedDestination is Landmark) {
+          lm = resolvedDestination as Landmark;
           st = repo.getStation(originStationId);
         }
 
         if (lm == null) {
           final List<dynamic> allLandmarks = repo.landmarks;
           for (final l in allLandmarks) {
-            if (l.id == origin.id && l is Landmark) {
+            if (l.id == resolvedOrigin.id && l is Landmark) {
               lm = l;
               st = repo.getStation(destinationStationId);
               break;
-            } else if (l.id == destination.id && l is Landmark) {
+            } else if (l.id == resolvedDestination.id && l is Landmark) {
               lm = l;
               st = repo.getStation(originStationId);
               break;
@@ -277,8 +449,8 @@ class SearchViewModel extends _$SearchViewModel {
           }
         }
 
-        exit ??= st?.findClosestExit(repo.exits, destination.routeLat, destination.routeLng);
-        walkingPath ??= [LatLng(origin.routeLat, origin.routeLng), LatLng(destination.routeLat, destination.routeLng)];
+        exit ??= st?.findClosestExit(repo.exits, resolvedDestination.routeLat, resolvedDestination.routeLng);
+        walkingPath ??= [LatLng(resolvedOrigin.routeLat, resolvedOrigin.routeLng), LatLng(resolvedDestination.routeLat, resolvedDestination.routeLng)];
 
         String direction = t.routeResult.walkToDestination;
         String? instructionsTh;
@@ -297,8 +469,8 @@ class SearchViewModel extends _$SearchViewModel {
           lineName: 'Walk',
           direction: direction,
           boundIndex: 0,
-          fromStation: origin,
-          toStation: destination,
+          fromStation: resolvedOrigin,
+          toStation: resolvedDestination,
           stationCount: 0,
           estimatedMinutes: walkMinutes > 0 ? walkMinutes : 5.0,
           fareThb: 0,
@@ -310,8 +482,8 @@ class SearchViewModel extends _$SearchViewModel {
         );
 
         routeResult = RouteResult(
-          origin: origin,
-          destination: destination,
+          origin: resolvedOrigin,
+          destination: resolvedDestination,
           segments: [walkSegment],
           transfers: [],
           totalMinutes: walkMinutes > 0 ? walkMinutes : 5.0,
@@ -320,7 +492,6 @@ class SearchViewModel extends _$SearchViewModel {
           totalStations: 0,
           calculatedAt: DateTime.now(),
         );
-      } else {
         // Run Dijkstra on transit stations
         final result = repo.findRoute(originStationId, destinationStationId);
 
@@ -333,11 +504,11 @@ class SearchViewModel extends _$SearchViewModel {
         }
 
         // Build RouteResult from DijkstraResult
-        routeResult = _buildRouteResult(result, origin, destination, repo, fareService);
+        routeResult = _buildRouteResult(result, resolvedOrigin, resolvedDestination, repo, fareService);
       }
 
       // Calculate saver route if available
-      final saverRoute = _findSaverRoute(origin, destination, routeResult, repo, fareService);
+      final saverRoute = _findSaverRoute(resolvedOrigin, resolvedDestination, routeResult, repo, fareService);
 
       state = state.copyWith(
         routeResult: routeResult,
