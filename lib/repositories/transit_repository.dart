@@ -319,7 +319,7 @@ class TransitRepository {
   /// Resolves the best entrance for a CustomLocation using Overpass and OSRM
   Future<CustomLocation?> resolveOnlinePlaceAsync(CustomLocation place) async {
     // 1. Fetch entrances around the centroid
-    final entrances = await _overpassService.findEntrances(place.lat, place.lng);
+    final entrances = await _overpassService.findEntrances(place.lat, place.lng, radius: 800.0);
     
     if (entrances.isEmpty) {
       // Fallback: use the centroid itself if no entrances found
