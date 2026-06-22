@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:latlong2/latlong.dart';
+import 'package:geolocator/geolocator.dart';
 
 /// Service for generating realistic walking routes (online via OSRM, offline via Manhattan grid fallback)
 class WalkingRouteService {
@@ -39,7 +40,29 @@ class WalkingRouteService {
             }).toList();
 
             if (points.isNotEmpty) {
-              return points;
+              final pathPoints = List<LatLng>.from(points);
+
+              // Ensure the path starts exactly at fromLat, fromLng
+              final distanceToStart = Geolocator.distanceBetween(
+                fromLat, fromLng, pathPoints.first.latitude, pathPoints.first.longitude
+              );
+              if (distanceToStart > 1.0) {
+                pathPoints.insert(0, LatLng(fromLat, fromLng));
+              } else {
+                pathPoints[0] = LatLng(fromLat, fromLng);
+              }
+
+              // Ensure the path ends exactly at toLat, toLng
+              final distanceToEnd = Geolocator.distanceBetween(
+                toLat, toLng, pathPoints.last.latitude, pathPoints.last.longitude
+              );
+              if (distanceToEnd > 1.0) {
+                pathPoints.add(LatLng(toLat, toLng));
+              } else {
+                pathPoints[pathPoints.length - 1] = LatLng(toLat, toLng);
+              }
+
+              return pathPoints;
             }
           }
         }
