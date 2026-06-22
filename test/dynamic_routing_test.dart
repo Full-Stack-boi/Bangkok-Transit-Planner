@@ -7,10 +7,17 @@ import 'package:flutter/widgets.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+class MockTransitRepository extends TransitRepository {
+  @override
+  Future<CustomLocation?> resolveOnlinePlaceAsync(CustomLocation place) async {
+    return place;
+  }
+}
+
 void main() {
   test('Verify Dynamic Entrance Resolution based on Route Origin', () async {
     WidgetsFlutterBinding.ensureInitialized();
-    final repo = TransitRepository();
+    final repo = MockTransitRepository();
     await repo.initialize();
 
     print('Initialized Repository Sizes:');

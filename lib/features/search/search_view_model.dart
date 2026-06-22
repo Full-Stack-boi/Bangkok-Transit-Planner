@@ -256,6 +256,7 @@ class SearchViewModel extends _$SearchViewModel {
               bestStationId = stationId;
               bestEntrance = entrance;
             }
+          } else {
             final route = repo.findRoute(originStationId, stationId);
             if (route != null) {
               final transitMinutes = route.totalWeight;
@@ -492,6 +493,7 @@ class SearchViewModel extends _$SearchViewModel {
           totalStations: 0,
           calculatedAt: DateTime.now(),
         );
+      } else {
         // Run Dijkstra on transit stations
         final result = repo.findRoute(originStationId, destinationStationId);
 
