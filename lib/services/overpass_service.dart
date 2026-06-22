@@ -68,10 +68,10 @@ class OverpassService {
             }
           }
           
-          // If a specific OSM object query returned empty, try falling back to radius-based search
-          if (entrances.isEmpty && osmType != null && osmId != null) {
-            return findEntrances(lat, lon, radius: radius);
-          }
+          // If a specific OSM-aware query (W/R) returned empty, do NOT fall back to a
+          // radius-based search — that would pick up entrances from nearby unrelated
+          // buildings (e.g. One Bangkok next to Lumphini Park). Return [] so the caller
+          // can fall back to the centroid itself instead.
           
           return entrances;
         }
@@ -82,10 +82,9 @@ class OverpassService {
       print('Exception calling Overpass API: $e');
     }
 
-    // Fallback if specific query fails/errors out
-    if (osmType != null && osmId != null) {
-      return findEntrances(lat, lon, radius: radius);
-    }
+    // If the OSM-aware query fails/errors out, return [] — do NOT fall back to radius.
+    // The caller will use the centroid as routing point, which is safer than a wrong
+    // entrance from an adjacent building.
 
     return [];
   }

@@ -10,6 +10,7 @@ import '../../core/theme/transit_colors.dart';
 import '../../models/station.dart';
 import '../../models/landmark.dart';
 import '../../models/custom_location.dart';
+import '../../models/namtang_stop.dart';
 import '../../models/crowd_report.dart';
 import '../../models/route_result.dart';
 import '../../providers/providers.dart';
@@ -36,9 +37,11 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   final _tileProvider = CachedTileProvider();
   Station? _selectedStation;
   CustomLocation? _customSelectedLocation;
+  NamtangStop? _selectedNamtangStop;
   Position? _userPosition;
   bool _isLocating = false;
   bool _isPrefetchExpanded = true;
+  double _currentZoom = 12.0;
 
   // Caches for Map Layer Optimization
   List<Polyline> _cachedPolylines = [];
@@ -618,6 +621,68 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     
     final markers = List<Marker>.from(_cachedBaseMarkers);
 
+    // Add Namtang stops overlay when zoomed in
+    if (_currentZoom >= 15.0 && !isRouteActive) {
+      try {
+        final bounds = _mapController.camera.visibleBounds;
+        for (final stop in transitRepo.namtangStops) {
+          final stopPoint = LatLng(stop.lat, stop.lng);
+          if (bounds.contains(stopPoint)) {
+            markers.add(
+              Marker(
+                point: stopPoint,
+                width: 24,
+                height: 24,
+                child: GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _selectedNamtangStop = stop;
+                      _selectedStation = null;
+                      _customSelectedLocation = null;
+                    });
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: themeBrightness == Brightness.dark 
+                          ? const Color(0xFF1E293B) 
+                          : Colors.white,
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: stop.type == 'boat' 
+                            ? Colors.blue.shade700 
+                            : (stop.type == 'commuter_train' ? Colors.red.shade700 : Colors.green.shade700),
+                        width: 2.0,
+                      ),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Colors.black26,
+                          blurRadius: 4,
+                          offset: Offset(0, 1),
+                        ),
+                      ],
+                    ),
+                    child: Center(
+                      child: Icon(
+                        stop.type == 'boat'
+                            ? Icons.directions_boat_rounded
+                            : (stop.type == 'commuter_train' ? Icons.train_rounded : Icons.directions_bus_rounded),
+                        size: 12,
+                        color: stop.type == 'boat' 
+                            ? Colors.blue.shade700 
+                            : (stop.type == 'commuter_train' ? Colors.red.shade700 : Colors.green.shade700),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            );
+          }
+        }
+      } catch (e) {
+        print('Error rendering Namtang stops: $e');
+      }
+    }
+
     // User location marker
     if (_userPosition != null) {
       markers.add(
@@ -670,6 +735,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
 
     final isBottomCardVisible = _selectedStation != null ||
         _customSelectedLocation != null ||
+        _selectedNamtangStop != null ||
         (isRouteActive && !isTrackingActive) ||
         isTrackingActive;
 
@@ -699,9 +765,19 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                         const LatLng(14.25, 101.00),
                       ),
                     ),
+                    onPositionChanged: (position, hasGesture) {
+                      if (position.zoom != null && (position.zoom! - _currentZoom).abs() > 0.15) {
+                        setState(() {
+                          _currentZoom = position.zoom!;
+                        });
+                      }
+                    },
                     onTap: (position, point) {
                       if (_selectedStation != null) {
                         setState(() => _selectedStation = null);
+                      }
+                      if (_selectedNamtangStop != null) {
+                        setState(() => _selectedNamtangStop = null);
                       }
                       
                       final nearest = _findNearestStation(point, transitRepo.stations);
@@ -713,6 +789,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
       
                         setState(() {
                           _selectedStation = null;
+                          _selectedNamtangStop = null;
                           _customSelectedLocation = CustomLocation(
                             id: 'CUSTOM_${point.latitude.toStringAsFixed(6)}_${point.longitude.toStringAsFixed(6)}',
                             nameTh: 'จุดที่เลือก (${point.latitude.toStringAsFixed(4)}, ${point.longitude.toStringAsFixed(4)})',
@@ -825,8 +902,23 @@ class _MapScreenState extends ConsumerState<MapScreen> {
               ),
             ),
 
+          // ─── Namtang Stop Details Popup Card ───
+          if (_selectedNamtangStop != null)
+            Positioned(
+              left: 16,
+              right: 16,
+              bottom: 16,
+              child: _buildNamtangStopDetailsCard(
+                context,
+                _selectedNamtangStop!,
+                theme,
+                t,
+                localeCode,
+              ),
+            ),
+
           // ─── Route Result Banner ───
-          if (isRouteActive && !isTrackingActive && _selectedStation == null && _customSelectedLocation == null)
+          if (isRouteActive && !isTrackingActive && _selectedStation == null && _customSelectedLocation == null && _selectedNamtangStop == null)
             Positioned(
               left: 16,
               right: 16,
@@ -839,7 +931,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
             ),
 
           // ─── Active Journey Tracking Panel ───
-          if (isTrackingActive && _selectedStation == null && _customSelectedLocation == null)
+          if (isTrackingActive && _selectedStation == null && _customSelectedLocation == null && _selectedNamtangStop == null)
             Positioned(
               left: 16,
               right: 16,
@@ -1875,6 +1967,122 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         },
         transitionDuration: const Duration(milliseconds: 200),
         reverseTransitionDuration: const Duration(milliseconds: 150),
+      ),
+    );
+  }
+
+  Widget _buildNamtangStopDetailsCard(
+    BuildContext context,
+    NamtangStop stop,
+    ThemeData theme,
+    AppLocalizations t,
+    String localeCode,
+  ) {
+    final searchVm = ref.read(searchViewModelProvider.notifier);
+    final transitRepo = ref.read(transitRepositoryProvider);
+    final nearest = stop.nearestStationId != null ? transitRepo.getStation(stop.nearestStationId!) : null;
+    final nearestName = nearest?.displayName(isEnglish: localeCode == 'en') ?? '';
+    final walkMin = stop.walkingMinutes?.toInt() ?? 5;
+
+    final stopName = localeCode == 'th' ? stop.nameTh : stop.nameEn;
+
+    IconData leadingIcon = Icons.directions_bus_rounded;
+    Color leadingColor = Colors.green;
+    if (stop.type == 'boat') {
+      leadingIcon = Icons.directions_boat_rounded;
+      leadingColor = Colors.blue.shade700;
+    } else if (stop.type == 'commuter_train') {
+      leadingIcon = Icons.train_rounded;
+      leadingColor = Colors.red.shade700;
+    }
+
+    return Card(
+      elevation: 8,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  leadingIcon,
+                  color: leadingColor,
+                  size: 28,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        stopName,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      if (nearestName.isNotEmpty)
+                        Text(
+                          t.proximity.nearStationWalk(nearestName, '$walkMin'),
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                            fontSize: 12,
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.close_rounded),
+                  onPressed: () {
+                    setState(() => _selectedNamtangStop = null);
+                  },
+                ),
+              ],
+            ),
+            const Divider(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () {
+                      searchVm.setOrigin(stop);
+                      setState(() => _selectedNamtangStop = null);
+                      final currentState = ref.read(searchViewModelProvider);
+                      if (currentState.destination == null) {
+                        _openSearchOverlay(context, focusDestination: true);
+                      }
+                    },
+                    icon: const Icon(Icons.trip_origin_rounded, size: 16, color: Colors.green),
+                    label: Text(t.favorites.setOriginBtn),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () {
+                      searchVm.setDestination(stop);
+                      setState(() => _selectedNamtangStop = null);
+                      final currentState = ref.read(searchViewModelProvider);
+                      if (currentState.origin == null) {
+                        _openSearchOverlay(context, focusDestination: false);
+                      }
+                    },
+                    icon: const Icon(Icons.location_on_rounded, size: 16, color: Colors.red),
+                    label: Text(t.favorites.setDestBtn),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -277,10 +277,19 @@ class SearchViewModel extends _$SearchViewModel {
         }
         
         if (bestEntrance != null) {
+          // Recalculate walkingMinutes from the newly chosen entrance to the station.
+          // Clear stale walkingPath so _hydrateAllRoutes refetches the correct OSRM path.
+          final bestStation = repo.getStation(bestStationId);
+          final newWalkDist = bestStation != null
+              ? Geolocator.distanceBetween(bestEntrance.latitude, bestEntrance.longitude, bestStation.lat, bestStation.lng)
+              : 0.0;
+          final newWalkMinutes = (newWalkDist / 80.0).clamp(1.0, 30.0);
           resolvedDestination = (resolvedDestination as CustomLocation).copyWith(
             routeLat: bestEntrance.latitude,
             routeLng: bestEntrance.longitude,
             nearestStationId: bestStationId,
+            walkingMinutes: newWalkMinutes,
+            clearWalkingPath: true,
           );
         }
       }
@@ -343,10 +352,19 @@ class SearchViewModel extends _$SearchViewModel {
         }
         
         if (bestEntrance != null) {
+          // Recalculate walkingMinutes from the newly chosen entrance to the station.
+          // Clear stale walkingPath so _hydrateAllRoutes refetches the correct OSRM path.
+          final bestStation = repo.getStation(bestStationId);
+          final newWalkDist = bestStation != null
+              ? Geolocator.distanceBetween(bestEntrance.latitude, bestEntrance.longitude, bestStation.lat, bestStation.lng)
+              : 0.0;
+          final newWalkMinutes = (newWalkDist / 80.0).clamp(1.0, 30.0);
           resolvedOrigin = (resolvedOrigin as CustomLocation).copyWith(
             routeLat: bestEntrance.latitude,
             routeLng: bestEntrance.longitude,
             nearestStationId: bestStationId,
+            walkingMinutes: newWalkMinutes,
+            clearWalkingPath: true,
           );
         }
       }
@@ -594,6 +612,10 @@ class SearchViewModel extends _$SearchViewModel {
       final dijkstraResult = repo.findRoute(startId, endId);
       if (dijkstraResult == null) return;
 
+      // BUG 5 fix: propagate routeLat/routeLng and path data from the resolved items.
+      // Without this, tempOrigin/tempDest use lat/lng (centroid) instead of the
+      // resolved entrance coordinate, causing saver route walking paths to start/end
+      // at the wrong place.
       final tempOrigin = CustomLocation(
         id: origin.id,
         nameTh: origin.nameTh,
@@ -602,6 +624,10 @@ class SearchViewModel extends _$SearchViewModel {
         walkingMinutes: startWalkMin,
         lat: originLat,
         lng: originLng,
+        routeLat: origin.routeLat,
+        routeLng: origin.routeLng,
+        entrances: origin is CustomLocation ? (origin as CustomLocation).entrances : null,
+        walkingPath: origin is CustomLocation ? (origin as CustomLocation).walkingPath : null,
       );
 
       final tempDest = CustomLocation(
@@ -612,6 +638,10 @@ class SearchViewModel extends _$SearchViewModel {
         walkingMinutes: endWalkMin,
         lat: destLat,
         lng: destLng,
+        routeLat: destination.routeLat,
+        routeLng: destination.routeLng,
+        entrances: destination is CustomLocation ? (destination as CustomLocation).entrances : null,
+        walkingPath: destination is CustomLocation ? (destination as CustomLocation).walkingPath : null,
       );
 
       final altRoute = _buildRouteResult(dijkstraResult, tempOrigin, tempDest, repo, fareService);

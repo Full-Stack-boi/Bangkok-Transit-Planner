@@ -5,6 +5,7 @@ import '../../../core/theme/transit_colors.dart';
 import '../../../models/station.dart';
 import '../../../models/searchable_item.dart';
 import '../../../models/custom_location.dart';
+import '../../../models/namtang_stop.dart';
 import '../../search/search_view_model.dart';
 import '../../../providers/providers.dart';
 import '../../../core/constants/translation_helper.dart';
@@ -623,6 +624,21 @@ class _StationListTile extends ConsumerWidget {
       itemColor = theme.colorScheme.secondary;
       subtitle = t.proximity.nearStationWalk(nearestName, '$walkTime');
 
+      IconData leadingIcon = Icons.place_rounded;
+      if (station is NamtangStop) {
+        final ns = station as NamtangStop;
+        if (ns.type == 'bus' || ns.type == 'brt') {
+          leadingIcon = Icons.directions_bus_rounded;
+          itemColor = Colors.green;
+        } else if (ns.type == 'boat') {
+          leadingIcon = Icons.directions_boat_rounded;
+          itemColor = Colors.blue.shade700;
+        } else if (ns.type == 'commuter_train') {
+          leadingIcon = Icons.train_rounded;
+          itemColor = Colors.red.shade700;
+        }
+      }
+
       leadingWidget = Container(
         width: 42,
         height: 42,
@@ -631,7 +647,7 @@ class _StationListTile extends ConsumerWidget {
           borderRadius: BorderRadius.circular(12),
         ),
         child: Center(
-          child: Icon(Icons.place_rounded, color: itemColor, size: 22),
+          child: Icon(leadingIcon, color: itemColor, size: 22),
         ),
       );
     }

@@ -54,6 +54,7 @@ class CustomLocation extends SearchableItem {
     double? routeLng,
     List<LatLng>? walkingPath,
     List<LatLng>? entrances,
+    bool clearWalkingPath = false,
   }) {
     return CustomLocation(
       id: id ?? this.id,
@@ -65,7 +66,7 @@ class CustomLocation extends SearchableItem {
       lng: lng ?? this.lng,
       routeLat: routeLat ?? this.routeLat,
       routeLng: routeLng ?? this.routeLng,
-      walkingPath: walkingPath ?? this.walkingPath,
+      walkingPath: clearWalkingPath ? null : (walkingPath ?? this.walkingPath),
       entrances: entrances ?? this.entrances,
     );
   }

@@ -12,6 +12,7 @@ import '../services/overpass_service.dart';
 import 'package:latlong2/latlong.dart';
 import '../models/custom_location.dart';
 import '../models/searchable_item.dart';
+import '../models/namtang_stop.dart';
 
 /// Repository for loading and accessing static transit data
 class TransitRepository {
@@ -21,6 +22,7 @@ class TransitRepository {
   List<Station>? _stations;
   List<TransitLine>? _lines;
   List<Landmark>? _landmarks;
+  List<NamtangStop>? _namtangStops;
   List<StationExit> _exits = [];
   TransitGraph? _graph;
   bool _initialized = false;
@@ -33,6 +35,7 @@ class TransitRepository {
   List<Station> get stations => _stations ?? [];
   List<TransitLine> get lines => _lines ?? [];
   List<Landmark> get landmarks => _landmarks ?? [];
+  List<NamtangStop> get namtangStops => _namtangStops ?? [];
   List<StationExit> get exits => _exits;
   TransitGraph get graph => _graph!;
 
@@ -46,6 +49,8 @@ class TransitRepository {
       _loadLandmarks(),
       _loadExits(),
     ]);
+
+    await _loadNamtangStops();
 
     _buildGraph();
     _initialized = true;
@@ -103,6 +108,49 @@ class TransitRepository {
     } catch (e) {
       _landmarks = [];
     }
+  }
+
+  Future<void> _loadNamtangStops() async {
+    try {
+      final jsonStr = await rootBundle.loadString('assets/data/namtang_stops.json');
+      final List<dynamic> jsonList = json.decode(jsonStr);
+      final rawStops = jsonList.map((j) => NamtangStop.fromJson(j as Map<String, dynamic>)).toList();
+      
+      // Calculate nearest stations for all stops
+      _namtangStops = rawStops.map((stop) {
+        final nearest = _findNearestStationFast(stop.lat, stop.lng);
+        if (nearest != null) {
+          final dist = Geolocator.distanceBetween(stop.lat, stop.lng, nearest.lat, nearest.lng);
+          final walkMin = (dist / 80.0).clamp(1.0, 30.0);
+          return stop.copyWith(
+            nearestStationId: nearest.id,
+            walkingMinutes: walkMin,
+          );
+        }
+        return stop;
+      }).toList();
+    } catch (e) {
+      _namtangStops = [];
+      print('Failed to load Namtang stops: $e');
+    }
+  }
+
+  Station? _findNearestStationFast(double lat, double lon) {
+    if (_stations == null || _stations!.isEmpty) return null;
+
+    Station? closest;
+    double minDistSq = double.infinity;
+
+    for (final station in _stations!) {
+      final dLat = lat - station.lat;
+      final dLon = lon - station.lng;
+      final distSq = dLat * dLat + dLon * dLon;
+      if (distSq < minDistSq) {
+        minDistSq = distSq;
+        closest = station;
+      }
+    }
+    return closest;
   }
 
   void _buildGraph() {
@@ -228,7 +276,14 @@ class TransitRepository {
              normalizedEn.contains(q);
     }).toList();
 
-    return [...matchingStations, ...matchingLandmarks];
+    final matchingNamtangStops = (_namtangStops ?? []).where((s) {
+      final normalizedTh = s.nameTh.toLowerCase().replaceAll(RegExp(r'\s+'), '');
+      final normalizedEn = s.nameEn.toLowerCase().replaceAll(RegExp(r'\s+'), '');
+      return normalizedTh.contains(q) ||
+             normalizedEn.contains(q);
+    }).take(20).toList();
+
+    return [...matchingStations, ...matchingLandmarks, ...matchingNamtangStops];
   }
 
   /// Search places online via Photon API (Elasticsearch-based autocomplete), bounded to Bangkok
@@ -382,9 +437,11 @@ class TransitRepository {
 
     if (bestMatch != null && bestEntrance != null) {
       // We found a valid route via an entrance!
+      // Use routeLat/routeLng (not lat/lng) so the map display pin stays at the
+      // original centroid while only the routing/walking coordinate moves to the entrance.
       return place.copyWith(
-        lat: bestEntrance.latitude,
-        lng: bestEntrance.longitude,
+        routeLat: bestEntrance.latitude,
+        routeLng: bestEntrance.longitude,
         nearestStationId: bestMatch.station.id,
         walkingMinutes: (bestMatch.osrmResult!.durationSeconds / 60.0).clamp(1.0, 30.0),
         walkingPath: bestMatch.osrmResult!.coordinates,
