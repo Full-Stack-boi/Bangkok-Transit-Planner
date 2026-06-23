@@ -250,6 +250,10 @@ class FavoritesRepository {
             'destination_id': route['destination_id']!,
             'origin_name': existing?['origin_name'] ?? route['origin_name'] ?? '',
             'destination_name': existing?['destination_name'] ?? route['destination_name'] ?? '',
+            'origin_lat': existing?['origin_lat'] ?? '',
+            'origin_lng': existing?['origin_lng'] ?? '',
+            'destination_lat': existing?['destination_lat'] ?? '',
+            'destination_lng': existing?['destination_lng'] ?? '',
             'name': route['name']!,
             'created_at': route['created_at']!,
           };

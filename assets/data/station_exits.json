@@ -4080,9 +4080,10 @@
     "exit_code": "1",
     "name_th": "ทางออก 1 (ซอยจรัญสนิทวงศ์ 11, วัดเจ้ามูล)",
     "name_en": "Exit 1 (Soi Charan Sanit Wong 11, Wat Chao Mun)",
-    "lat": 13.740421,
-    "lng": 100.470959,
-    "source": "estimated"
+    "lat": 13.7397955,
+    "lng": 100.4680552,
+    "source": "longdo_geocoded",
+    "geocode_keyword": "จรัญสนิทวงศ์ 11"
   },
   {
     "id": "MRT_BL02_EX2",
@@ -4090,9 +4091,10 @@
     "exit_code": "2",
     "name_th": "ทางออก 2 (ซอยจรัญสนิทวงศ์ 13, วิทยาลัยพาณิชยการธนบุรี)",
     "name_en": "Exit 2 (Soi Charan Sanit Wong 13, Thonburi Commercial College)",
-    "lat": 13.739921,
-    "lng": 100.470459,
-    "source": "estimated"
+    "lat": 13.741173,
+    "lng": 100.47109,
+    "source": "longdo_geocoded",
+    "geocode_keyword": "จรัญสนิทวงศ์ 13"
   },
   {
     "id": "MRT_BL02_EX3",
@@ -4100,9 +4102,10 @@
     "exit_code": "3",
     "name_th": "ทางออก 3 (การไฟฟ้านครหลวงธนบุรี, วัดโพธิ์เรียง)",
     "name_en": "Exit 3 (การไฟฟ้านครหลวงธนบุรี, Wat โพธิ์เรียง)",
-    "lat": 13.740421,
-    "lng": 100.470459,
-    "source": "estimated"
+    "lat": 13.7438451,
+    "lng": 100.4721161,
+    "source": "longdo_geocoded",
+    "geocode_keyword": "วัดโพธิ์เรียง"
   },
   {
     "id": "MRT_BL02_EX4",
@@ -4110,9 +4113,10 @@
     "exit_code": "4",
     "name_th": "ทางออก 4 (วิทยาลัยเทคโนโลยีสยาม)",
     "name_en": "Exit 4 (College เทคโนโลยีสยาม)",
-    "lat": 13.739921,
-    "lng": 100.470959,
-    "source": "estimated"
+    "lat": 13.7388327,
+    "lng": 100.4712568,
+    "source": "longdo_geocoded",
+    "geocode_keyword": "วิทยาลัยเทคโนโลยีสยาม"
   },
   {
     "id": "MRT_BL03_EX1",
@@ -4130,9 +4134,10 @@
     "exit_code": "2",
     "name_th": "ทางออก 2 (ซอยจรัญสนิทวงศ์ 31/1)",
     "name_en": "Exit 2 (Soi Charan Sanit Wong 31/1)",
-    "lat": 13.755551,
-    "lng": 100.46907,
-    "source": "estimated"
+    "lat": 13.7553899,
+    "lng": 100.468162,
+    "source": "longdo_geocoded",
+    "geocode_keyword": "จรัญสนิทวงศ์ 31/1"
   },
   {
     "id": "MRT_BL03_EX3",
@@ -4140,9 +4145,10 @@
     "exit_code": "3",
     "name_th": "ทางออก 3 (ซอยจรัญสนิทวงศ์ 31/2, วัดรวกสุทธาราม, ตลาดบางขุนศรี)",
     "name_en": "Exit 3 (Soi Charan Sanit Wong 31/2, Wat Ruak Suttharam, Bang Khun Sri Market)",
-    "lat": 13.756051,
-    "lng": 100.46907,
-    "source": "estimated"
+    "lat": 13.7561106,
+    "lng": 100.4689609,
+    "source": "longdo_geocoded",
+    "geocode_keyword": "จรัญสนิทวงศ์ 31/2"
   },
   {
     "id": "MRT_BL03_EX4",
@@ -4150,9 +4156,10 @@
     "exit_code": "4",
     "name_th": "ทางออก 4 (โรงพยาบาลวิชัยเวช)",
     "name_en": "Exit 4 (Vichaivej Hospital)",
-    "lat": 13.755551,
-    "lng": 100.46957,
-    "source": "estimated"
+    "lat": 13.755907,
+    "lng": 100.4696596,
+    "source": "longdo_geocoded",
+    "geocode_keyword": "โรงพยาบาลวิชัยเวช"
   },
   {
     "id": "MRT_BL04_EX1",
@@ -4160,9 +4167,9 @@
     "exit_code": "1",
     "name_th": "ทางออก 1 (วัดสุทธาวาส, สถานีรถไฟธนบุรี, สำนักงานประปา เขตบางกอกน้อย, สถานีตำรวจนครบาลบางกอกน้อย, ซอยจรัญสนิทวงศ์ 30/1)",
     "name_en": "Exit 1 (Wat สุทธาวาส, สถานีรถไฟธนบุรี, สำนักงานประปา เขตบางกอกน้อย, Metropolitan Police Station บางกอกน้อย, Soi Charan Sanit Wong 30/1)",
-    "lat": 13.763549999999999,
-    "lng": 100.47345,
-    "source": "estimated"
+    "lat": 13.763218,
+    "lng": 100.47318,
+    "source": "google_street_view"
   },
   {
     "id": "MRT_BL04_EX2",
@@ -4170,9 +4177,9 @@
     "exit_code": "2",
     "name_th": "ทางออก 2 (ซอยจรัญสนิทวงศ์ 39)",
     "name_en": "Exit 2 (Soi Charan Sanit Wong 39)",
-    "lat": 13.76305,
-    "lng": 100.47295000000001,
-    "source": "estimated"
+    "lat": 13.76355,
+    "lng": 100.47295,
+    "source": "google_street_view"
   },
   {
     "id": "MRT_BL04_EX3",
@@ -4180,9 +4187,9 @@
     "exit_code": "3",
     "name_th": "ทางออก 3 (แยกบางขุนนนท์)",
     "name_en": "Exit 3 (Intersection บางขุนนนท์)",
-    "lat": 13.763549999999999,
-    "lng": 100.47295000000001,
-    "source": "estimated"
+    "lat": 13.76365,
+    "lng": 100.47355,
+    "source": "google_street_view"
   },
   {
     "id": "MRT_BL04_EX4",
@@ -4190,9 +4197,9 @@
     "exit_code": "4",
     "name_th": "ทางออก 4 (สำนักงานเขตบางกอกน้อย, วัดสุวรรณารามราชวรวิหาร)",
     "name_en": "Exit 4 (District Office บางกอกน้อย, Wat สุวรรณารามราชวรวิหาร)",
-    "lat": 13.76305,
-    "lng": 100.47345,
-    "source": "estimated"
+    "lat": 13.76336,
+    "lng": 100.47362,
+    "source": "google_street_view"
   },
   {
     "id": "MRT_BL05_EX1",
@@ -4200,9 +4207,10 @@
     "exit_code": "1",
     "name_th": "ทางออก 1 (ซอยจรัญสนิทวงศ์ 49/1)",
     "name_en": "Exit 1 (Soi Charan Sanit Wong 49/1)",
-    "lat": 13.77755,
-    "lng": 100.48545,
-    "source": "estimated"
+    "lat": 13.7771851,
+    "lng": 100.4827872,
+    "source": "longdo_geocoded",
+    "geocode_keyword": "จรัญสนิทวงศ์ 49/1"
   },
   {
     "id": "MRT_BL05_EX2",
@@ -4210,9 +4218,10 @@
     "exit_code": "2",
     "name_th": "ทางออก 2 (ซอยจรัญสนิทวงศ์ 55)",
     "name_en": "Exit 2 (Soi Charan Sanit Wong 55)",
-    "lat": 13.777050000000001,
-    "lng": 100.48495000000001,
-    "source": "estimated"
+    "lat": 13.7786135,
+    "lng": 100.4860117,
+    "source": "longdo_geocoded",
+    "geocode_keyword": "จรัญสนิทวงศ์ 55"
   },
   {
     "id": "MRT_BL05_EX3",
@@ -4220,9 +4229,10 @@
     "exit_code": "3",
     "name_th": "ทางออก 3 (ซอยจรัญสนิทวงศ์ 42)",
     "name_en": "Exit 3 (Soi Charan Sanit Wong 42)",
-    "lat": 13.77755,
-    "lng": 100.48495000000001,
-    "source": "estimated"
+    "lat": 13.773993,
+    "lng": 100.4890277,
+    "source": "longdo_geocoded",
+    "geocode_keyword": "จรัญสนิทวงศ์ 42"
   },
   {
     "id": "MRT_BL05_EX4",
@@ -4230,9 +4240,10 @@
     "exit_code": "4",
     "name_th": "ทางออก 4 (ซอยจรัญสนิทวงศ์ 40/1)",
     "name_en": "Exit 4 (Soi Charan Sanit Wong 40/1)",
-    "lat": 13.777050000000001,
-    "lng": 100.48545,
-    "source": "estimated"
+    "lat": 13.7761843,
+    "lng": 100.4868491,
+    "source": "longdo_geocoded",
+    "geocode_keyword": "จรัญสนิทวงศ์ 40/1"
   },
   {
     "id": "MRT_BL06_EX1",
@@ -4240,9 +4251,10 @@
     "exit_code": "1",
     "name_th": "ทางออก 1 (ซอยจรัญสนิทวงศ์ 64, วัดสิงห์)",
     "name_en": "Exit 1 (Soi Charan Sanit Wong 64, Wat สิงห์)",
-    "lat": 13.784123,
-    "lng": 100.493577,
-    "source": "estimated"
+    "lat": 13.7828879,
+    "lng": 100.4958932,
+    "source": "longdo_geocoded",
+    "geocode_keyword": "จรัญสนิทวงศ์ 64"
   },
   {
     "id": "MRT_BL06_EX2A",
@@ -4250,9 +4262,10 @@
     "exit_code": "2A",
     "name_th": "ทางออก 2A (ซอยจรัญสนิทวงศ์ 62)",
     "name_en": "Exit 2A (Soi Charan Sanit Wong 62)",
-    "lat": 13.783417718286708,
-    "lng": 100.49278539757728,
-    "source": "estimated"
+    "lat": 13.7810505,
+    "lng": 100.49421,
+    "source": "longdo_geocoded",
+    "geocode_keyword": "จรัญสนิทวงศ์ 62"
   },
   {
     "id": "MRT_BL06_EX2B",
@@ -4260,9 +4273,10 @@
     "exit_code": "2B",
     "name_th": "ทางออก 2B (ซอยจรัญสนิทวงศ์ 56)",
     "name_en": "Exit 2B (Soi Charan Sanit Wong 56)",
-    "lat": 13.783367718286708,
-    "lng": 100.49283539757728,
-    "source": "estimated"
+    "lat": 13.7817514,
+    "lng": 100.4908115,
+    "source": "longdo_geocoded",
+    "geocode_keyword": "จรัญสนิทวงศ์ 56"
   },
   {
     "id": "MRT_BL06_EX3A",
@@ -4270,9 +4284,10 @@
     "exit_code": "3A",
     "name_th": "ทางออก 3A (3B สำนักงานที่ดิน บางกอกน้อย, ซอยจรัญสนิทวงศ์ 59)",
     "name_en": "Exit 3A (3B สำนักงานที่ดิน บางกอกน้อย, Soi Charan Sanit Wong 59)",
-    "lat": 13.784217718286708,
-    "lng": 100.49328539757728,
-    "source": "estimated"
+    "lat": 13.78246,
+    "lng": 100.48756,
+    "source": "longdo_geocoded",
+    "geocode_keyword": "จรัญสนิทวงศ์ 59"
   },
   {
     "id": "MRT_BL06_EX3C",
@@ -4300,9 +4315,10 @@
     "exit_code": "1",
     "name_th": "ทางออก 1 (ซอยจรัญสนิทวงศ์ 81)",
     "name_en": "Exit 1 (Soi Charan Sanit Wong 81)",
-    "lat": 13.79275,
-    "lng": 100.50515,
-    "source": "estimated"
+    "lat": 13.7924477,
+    "lng": 100.5035146,
+    "source": "longdo_geocoded",
+    "geocode_keyword": "จรัญสนิทวงศ์ 81"
   },
   {
     "id": "MRT_BL07_EX2",
@@ -4310,9 +4326,10 @@
     "exit_code": "2",
     "name_th": "ทางออก 2 (สำนักงานเขตบางพลัด, ซอยจรัญสนิทวงศ์ 83/1)",
     "name_en": "Exit 2 (District Office บางพลัด, Soi Charan Sanit Wong 83/1)",
-    "lat": 13.792250000000001,
-    "lng": 100.50465000000001,
-    "source": "estimated"
+    "lat": 13.7949728,
+    "lng": 100.504658,
+    "source": "longdo_geocoded",
+    "geocode_keyword": "จรัญสนิทวงศ์ 83/1"
   },
   {
     "id": "MRT_BL07_EX3",
@@ -4320,9 +4337,10 @@
     "exit_code": "3",
     "name_th": "ทางออก 3 (ซอยจรัญสนิทวงศ์ 76)",
     "name_en": "Exit 3 (Soi Charan Sanit Wong 76)",
-    "lat": 13.79275,
-    "lng": 100.50465000000001,
-    "source": "estimated"
+    "lat": 13.7927707,
+    "lng": 100.5059457,
+    "source": "longdo_geocoded",
+    "geocode_keyword": "จรัญสนิทวงศ์ 76"
   },
   {
     "id": "MRT_BL07_EX4",
@@ -4330,9 +4348,10 @@
     "exit_code": "4",
     "name_th": "ทางออก 4 (ซอยจรัญสนิทวงศ์ 72, วัดอาวุธวิกสิตาราม)",
     "name_en": "Exit 4 (Soi Charan Sanit Wong 72, Wat อาวุธวิกสิตาราม)",
-    "lat": 13.792250000000001,
-    "lng": 100.50515,
-    "source": "estimated"
+    "lat": 13.7894071,
+    "lng": 100.5055438,
+    "source": "longdo_geocoded",
+    "geocode_keyword": "จรัญสนิทวงศ์ 72"
   },
   {
     "id": "MRT_BL08_EX1",
@@ -4340,9 +4359,10 @@
     "exit_code": "1",
     "name_th": "ทางออก 1 (ซอยจรัญสนิทวงศ์ 86/2, ศูนย์บริการสาธารณสุข 31, มัสยิดบางอ้อ)",
     "name_en": "Exit 1 (Soi Charan Sanit Wong 86/2, ศูนย์บริการสาธารณสุข 31, มัสยิดบางอ้อ)",
-    "lat": 13.79915,
-    "lng": 100.50994999999999,
-    "source": "estimated"
+    "lat": 13.797022,
+    "lng": 100.5110371,
+    "source": "longdo_geocoded",
+    "geocode_keyword": "จรัญสนิทวงศ์ 86/2"
   },
   {
     "id": "MRT_BL08_EX2",
@@ -4350,9 +4370,10 @@
     "exit_code": "2",
     "name_th": "ทางออก 2 (ซอยจรัญสนิทวงศ์ 85, วัดสามัคคีสุทธาวาส)",
     "name_en": "Exit 2 (Soi Charan Sanit Wong 85, Wat สามัคคีสุทธาวาส)",
-    "lat": 13.79865,
-    "lng": 100.50945,
-    "source": "estimated"
+    "lat": 13.7955822,
+    "lng": 100.505355,
+    "source": "longdo_geocoded",
+    "geocode_keyword": "จรัญสนิทวงศ์ 85"
   },
   {
     "id": "MRT_BL08_EX3",
@@ -4360,9 +4381,10 @@
     "exit_code": "3",
     "name_th": "ทางออก 3 (ซอยจรัญสนิทวงศ์ 89/2)",
     "name_en": "Exit 3 (Soi Charan Sanit Wong 89/2)",
-    "lat": 13.79915,
-    "lng": 100.50945,
-    "source": "estimated"
+    "lat": 13.7996937,
+    "lng": 100.5101193,
+    "source": "longdo_geocoded",
+    "geocode_keyword": "จรัญสนิทวงศ์ 89/2"
   },
   {
     "id": "MRT_BL08_EX4",
@@ -4411,9 +4433,10 @@
     "exit_code": "2A",
     "name_th": "ทางออก 2A (ถนนประชาราษฎร์ สาย 2, วัดบางโพโอมาวาส)",
     "name_en": "Exit 2A (Rd. ประชาราษฎร์ สาย 2, Wat บางโพโอมาวาส)",
-    "lat": 13.806164492522052,
-    "lng": 100.52081984620094,
-    "source": "estimated"
+    "lat": 13.8091599,
+    "lng": 100.5195567,
+    "source": "longdo_geocoded",
+    "geocode_keyword": "วัดบางโพโอมาวาส"
   },
   {
     "id": "MRT_BL09_EX2B",
@@ -4421,9 +4444,10 @@
     "exit_code": "2B",
     "name_th": "ทางออก 2B (โรงพยาบาลบางโพ, ตลาดบางโพ)",
     "name_en": "Exit 2B (Hospital บางโพ, Market บางโพ)",
-    "lat": 13.806114492522052,
-    "lng": 100.52086984620094,
-    "source": "estimated"
+    "lat": 13.8068491,
+    "lng": 100.5233025,
+    "source": "longdo_geocoded",
+    "geocode_keyword": "โรงพยาบาลบางโพ"
   },
   {
     "id": "MRT_BL09_EX3A",
@@ -4431,9 +4455,10 @@
     "exit_code": "3A",
     "name_th": "ทางออก 3A (ที่ทำการไปรษณีย์บางโพ, สถานีดับเพลิงบางโพ, ที่ทำการด่านป่าไม้กรุงเทพ)",
     "name_en": "Exit 3A (ที่ทำการไปรษณีย์บางโพ, สถานีดับเพลิงบางโพ, ที่ทำการด่านป่าไม้กรุงเทพ)",
-    "lat": 13.807264492522052,
-    "lng": 100.52161984620095,
-    "source": "estimated"
+    "lat": 13.8062246,
+    "lng": 100.5225651,
+    "source": "longdo_geocoded",
+    "geocode_keyword": "ที่ทำการไปรษณีย์บางโพ"
   },
   {
     "id": "MRT_BL09_EX3B",
@@ -4515,9 +4540,10 @@
     "exit_code": "1",
     "name_th": "ทางออก 1 (ตลาดนัดจตุจักร)",
     "name_en": "Exit 1 (Chatuchak Weekend Market)",
-    "lat": 13.7980503,
-    "lng": 100.5475995,
-    "source": "estimated"
+    "lat": 13.7994072,
+    "lng": 100.5487311,
+    "source": "longdo_geocoded",
+    "geocode_keyword": "ตลาดนัดจตุจักร"
   },
   {
     "id": "MRT_BL12_EX2",
@@ -4771,9 +4797,10 @@
     "exit_code": "2",
     "name_th": "ทางออก 2 (ซอยรัชดาภิเษก 12)",
     "name_en": "Exit 2 (Soi รัชดาภิเษก 12)",
-    "lat": 13.778438,
-    "lng": 100.573316,
-    "source": "estimated"
+    "lat": 13.7750993,
+    "lng": 100.5737078,
+    "source": "longdo_geocoded",
+    "geocode_keyword": "รัชดาภิเษก 12"
   },
   {
     "id": "MRT_BL18_EX3",
@@ -4792,9 +4819,10 @@
     "exit_code": "4",
     "name_th": "ทางออก 4 (โรงเรียนกุนนทีรุทธารามวิทยาคม)",
     "name_en": "Exit 4 (School กุนนทีรุทธารามวิทยาคม)",
-    "lat": 13.778438,
-    "lng": 100.573816,
-    "source": "estimated"
+    "lat": 13.7823895,
+    "lng": 100.5726374,
+    "source": "longdo_geocoded",
+    "geocode_keyword": "โรงเรียนกุนนทีรุทธารามวิทยาคม"
   },
   {
     "id": "MRT_BL19_EX1",
@@ -4802,9 +4830,10 @@
     "exit_code": "1",
     "name_th": "ทางออก 1 (ศูนย์วัฒนธรรมแห่งประเทศไทย)",
     "name_en": "Exit 1 (ศูนย์วัฒนธรรมแห่งประเทศไทย)",
-    "lat": 13.766541,
-    "lng": 100.570333,
-    "source": "estimated"
+    "lat": 13.766706,
+    "lng": 100.5739418,
+    "source": "longdo_geocoded",
+    "geocode_keyword": "ศูนย์วัฒนธรรมแห่งประเทศไทย"
   },
   {
     "id": "MRT_BL19_EX2",
@@ -4812,9 +4841,10 @@
     "exit_code": "2",
     "name_th": "ทางออก 2 (ซอยรัชดาภิเษก 8)",
     "name_en": "Exit 2 (Soi รัชดาภิเษก 8)",
-    "lat": 13.766041,
-    "lng": 100.569833,
-    "source": "estimated"
+    "lat": 13.7651999,
+    "lng": 100.5697435,
+    "source": "longdo_geocoded",
+    "geocode_keyword": "รัชดาภิเษก 8"
   },
   {
     "id": "MRT_BL19_EX3",
@@ -4832,9 +4862,10 @@
     "exit_code": "4",
     "name_th": "ทางออก 4 (แยกเทียมร่วมมิตร)",
     "name_en": "Exit 4 (Intersection เทียมร่วมมิตร)",
-    "lat": 13.766041,
-    "lng": 100.570333,
-    "source": "estimated"
+    "lat": 13.7690623,
+    "lng": 100.5732029,
+    "source": "longdo_geocoded",
+    "geocode_keyword": "แยกเทียมร่วมมิตร"
   },
   {
     "id": "MRT_BL20_EX1",
@@ -4853,9 +4884,9 @@
     "exit_code": "2",
     "name_th": "ทางออก 2 (ซอยพระราม 9 สแควร์ เซ็นทรัลพลาซ่าพระราม 9)",
     "name_en": "Exit 2 (Soi พระราม 9 สแควร์ Central พลาซ่าพระราม 9)",
-    "lat": 13.75695,
-    "lng": 100.56505,
-    "source": "estimated"
+    "lat": 13.7577844,
+    "lng": 100.565554,
+    "source": "google_street_view"
   },
   {
     "id": "MRT_BL20_EX3",
@@ -4863,9 +4894,10 @@
     "exit_code": "3",
     "name_th": "ทางออก 3 (แยกพระราม 9)",
     "name_en": "Exit 3 (Intersection พระราม 9)",
-    "lat": 13.757449999999999,
-    "lng": 100.56505,
-    "source": "estimated"
+    "lat": 13.757028,
+    "lng": 100.565417,
+    "source": "user_verification",
+    "geocode_keyword": "แยกพระราม 9"
   },
   {
     "id": "MRT_BL21_EX1",
@@ -5148,9 +5180,10 @@
     "exit_code": "3",
     "name_th": "ทางออก 3 (วัดมังกรกมลาวาส)",
     "name_en": "Exit 3 (Wat มังกรกมลาวาส)",
-    "lat": 13.742116211089032,
-    "lng": 100.50988617200852,
-    "source": "estimated"
+    "lat": 13.7430943,
+    "lng": 100.5092547,
+    "source": "longdo_geocoded",
+    "geocode_keyword": "วัดมังกรกมลาวาส"
   },
   {
     "id": "MRT_BL30_EX1",
@@ -5246,9 +5279,10 @@
     "exit_code": "1",
     "name_th": "ทางออก 1 (ซอยอิสรภาพ 34)",
     "name_en": "Exit 1 (Soi อิสรภาพ 34)",
-    "lat": 13.738614,
-    "lng": 100.48595,
-    "source": "estimated"
+    "lat": 13.7384542,
+    "lng": 100.4856301,
+    "source": "longdo_geocoded",
+    "geocode_keyword": "อิสรภาพ 34"
   },
   {
     "id": "MRT_BL32_EX2",
@@ -5256,9 +5290,10 @@
     "exit_code": "2",
     "name_th": "ทางออก 2 (วัดราชสิทธาราม , ซอยอิสรภาพ 23)",
     "name_en": "Exit 2 (Wat ราชสิทธาราม, Soi อิสรภาพ 23)",
-    "lat": 13.738114,
-    "lng": 100.48545,
-    "source": "estimated"
+    "lat": 13.7375776,
+    "lng": 100.4850118,
+    "source": "longdo_geocoded",
+    "geocode_keyword": "อิสรภาพ 23"
   },
   {
     "id": "MRT_BL33_EX1",
@@ -6270,5 +6305,1225 @@
     "lng": 100.571616,
     "source": "osm",
     "osm_id": 1700571537
+  },
+  {
+    "id": "SRT_RN00_EX1",
+    "station_id": "SRT_RN00",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (เหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.802228,
+    "lng": 100.542856,
+    "source": "estimated"
+  },
+  {
+    "id": "SRT_RN00_EX2",
+    "station_id": "SRT_RN00",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.801828,
+    "lng": 100.542856,
+    "source": "estimated"
+  },
+  {
+    "id": "SRT_RN01_EX1",
+    "station_id": "SRT_RN01",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (เหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.810831,
+    "lng": 100.552608,
+    "source": "estimated"
+  },
+  {
+    "id": "SRT_RN01_EX2",
+    "station_id": "SRT_RN01",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.810431,
+    "lng": 100.552608,
+    "source": "estimated"
+  },
+  {
+    "id": "SRT_RN02_EX1",
+    "station_id": "SRT_RN02",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (เหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.820478,
+    "lng": 100.557578,
+    "source": "estimated"
+  },
+  {
+    "id": "SRT_RN02_EX2",
+    "station_id": "SRT_RN02",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.820078,
+    "lng": 100.557578,
+    "source": "estimated"
+  },
+  {
+    "id": "SRT_RN03_EX1",
+    "station_id": "SRT_RN03",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (เหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.834367,
+    "lng": 100.565078,
+    "source": "estimated"
+  },
+  {
+    "id": "SRT_RN03_EX2",
+    "station_id": "SRT_RN03",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.833967,
+    "lng": 100.565078,
+    "source": "estimated"
+  },
+  {
+    "id": "SRT_RN04_EX1",
+    "station_id": "SRT_RN04",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (เหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.836311,
+    "lng": 100.565356,
+    "source": "estimated"
+  },
+  {
+    "id": "SRT_RN04_EX2",
+    "station_id": "SRT_RN04",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.835911,
+    "lng": 100.565356,
+    "source": "estimated"
+  },
+  {
+    "id": "SRT_RN05_EX1",
+    "station_id": "SRT_RN05",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (เหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.852978,
+    "lng": 100.568689,
+    "source": "estimated"
+  },
+  {
+    "id": "SRT_RN05_EX2",
+    "station_id": "SRT_RN05",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.852578,
+    "lng": 100.568689,
+    "source": "estimated"
+  },
+  {
+    "id": "SRT_RN06_EX1",
+    "station_id": "SRT_RN06",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (เหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.869367,
+    "lng": 100.577022,
+    "source": "estimated"
+  },
+  {
+    "id": "SRT_RN06_EX2",
+    "station_id": "SRT_RN06",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.868967,
+    "lng": 100.577022,
+    "source": "estimated"
+  },
+  {
+    "id": "SRT_RN07_EX1",
+    "station_id": "SRT_RN07",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (เหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.913533,
+    "lng": 100.607022,
+    "source": "estimated"
+  },
+  {
+    "id": "SRT_RN07_EX2",
+    "station_id": "SRT_RN07",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.913133,
+    "lng": 100.607022,
+    "source": "estimated"
+  },
+  {
+    "id": "SRT_RN08_EX1",
+    "station_id": "SRT_RN08",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (เหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.969922,
+    "lng": 100.617856,
+    "source": "estimated"
+  },
+  {
+    "id": "SRT_RN08_EX2",
+    "station_id": "SRT_RN08",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.969522,
+    "lng": 100.617856,
+    "source": "estimated"
+  },
+  {
+    "id": "SRT_RN09_EX1",
+    "station_id": "SRT_RN09",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (เหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 14.011311,
+    "lng": 100.616467,
+    "source": "estimated"
+  },
+  {
+    "id": "SRT_RN09_EX2",
+    "station_id": "SRT_RN09",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 14.010911,
+    "lng": 100.616467,
+    "source": "estimated"
+  },
+  {
+    "id": "SRT_RW01_EX1",
+    "station_id": "SRT_RW01",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (เหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.814089,
+    "lng": 100.524244,
+    "source": "estimated"
+  },
+  {
+    "id": "SRT_RW01_EX2",
+    "station_id": "SRT_RW01",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.813689,
+    "lng": 100.524244,
+    "source": "estimated"
+  },
+  {
+    "id": "SRT_RW02_EX1",
+    "station_id": "SRT_RW02",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (เหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.7902,
+    "lng": 100.491189,
+    "source": "estimated"
+  },
+  {
+    "id": "SRT_RW02_EX2",
+    "station_id": "SRT_RW02",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.7898,
+    "lng": 100.491189,
+    "source": "estimated"
+  },
+  {
+    "id": "SRT_RW03_EX1",
+    "station_id": "SRT_RW03",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (เหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.779367,
+    "lng": 100.460911,
+    "source": "estimated"
+  },
+  {
+    "id": "SRT_RW03_EX2",
+    "station_id": "SRT_RW03",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.778967,
+    "lng": 100.460911,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK01_EX1",
+    "station_id": "MRT_PK01",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (เหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.85889,
+    "lng": 100.51115,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK01_EX2",
+    "station_id": "MRT_PK01",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.85849,
+    "lng": 100.51115,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK01_EX3",
+    "station_id": "MRT_PK01",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ตะวันออก)",
+    "name_en": "Exit 3 (East)",
+    "lat": 13.85849,
+    "lng": 100.51155,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK02_EX1",
+    "station_id": "MRT_PK02",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (เหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.880069,
+    "lng": 100.520699,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK02_EX2",
+    "station_id": "MRT_PK02",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.879669,
+    "lng": 100.520699,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK02_EX3",
+    "station_id": "MRT_PK02",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ตะวันออก)",
+    "name_en": "Exit 3 (East)",
+    "lat": 13.879669,
+    "lng": 100.521099,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK03_EX1",
+    "station_id": "MRT_PK03",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (เหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.882676,
+    "lng": 100.527713,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK03_EX2",
+    "station_id": "MRT_PK03",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.882276,
+    "lng": 100.527713,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK03_EX3",
+    "station_id": "MRT_PK03",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ตะวันออก)",
+    "name_en": "Exit 3 (East)",
+    "lat": 13.882276,
+    "lng": 100.528113,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK04_EX1",
+    "station_id": "MRT_PK04",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (เหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.882817,
+    "lng": 100.537552,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK04_EX2",
+    "station_id": "MRT_PK04",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.882417,
+    "lng": 100.537552,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK04_EX3",
+    "station_id": "MRT_PK04",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ตะวันออก)",
+    "name_en": "Exit 3 (East)",
+    "lat": 13.882417,
+    "lng": 100.537952,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK05_EX1",
+    "station_id": "MRT_PK05",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (เหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.882348,
+    "lng": 100.546589,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK05_EX2",
+    "station_id": "MRT_PK05",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.881948,
+    "lng": 100.546589,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK05_EX3",
+    "station_id": "MRT_PK05",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ตะวันออก)",
+    "name_en": "Exit 3 (East)",
+    "lat": 13.881948,
+    "lng": 100.546989,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK06_EX1",
+    "station_id": "MRT_PK06",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (เหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.884337,
+    "lng": 100.556347,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK06_EX2",
+    "station_id": "MRT_PK06",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.883937,
+    "lng": 100.556347,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK06_EX3",
+    "station_id": "MRT_PK06",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ตะวันออก)",
+    "name_en": "Exit 3 (East)",
+    "lat": 13.883937,
+    "lng": 100.556747,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK07_EX1",
+    "station_id": "MRT_PK07",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (เหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.886499,
+    "lng": 100.56576,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK07_EX2",
+    "station_id": "MRT_PK07",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.886099,
+    "lng": 100.56576,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK07_EX3",
+    "station_id": "MRT_PK07",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ตะวันออก)",
+    "name_en": "Exit 3 (East)",
+    "lat": 13.886099,
+    "lng": 100.56616,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK08_EX1",
+    "station_id": "MRT_PK08",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (เหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.888207,
+    "lng": 100.574602,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK08_EX2",
+    "station_id": "MRT_PK08",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.887807,
+    "lng": 100.574602,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK08_EX3",
+    "station_id": "MRT_PK08",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ตะวันออก)",
+    "name_en": "Exit 3 (East)",
+    "lat": 13.887807,
+    "lng": 100.575002,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK09_EX1",
+    "station_id": "MRT_PK09",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (เหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.876897,
+    "lng": 100.568884,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK09_EX2",
+    "station_id": "MRT_PK09",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.876497,
+    "lng": 100.568884,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK09_EX3",
+    "station_id": "MRT_PK09",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ตะวันออก)",
+    "name_en": "Exit 3 (East)",
+    "lat": 13.876497,
+    "lng": 100.569284,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK10_EX1",
+    "station_id": "MRT_PK10",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (เหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.868213,
+    "lng": 100.56586,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK10_EX2",
+    "station_id": "MRT_PK10",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.867813,
+    "lng": 100.56586,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK10_EX3",
+    "station_id": "MRT_PK10",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ตะวันออก)",
+    "name_en": "Exit 3 (East)",
+    "lat": 13.867813,
+    "lng": 100.56626,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK11_EX1",
+    "station_id": "MRT_PK11",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (เหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.859483,
+    "lng": 100.557717,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK11_EX2",
+    "station_id": "MRT_PK11",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.859083,
+    "lng": 100.557717,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK11_EX3",
+    "station_id": "MRT_PK11",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ตะวันออก)",
+    "name_en": "Exit 3 (East)",
+    "lat": 13.859083,
+    "lng": 100.558117,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK12_EX1",
+    "station_id": "MRT_PK12",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (เหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.852288,
+    "lng": 100.553679,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK12_EX2",
+    "station_id": "MRT_PK12",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.851888,
+    "lng": 100.553679,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK12_EX3",
+    "station_id": "MRT_PK12",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ตะวันออก)",
+    "name_en": "Exit 3 (East)",
+    "lat": 13.851888,
+    "lng": 100.554079,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK13_EX1",
+    "station_id": "MRT_PK13",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (เหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.846027,
+    "lng": 100.553,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK13_EX2",
+    "station_id": "MRT_PK13",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.845627,
+    "lng": 100.553,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK13_EX3",
+    "station_id": "MRT_PK13",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ตะวันออก)",
+    "name_en": "Exit 3 (East)",
+    "lat": 13.845627,
+    "lng": 100.5534,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK14_EX1",
+    "station_id": "MRT_PK14",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (เหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.843367,
+    "lng": 100.557717,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK14_EX2",
+    "station_id": "MRT_PK14",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.842967,
+    "lng": 100.557717,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK14_EX3",
+    "station_id": "MRT_PK14",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ตะวันออก)",
+    "name_en": "Exit 3 (East)",
+    "lat": 13.842967,
+    "lng": 100.558117,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK15_EX1",
+    "station_id": "MRT_PK15",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (เหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.836069,
+    "lng": 100.561828,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK15_EX2",
+    "station_id": "MRT_PK15",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.835669,
+    "lng": 100.561828,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK15_EX3",
+    "station_id": "MRT_PK15",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ตะวันออก)",
+    "name_en": "Exit 3 (East)",
+    "lat": 13.835669,
+    "lng": 100.562228,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK16_EX1",
+    "station_id": "MRT_PK16",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (เหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.828899,
+    "lng": 100.568837,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK16_EX2",
+    "station_id": "MRT_PK16",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.828499,
+    "lng": 100.568837,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK16_EX3",
+    "station_id": "MRT_PK16",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ตะวันออก)",
+    "name_en": "Exit 3 (East)",
+    "lat": 13.828499,
+    "lng": 100.569237,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK17_EX1",
+    "station_id": "MRT_PK17",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (เหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.822069,
+    "lng": 100.57486,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK17_EX2",
+    "station_id": "MRT_PK17",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.821669,
+    "lng": 100.57486,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK17_EX3",
+    "station_id": "MRT_PK17",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ตะวันออก)",
+    "name_en": "Exit 3 (East)",
+    "lat": 13.821669,
+    "lng": 100.57526,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK18_EX1",
+    "station_id": "MRT_PK18",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (เหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.814183,
+    "lng": 100.579779,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK18_EX2",
+    "station_id": "MRT_PK18",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.813783,
+    "lng": 100.579779,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK18_EX3",
+    "station_id": "MRT_PK18",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ตะวันออก)",
+    "name_en": "Exit 3 (East)",
+    "lat": 13.813783,
+    "lng": 100.580179,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK19_EX1",
+    "station_id": "MRT_PK19",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (เหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.808579,
+    "lng": 100.58222,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK19_EX2",
+    "station_id": "MRT_PK19",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.808179,
+    "lng": 100.58222,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK19_EX3",
+    "station_id": "MRT_PK19",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ตะวันออก)",
+    "name_en": "Exit 3 (East)",
+    "lat": 13.808179,
+    "lng": 100.58262,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK20_EX1",
+    "station_id": "MRT_PK20",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (เหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.801061,
+    "lng": 100.588331,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK20_EX2",
+    "station_id": "MRT_PK20",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.800661,
+    "lng": 100.588331,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK20_EX3",
+    "station_id": "MRT_PK20",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ตะวันออก)",
+    "name_en": "Exit 3 (East)",
+    "lat": 13.800661,
+    "lng": 100.588731,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK21_EX1",
+    "station_id": "MRT_PK21",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (เหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.793961,
+    "lng": 100.593344,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK21_EX2",
+    "station_id": "MRT_PK21",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.793561,
+    "lng": 100.593344,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK21_EX3",
+    "station_id": "MRT_PK21",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ตะวันออก)",
+    "name_en": "Exit 3 (East)",
+    "lat": 13.793561,
+    "lng": 100.593744,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK22_EX1",
+    "station_id": "MRT_PK22",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (เหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.785631,
+    "lng": 100.601248,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK22_EX2",
+    "station_id": "MRT_PK22",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.785231,
+    "lng": 100.601248,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK22_EX3",
+    "station_id": "MRT_PK22",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ตะวันออก)",
+    "name_en": "Exit 3 (East)",
+    "lat": 13.785231,
+    "lng": 100.601648,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK23_EX1",
+    "station_id": "MRT_PK23",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (เหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.776431,
+    "lng": 100.608588,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK23_EX2",
+    "station_id": "MRT_PK23",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.776031,
+    "lng": 100.608588,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK23_EX3",
+    "station_id": "MRT_PK23",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ตะวันออก)",
+    "name_en": "Exit 3 (East)",
+    "lat": 13.776031,
+    "lng": 100.608988,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK24_EX1",
+    "station_id": "MRT_PK24",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (เหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.769251,
+    "lng": 100.616368,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK24_EX2",
+    "station_id": "MRT_PK24",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.768851,
+    "lng": 100.616368,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK24_EX3",
+    "station_id": "MRT_PK24",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ตะวันออก)",
+    "name_en": "Exit 3 (East)",
+    "lat": 13.768851,
+    "lng": 100.616768,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK25_EX1",
+    "station_id": "MRT_PK25",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (เหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.763711,
+    "lng": 100.621704,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK25_EX2",
+    "station_id": "MRT_PK25",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.763311,
+    "lng": 100.621704,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK25_EX3",
+    "station_id": "MRT_PK25",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ตะวันออก)",
+    "name_en": "Exit 3 (East)",
+    "lat": 13.763311,
+    "lng": 100.622104,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK26_EX1",
+    "station_id": "MRT_PK26",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (เหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.758791,
+    "lng": 100.628704,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK26_EX2",
+    "station_id": "MRT_PK26",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.758391,
+    "lng": 100.628704,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK26_EX3",
+    "station_id": "MRT_PK26",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ตะวันออก)",
+    "name_en": "Exit 3 (East)",
+    "lat": 13.758391,
+    "lng": 100.629104,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK27_EX1",
+    "station_id": "MRT_PK27",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (เหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.753231,
+    "lng": 100.636536,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK27_EX2",
+    "station_id": "MRT_PK27",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.752831,
+    "lng": 100.636536,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK27_EX3",
+    "station_id": "MRT_PK27",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ตะวันออก)",
+    "name_en": "Exit 3 (East)",
+    "lat": 13.752831,
+    "lng": 100.636936,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK28_EX1",
+    "station_id": "MRT_PK28",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (เหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.748631,
+    "lng": 100.642904,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK28_EX2",
+    "station_id": "MRT_PK28",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.748231,
+    "lng": 100.642904,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK28_EX3",
+    "station_id": "MRT_PK28",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ตะวันออก)",
+    "name_en": "Exit 3 (East)",
+    "lat": 13.748231,
+    "lng": 100.643304,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK29_EX1",
+    "station_id": "MRT_PK29",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (เหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.745941,
+    "lng": 100.648248,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK29_EX2",
+    "station_id": "MRT_PK29",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.745541,
+    "lng": 100.648248,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK29_EX3",
+    "station_id": "MRT_PK29",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ตะวันออก)",
+    "name_en": "Exit 3 (East)",
+    "lat": 13.745541,
+    "lng": 100.648648,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK30_EX1",
+    "station_id": "MRT_PK30",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (เหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.7437,
+    "lng": 100.6526,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK30_EX2",
+    "station_id": "MRT_PK30",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.7433,
+    "lng": 100.6526,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_PK30_EX3",
+    "station_id": "MRT_PK30",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ตะวันออก)",
+    "name_en": "Exit 3 (East)",
+    "lat": 13.7433,
+    "lng": 100.653,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_MT01_EX1",
+    "station_id": "MRT_MT01",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (เหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.872297,
+    "lng": 100.552828,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_MT01_EX2",
+    "station_id": "MRT_MT01",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.871897,
+    "lng": 100.552828,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_MT01_EX3",
+    "station_id": "MRT_MT01",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ตะวันออก)",
+    "name_en": "Exit 3 (East)",
+    "lat": 13.871897,
+    "lng": 100.553228,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_MT02_EX1",
+    "station_id": "MRT_MT02",
+    "exit_code": "1",
+    "name_th": "ทางออก 1 (เหนือ)",
+    "name_en": "Exit 1 (North)",
+    "lat": 13.876747,
+    "lng": 100.545728,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_MT02_EX2",
+    "station_id": "MRT_MT02",
+    "exit_code": "2",
+    "name_th": "ทางออก 2 (ใต้)",
+    "name_en": "Exit 2 (South)",
+    "lat": 13.876347,
+    "lng": 100.545728,
+    "source": "estimated"
+  },
+  {
+    "id": "MRT_MT02_EX3",
+    "station_id": "MRT_MT02",
+    "exit_code": "3",
+    "name_th": "ทางออก 3 (ตะวันออก)",
+    "name_en": "Exit 3 (East)",
+    "lat": 13.876347,
+    "lng": 100.546128,
+    "source": "estimated"
   }
 ]

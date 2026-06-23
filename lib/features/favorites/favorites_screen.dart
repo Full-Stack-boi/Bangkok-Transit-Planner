@@ -320,13 +320,19 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
       lng = double.tryParse(lngStr);
     }
 
-    // 4. If no stored coordinates, try to parse from ID (for CUSTOM_lat_lng)
+    // 4. If no stored coordinates, try to parse from ID (for CUSTOM_lat_lng or OSM_type_id_lat_lng)
     if (lat == null || lng == null) {
       if (id.startsWith('CUSTOM_')) {
         final parts = id.split('_');
         if (parts.length >= 3) {
           lat = double.tryParse(parts[1]);
           lng = double.tryParse(parts[2]);
+        }
+      } else if (id.startsWith('OSM_')) {
+        final parts = id.split('_');
+        if (parts.length >= 5) {
+          lat = double.tryParse(parts[3]);
+          lng = double.tryParse(parts[4]);
         }
       }
     }
@@ -463,10 +469,9 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
                 ),
               ],
             ),
-            onTap: () {
+            onTap: () async {
               if (originItem != null && destItem != null) {
-                searchVm.setOrigin(originItem);
-                searchVm.setDestination(destItem);
+                await searchVm.setRoute(originItem, destItem);
                 ref.read(homeTabIndexProvider.notifier).setTab(1); // Switch to Map Screen
               }
             },

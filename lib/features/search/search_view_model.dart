@@ -181,6 +181,24 @@ class SearchViewModel extends _$SearchViewModel {
     _tryCalculateRoute();
   }
 
+  /// Set both origin and destination at the same time (e.g. from saved routes)
+  Future<void> setRoute(SearchableItem origin, SearchableItem destination) async {
+    state = state.copyWith(isCalculating: true, clearError: true);
+    final results = await Future.wait([
+      _resolveItem(origin),
+      _resolveItem(destination),
+    ]);
+    if (!_mounted) return;
+    state = state.copyWith(
+      origin: results[0],
+      destination: results[1],
+      clearRoute: true,
+      clearError: true,
+      isCalculating: false,
+    );
+    _tryCalculateRoute();
+  }
+
   /// Swap origin and destination
   void swapStations() {
     final origin = state.origin;
@@ -240,7 +258,7 @@ class SearchViewModel extends _$SearchViewModel {
           }
         }
         
-        double minTotalTime = double.infinity;
+        double minWalkTime = double.infinity;
         String bestStationId = destination.nearestStationId;
         LatLng? bestEntrance;
         
@@ -251,24 +269,22 @@ class SearchViewModel extends _$SearchViewModel {
           if (originStationId == stationId) {
             final walkDist = Geolocator.distanceBetween(entrance.latitude, entrance.longitude, origin.routeLat, origin.routeLng);
             final walkMinutes = walkDist / 80.0;
-            if (walkMinutes < minTotalTime) {
-              minTotalTime = walkMinutes;
+            if (walkMinutes < minWalkTime) {
+              minWalkTime = walkMinutes;
               bestStationId = stationId;
               bestEntrance = entrance;
             }
           } else {
             final route = repo.findRoute(originStationId, stationId);
             if (route != null) {
-              final transitMinutes = route.totalWeight;
               final station = repo.getStation(stationId);
               final walkDist = station != null 
                 ? Geolocator.distanceBetween(entrance.latitude, entrance.longitude, station.lat, station.lng)
                 : 0.0;
               final walkMinutes = walkDist / 80.0;
-              final totalTime = transitMinutes + walkMinutes;
               
-              if (totalTime < minTotalTime) {
-                minTotalTime = totalTime;
+              if (walkMinutes < minWalkTime) {
+                minWalkTime = walkMinutes;
                 bestStationId = stationId;
                 bestEntrance = entrance;
               }
@@ -315,7 +331,7 @@ class SearchViewModel extends _$SearchViewModel {
           }
         }
         
-        double minTotalTime = double.infinity;
+        double minWalkTime = double.infinity;
         String bestStationId = origin.nearestStationId;
         LatLng? bestEntrance;
         
@@ -326,24 +342,22 @@ class SearchViewModel extends _$SearchViewModel {
           if (destStationId == stationId) {
             final walkDist = Geolocator.distanceBetween(entrance.latitude, entrance.longitude, resolvedDestination.routeLat, resolvedDestination.routeLng);
             final walkMinutes = walkDist / 80.0;
-            if (walkMinutes < minTotalTime) {
-              minTotalTime = walkMinutes;
+            if (walkMinutes < minWalkTime) {
+              minWalkTime = walkMinutes;
               bestStationId = stationId;
               bestEntrance = entrance;
             }
           } else {
             final route = repo.findRoute(stationId, destStationId);
             if (route != null) {
-              final transitMinutes = route.totalWeight;
               final station = repo.getStation(stationId);
               final walkDist = station != null 
                 ? Geolocator.distanceBetween(entrance.latitude, entrance.longitude, station.lat, station.lng)
                 : 0.0;
               final walkMinutes = walkDist / 80.0;
-              final totalTime = transitMinutes + walkMinutes;
               
-              if (totalTime < minTotalTime) {
-                minTotalTime = totalTime;
+              if (walkMinutes < minWalkTime) {
+                minWalkTime = walkMinutes;
                 bestStationId = stationId;
                 bestEntrance = entrance;
               }
@@ -453,7 +467,7 @@ class SearchViewModel extends _$SearchViewModel {
               final exits = repo.getExitsForStation(station.id);
               exit = exits.firstWhere(
                 (e) => e.exitCode == landmark.exitCode,
-                orElse: () => station.findClosestExit(repo.exits, landmark.routeLat, landmark.routeLng),
+                orElse: () => station.findClosestExit(repo.exits, landmark.routeLat, landmark.routeLng, targetNameTh: landmark.nameTh, targetNameEn: landmark.nameEn),
               );
             }
           } else if (landmark.alternativeWalks != null && landmark.alternativeWalks!.containsKey(station.id)) {
@@ -463,12 +477,12 @@ class SearchViewModel extends _$SearchViewModel {
             final exits = repo.getExitsForStation(station.id);
             exit = exits.firstWhere(
               (e) => e.exitCode == walk.exitCode,
-              orElse: () => station.findClosestExit(repo.exits, landmark.routeLat, landmark.routeLng),
+              orElse: () => station.findClosestExit(repo.exits, landmark.routeLat, landmark.routeLng, targetNameTh: landmark.nameTh, targetNameEn: landmark.nameEn),
             );
           }
         }
 
-        exit ??= st?.findClosestExit(repo.exits, resolvedDestination.routeLat, resolvedDestination.routeLng);
+        exit ??= st?.findClosestExit(repo.exits, resolvedDestination.routeLat, resolvedDestination.routeLng, targetNameTh: resolvedDestination.nameTh, targetNameEn: resolvedDestination.nameEn);
         walkingPath ??= [LatLng(resolvedOrigin.routeLat, resolvedOrigin.routeLng), LatLng(resolvedDestination.routeLat, resolvedDestination.routeLng)];
 
         String direction = t.routeResult.walkToDestination;
@@ -584,38 +598,78 @@ class SearchViewModel extends _$SearchViewModel {
     final originLat = origin.routeLat;
     final originLng = origin.routeLng;
 
-    final candidateDestStations = <Station>[];
+    final candidateDestStations = <({Station station, LatLng entrance, double walkMinutes})>[];
     for (final station in repo.stations) {
       if (station.id == destinationStationId) continue;
       
-      final dist = Geolocator.distanceBetween(destLat, destLng, station.lat, station.lng);
-      // Look for alternative stations within 700 meters
-      if (dist <= 700.0) {
-        candidateDestStations.add(station);
+      LatLng targetEntrance = LatLng(destLat, destLng);
+      double minDist = Geolocator.distanceBetween(destLat, destLng, station.lat, station.lng);
+      
+      if (destination is CustomLocation && destination.entrances != null && destination.entrances!.isNotEmpty) {
+        double dMin = double.infinity;
+        for (final ent in destination.entrances!) {
+          final d = Geolocator.distanceBetween(ent.latitude, ent.longitude, station.lat, station.lng);
+          if (d < dMin) {
+            dMin = d;
+            targetEntrance = ent;
+          }
+        }
+        minDist = dMin;
+      }
+      
+      if (minDist <= 700.0) {
+        candidateDestStations.add((
+          station: station,
+          entrance: targetEntrance,
+          walkMinutes: (minDist / 80.0).clamp(1.0, 30.0),
+        ));
       }
     }
 
-    final candidateOriginStations = <Station>[];
+    final candidateOriginStations = <({Station station, LatLng entrance, double walkMinutes})>[];
     for (final station in repo.stations) {
       if (station.id == originStationId) continue;
       
-      final dist = Geolocator.distanceBetween(originLat, originLng, station.lat, station.lng);
-      // Look for alternative origin stations within 700 meters
-      if (dist <= 700.0) {
-        candidateOriginStations.add(station);
+      LatLng targetEntrance = LatLng(originLat, originLng);
+      double minDist = Geolocator.distanceBetween(originLat, originLng, station.lat, station.lng);
+      
+      if (origin is CustomLocation && origin.entrances != null && origin.entrances!.isNotEmpty) {
+        double dMin = double.infinity;
+        for (final ent in origin.entrances!) {
+          final d = Geolocator.distanceBetween(ent.latitude, ent.longitude, station.lat, station.lng);
+          if (d < dMin) {
+            dMin = d;
+            targetEntrance = ent;
+          }
+        }
+        minDist = dMin;
+      }
+      
+      if (minDist <= 700.0) {
+        candidateOriginStations.add((
+          station: station,
+          entrance: targetEntrance,
+          walkMinutes: (minDist / 80.0).clamp(1.0, 30.0),
+        ));
       }
     }
 
     RouteResult? bestSaverRoute;
 
-    void evaluateCandidate(String startId, String endId, double startWalkMin, double endWalkMin) {
+    void evaluateCandidate({
+      required String startId,
+      required String endId,
+      required double startWalkMin,
+      required double endWalkMin,
+      required double altOriginRouteLat,
+      required double altOriginRouteLng,
+      required double altDestRouteLat,
+      required double altDestRouteLng,
+    }) {
       final dijkstraResult = repo.findRoute(startId, endId);
       if (dijkstraResult == null) return;
 
       // BUG 5 fix: propagate routeLat/routeLng and path data from the resolved items.
-      // Without this, tempOrigin/tempDest use lat/lng (centroid) instead of the
-      // resolved entrance coordinate, causing saver route walking paths to start/end
-      // at the wrong place.
       final tempOrigin = CustomLocation(
         id: origin.id,
         nameTh: origin.nameTh,
@@ -624,8 +678,8 @@ class SearchViewModel extends _$SearchViewModel {
         walkingMinutes: startWalkMin,
         lat: originLat,
         lng: originLng,
-        routeLat: origin.routeLat,
-        routeLng: origin.routeLng,
+        routeLat: altOriginRouteLat,
+        routeLng: altOriginRouteLng,
         entrances: origin is CustomLocation ? (origin as CustomLocation).entrances : null,
         walkingPath: origin is CustomLocation ? (origin as CustomLocation).walkingPath : null,
       );
@@ -638,8 +692,8 @@ class SearchViewModel extends _$SearchViewModel {
         walkingMinutes: endWalkMin,
         lat: destLat,
         lng: destLng,
-        routeLat: destination.routeLat,
-        routeLng: destination.routeLng,
+        routeLat: altDestRouteLat,
+        routeLng: altDestRouteLng,
         entrances: destination is CustomLocation ? (destination as CustomLocation).entrances : null,
         walkingPath: destination is CustomLocation ? (destination as CustomLocation).walkingPath : null,
       );
@@ -664,30 +718,45 @@ class SearchViewModel extends _$SearchViewModel {
 
     // 1. Alternative destination stations
     for (final altDest in candidateDestStations) {
-      final dist = Geolocator.distanceBetween(destLat, destLng, altDest.lat, altDest.lng);
-      final walkMinutes = (dist / 80.0).clamp(1.0, 30.0);
-      final originWalkMin = origin.walkingMinutes ?? 0.0;
-      evaluateCandidate(originStationId, altDest.id, originWalkMin, walkMinutes);
+      evaluateCandidate(
+        startId: originStationId,
+        endId: altDest.station.id,
+        startWalkMin: origin.walkingMinutes ?? 0.0,
+        endWalkMin: altDest.walkMinutes,
+        altOriginRouteLat: origin.routeLat,
+        altOriginRouteLng: origin.routeLng,
+        altDestRouteLat: altDest.entrance.latitude,
+        altDestRouteLng: altDest.entrance.longitude,
+      );
     }
 
     // 2. Alternative origin stations
     for (final altOrigin in candidateOriginStations) {
-      final dist = Geolocator.distanceBetween(originLat, originLng, altOrigin.lat, altOrigin.lng);
-      final walkMinutes = (dist / 80.0).clamp(1.0, 30.0);
-      final destWalkMin = destination.walkingMinutes ?? 0.0;
-      evaluateCandidate(altOrigin.id, destinationStationId, walkMinutes, destWalkMin);
+      evaluateCandidate(
+        startId: altOrigin.station.id,
+        endId: destinationStationId,
+        startWalkMin: altOrigin.walkMinutes,
+        endWalkMin: destination.walkingMinutes ?? 0.0,
+        altOriginRouteLat: altOrigin.entrance.latitude,
+        altOriginRouteLng: altOrigin.entrance.longitude,
+        altDestRouteLat: destination.routeLat,
+        altDestRouteLng: destination.routeLng,
+      );
     }
 
     // 3. Alternative both origin and destination stations
     for (final altOrigin in candidateOriginStations) {
-      final distOrigin = Geolocator.distanceBetween(originLat, originLng, altOrigin.lat, altOrigin.lng);
-      final originWalkMin = (distOrigin / 80.0).clamp(1.0, 30.0);
-
       for (final altDest in candidateDestStations) {
-        final distDest = Geolocator.distanceBetween(destLat, destLng, altDest.lat, altDest.lng);
-        final destWalkMin = (distDest / 80.0).clamp(1.0, 30.0);
-
-        evaluateCandidate(altOrigin.id, altDest.id, originWalkMin, destWalkMin);
+        evaluateCandidate(
+          startId: altOrigin.station.id,
+          endId: altDest.station.id,
+          startWalkMin: altOrigin.walkMinutes,
+          endWalkMin: altDest.walkMinutes,
+          altOriginRouteLat: altOrigin.entrance.latitude,
+          altOriginRouteLng: altOrigin.entrance.longitude,
+          altDestRouteLat: altDest.entrance.latitude,
+          altDestRouteLng: altDest.entrance.longitude,
+        );
       }
     }
 
@@ -734,7 +803,7 @@ class SearchViewModel extends _$SearchViewModel {
               final exits = repo.getExitsForStation(nearestStation.id);
               exit = exits.firstWhere(
                 (e) => e.exitCode == originLandmark!.exitCode,
-                orElse: () => nearestStation.findClosestExit(repo.exits, originLandmark!.routeLat, originLandmark.routeLng),
+                orElse: () => nearestStation.findClosestExit(repo.exits, originLandmark!.routeLat, originLandmark.routeLng, targetNameTh: originLandmark.nameTh, targetNameEn: originLandmark.nameEn),
               );
             }
           } else if (originLandmark.alternativeWalks != null && originLandmark.alternativeWalks!.containsKey(nearestStation.id)) {
@@ -745,7 +814,7 @@ class SearchViewModel extends _$SearchViewModel {
               final exits = repo.getExitsForStation(nearestStation.id);
               exit = exits.firstWhere(
                 (e) => e.exitCode == walk.exitCode,
-                orElse: () => nearestStation.findClosestExit(repo.exits, originLandmark!.routeLat, originLandmark.routeLng),
+                orElse: () => nearestStation.findClosestExit(repo.exits, originLandmark!.routeLat, originLandmark.routeLng, targetNameTh: originLandmark.nameTh, targetNameEn: originLandmark.nameEn),
               );
             }
           }
@@ -754,8 +823,8 @@ class SearchViewModel extends _$SearchViewModel {
       if (origin is CustomLocation && origin.walkingPath != null) {
         walkingPath = origin.walkingPath;
       }
-
-        exit ??= nearestStation.findClosestExit(repo.exits, origin.routeLat, origin.routeLng);
+ 
+        exit ??= nearestStation.findClosestExit(repo.exits, origin.routeLat, origin.routeLng, targetNameTh: origin.nameTh, targetNameEn: origin.nameEn);
         walkingPath ??= [LatLng(origin.routeLat, origin.routeLng), LatLng(exit.lat, exit.lng)];
 
         String direction = t.routeResult.walkToStation;
@@ -967,7 +1036,7 @@ class SearchViewModel extends _$SearchViewModel {
               final exits = repo.getExitsForStation(nearestStation.id);
               exit = exits.firstWhere(
                 (e) => e.exitCode == destLandmark!.exitCode,
-                orElse: () => nearestStation.findClosestExit(repo.exits, destLandmark!.routeLat, destLandmark.routeLng),
+                orElse: () => nearestStation.findClosestExit(repo.exits, destLandmark!.routeLat, destLandmark.routeLng, targetNameTh: destLandmark.nameTh, targetNameEn: destLandmark.nameEn),
               );
             }
           } else if (destLandmark.alternativeWalks != null && destLandmark.alternativeWalks!.containsKey(nearestStation.id)) {
@@ -978,7 +1047,7 @@ class SearchViewModel extends _$SearchViewModel {
               final exits = repo.getExitsForStation(nearestStation.id);
               exit = exits.firstWhere(
                 (e) => e.exitCode == walk.exitCode,
-                orElse: () => nearestStation.findClosestExit(repo.exits, destLandmark!.routeLat, destLandmark.routeLng),
+                orElse: () => nearestStation.findClosestExit(repo.exits, destLandmark!.routeLat, destLandmark.routeLng, targetNameTh: destLandmark.nameTh, targetNameEn: destLandmark.nameEn),
               );
             }
           }
@@ -987,8 +1056,8 @@ class SearchViewModel extends _$SearchViewModel {
       if (destination is CustomLocation && destination.walkingPath != null) {
         walkingPath = destination.walkingPath;
       }
-
-        exit ??= nearestStation.findClosestExit(repo.exits, destination.routeLat, destination.routeLng);
+ 
+        exit ??= nearestStation.findClosestExit(repo.exits, destination.routeLat, destination.routeLng, targetNameTh: destination.nameTh, targetNameEn: destination.nameEn);
         walkingPath ??= [LatLng(exit.lat, exit.lng), LatLng(destination.routeLat, destination.routeLng)];
 
         String direction = t.routeResult.walkToDestination;
@@ -1142,10 +1211,10 @@ class SearchViewModel extends _$SearchViewModel {
 
         List<LatLng> path = await WalkingRouteService.getWalkingPath(fLat, fLng, tLat, tLng);
 
-        // Detour Safety Guard: if OSRM returns a massive detour for a short straight-line distance,
-        // override it with our smart L-shape Manhattan path.
         final straightDist = Geolocator.distanceBetween(fLat, fLng, tLat, tLng);
-        if (straightDist < 400.0 && path.isNotEmpty) {
+        if (straightDist < 150.0) {
+          path = [LatLng(fLat, fLng), LatLng(tLat, tLng)];
+        } else if (straightDist < 600.0 && path.isNotEmpty) {
           double pathDist = 0.0;
           for (int idx = 0; idx < path.length - 1; idx++) {
             pathDist += Geolocator.distanceBetween(
@@ -1153,7 +1222,10 @@ class SearchViewModel extends _$SearchViewModel {
               path[idx + 1].latitude, path[idx + 1].longitude,
             );
           }
-          if (pathDist > 2.2 * straightDist) {
+          if (pathDist > 2.0 * straightDist) {
+            print("OSRM massive detour detected (OSRM: ${pathDist.toStringAsFixed(1)}m, Straight: ${straightDist.toStringAsFixed(1)}m). Falling back to direct straight-line path.");
+            path = [LatLng(fLat, fLng), LatLng(tLat, tLng)];
+          } else if (pathDist > 1.4 * straightDist) {
             print("OSRM detour detected (OSRM: ${pathDist.toStringAsFixed(1)}m, Straight: ${straightDist.toStringAsFixed(1)}m). Falling back to smart L-shape path.");
             path = WalkingRouteService.generateManhattanPath(fLat, fLng, tLat, tLng);
           }

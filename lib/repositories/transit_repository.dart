@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
 import '../models/station.dart';
@@ -60,7 +61,18 @@ class TransitRepository {
     try {
       final jsonStr = await rootBundle.loadString('assets/data/station_exits.json');
       final List<dynamic> jsonList = json.decode(jsonStr);
-      _exits = jsonList.map((j) => StationExit.fromJson(j as Map<String, dynamic>)).toList();
+      var exitsList = jsonList.map((j) => StationExit.fromJson(j as Map<String, dynamic>)).toList();
+      if (!kDebugMode) {
+        exitsList = exitsList.where((e) {
+          final id = e.stationId;
+          final isNew = id.startsWith('MRT_PK') || 
+                        id.startsWith('MRT_MT') || 
+                        id.startsWith('SRT_RN') || 
+                        id.startsWith('SRT_RW');
+          return !isNew;
+        }).toList();
+      }
+      _exits = exitsList;
     } catch (e) {
       _exits = [];
       print('Failed to load station exits: $e');
@@ -75,7 +87,15 @@ class TransitRepository {
     try {
       final jsonStr = await rootBundle.loadString('assets/data/stations.json');
       final List<dynamic> jsonList = json.decode(jsonStr);
-      _stations = jsonList.map((j) => Station.fromJson(j as Map<String, dynamic>)).toList();
+      var stationsList = jsonList.map((j) => Station.fromJson(j as Map<String, dynamic>)).toList();
+      if (!kDebugMode) {
+        stationsList = stationsList.where((s) => 
+          s.lineId != 'MRT_PINK' && 
+          s.lineId != 'SRT_RED_NORTH' && 
+          s.lineId != 'SRT_RED_WEST'
+        ).toList();
+      }
+      _stations = stationsList;
       _stationCache.clear();
       for (final s in _stations!) {
         _stationCache[s.id] = s;
@@ -90,7 +110,15 @@ class TransitRepository {
     try {
       final jsonStr = await rootBundle.loadString('assets/data/lines.json');
       final List<dynamic> jsonList = json.decode(jsonStr);
-      _lines = jsonList.map((j) => TransitLine.fromJson(j as Map<String, dynamic>)).toList();
+      var linesList = jsonList.map((j) => TransitLine.fromJson(j as Map<String, dynamic>)).toList();
+      if (!kDebugMode) {
+        linesList = linesList.where((l) => 
+          l.id != 'MRT_PINK' && 
+          l.id != 'SRT_RED_NORTH' && 
+          l.id != 'SRT_RED_WEST'
+        ).toList();
+      }
+      _lines = linesList;
       _lineCache.clear();
       for (final l in _lines!) {
         _lineCache[l.id] = l;
@@ -352,7 +380,7 @@ class TransitRepository {
               final osmType = properties['osm_type'] as String? ?? 'N';
               final osmId = properties['osm_id'] ?? DateTime.now().millisecondsSinceEpoch;
               results.add(CustomLocation(
-                id: 'OSM_${osmType}_$osmId',
+                id: 'OSM_${osmType}_${osmId}_${lat.toStringAsFixed(6)}_${lon.toStringAsFixed(6)}',
                 nameTh: name,
                 nameEn: name,
                 nearestStationId: nearest.id,
@@ -384,7 +412,7 @@ class TransitRepository {
       int? osmId;
       if (place.id.startsWith('OSM_')) {
         final parts = place.id.split('_');
-        if (parts.length == 3) {
+        if (parts.length >= 3) {
           osmType = parts[1];
           osmId = int.tryParse(parts[2]);
         }
@@ -411,37 +439,55 @@ class TransitRepository {
       return place;
     }
 
-    // 2. We have entrances. Find the one that gives the shortest OSRM path to any station.
-    // To avoid too many calls, limit to top 10 entrances closest to the centroid by straight line.
+    // 2. We have entrances. Find the one that gives the shortest OSRM path to its nearest station.
+    // Limit to top 5 entrances closest to the centroid by straight line to balance performance and accuracy.
     entrances.sort((a, b) => 
       Geolocator.distanceBetween(place.lat, place.lng, a.latitude, a.longitude)
       .compareTo(Geolocator.distanceBetween(place.lat, place.lng, b.latitude, b.longitude))
     );
-    final topEntrances = entrances.take(10).toList();
+    final topEntrances = entrances.take(5).toList();
 
-    ({Station station, OsrmRouteResult? osrmResult})? bestMatch;
+    ({Station station, OsrmRouteResult? osrmResult, LatLng entrance})? bestMatch;
     double shortestDuration = double.infinity;
-    LatLng? bestEntrance;
+
+    // Fetch OSRM walking paths for all 5 entrances in parallel
+    final List<Future<({Station station, OsrmRouteResult? osrmResult, LatLng entrance})?>> futures = [];
 
     for (final entrance in topEntrances) {
-      final result = await findTrueNearestStationAsync(entrance.latitude, entrance.longitude);
-      if (result?.osrmResult != null) {
-        final duration = result!.osrmResult!.durationSeconds.toDouble();
+      final nearest = findNearestStation(entrance.latitude, entrance.longitude);
+      if (nearest != null) {
+        futures.add(() async {
+          final res = await _osrmService.getWalkingRoute(
+            entrance.latitude,
+            entrance.longitude,
+            nearest.lat,
+            nearest.lng,
+            fetchGeometry: true,
+          );
+          return (station: nearest, osrmResult: res, entrance: entrance);
+        }());
+      }
+    }
+
+    final results = await Future.wait(futures);
+
+    for (final r in results) {
+      if (r != null && r.osrmResult != null) {
+        final duration = r.osrmResult!.durationSeconds.toDouble();
         if (duration < shortestDuration) {
           shortestDuration = duration;
-          bestMatch = result;
-          bestEntrance = entrance;
+          bestMatch = r;
         }
       }
     }
 
-    if (bestMatch != null && bestEntrance != null) {
+    if (bestMatch != null) {
       // We found a valid route via an entrance!
       // Use routeLat/routeLng (not lat/lng) so the map display pin stays at the
       // original centroid while only the routing/walking coordinate moves to the entrance.
       return place.copyWith(
-        routeLat: bestEntrance.latitude,
-        routeLng: bestEntrance.longitude,
+        routeLat: bestMatch.entrance.latitude,
+        routeLng: bestMatch.entrance.longitude,
         nearestStationId: bestMatch.station.id,
         walkingMinutes: (bestMatch.osrmResult!.durationSeconds / 60.0).clamp(1.0, 30.0),
         walkingPath: bestMatch.osrmResult!.coordinates,
@@ -488,15 +534,20 @@ class TransitRepository {
     OsrmRouteResult? bestOsrmResult;
     double minWalkDuration = double.infinity;
 
-    // 2. Query OSRM for true walking duration
-    for (final station in topCandidates) {
-      final osrmResult = await _osrmService.getWalkingRoute(lat, lon, station.lat, station.lng, fetchGeometry: true);
-      
-      if (osrmResult != null) {
-        if (osrmResult.durationSeconds < minWalkDuration) {
-          minWalkDuration = osrmResult.durationSeconds;
-          bestStation = station;
-          bestOsrmResult = osrmResult;
+    // 2. Query OSRM for true walking duration in parallel
+    final results = await Future.wait(
+      topCandidates.map((station) async {
+        final res = await _osrmService.getWalkingRoute(lat, lon, station.lat, station.lng, fetchGeometry: true);
+        return (station: station, osrmResult: res);
+      })
+    );
+
+    for (final r in results) {
+      if (r.osrmResult != null) {
+        if (r.osrmResult!.durationSeconds < minWalkDuration) {
+          minWalkDuration = r.osrmResult!.durationSeconds;
+          bestStation = r.station;
+          bestOsrmResult = r.osrmResult;
         }
       }
     }
