@@ -26,6 +26,7 @@ class SearchState {
   final RouteResult? saverRoute;
   final String activeRouteType; // 'recommended' or 'saver'
   final bool isCalculating;
+  final bool isSearching;
   final String? error;
 
   const SearchState({
@@ -38,6 +39,7 @@ class SearchState {
     this.saverRoute,
     this.activeRouteType = 'recommended',
     this.isCalculating = false,
+    this.isSearching = false,
     this.error,
   });
 
@@ -51,6 +53,7 @@ class SearchState {
     RouteResult? saverRoute,
     String? activeRouteType,
     bool? isCalculating,
+    bool? isSearching,
     String? error,
     bool clearOrigin = false,
     bool clearDestination = false,
@@ -67,6 +70,7 @@ class SearchState {
       saverRoute: clearRoute ? null : (saverRoute ?? this.saverRoute),
       activeRouteType: activeRouteType ?? this.activeRouteType,
       isCalculating: isCalculating ?? this.isCalculating,
+      isSearching: isSearching ?? this.isSearching,
       error: clearError ? null : (error ?? this.error),
     );
   }
@@ -103,6 +107,7 @@ class SearchViewModel extends _$SearchViewModel {
 
     if (query.trim().length >= 3) {
       // 2. Fetch online places in background
+      state = state.copyWith(isSearching: true);
       try {
         final onlineResults = await repo.searchOnlinePlaces(query);
 
@@ -118,11 +123,16 @@ class SearchViewModel extends _$SearchViewModel {
               merged.add(online);
             }
           }
-          state = state.copyWith(searchResults: merged);
+          state = state.copyWith(searchResults: merged, isSearching: false);
         }
       } catch (e) {
         print('Online place search failed: $e');
+        if (state.query == query) {
+          state = state.copyWith(isSearching: false);
+        }
       }
+    } else {
+      state = state.copyWith(isSearching: false);
     }
   }
 

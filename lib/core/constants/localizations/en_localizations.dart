@@ -100,6 +100,18 @@ class EnglishSearch implements BaseSearch {
   String get locationDeniedSnack => 'Location permission denied';
   @override
   String get locationFailedSnack => 'Unable to retrieve location';
+  @override
+  String get groupStations => 'Transit Stations';
+  @override
+  String get groupLandmarks => 'Landmarks';
+  @override
+  String get groupOtherTransit => 'Other Transit Stops';
+  @override
+  String get groupPlaces => 'Places';
+  @override
+  String showMore(int count) => 'Show more ($count)';
+  @override
+  String get noResultsFound => 'No results found';
 }
 
 class EnglishFavorites implements BaseFavorites {

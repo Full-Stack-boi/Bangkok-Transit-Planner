@@ -53,6 +53,12 @@ abstract class BaseSearch {
   String get useCurrentLocationDesc;
   String get locationDeniedSnack;
   String get locationFailedSnack;
+  String get groupStations;
+  String get groupLandmarks;
+  String get groupOtherTransit;
+  String get groupPlaces;
+  String showMore(int count);
+  String get noResultsFound;
 }
 
 abstract class BaseFavorites {

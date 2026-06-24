@@ -100,6 +100,18 @@ class ThaiSearch implements BaseSearch {
   String get locationDeniedSnack => 'ปฏิเสธการเข้าถึงตำแหน่งที่ตั้ง';
   @override
   String get locationFailedSnack => 'ไม่สามารถดึงข้อมูลตำแหน่งที่ตั้งได้';
+  @override
+  String get groupStations => 'สถานีรถไฟฟ้า';
+  @override
+  String get groupLandmarks => 'สถานที่สำคัญ';
+  @override
+  String get groupOtherTransit => 'จุดจอดรถสาธารณะอื่นๆ';
+  @override
+  String get groupPlaces => 'สถานที่ทั่วไป';
+  @override
+  String showMore(int count) => 'ดูเพิ่มเติม ($count)';
+  @override
+  String get noResultsFound => 'ไม่พบข้อมูลที่ค้นหา';
 }
 
 class ThaiFavorites implements BaseFavorites {

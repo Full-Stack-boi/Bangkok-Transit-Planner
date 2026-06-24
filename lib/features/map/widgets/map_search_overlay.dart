@@ -6,6 +6,7 @@ import '../../../models/station.dart';
 import '../../../models/searchable_item.dart';
 import '../../../models/custom_location.dart';
 import '../../../models/namtang_stop.dart';
+import '../../../models/landmark.dart';
 import '../../search/search_view_model.dart';
 import '../../../providers/providers.dart';
 import '../../../core/constants/translation_helper.dart';
@@ -31,6 +32,7 @@ class _MapSearchOverlayState extends ConsumerState<MapSearchOverlay> {
 
   bool _isSelectingOrigin = true;
   bool _isFirstLoad = true;
+  final Set<String> _expandedCategories = {};
 
   @override
   void initState() {
@@ -290,6 +292,20 @@ class _MapSearchOverlayState extends ConsumerState<MapSearchOverlay> {
                 ),
               ),
 
+            // Loading Indicator
+            if (state.isSearching)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(2),
+                  child: LinearProgressIndicator(
+                    minHeight: 3,
+                    backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.1),
+                    valueColor: AlwaysStoppedAnimation<Color>(theme.colorScheme.primary),
+                  ),
+                ),
+              ),
+
             // ─── Search Results or Quick Actions ───
             Expanded(
               child: state.searchResults.isEmpty && state.query.isEmpty
@@ -308,18 +324,19 @@ class _MapSearchOverlayState extends ConsumerState<MapSearchOverlay> {
     AppLocalizations t,
     String localeCode,
   ) {
-    final theme = Theme.of(context);
-    if (state.searchResults.isEmpty && state.query.isNotEmpty) {
+    final results = state.searchResults;
+    if (results.isEmpty && !state.isSearching) {
+      final theme = Theme.of(context);
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.search_off, size: 64, color: Colors.grey.shade500),
+            Icon(Icons.search_off_rounded, size: 64, color: theme.colorScheme.outline),
             const SizedBox(height: 16),
             Text(
-              '${t.search.noStationFound} "${state.query}"',
+              t.search.noResultsFound,
               style: theme.textTheme.titleMedium?.copyWith(
-                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
               ),
             ),
           ],
@@ -327,40 +344,163 @@ class _MapSearchOverlayState extends ConsumerState<MapSearchOverlay> {
       );
     }
 
-    return ListView.builder(
-      itemCount: state.searchResults.length,
+    final stations = results.whereType<Station>().toList();
+    final landmarks = results.whereType<Landmark>().toList();
+    final transitStops = results.whereType<NamtangStop>().toList();
+    final onlinePlaces = results.where((item) => item is CustomLocation && item.id != 'GPS_CURRENT').toList();
+
+    return ListView(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-      itemBuilder: (context, index) {
-        final item = state.searchResults[index];
-        return _StationListTile(
-          station: item,
-          localeCode: localeCode,
-          onTap: () {
-            if (_isSelectingOrigin) {
-              vm.setOrigin(item);
-              final nextState = ref.read(searchViewModelProvider);
-              _originController.text = item.displayName(isEnglish: localeCode == 'en');
-              if (nextState.destination == null) {
-                _startEditingDest(nextState);
-              } else {
-                FocusScope.of(context).unfocus();
-                Navigator.of(context).pop(true);
-              }
-            } else {
-              vm.setDestination(item);
-              final nextState = ref.read(searchViewModelProvider);
-              _destController.text = item.displayName(isEnglish: localeCode == 'en');
-              if (nextState.origin == null) {
-                _startEditingOrigin(nextState);
-              } else {
-                FocusScope.of(context).unfocus();
-                Navigator.of(context).pop(true);
-              }
-            }
-            vm.search('');
-          },
-        );
-      },
+      children: [
+        if (stations.isNotEmpty)
+          _buildGroup(
+            t.search.groupStations,
+            Icons.train_rounded,
+            stations,
+            vm,
+            localeCode,
+          ),
+        if (landmarks.isNotEmpty)
+          _buildGroup(
+            t.search.groupLandmarks,
+            Icons.domain_rounded,
+            landmarks,
+            vm,
+            localeCode,
+          ),
+        if (transitStops.isNotEmpty)
+          _buildGroup(
+            t.search.groupOtherTransit,
+            Icons.directions_bus_rounded,
+            transitStops,
+            vm,
+            localeCode,
+          ),
+        if (onlinePlaces.isNotEmpty)
+          _buildGroup(
+            t.search.groupPlaces,
+            Icons.place_rounded,
+            onlinePlaces,
+            vm,
+            localeCode,
+          ),
+        if (results.isEmpty && state.isSearching)
+          const Padding(
+            padding: EdgeInsets.only(top: 32),
+            child: Center(child: CircularProgressIndicator()),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildGroup(
+    String title,
+    IconData icon,
+    List<SearchableItem> items,
+    SearchViewModel vm,
+    String localeCode,
+  ) {
+    final theme = Theme.of(context);
+    final isExpanded = _expandedCategories.contains(title);
+    final displayItems = isExpanded ? items : items.take(2).toList();
+    final hasMore = items.length > 2 && !isExpanded;
+    final t = ref.watch(translationsProvider);
+    
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: theme.colorScheme.outline.withValues(alpha: 0.08),
+        ),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(16),
+        clipBehavior: Clip.antiAlias,
+        child: Theme(
+          data: theme.copyWith(dividerColor: Colors.transparent),
+          child: ExpansionTile(
+            initiallyExpanded: true,
+            dense: true,
+            visualDensity: VisualDensity.compact,
+            leading: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.primary.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(icon, color: theme.colorScheme.primary, size: 18),
+            ),
+            title: Text(
+              title,
+              style: theme.textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: theme.colorScheme.onSurface,
+              ),
+            ),
+            childrenPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            children: [
+              ...displayItems.map((item) {
+                return _StationListTile(
+                  station: item,
+                  localeCode: localeCode,
+                  onTap: () {
+                    if (_isSelectingOrigin) {
+                      vm.setOrigin(item);
+                      final nextState = ref.read(searchViewModelProvider);
+                      _originController.text = item.displayName(isEnglish: localeCode == 'en');
+                      if (nextState.destination == null) {
+                        _startEditingDest(nextState);
+                      } else {
+                        FocusScope.of(context).unfocus();
+                        Navigator.of(context).pop(true);
+                      }
+                    } else {
+                      vm.setDestination(item);
+                      final nextState = ref.read(searchViewModelProvider);
+                      _destController.text = item.displayName(isEnglish: localeCode == 'en');
+                      if (nextState.origin == null) {
+                        _startEditingOrigin(nextState);
+                      } else {
+                        FocusScope.of(context).unfocus();
+                        Navigator.of(context).pop(true);
+                      }
+                    }
+                    vm.search('');
+                  },
+                );
+              }),
+              if (hasMore)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 4),
+                  child: TextButton(
+                    onPressed: () {
+                      setState(() {
+                        _expandedCategories.add(title);
+                      });
+                    },
+                    style: TextButton.styleFrom(
+                      minimumSize: const Size.fromHeight(40),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: Text(
+                      t.search.showMore(items.length - 2),
+                      style: TextStyle(
+                        color: theme.colorScheme.primary,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
