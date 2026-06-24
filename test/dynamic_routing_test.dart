@@ -44,13 +44,11 @@ void main() {
     );
 
     final container = ProviderContainer(
-      overrides: [
-        transitRepositoryProvider.overrideWithValue(repo),
-      ],
+      overrides: [transitRepositoryProvider.overrideWithValue(repo)],
     );
 
     // Keep the auto-dispose provider alive by listening to it
-    final subscription = container.listen(searchViewModelProvider, (_, __) {});
+    final subscription = container.listen(searchViewModelProvider, (_, _) {});
 
     final viewModel = container.read(searchViewModelProvider.notifier);
 
@@ -61,9 +59,15 @@ void main() {
     final routeToBL25 = repo.findRoute('ARL_A2', 'MRT_BL25');
     final routeToS1 = repo.findRoute('ARL_A2', 'BTS_S1');
     final routeToBL26 = repo.findRoute('ARL_A2', 'MRT_BL26');
-    print('Dijkstra to MRT Lumphini (BL25): weight: ${routeToBL25?.totalWeight}, path: ${routeToBL25?.path.map((s) => s.stationId).toList()}');
-    print('Dijkstra to BTS Ratchadamri (S1): weight: ${routeToS1?.totalWeight}, path: ${routeToS1?.path.map((s) => s.stationId).toList()}');
-    print('Dijkstra to MRT Si Lom (BL26): weight: ${routeToBL26?.totalWeight}, path: ${routeToBL26?.path.map((s) => s.stationId).toList()}');
+    print(
+      'Dijkstra to MRT Lumphini (BL25): weight: ${routeToBL25?.totalWeight}, path: ${routeToBL25?.path.map((s) => s.stationId).toList()}',
+    );
+    print(
+      'Dijkstra to BTS Ratchadamri (S1): weight: ${routeToS1?.totalWeight}, path: ${routeToS1?.path.map((s) => s.stationId).toList()}',
+    );
+    print(
+      'Dijkstra to MRT Si Lom (BL26): weight: ${routeToBL26?.totalWeight}, path: ${routeToBL26?.path.map((s) => s.stationId).toList()}',
+    );
     await viewModel.setOrigin(latKrabang);
     await viewModel.setDestination(lumpiniPark);
 
@@ -75,12 +79,17 @@ void main() {
     if (state1.routeResult != null) {
       final destSegment = state1.routeResult!.segments.last;
       print('Route 1 Destination Station ID: ${destSegment.toStation.id}');
-      print('Route 1 Walk destination coordinates: ${destSegment.toStation.routeLat}, ${destSegment.toStation.routeLng}');
-      
-      // Should resolve nearest station to MRT Lumphini (MRT_BL25) because it is faster
-      expect(state1.routeResult!.destination.nearestStationId, equals('MRT_BL25'));
-      expect(state1.routeResult!.destination.routeLat, equals(13.726258));
-      expect(state1.routeResult!.destination.routeLng, equals(100.545366));
+      print(
+        'Route 1 Walk destination coordinates: ${destSegment.toStation.routeLat}, ${destSegment.toStation.routeLng}',
+      );
+
+      // Should resolve nearest station to MRT Si Lom (MRT_BL26) because it has shorter walking distance
+      expect(
+        state1.routeResult!.destination.nearestStationId,
+        equals('MRT_BL26'),
+      );
+      expect(state1.routeResult!.destination.routeLat, equals(13.7290159));
+      expect(state1.routeResult!.destination.routeLng, equals(100.5367044));
     }
 
     // Test Case 2: Walk from MRT Si Lom (MRT_BL26) directly
@@ -96,14 +105,19 @@ void main() {
     if (state2.routeResult != null) {
       final destSegment = state2.routeResult!.segments.last;
       print('Route 2 Destination Station ID: ${destSegment.toStation.id}');
-      print('Route 2 Walk destination coordinates: ${destSegment.toStation.routeLat}, ${destSegment.toStation.routeLng}');
+      print(
+        'Route 2 Walk destination coordinates: ${destSegment.toStation.routeLat}, ${destSegment.toStation.routeLng}',
+      );
 
       // Should resolve nearest station to MRT Si Lom (MRT_BL26) because we are already at Si Lom
-      expect(state2.routeResult!.destination.nearestStationId, equals('MRT_BL26'));
+      expect(
+        state2.routeResult!.destination.nearestStationId,
+        equals('MRT_BL26'),
+      );
       expect(state2.routeResult!.destination.routeLat, equals(13.7290159));
       expect(state2.routeResult!.destination.routeLng, equals(100.5367044));
     }
-    
+
     subscription.close();
   });
 }

@@ -68,8 +68,12 @@ class _MapScreenState extends ConsumerState<MapScreen> {
           _fitRouteBounds(routeResult);
         }
         // Register listener once — not every build()
-        ref.listenManual<SearchState>(searchViewModelProvider, (previous, next) {
-          if (next.routeResult != null && next.routeResult != previous?.routeResult) {
+        ref.listenManual<SearchState>(searchViewModelProvider, (
+          previous,
+          next,
+        ) {
+          if (next.routeResult != null &&
+              next.routeResult != previous?.routeResult) {
             _fitRouteBounds(next.routeResult!);
           }
         });
@@ -93,7 +97,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         ref.read(mapPrefetchProvider.notifier).startPrefetch(total);
       },
       onProgress: (current, success, cached, error) {
-        ref.read(mapPrefetchProvider.notifier).updateProgress(
+        ref
+            .read(mapPrefetchProvider.notifier)
+            .updateProgress(
               current: current,
               success: success,
               cached: cached,
@@ -152,16 +158,26 @@ class _MapScreenState extends ConsumerState<MapScreen> {
 
   void _fitRouteBounds(RouteResult routeResult) {
     final points = <LatLng>[];
-    final originLat = routeResult.origin is Landmark ? (routeResult.origin as Landmark).routeLat : routeResult.origin.lat;
-    final originLng = routeResult.origin is Landmark ? (routeResult.origin as Landmark).routeLng : routeResult.origin.lng;
+    final originLat = routeResult.origin is Landmark
+        ? (routeResult.origin as Landmark).routeLat
+        : routeResult.origin.lat;
+    final originLng = routeResult.origin is Landmark
+        ? (routeResult.origin as Landmark).routeLng
+        : routeResult.origin.lng;
     points.add(LatLng(originLat, originLng));
 
-    final destLat = routeResult.destination is Landmark ? (routeResult.destination as Landmark).routeLat : routeResult.destination.lat;
-    final destLng = routeResult.destination is Landmark ? (routeResult.destination as Landmark).routeLng : routeResult.destination.lng;
+    final destLat = routeResult.destination is Landmark
+        ? (routeResult.destination as Landmark).routeLat
+        : routeResult.destination.lat;
+    final destLng = routeResult.destination is Landmark
+        ? (routeResult.destination as Landmark).routeLng
+        : routeResult.destination.lng;
     points.add(LatLng(destLat, destLng));
 
     for (final segment in routeResult.segments) {
-      if (segment.lineId == 'WALK' && segment.walkingPath != null && segment.walkingPath!.isNotEmpty) {
+      if (segment.lineId == 'WALK' &&
+          segment.walkingPath != null &&
+          segment.walkingPath!.isNotEmpty) {
         points.addAll(segment.walkingPath!);
       } else {
         points.add(LatLng(segment.fromStation.lat, segment.fromStation.lng));
@@ -186,10 +202,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
       if (p.longitude > maxLng) maxLng = p.longitude;
     }
 
-    final bounds = LatLngBounds(
-      LatLng(minLat, minLng),
-      LatLng(maxLat, maxLng),
-    );
+    final bounds = LatLngBounds(LatLng(minLat, minLng), LatLng(maxLat, maxLng));
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
@@ -213,7 +226,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     try {
       final locationService = ref.read(locationServiceProvider);
       final hasMock = kDebugMode && ref.read(mockLocationProvider) != null;
-      final hasPermission = hasMock || await locationService.isLocationPermissionGranted();
+      final hasPermission =
+          hasMock || await locationService.isLocationPermissionGranted();
       if (hasPermission) {
         final pos = await locationService.getCurrentPosition();
         if (pos != null && mounted) {
@@ -253,16 +267,23 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     final t = ref.watch(translationsProvider);
     final transitRepo = ref.watch(transitRepositoryProvider);
     final favoritesRepo = ref.watch(favoritesRepositoryProvider);
-    final routeResult = ref.watch(searchViewModelProvider.select((s) => s.routeResult));
+    final routeResult = ref.watch(
+      searchViewModelProvider.select((s) => s.routeResult),
+    );
     final isRouteActive = routeResult != null;
     final localeCode = ref.watch(localeProvider);
-    final isTrackingActive = ref.watch(routeTrackerProvider.select((s) => s.isActive));
-    final trackerState = isTrackingActive ? ref.watch(routeTrackerProvider) : null;
+    final isTrackingActive = ref.watch(
+      routeTrackerProvider.select((s) => s.isActive),
+    );
+    final trackerState = isTrackingActive
+        ? ref.watch(routeTrackerProvider)
+        : null;
     final prefetchState = ref.watch(mapPrefetchProvider);
 
     // Build Polylines for transit lines
     final themeBrightness = theme.brightness;
-    if (_lastRouteResultForPolylines != routeResult || _lastBrightnessForPolylines != themeBrightness) {
+    if (_lastRouteResultForPolylines != routeResult ||
+        _lastBrightnessForPolylines != themeBrightness) {
       _lastRouteResultForPolylines = routeResult;
       _lastBrightnessForPolylines = themeBrightness;
       final newPolylines = <Polyline>[];
@@ -271,10 +292,14 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         for (final segment in routeResult.segments) {
           final isWalk = segment.lineId == 'WALK';
           final points = <LatLng>[];
-          if (isWalk && segment.walkingPath != null && segment.walkingPath!.isNotEmpty) {
+          if (isWalk &&
+              segment.walkingPath != null &&
+              segment.walkingPath!.isNotEmpty) {
             points.addAll(segment.walkingPath!);
           } else {
-            points.add(LatLng(segment.fromStation.lat, segment.fromStation.lng));
+            points.add(
+              LatLng(segment.fromStation.lat, segment.fromStation.lng),
+            );
             for (final s in segment.intermediateStations) {
               points.add(LatLng(s.lat, s.lng));
             }
@@ -284,14 +309,18 @@ class _MapScreenState extends ConsumerState<MapScreen> {
           newPolylines.add(
             Polyline(
               points: points,
-              color: isWalk ? Colors.grey : TransitColors.getLineColor(segment.lineId),
+              color: isWalk
+                  ? Colors.grey
+                  : TransitColors.getLineColor(segment.lineId),
               strokeWidth: isWalk ? 3.5 : 6.0,
-              pattern: isWalk ? const StrokePattern.dotted() : const StrokePattern.solid(),
-              borderColor: isWalk 
-                  ? Colors.transparent 
+              pattern: isWalk
+                  ? const StrokePattern.dotted()
+                  : const StrokePattern.solid(),
+              borderColor: isWalk
+                  ? Colors.transparent
                   : (themeBrightness == Brightness.dark
-                      ? Colors.black.withValues(alpha: 0.3)
-                      : Colors.white.withValues(alpha: 0.3)),
+                        ? Colors.black.withValues(alpha: 0.3)
+                        : Colors.white.withValues(alpha: 0.3)),
               borderStrokeWidth: isWalk ? 0.0 : 1.5,
             ),
           );
@@ -323,132 +352,146 @@ class _MapScreenState extends ConsumerState<MapScreen> {
 
     // Build Station Markers
     final currentStationId = trackerState?.currentStation?.id;
-    if (_lastRouteResultForMarkers != routeResult || 
-        _lastBrightnessForMarkers != themeBrightness || 
+    if (_lastRouteResultForMarkers != routeResult ||
+        _lastBrightnessForMarkers != themeBrightness ||
         _lastCurrentStationId != currentStationId) {
       _lastRouteResultForMarkers = routeResult;
       _lastBrightnessForMarkers = themeBrightness;
       _lastCurrentStationId = currentStationId;
       final newMarkers = <Marker>[];
-      
+
       if (isRouteActive) {
-      // Find all transit stations on the route
-      final routeStations = <Station>[];
-      for (final segment in routeResult.segments) {
-        if (segment.fromStation is Station) {
-          final s = segment.fromStation as Station;
-          if (!routeStations.any((x) => x.id == s.id)) routeStations.add(s);
+        // Find all transit stations on the route
+        final routeStations = <Station>[];
+        for (final segment in routeResult.segments) {
+          if (segment.fromStation is Station) {
+            final s = segment.fromStation as Station;
+            if (!routeStations.any((x) => x.id == s.id)) routeStations.add(s);
+          }
+          for (final s in segment.intermediateStations) {
+            if (!routeStations.any((x) => x.id == s.id)) routeStations.add(s);
+          }
+          if (segment.toStation is Station) {
+            final s = segment.toStation as Station;
+            if (!routeStations.any((x) => x.id == s.id)) routeStations.add(s);
+          }
         }
-        for (final s in segment.intermediateStations) {
-          if (!routeStations.any((x) => x.id == s.id)) routeStations.add(s);
-        }
-        if (segment.toStation is Station) {
-          final s = segment.toStation as Station;
-          if (!routeStations.any((x) => x.id == s.id)) routeStations.add(s);
-        }
-      }
 
-      // Add markers for only these stations
-      for (final station in routeStations) {
-        final lineColor = TransitColors.getLineColor(station.lineId);
-        final isInterchange = station.interchange.isNotEmpty;
-        final isCurrentStation = isTrackingActive && trackerState?.currentStation?.id == station.id;
+        // Add markers for only these stations
+        for (final station in routeStations) {
+          final lineColor = TransitColors.getLineColor(station.lineId);
+          final isInterchange = station.interchange.isNotEmpty;
+          final isCurrentStation =
+              isTrackingActive &&
+              trackerState?.currentStation?.id == station.id;
 
-        newMarkers.add(
-          Marker(
-            point: LatLng(station.lat, station.lng),
-            width: isCurrentStation ? 44 : (isInterchange ? 32 : 24),
-            height: isCurrentStation ? 44 : (isInterchange ? 32 : 24),
-            child: GestureDetector(
-              onTap: () {
-                setState(() => _selectedStation = station);
-              },
-              child: Container(
-                decoration: BoxDecoration(
-                  color: isCurrentStation 
-                      ? Colors.green 
-                      : (theme.brightness == Brightness.dark ? const Color(0xFF1E293B) : Colors.white),
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: isCurrentStation ? Colors.white : lineColor,
-                    width: isCurrentStation ? 4.0 : (isInterchange ? 4.0 : 3.0),
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: isCurrentStation ? Colors.green.withValues(alpha: 0.5) : Colors.black26,
-                      blurRadius: isCurrentStation ? 8 : 4,
-                      spreadRadius: isCurrentStation ? 2 : 0,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: Center(
-                  child: isCurrentStation
-                      ? const Icon(Icons.navigation_rounded, size: 20, color: Colors.white)
-                      : (isInterchange
-                          ? Icon(
-                              Icons.swap_horiz_rounded,
-                              size: 14,
-                              color: theme.brightness == Brightness.dark ? Colors.white : Colors.black,
-                            )
-                          : Container(
-                              width: 6,
-                              height: 6,
-                              decoration: BoxDecoration(
-                                color: lineColor,
-                                shape: BoxShape.circle,
-                              ),
-                            )),
-                ),
-              ),
-            ),
-          ),
-        );
-      }
-
-      // Add Station Exit Markers
-      for (final segment in routeResult.segments) {
-        if (segment.lineId == 'WALK' && segment.exit != null) {
-          // Exits are only shown at destination (where we walk from station: fromStation is Station), not at origin (where we walk to station: toStation is Station)
-          if (segment.fromStation is! Station) continue;
-
-          final exit = segment.exit!;
           newMarkers.add(
             Marker(
-              point: LatLng(exit.lat, exit.lng),
-              width: 32,
-              height: 32,
-              child: Tooltip(
-                message: t.routeResult.exitLabel(exit.exitCode),
+              point: LatLng(station.lat, station.lng),
+              width: isCurrentStation ? 44 : (isInterchange ? 32 : 24),
+              height: isCurrentStation ? 44 : (isInterchange ? 32 : 24),
+              child: GestureDetector(
+                onTap: () {
+                  setState(() => _selectedStation = station);
+                },
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Colors.orange.shade800,
+                    color: isCurrentStation
+                        ? Colors.green
+                        : (theme.brightness == Brightness.dark
+                              ? const Color(0xFF1E293B)
+                              : Colors.white),
                     shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white, width: 2.0),
-                    boxShadow: const [
+                    border: Border.all(
+                      color: isCurrentStation ? Colors.white : lineColor,
+                      width: isCurrentStation
+                          ? 4.0
+                          : (isInterchange ? 4.0 : 3.0),
+                    ),
+                    boxShadow: [
                       BoxShadow(
-                        color: Colors.black26,
-                        blurRadius: 4,
-                        offset: Offset(0, 2),
+                        color: isCurrentStation
+                            ? Colors.green.withValues(alpha: 0.5)
+                            : Colors.black26,
+                        blurRadius: isCurrentStation ? 8 : 4,
+                        spreadRadius: isCurrentStation ? 2 : 0,
+                        offset: const Offset(0, 2),
                       ),
                     ],
                   ),
                   child: Center(
-                    child: Text(
-                      exit.exitCode,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    child: isCurrentStation
+                        ? const Icon(
+                            Icons.navigation_rounded,
+                            size: 20,
+                            color: Colors.white,
+                          )
+                        : (isInterchange
+                              ? Icon(
+                                  Icons.swap_horiz_rounded,
+                                  size: 14,
+                                  color: theme.brightness == Brightness.dark
+                                      ? Colors.white
+                                      : Colors.black,
+                                )
+                              : Container(
+                                  width: 6,
+                                  height: 6,
+                                  decoration: BoxDecoration(
+                                    color: lineColor,
+                                    shape: BoxShape.circle,
+                                  ),
+                                )),
                   ),
                 ),
               ),
             ),
           );
         }
-      }
+
+        // Add Station Exit Markers
+        for (final segment in routeResult.segments) {
+          if (segment.lineId == 'WALK' && segment.exit != null) {
+            // Exits are only shown at destination (where we walk from station: fromStation is Station), not at origin (where we walk to station: toStation is Station)
+            if (segment.fromStation is! Station) continue;
+
+            final exit = segment.exit!;
+            newMarkers.add(
+              Marker(
+                point: LatLng(exit.lat, exit.lng),
+                width: 32,
+                height: 32,
+                child: Tooltip(
+                  message: t.routeResult.exitLabel(exit.exitCode),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.orange.shade800,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white, width: 2.0),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Colors.black26,
+                          blurRadius: 4,
+                          offset: Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Center(
+                      child: Text(
+                        exit.exitCode,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            );
+          }
+        }
 
         // Add custom origin/destination pins
         // Origin Pin (Green)
@@ -461,7 +504,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
             height: 44,
             alignment: Alignment.topCenter,
             child: Tooltip(
-              message: routeResult.origin.displayName(isEnglish: localeCode == 'en'),
+              message: routeResult.origin.displayName(
+                isEnglish: localeCode == 'en',
+              ),
               child: CustomMapPin(
                 color: Colors.green.shade600,
                 icon: Icons.trip_origin_rounded,
@@ -480,7 +525,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
             height: 44,
             alignment: Alignment.topCenter,
             child: Tooltip(
-              message: routeResult.destination.displayName(isEnglish: localeCode == 'en'),
+              message: routeResult.destination.displayName(
+                isEnglish: localeCode == 'en',
+              ),
               child: CustomMapPin(
                 color: Colors.red.shade600,
                 icon: Icons.flag_rounded,
@@ -491,21 +538,25 @@ class _MapScreenState extends ConsumerState<MapScreen> {
 
         // Add walking path direction markers
         for (final segment in routeResult.segments) {
-          if (segment.lineId == 'WALK' && segment.walkingPath != null && segment.walkingPath!.isNotEmpty) {
+          if (segment.lineId == 'WALK' &&
+              segment.walkingPath != null &&
+              segment.walkingPath!.isNotEmpty) {
             final path = segment.walkingPath!;
             for (int idx = 0; idx < path.length - 1; idx++) {
               final p1 = path[idx];
               final p2 = path[idx + 1];
               final dist = Geolocator.distanceBetween(
-                p1.latitude, p1.longitude,
-                p2.latitude, p2.longitude,
+                p1.latitude,
+                p1.longitude,
+                p2.latitude,
+                p2.longitude,
               );
               if (dist > 10.0) {
                 final midpoint = LatLng(
                   (p1.latitude + p2.latitude) / 2,
                   (p1.longitude + p2.longitude) / 2,
                 );
-                
+
                 // Calculate bearing in radians
                 final lat1 = p1.latitude * math.pi / 180.0;
                 final lon1 = p1.longitude * math.pi / 180.0;
@@ -513,7 +564,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                 final lon2 = p2.longitude * math.pi / 180.0;
                 final dLon = lon2 - lon1;
                 final y = math.sin(dLon) * math.cos(lat2);
-                final x = math.cos(lat1) * math.sin(lat2) -
+                final x =
+                    math.cos(lat1) * math.sin(lat2) -
                     math.sin(lat1) * math.cos(lat2) * math.cos(dLon);
                 final bearing = math.atan2(y, x);
 
@@ -525,8 +577,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                     child: IgnorePointer(
                       child: Container(
                         decoration: BoxDecoration(
-                          color: theme.brightness == Brightness.dark 
-                              ? Colors.black 
+                          color: theme.brightness == Brightness.dark
+                              ? Colors.black
                               : Colors.white,
                           shape: BoxShape.circle,
                           border: Border.all(
@@ -565,60 +617,64 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         }
       } else {
         // Show all stations
-      for (final station in transitRepo.stations) {
-        final lineColor = TransitColors.getLineColor(station.lineId);
-        final isInterchange = station.interchange.isNotEmpty;
+        for (final station in transitRepo.stations) {
+          final lineColor = TransitColors.getLineColor(station.lineId);
+          final isInterchange = station.interchange.isNotEmpty;
 
-        newMarkers.add(
-          Marker(
-            point: LatLng(station.lat, station.lng),
-            width: isInterchange ? 32 : 24,
-            height: isInterchange ? 32 : 24,
-            child: GestureDetector(
-              onTap: () {
-                setState(() => _selectedStation = station);
-              },
-              child: Container(
-                decoration: BoxDecoration(
-                  color: themeBrightness == Brightness.dark ? const Color(0xFF1E293B) : Colors.white,
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: lineColor,
-                    width: isInterchange ? 4.0 : 3.0,
-                  ),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Colors.black26,
-                      blurRadius: 4,
-                      offset: Offset(0, 2),
+          newMarkers.add(
+            Marker(
+              point: LatLng(station.lat, station.lng),
+              width: isInterchange ? 32 : 24,
+              height: isInterchange ? 32 : 24,
+              child: GestureDetector(
+                onTap: () {
+                  setState(() => _selectedStation = station);
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: themeBrightness == Brightness.dark
+                        ? const Color(0xFF1E293B)
+                        : Colors.white,
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: lineColor,
+                      width: isInterchange ? 4.0 : 3.0,
                     ),
-                  ],
-                ),
-                child: Center(
-                  child: isInterchange
-                      ? Icon(
-                          Icons.swap_horiz_rounded,
-                          size: 14,
-                          color: themeBrightness == Brightness.dark ? Colors.white : Colors.black,
-                        )
-                      : Container(
-                          width: 6,
-                          height: 6,
-                          decoration: BoxDecoration(
-                            color: lineColor,
-                            shape: BoxShape.circle,
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Colors.black26,
+                        blurRadius: 4,
+                        offset: Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Center(
+                    child: isInterchange
+                        ? Icon(
+                            Icons.swap_horiz_rounded,
+                            size: 14,
+                            color: themeBrightness == Brightness.dark
+                                ? Colors.white
+                                : Colors.black,
+                          )
+                        : Container(
+                            width: 6,
+                            height: 6,
+                            decoration: BoxDecoration(
+                              color: lineColor,
+                              shape: BoxShape.circle,
+                            ),
                           ),
-                        ),
+                  ),
                 ),
               ),
             ),
-          ),
-        );
+          );
+        }
       }
+      _cachedBaseMarkers = newMarkers;
     }
-    _cachedBaseMarkers = newMarkers;
-    }
-    
+
     final markers = List<Marker>.from(_cachedBaseMarkers);
 
     // Add Namtang stops overlay when zoomed in
@@ -643,14 +699,16 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                   },
                   child: Container(
                     decoration: BoxDecoration(
-                      color: themeBrightness == Brightness.dark 
-                          ? const Color(0xFF1E293B) 
+                      color: themeBrightness == Brightness.dark
+                          ? const Color(0xFF1E293B)
                           : Colors.white,
                       shape: BoxShape.circle,
                       border: Border.all(
-                        color: stop.type == 'boat' 
-                            ? Colors.blue.shade700 
-                            : (stop.type == 'commuter_train' ? Colors.red.shade700 : Colors.green.shade700),
+                        color: stop.type == 'boat'
+                            ? Colors.blue.shade700
+                            : (stop.type == 'commuter_train'
+                                  ? Colors.red.shade700
+                                  : Colors.green.shade700),
                         width: 2.0,
                       ),
                       boxShadow: const [
@@ -665,11 +723,15 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                       child: Icon(
                         stop.type == 'boat'
                             ? Icons.directions_boat_rounded
-                            : (stop.type == 'commuter_train' ? Icons.train_rounded : Icons.directions_bus_rounded),
+                            : (stop.type == 'commuter_train'
+                                  ? Icons.train_rounded
+                                  : Icons.directions_bus_rounded),
                         size: 12,
-                        color: stop.type == 'boat' 
-                            ? Colors.blue.shade700 
-                            : (stop.type == 'commuter_train' ? Colors.red.shade700 : Colors.green.shade700),
+                        color: stop.type == 'boat'
+                            ? Colors.blue.shade700
+                            : (stop.type == 'commuter_train'
+                                  ? Colors.red.shade700
+                                  : Colors.green.shade700),
                       ),
                     ),
                   ),
@@ -721,7 +783,10 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     if (_customSelectedLocation != null) {
       markers.add(
         Marker(
-          point: LatLng(_customSelectedLocation!.lat, _customSelectedLocation!.lng),
+          point: LatLng(
+            _customSelectedLocation!.lat,
+            _customSelectedLocation!.lng,
+          ),
           width: 40,
           height: 44,
           alignment: Alignment.topCenter,
@@ -733,7 +798,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
       );
     }
 
-    final isBottomCardVisible = _selectedStation != null ||
+    final isBottomCardVisible =
+        _selectedStation != null ||
         _customSelectedLocation != null ||
         _selectedNamtangStop != null ||
         (isRouteActive && !isTrackingActive) ||
@@ -766,9 +832,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                       ),
                     ),
                     onPositionChanged: (position, hasGesture) {
-                      if (position.zoom != null && (position.zoom! - _currentZoom).abs() > 0.15) {
+                      if ((position.zoom - _currentZoom).abs() > 0.15) {
                         setState(() {
-                          _currentZoom = position.zoom!;
+                          _currentZoom = position.zoom;
                         });
                       }
                     },
@@ -779,21 +845,29 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                       if (_selectedNamtangStop != null) {
                         setState(() => _selectedNamtangStop = null);
                       }
-                      
-                      final nearest = _findNearestStation(point, transitRepo.stations);
+
+                      final nearest = _findNearestStation(
+                        point,
+                        transitRepo.stations,
+                      );
                       if (nearest != null) {
                         final dist = Geolocator.distanceBetween(
-                          point.latitude, point.longitude, nearest.lat, nearest.lng
+                          point.latitude,
+                          point.longitude,
+                          nearest.lat,
+                          nearest.lng,
                         );
                         final walkMin = (dist / 80.0).clamp(1.0, 30.0);
-      
+
                         setState(() {
                           _selectedStation = null;
                           _selectedNamtangStop = null;
                           _customSelectedLocation = CustomLocation(
                             id: 'CUSTOM_${point.latitude.toStringAsFixed(6)}_${point.longitude.toStringAsFixed(6)}',
-                            nameTh: 'จุดที่เลือก (${point.latitude.toStringAsFixed(4)}, ${point.longitude.toStringAsFixed(4)})',
-                            nameEn: 'Selected Location (${point.latitude.toStringAsFixed(4)}, ${point.longitude.toStringAsFixed(4)})',
+                            nameTh:
+                                'จุดที่เลือก (${point.latitude.toStringAsFixed(4)}, ${point.longitude.toStringAsFixed(4)})',
+                            nameEn:
+                                'Selected Location (${point.latitude.toStringAsFixed(4)}, ${point.longitude.toStringAsFixed(4)})',
                             nearestStationId: nearest.id,
                             walkingMinutes: walkMin,
                             lat: point.latitude,
@@ -808,7 +882,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                       urlTemplate: theme.brightness == Brightness.dark
                           ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
                           : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
-                      userAgentPackageName: 'com.bkktransit.bkk_transit_planner',
+                      userAgentPackageName:
+                          'com.bkktransit.bkk_transit_planner',
                       tileProvider: _tileProvider,
                       retinaMode: true,
                       maxNativeZoom: 18,
@@ -840,7 +915,12 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                   Consumer(
                     builder: (context, ref, child) {
                       final searchState = ref.watch(searchViewModelProvider);
-                      return _buildTopSearchCard(context, searchState, t, localeCode);
+                      return _buildTopSearchCard(
+                        context,
+                        searchState,
+                        t,
+                        localeCode,
+                      );
                     },
                   ),
                   if (prefetchState.isPrefetching) ...[
@@ -918,7 +998,11 @@ class _MapScreenState extends ConsumerState<MapScreen> {
             ),
 
           // ─── Route Result Banner ───
-          if (isRouteActive && !isTrackingActive && _selectedStation == null && _customSelectedLocation == null && _selectedNamtangStop == null)
+          if (isRouteActive &&
+              !isTrackingActive &&
+              _selectedStation == null &&
+              _customSelectedLocation == null &&
+              _selectedNamtangStop == null)
             Positioned(
               left: 16,
               right: 16,
@@ -931,7 +1015,10 @@ class _MapScreenState extends ConsumerState<MapScreen> {
             ),
 
           // ─── Active Journey Tracking Panel ───
-          if (isTrackingActive && _selectedStation == null && _customSelectedLocation == null && _selectedNamtangStop == null)
+          if (isTrackingActive &&
+              _selectedStation == null &&
+              _customSelectedLocation == null &&
+              _selectedNamtangStop == null)
             Positioned(
               left: 16,
               right: 16,
@@ -965,7 +1052,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
 
     final isFav = favoritesRepo.isFavoriteStation(station.id);
     final crowdInfo = crowdService.getCrowdInfo(station.id);
-    final minutesUntilNext = scheduleService.getMinutesUntilNextTrain(station.lineId);
+    final minutesUntilNext = scheduleService.getMinutesUntilNextTrain(
+      station.lineId,
+    );
 
     final stationName = localeCode == 'th' ? station.nameTh : station.nameEn;
     final stationSubName = localeCode == 'th' ? station.nameEn : station.nameTh;
@@ -985,6 +1074,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         if (lineId.startsWith('MRT')) return 1;
         return 2;
       }
+
       final pA = getPriority(a.lineId);
       final pB = getPriority(b.lineId);
       if (pA != pB) return pA.compareTo(pB);
@@ -997,7 +1087,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     } else if (minutesUntilNext == 0) {
       trainStatusText = t.routeResult.trainArriving;
     } else {
-      trainStatusText = '${t.routeResult.nextTrain}: ~$minutesUntilNext ${t.common.minutesUnit}';
+      trainStatusText =
+          '${t.routeResult.nextTrain}: ~$minutesUntilNext ${t.common.minutesUnit}';
     }
 
     String getCrowdLevelText(CrowdLevel level) {
@@ -1025,7 +1116,10 @@ class _MapScreenState extends ConsumerState<MapScreen> {
             Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: lineColor,
                     borderRadius: BorderRadius.circular(6),
@@ -1053,7 +1147,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                       Text(
                         stationSubName,
                         style: theme.textTheme.bodyMedium?.copyWith(
-                          color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                          color: theme.colorScheme.onSurface.withValues(
+                            alpha: 0.5,
+                          ),
                           fontSize: 12,
                         ),
                       ),
@@ -1062,7 +1158,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                 ),
                 IconButton(
                   icon: Icon(
-                    isFav ? Icons.favorite_rounded : Icons.favorite_outline_rounded,
+                    isFav
+                        ? Icons.favorite_rounded
+                        : Icons.favorite_outline_rounded,
                     color: isFav ? Colors.red : null,
                   ),
                   onPressed: () async {
@@ -1085,21 +1183,21 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                 child: Row(
                   children: hubStations.map((hubStation) {
                     final hubLine = transitRepo.getLine(hubStation.lineId);
-                    final hubLineColor = TransitColors.getLineColor(hubStation.lineId);
+                    final hubLineColor = TransitColors.getLineColor(
+                      hubStation.lineId,
+                    );
                     final isSelected = hubStation.id == station.id;
                     final hubLineName = hubLine != null
                         ? (localeCode == 'th' ? hubLine.nameTh : hubLine.nameEn)
                         : hubStation.lineId;
-                    
+
                     return Padding(
                       padding: const EdgeInsets.only(right: 8.0),
                       child: ChoiceChip(
                         label: Text(
                           '${hubStation.code} - $hubLineName',
                           style: TextStyle(
-                            color: isSelected 
-                                ? Colors.white 
-                                : hubLineColor,
+                            color: isSelected ? Colors.white : hubLineColor,
                             fontWeight: FontWeight.bold,
                             fontSize: 12,
                           ),
@@ -1113,10 +1211,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                         showCheckmark: false,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20),
-                          side: BorderSide(
-                            color: hubLineColor,
-                            width: 1.5,
-                          ),
+                          side: BorderSide(color: hubLineColor, width: 1.5),
                         ),
                         onSelected: (selected) {
                           if (selected) {
@@ -1144,15 +1239,21 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                       Icon(
                         Icons.access_time_rounded,
                         size: 16,
-                        color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                        color: theme.colorScheme.onSurface.withValues(
+                          alpha: 0.6,
+                        ),
                       ),
                       const SizedBox(width: 6),
                       Expanded(
                         child: Text(
                           trainStatusText,
                           style: theme.textTheme.bodyMedium?.copyWith(
-                            color: minutesUntilNext == 0 ? Colors.amber.shade700 : null,
-                            fontWeight: minutesUntilNext == 0 ? FontWeight.bold : null,
+                            color: minutesUntilNext == 0
+                                ? Colors.amber.shade700
+                                : null,
+                            fontWeight: minutesUntilNext == 0
+                                ? FontWeight.bold
+                                : null,
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -1169,7 +1270,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                       size: 16,
                       color: crowdInfo.level == CrowdLevel.high
                           ? Colors.red
-                          : (crowdInfo.level == CrowdLevel.medium ? Colors.orange : Colors.green),
+                          : (crowdInfo.level == CrowdLevel.medium
+                                ? Colors.orange
+                                : Colors.green),
                     ),
                     const SizedBox(width: 6),
                     Text(
@@ -1178,8 +1281,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                         color: crowdInfo.level == CrowdLevel.high
                             ? Colors.red.shade400
                             : (crowdInfo.level == CrowdLevel.medium
-                                ? Colors.orange.shade400
-                                : Colors.green.shade400),
+                                  ? Colors.orange.shade400
+                                  : Colors.green.shade400),
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -1202,7 +1305,11 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                         _openSearchOverlay(context, focusDestination: true);
                       }
                     },
-                    icon: const Icon(Icons.trip_origin_rounded, size: 16, color: Colors.green),
+                    icon: const Icon(
+                      Icons.trip_origin_rounded,
+                      size: 16,
+                      color: Colors.green,
+                    ),
                     label: Text(t.favorites.setOriginBtn),
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 10),
@@ -1220,7 +1327,11 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                         _openSearchOverlay(context, focusDestination: false);
                       }
                     },
-                    icon: const Icon(Icons.location_on_rounded, size: 16, color: Colors.red),
+                    icon: const Icon(
+                      Icons.location_on_rounded,
+                      size: 16,
+                      color: Colors.red,
+                    ),
                     label: Text(t.favorites.setDestBtn),
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 10),
@@ -1241,7 +1352,10 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     double minDist = double.infinity;
     for (final s in stations) {
       final dist = Geolocator.distanceBetween(
-        point.latitude, point.longitude, s.lat, s.lng
+        point.latitude,
+        point.longitude,
+        s.lat,
+        s.lng,
       );
       if (dist < minDist) {
         minDist = dist;
@@ -1270,7 +1384,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     final searchVm = ref.read(searchViewModelProvider.notifier);
     final transitRepo = ref.read(transitRepositoryProvider);
     final nearest = transitRepo.getStation(location.nearestStationId);
-    final nearestName = nearest?.displayName(isEnglish: localeCode == 'en') ?? '';
+    final nearestName =
+        nearest?.displayName(isEnglish: localeCode == 'en') ?? '';
     final walkMin = location.walkingMinutes.toInt();
 
     final stationName = localeCode == 'th' ? location.nameTh : location.nameEn;
@@ -1302,9 +1417,14 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                         ),
                       ),
                       Text(
-                        t.proximity.nearStationWalk(nearestName, '${walkMin.toInt()}'),
+                        t.proximity.nearStationWalk(
+                          nearestName,
+                          '${walkMin.toInt()}',
+                        ),
                         style: theme.textTheme.bodyMedium?.copyWith(
-                          color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                          color: theme.colorScheme.onSurface.withValues(
+                            alpha: 0.5,
+                          ),
                           fontSize: 12,
                         ),
                       ),
@@ -1332,7 +1452,11 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                         _openSearchOverlay(context, focusDestination: true);
                       }
                     },
-                    icon: const Icon(Icons.trip_origin_rounded, size: 16, color: Colors.green),
+                    icon: const Icon(
+                      Icons.trip_origin_rounded,
+                      size: 16,
+                      color: Colors.green,
+                    ),
                     label: Text(t.favorites.setOriginBtn),
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 10),
@@ -1350,7 +1474,11 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                         _openSearchOverlay(context, focusDestination: false);
                       }
                     },
-                    icon: const Icon(Icons.location_on_rounded, size: 16, color: Colors.red),
+                    icon: const Icon(
+                      Icons.location_on_rounded,
+                      size: 16,
+                      color: Colors.red,
+                    ),
                     label: Text(t.favorites.setDestBtn),
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 10),
@@ -1376,7 +1504,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     if (segment == null) return const SizedBox.shrink();
 
     final isWalk = segment.lineId == 'WALK';
-    final lineColor = isWalk ? Colors.grey : TransitColors.getLineColor(segment.lineId);
+    final lineColor = isWalk
+        ? Colors.grey
+        : TransitColors.getLineColor(segment.lineId);
     final stations = tracker.currentSegmentStations;
 
     if (tracker.hasArrived) {
@@ -1394,12 +1524,18 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                   color: Colors.green,
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.check_rounded, color: Colors.white, size: 32),
+                child: const Icon(
+                  Icons.check_rounded,
+                  color: Colors.white,
+                  size: 32,
+                ),
               ),
               const SizedBox(height: 16),
               Text(
                 t.journey.arrivedLabel,
-                style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                style: theme.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 20),
               ElevatedButton(
@@ -1410,7 +1546,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                   backgroundColor: theme.colorScheme.primary,
                   foregroundColor: theme.colorScheme.onPrimary,
                   minimumSize: const Size.fromHeight(48),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
                 child: Text(t.journey.endJourneyBtn),
               ),
@@ -1420,8 +1558,11 @@ class _MapScreenState extends ConsumerState<MapScreen> {
       );
     }
 
-    final currentStationName = tracker.currentStation?.displayName(isEnglish: localeCode == 'en') ?? '';
-    final nextStationName = tracker.nextStation?.displayName(isEnglish: localeCode == 'en') ?? '';
+    final currentStationName =
+        tracker.currentStation?.displayName(isEnglish: localeCode == 'en') ??
+        '';
+    final nextStationName =
+        tracker.nextStation?.displayName(isEnglish: localeCode == 'en') ?? '';
 
     // Calculate progress
     double progress = 1.0;
@@ -1442,7 +1583,10 @@ class _MapScreenState extends ConsumerState<MapScreen> {
             Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: lineColor,
                     borderRadius: BorderRadius.circular(8),
@@ -1450,7 +1594,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                   child: Text(
                     isWalk ? t.journey.walkToLabel : segment.lineName,
                     style: TextStyle(
-                      color: isWalk ? Colors.white : TransitColors.getLineTextColor(segment.lineId),
+                      color: isWalk
+                          ? Colors.white
+                          : TransitColors.getLineTextColor(segment.lineId),
                       fontWeight: FontWeight.bold,
                       fontSize: 12,
                     ),
@@ -1459,7 +1605,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    isWalk 
+                    isWalk
                         ? '~${segment.estimatedMinutes.toInt()} ${t.common.minutesUnit}'
                         : '${stations.length} ${t.journey.stationsCount}',
                     style: theme.textTheme.labelLarge?.copyWith(
@@ -1470,10 +1616,16 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                 if (tracker.isSimulation) ...[
                   const SizedBox(width: 8),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 2,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.amber.withValues(alpha: 0.15),
-                      border: Border.all(color: Colors.amber.shade700, width: 1),
+                      border: Border.all(
+                        color: Colors.amber.shade700,
+                        width: 1,
+                      ),
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(
@@ -1512,12 +1664,20 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                       Text(
                         t.journey.currentStationLabel,
                         style: theme.textTheme.labelMedium?.copyWith(
-                          color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                          color: theme.colorScheme.onSurface.withValues(
+                            alpha: 0.5,
+                          ),
                         ),
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        currentStationName.isNotEmpty ? currentStationName : (isWalk ? segment.fromStation.displayName(isEnglish: localeCode == 'en') : ''),
+                        currentStationName.isNotEmpty
+                            ? currentStationName
+                            : (isWalk
+                                  ? segment.fromStation.displayName(
+                                      isEnglish: localeCode == 'en',
+                                    )
+                                  : ''),
                         style: theme.textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
@@ -1529,7 +1689,11 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                 ),
                 const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 8),
-                  child: Icon(Icons.arrow_forward_rounded, color: Colors.grey, size: 20),
+                  child: Icon(
+                    Icons.arrow_forward_rounded,
+                    color: Colors.grey,
+                    size: 20,
+                  ),
                 ),
                 Expanded(
                   child: Column(
@@ -1538,12 +1702,20 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                       Text(
                         t.journey.nextStationLabel,
                         style: theme.textTheme.labelMedium?.copyWith(
-                          color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                          color: theme.colorScheme.onSurface.withValues(
+                            alpha: 0.5,
+                          ),
                         ),
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        nextStationName.isNotEmpty ? nextStationName : (isWalk ? segment.toStation.displayName(isEnglish: localeCode == 'en') : '-'),
+                        nextStationName.isNotEmpty
+                            ? nextStationName
+                            : (isWalk
+                                  ? segment.toStation.displayName(
+                                      isEnglish: localeCode == 'en',
+                                    )
+                                  : '-'),
                         style: theme.textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.bold,
                           color: theme.colorScheme.primary,
@@ -1565,12 +1737,16 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                   Expanded(
                     child: OutlinedButton.icon(
                       onPressed: () {
-                        ref.read(routeTrackerProvider.notifier).advanceSimulation();
+                        ref
+                            .read(routeTrackerProvider.notifier)
+                            .advanceSimulation();
                       },
                       icon: const Icon(Icons.skip_next_rounded, size: 20),
                       label: Text(t.journey.nextSimulationBtn),
                       style: OutlinedButton.styleFrom(
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
                         padding: const EdgeInsets.symmetric(vertical: 12),
                       ),
                     ),
@@ -1585,7 +1761,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: theme.colorScheme.errorContainer,
                       foregroundColor: theme.colorScheme.onErrorContainer,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                       padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
                     child: Text(t.journey.endJourneyBtn),
@@ -1626,7 +1804,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    t.localeCode == 'th' ? 'ค้นหาเส้นทาง...' : 'Plan a Journey...',
+                    t.localeCode == 'th'
+                        ? 'ค้นหาเส้นทาง...'
+                        : 'Plan a Journey...',
                     style: theme.textTheme.bodyLarge?.copyWith(
                       color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                     ),
@@ -1661,18 +1841,27 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                   },
                   borderRadius: BorderRadius.circular(8),
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Row(
                           children: [
-                            const Icon(Icons.trip_origin_rounded, color: Colors.green, size: 14),
+                            const Icon(
+                              Icons.trip_origin_rounded,
+                              color: Colors.green,
+                              size: 14,
+                            ),
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
-                                searchState.origin!.displayName(isEnglish: localeCode == 'en'),
+                                searchState.origin!.displayName(
+                                  isEnglish: localeCode == 'en',
+                                ),
                                 style: theme.textTheme.bodyMedium?.copyWith(
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -1684,11 +1873,17 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                         const SizedBox(height: 2),
                         Row(
                           children: [
-                            const Icon(Icons.location_on_rounded, color: Colors.red, size: 14),
+                            const Icon(
+                              Icons.location_on_rounded,
+                              color: Colors.red,
+                              size: 14,
+                            ),
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
-                                searchState.destination!.displayName(isEnglish: localeCode == 'en'),
+                                searchState.destination!.displayName(
+                                  isEnglish: localeCode == 'en',
+                                ),
                                 style: theme.textTheme.bodyMedium?.copyWith(
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -1704,7 +1899,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
               ),
               IconButton(
                 icon: const Icon(Icons.swap_vert_rounded),
-                tooltip: t.localeCode == 'th' ? 'สลับต้นทาง/ปลายทาง' : 'Swap Origin/Destination',
+                tooltip: t.localeCode == 'th'
+                    ? 'สลับต้นทาง/ปลายทาง'
+                    : 'Swap Origin/Destination',
                 onPressed: () {
                   ref.read(searchViewModelProvider.notifier).swapStations();
                 },
@@ -1732,7 +1929,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
           child: Row(
             children: [
               Icon(
-                isOrigin ? Icons.trip_origin_rounded : Icons.location_on_rounded,
+                isOrigin
+                    ? Icons.trip_origin_rounded
+                    : Icons.location_on_rounded,
                 color: isOrigin ? Colors.green : Colors.red,
                 size: 20,
               ),
@@ -1750,8 +1949,12 @@ class _MapScreenState extends ConsumerState<MapScreen> {
               const SizedBox(width: 8),
               Text(
                 isOrigin
-                    ? (t.localeCode == 'th' ? 'เลือกปลายทาง...' : 'Choose destination...')
-                    : (t.localeCode == 'th' ? 'เลือกต้นทาง...' : 'Choose origin...'),
+                    ? (t.localeCode == 'th'
+                          ? 'เลือกปลายทาง...'
+                          : 'Choose destination...')
+                    : (t.localeCode == 'th'
+                          ? 'เลือกต้นทาง...'
+                          : 'Choose origin...'),
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: theme.colorScheme.primary,
                   fontWeight: FontWeight.bold,
@@ -1879,7 +2082,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                         children: [
                           Expanded(
                             child: Text(
-                              isTh ? 'ดาวน์โหลดแผนที่ออฟไลน์' : 'Downloading Offline Map',
+                              isTh
+                                  ? 'ดาวน์โหลดแผนที่ออฟไลน์'
+                                  : 'Downloading Offline Map',
                               style: theme.textTheme.titleSmall?.copyWith(
                                 fontWeight: FontWeight.bold,
                               ),
@@ -1908,8 +2113,12 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                         child: LinearProgressIndicator(
                           value: prefetchState.progress,
                           minHeight: 6,
-                          backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.1),
-                          valueColor: AlwaysStoppedAnimation<Color>(theme.colorScheme.primary),
+                          backgroundColor: theme.colorScheme.primary.withValues(
+                            alpha: 0.1,
+                          ),
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            theme.colorScheme.primary,
+                          ),
                         ),
                       ),
                       const SizedBox(height: 6),
@@ -1917,8 +2126,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            isTh 
-                                ? 'ดาวน์โหลดแล้ว ${prefetchState.currentTile} / ${prefetchState.totalTiles} รูป' 
+                            isTh
+                                ? 'ดาวน์โหลดแล้ว ${prefetchState.currentTile} / ${prefetchState.totalTiles} รูป'
                                 : 'Downloaded ${prefetchState.currentTile} / ${prefetchState.totalTiles} tiles',
                             style: theme.textTheme.bodySmall?.copyWith(
                               color: theme.colorScheme.onSurfaceVariant,
@@ -1939,7 +2148,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                             ? 'เก็บในเครื่องแล้ว: ${prefetchState.cachedCount} รูป | โหลดใหม่: ${prefetchState.successCount} รูป'
                             : 'Cached: ${prefetchState.cachedCount} | New: ${prefetchState.successCount} tiles',
                         style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+                          color: theme.colorScheme.onSurfaceVariant.withValues(
+                            alpha: 0.7,
+                          ),
                           fontSize: 10,
                         ),
                       ),
@@ -1954,16 +2165,16 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     );
   }
 
-  void _openSearchOverlay(BuildContext context, {bool focusDestination = false}) {
+  void _openSearchOverlay(
+    BuildContext context, {
+    bool focusDestination = false,
+  }) {
     Navigator.of(context).push(
       PageRouteBuilder(
         pageBuilder: (context, animation, secondaryAnimation) =>
             MapSearchOverlay(focusDestination: focusDestination),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          return FadeTransition(
-            opacity: animation,
-            child: child,
-          );
+          return FadeTransition(opacity: animation, child: child);
         },
         transitionDuration: const Duration(milliseconds: 200),
         reverseTransitionDuration: const Duration(milliseconds: 150),
@@ -1980,8 +2191,11 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   ) {
     final searchVm = ref.read(searchViewModelProvider.notifier);
     final transitRepo = ref.read(transitRepositoryProvider);
-    final nearest = stop.nearestStationId != null ? transitRepo.getStation(stop.nearestStationId!) : null;
-    final nearestName = nearest?.displayName(isEnglish: localeCode == 'en') ?? '';
+    final nearest = stop.nearestStationId != null
+        ? transitRepo.getStation(stop.nearestStationId!)
+        : null;
+    final nearestName =
+        nearest?.displayName(isEnglish: localeCode == 'en') ?? '';
     final walkMin = stop.walkingMinutes?.toInt() ?? 5;
 
     final stopName = localeCode == 'th' ? stop.nameTh : stop.nameEn;
@@ -2006,11 +2220,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
           children: [
             Row(
               children: [
-                Icon(
-                  leadingIcon,
-                  color: leadingColor,
-                  size: 28,
-                ),
+                Icon(leadingIcon, color: leadingColor, size: 28),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Column(
@@ -2026,7 +2236,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                         Text(
                           t.proximity.nearStationWalk(nearestName, '$walkMin'),
                           style: theme.textTheme.bodyMedium?.copyWith(
-                            color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                            color: theme.colorScheme.onSurface.withValues(
+                              alpha: 0.5,
+                            ),
                             fontSize: 12,
                           ),
                         ),
@@ -2054,7 +2266,11 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                         _openSearchOverlay(context, focusDestination: true);
                       }
                     },
-                    icon: const Icon(Icons.trip_origin_rounded, size: 16, color: Colors.green),
+                    icon: const Icon(
+                      Icons.trip_origin_rounded,
+                      size: 16,
+                      color: Colors.green,
+                    ),
                     label: Text(t.favorites.setOriginBtn),
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 10),
@@ -2072,7 +2288,11 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                         _openSearchOverlay(context, focusDestination: false);
                       }
                     },
-                    icon: const Icon(Icons.location_on_rounded, size: 16, color: Colors.red),
+                    icon: const Icon(
+                      Icons.location_on_rounded,
+                      size: 16,
+                      color: Colors.red,
+                    ),
                     label: Text(t.favorites.setDestBtn),
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 10),
@@ -2092,11 +2312,7 @@ class CustomMapPin extends StatelessWidget {
   final Color color;
   final IconData icon;
 
-  const CustomMapPin({
-    super.key,
-    required this.color,
-    required this.icon,
-  });
+  const CustomMapPin({super.key, required this.color, required this.icon});
 
   @override
   Widget build(BuildContext context) {
@@ -2119,13 +2335,7 @@ class CustomMapPin extends StatelessWidget {
               ),
             ],
           ),
-          child: Center(
-            child: Icon(
-              icon,
-              color: Colors.white,
-              size: 16,
-            ),
-          ),
+          child: Center(child: Icon(icon, color: Colors.white, size: 16)),
         ),
         // Pin Tip (Teardrop pointer)
         Transform.translate(
@@ -2236,5 +2446,3 @@ class _RoundedRectangleProgressPainter extends CustomPainter {
         oldDelegate.borderRadius != borderRadius;
   }
 }
-
-

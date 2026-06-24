@@ -110,9 +110,11 @@ class SearchViewModel extends _$SearchViewModel {
         if (state.query == query) {
           final merged = [...localResults];
           for (final online in onlineResults) {
-            if (!merged.any((item) =>
-                item.nameTh.toLowerCase() == online.nameTh.toLowerCase() ||
-                (item.lat == online.lat && item.lng == online.lng))) {
+            if (!merged.any(
+              (item) =>
+                  item.nameTh.toLowerCase() == online.nameTh.toLowerCase() ||
+                  (item.lat == online.lat && item.lng == online.lng),
+            )) {
               merged.add(online);
             }
           }
@@ -127,14 +129,14 @@ class SearchViewModel extends _$SearchViewModel {
   /// Resolve a CustomLocation to find true entrance and path
   Future<SearchableItem> _resolveItem(SearchableItem item) async {
     if (item is! CustomLocation) return item;
-    
+
     state = state.copyWith(isCalculating: true, clearError: true);
     final repo = ref.read(transitRepositoryProvider);
-    
+
     // First, try matching with local landmarks (like MBK Center) by name to use curated entrances
     final queryLower = item.nameTh.toLowerCase();
     for (final l in repo.landmarks) {
-      if (l.nameTh.toLowerCase() == queryLower || 
+      if (l.nameTh.toLowerCase() == queryLower ||
           l.nameEn.toLowerCase() == item.nameEn.toLowerCase() ||
           l.nameTh.toLowerCase().contains(queryLower)) {
         return l; // Return the perfectly curated local landmark instead
@@ -182,7 +184,10 @@ class SearchViewModel extends _$SearchViewModel {
   }
 
   /// Set both origin and destination at the same time (e.g. from saved routes)
-  Future<void> setRoute(SearchableItem origin, SearchableItem destination) async {
+  Future<void> setRoute(
+    SearchableItem origin,
+    SearchableItem destination,
+  ) async {
     state = state.copyWith(isCalculating: true, clearError: true);
     final results = await Future.wait([
       _resolveItem(origin),
@@ -238,36 +243,56 @@ class SearchViewModel extends _$SearchViewModel {
       var resolvedDestination = destination;
 
       // Dynamic entrance & station resolution for large destination
-      if (destination is CustomLocation && destination.entrances != null && destination.entrances!.isNotEmpty) {
+      if (destination is CustomLocation &&
+          destination.entrances != null &&
+          destination.entrances!.isNotEmpty) {
         final originStationId = origin.nearestStationId ?? origin.id;
-        
+
         final candidateStations = <String, LatLng>{};
         for (final entrance in destination.entrances!) {
-          final nearest = repo.findNearestStation(entrance.latitude, entrance.longitude);
+          final nearest = repo.findNearestStation(
+            entrance.latitude,
+            entrance.longitude,
+          );
           if (nearest != null) {
             final existing = candidateStations[nearest.id];
             if (existing == null) {
               candidateStations[nearest.id] = entrance;
             } else {
-              final dNew = Geolocator.distanceBetween(entrance.latitude, entrance.longitude, nearest.lat, nearest.lng);
-              final dExisting = Geolocator.distanceBetween(existing.latitude, existing.longitude, nearest.lat, nearest.lng);
+              final dNew = Geolocator.distanceBetween(
+                entrance.latitude,
+                entrance.longitude,
+                nearest.lat,
+                nearest.lng,
+              );
+              final dExisting = Geolocator.distanceBetween(
+                existing.latitude,
+                existing.longitude,
+                nearest.lat,
+                nearest.lng,
+              );
               if (dNew < dExisting) {
                 candidateStations[nearest.id] = entrance;
               }
             }
           }
         }
-        
+
         double minWalkTime = double.infinity;
         String bestStationId = destination.nearestStationId;
         LatLng? bestEntrance;
-        
+
         for (final entry in candidateStations.entries) {
           final stationId = entry.key;
           final entrance = entry.value;
-          
+
           if (originStationId == stationId) {
-            final walkDist = Geolocator.distanceBetween(entrance.latitude, entrance.longitude, origin.routeLat, origin.routeLng);
+            final walkDist = Geolocator.distanceBetween(
+              entrance.latitude,
+              entrance.longitude,
+              origin.routeLat,
+              origin.routeLng,
+            );
             final walkMinutes = walkDist / 80.0;
             if (walkMinutes < minWalkTime) {
               minWalkTime = walkMinutes;
@@ -278,11 +303,16 @@ class SearchViewModel extends _$SearchViewModel {
             final route = repo.findRoute(originStationId, stationId);
             if (route != null) {
               final station = repo.getStation(stationId);
-              final walkDist = station != null 
-                ? Geolocator.distanceBetween(entrance.latitude, entrance.longitude, station.lat, station.lng)
-                : 0.0;
+              final walkDist = station != null
+                  ? Geolocator.distanceBetween(
+                      entrance.latitude,
+                      entrance.longitude,
+                      station.lat,
+                      station.lng,
+                    )
+                  : 0.0;
               final walkMinutes = walkDist / 80.0;
-              
+
               if (walkMinutes < minWalkTime) {
                 minWalkTime = walkMinutes;
                 bestStationId = stationId;
@@ -291,56 +321,83 @@ class SearchViewModel extends _$SearchViewModel {
             }
           }
         }
-        
+
         if (bestEntrance != null) {
           // Recalculate walkingMinutes from the newly chosen entrance to the station.
           // Clear stale walkingPath so _hydrateAllRoutes refetches the correct OSRM path.
           final bestStation = repo.getStation(bestStationId);
           final newWalkDist = bestStation != null
-              ? Geolocator.distanceBetween(bestEntrance.latitude, bestEntrance.longitude, bestStation.lat, bestStation.lng)
+              ? Geolocator.distanceBetween(
+                  bestEntrance.latitude,
+                  bestEntrance.longitude,
+                  bestStation.lat,
+                  bestStation.lng,
+                )
               : 0.0;
           final newWalkMinutes = (newWalkDist / 80.0).clamp(1.0, 30.0);
-          resolvedDestination = (resolvedDestination as CustomLocation).copyWith(
-            routeLat: bestEntrance.latitude,
-            routeLng: bestEntrance.longitude,
-            nearestStationId: bestStationId,
-            walkingMinutes: newWalkMinutes,
-            clearWalkingPath: true,
-          );
+          resolvedDestination = (resolvedDestination as CustomLocation)
+              .copyWith(
+                routeLat: bestEntrance.latitude,
+                routeLng: bestEntrance.longitude,
+                nearestStationId: bestStationId,
+                walkingMinutes: newWalkMinutes,
+                clearWalkingPath: true,
+              );
         }
       }
 
       // Dynamic entrance & station resolution for large origin
-      if (origin is CustomLocation && origin.entrances != null && origin.entrances!.isNotEmpty) {
-        final destStationId = resolvedDestination.nearestStationId ?? resolvedDestination.id;
-        
+      if (origin is CustomLocation &&
+          origin.entrances != null &&
+          origin.entrances!.isNotEmpty) {
+        final destStationId =
+            resolvedDestination.nearestStationId ?? resolvedDestination.id;
+
         final candidateStations = <String, LatLng>{};
         for (final entrance in origin.entrances!) {
-          final nearest = repo.findNearestStation(entrance.latitude, entrance.longitude);
+          final nearest = repo.findNearestStation(
+            entrance.latitude,
+            entrance.longitude,
+          );
           if (nearest != null) {
             final existing = candidateStations[nearest.id];
             if (existing == null) {
               candidateStations[nearest.id] = entrance;
             } else {
-              final dNew = Geolocator.distanceBetween(entrance.latitude, entrance.longitude, nearest.lat, nearest.lng);
-              final dExisting = Geolocator.distanceBetween(existing.latitude, existing.longitude, nearest.lat, nearest.lng);
+              final dNew = Geolocator.distanceBetween(
+                entrance.latitude,
+                entrance.longitude,
+                nearest.lat,
+                nearest.lng,
+              );
+              final dExisting = Geolocator.distanceBetween(
+                existing.latitude,
+                existing.longitude,
+                nearest.lat,
+                nearest.lng,
+              );
               if (dNew < dExisting) {
                 candidateStations[nearest.id] = entrance;
               }
             }
           }
         }
-        
+
         double minWalkTime = double.infinity;
         String bestStationId = origin.nearestStationId;
         LatLng? bestEntrance;
-        
+
         for (final entry in candidateStations.entries) {
           final stationId = entry.key;
           final entrance = entry.value;
-          
+
           if (destStationId == stationId) {
-            final walkDist = Geolocator.distanceBetween(entrance.latitude, entrance.longitude, resolvedDestination.routeLat, resolvedDestination.routeLng);
+            final walkDist = Geolocator.distanceBetween(
+              entrance.latitude,
+              entrance.longitude,
+              resolvedDestination.routeLat,
+              resolvedDestination.routeLng,
+            );
             final walkMinutes = walkDist / 80.0;
             if (walkMinutes < minWalkTime) {
               minWalkTime = walkMinutes;
@@ -351,11 +408,16 @@ class SearchViewModel extends _$SearchViewModel {
             final route = repo.findRoute(stationId, destStationId);
             if (route != null) {
               final station = repo.getStation(stationId);
-              final walkDist = station != null 
-                ? Geolocator.distanceBetween(entrance.latitude, entrance.longitude, station.lat, station.lng)
-                : 0.0;
+              final walkDist = station != null
+                  ? Geolocator.distanceBetween(
+                      entrance.latitude,
+                      entrance.longitude,
+                      station.lat,
+                      station.lng,
+                    )
+                  : 0.0;
               final walkMinutes = walkDist / 80.0;
-              
+
               if (walkMinutes < minWalkTime) {
                 minWalkTime = walkMinutes;
                 bestStationId = stationId;
@@ -364,13 +426,18 @@ class SearchViewModel extends _$SearchViewModel {
             }
           }
         }
-        
+
         if (bestEntrance != null) {
           // Recalculate walkingMinutes from the newly chosen entrance to the station.
           // Clear stale walkingPath so _hydrateAllRoutes refetches the correct OSRM path.
           final bestStation = repo.getStation(bestStationId);
           final newWalkDist = bestStation != null
-              ? Geolocator.distanceBetween(bestEntrance.latitude, bestEntrance.longitude, bestStation.lat, bestStation.lng)
+              ? Geolocator.distanceBetween(
+                  bestEntrance.latitude,
+                  bestEntrance.longitude,
+                  bestStation.lat,
+                  bestStation.lng,
+                )
               : 0.0;
           final newWalkMinutes = (newWalkDist / 80.0).clamp(1.0, 30.0);
           resolvedOrigin = (resolvedOrigin as CustomLocation).copyWith(
@@ -383,40 +450,56 @@ class SearchViewModel extends _$SearchViewModel {
         }
       }
 
-      final originStationId = resolvedOrigin.nearestStationId ?? resolvedOrigin.id;
-      final destinationStationId = resolvedDestination.nearestStationId ?? resolvedDestination.id;
+      final originStationId =
+          resolvedOrigin.nearestStationId ?? resolvedOrigin.id;
+      final destinationStationId =
+          resolvedDestination.nearestStationId ?? resolvedDestination.id;
 
       // In case they resolved to the same station, run exit-to-entrance optimization
       if (originStationId == destinationStationId) {
-        if (resolvedDestination is CustomLocation && resolvedDestination.entrances != null && resolvedDestination.entrances!.isNotEmpty) {
+        if (resolvedDestination is CustomLocation &&
+            resolvedDestination.entrances != null &&
+            resolvedDestination.entrances!.isNotEmpty) {
           double minDist = double.infinity;
           LatLng? bestEntrance;
           for (final entrance in resolvedDestination.entrances!) {
-            final dist = Geolocator.distanceBetween(entrance.latitude, entrance.longitude, resolvedOrigin.routeLat, resolvedOrigin.routeLng);
+            final dist = Geolocator.distanceBetween(
+              entrance.latitude,
+              entrance.longitude,
+              resolvedOrigin.routeLat,
+              resolvedOrigin.routeLng,
+            );
             if (dist < minDist) {
               minDist = dist;
               bestEntrance = entrance;
             }
           }
           if (bestEntrance != null) {
-            resolvedDestination = (resolvedDestination as CustomLocation).copyWith(
+            resolvedDestination = (resolvedDestination).copyWith(
               routeLat: bestEntrance.latitude,
               routeLng: bestEntrance.longitude,
             );
           }
         }
-        if (resolvedOrigin is CustomLocation && resolvedOrigin.entrances != null && resolvedOrigin.entrances!.isNotEmpty) {
+        if (resolvedOrigin is CustomLocation &&
+            resolvedOrigin.entrances != null &&
+            resolvedOrigin.entrances!.isNotEmpty) {
           double minDist = double.infinity;
           LatLng? bestEntrance;
           for (final entrance in resolvedOrigin.entrances!) {
-            final dist = Geolocator.distanceBetween(entrance.latitude, entrance.longitude, resolvedDestination.routeLat, resolvedDestination.routeLng);
+            final dist = Geolocator.distanceBetween(
+              entrance.latitude,
+              entrance.longitude,
+              resolvedDestination.routeLat,
+              resolvedDestination.routeLng,
+            );
             if (dist < minDist) {
               minDist = dist;
               bestEntrance = entrance;
             }
           }
           if (bestEntrance != null) {
-            resolvedOrigin = (resolvedOrigin as CustomLocation).copyWith(
+            resolvedOrigin = (resolvedOrigin).copyWith(
               routeLat: bestEntrance.latitude,
               routeLng: bestEntrance.longitude,
             );
@@ -430,15 +513,17 @@ class SearchViewModel extends _$SearchViewModel {
         // Direct walk scenario (e.g. between landmarks near same station, or landmark and its station)
         StationExit? exit;
         List<LatLng>? walkingPath;
-        double walkMinutes = (resolvedOrigin.walkingMinutes ?? 0.0) + (resolvedDestination.walkingMinutes ?? 0.0);
+        double walkMinutes =
+            (resolvedOrigin.walkingMinutes ?? 0.0) +
+            (resolvedDestination.walkingMinutes ?? 0.0);
 
         Landmark? lm;
         Station? st;
         if (resolvedOrigin is Landmark) {
-          lm = resolvedOrigin as Landmark;
+          lm = resolvedOrigin;
           st = repo.getStation(destinationStationId);
         } else if (resolvedDestination is Landmark) {
-          lm = resolvedDestination as Landmark;
+          lm = resolvedDestination;
           st = repo.getStation(originStationId);
         }
 
@@ -460,35 +545,61 @@ class SearchViewModel extends _$SearchViewModel {
         if (lm != null && st != null) {
           final landmark = lm;
           final station = st;
-          if (station.id == landmark.nearestStationId && landmark.walkingPath != null) {
+          if (station.id == landmark.nearestStationId &&
+              landmark.walkingPath != null) {
             walkingPath = landmark.walkingPath;
             walkMinutes = landmark.walkingMinutes;
             if (landmark.exitCode != null) {
               final exits = repo.getExitsForStation(station.id);
               exit = exits.firstWhere(
                 (e) => e.exitCode == landmark.exitCode,
-                orElse: () => station.findClosestExit(repo.exits, landmark.routeLat, landmark.routeLng, targetNameTh: landmark.nameTh, targetNameEn: landmark.nameEn),
+                orElse: () => station.findClosestExit(
+                  repo.exits,
+                  landmark.routeLat,
+                  landmark.routeLng,
+                  targetNameTh: landmark.nameTh,
+                  targetNameEn: landmark.nameEn,
+                ),
               );
             }
-          } else if (landmark.alternativeWalks != null && landmark.alternativeWalks!.containsKey(station.id)) {
+          } else if (landmark.alternativeWalks != null &&
+              landmark.alternativeWalks!.containsKey(station.id)) {
             final walk = landmark.alternativeWalks![station.id]!;
             walkingPath = walk.walkingPath;
             walkMinutes = walk.walkingMinutes;
             final exits = repo.getExitsForStation(station.id);
             exit = exits.firstWhere(
               (e) => e.exitCode == walk.exitCode,
-              orElse: () => station.findClosestExit(repo.exits, landmark.routeLat, landmark.routeLng, targetNameTh: landmark.nameTh, targetNameEn: landmark.nameEn),
+              orElse: () => station.findClosestExit(
+                repo.exits,
+                landmark.routeLat,
+                landmark.routeLng,
+                targetNameTh: landmark.nameTh,
+                targetNameEn: landmark.nameEn,
+              ),
             );
           }
         }
 
-        exit ??= st?.findClosestExit(repo.exits, resolvedDestination.routeLat, resolvedDestination.routeLng, targetNameTh: resolvedDestination.nameTh, targetNameEn: resolvedDestination.nameEn);
-        walkingPath ??= [LatLng(resolvedOrigin.routeLat, resolvedOrigin.routeLng), LatLng(resolvedDestination.routeLat, resolvedDestination.routeLng)];
+        exit ??= st?.findClosestExit(
+          repo.exits,
+          resolvedDestination.routeLat,
+          resolvedDestination.routeLng,
+          targetNameTh: resolvedDestination.nameTh,
+          targetNameEn: resolvedDestination.nameEn,
+        );
+        walkingPath ??= [
+          LatLng(resolvedOrigin.routeLat, resolvedOrigin.routeLng),
+          LatLng(resolvedDestination.routeLat, resolvedDestination.routeLng),
+        ];
 
         String direction = t.routeResult.walkToDestination;
         String? instructionsTh;
         String? instructionsEn;
-        if (lm != null && st != null && lm.alternativeWalks != null && lm.alternativeWalks!.containsKey(st.id)) {
+        if (lm != null &&
+            st != null &&
+            lm.alternativeWalks != null &&
+            lm.alternativeWalks!.containsKey(st.id)) {
           final sw = lm.alternativeWalks![st.id]!;
           instructionsTh = sw.instructionsTh;
           instructionsEn = sw.instructionsEn;
@@ -538,11 +649,23 @@ class SearchViewModel extends _$SearchViewModel {
         }
 
         // Build RouteResult from DijkstraResult
-        routeResult = _buildRouteResult(result, resolvedOrigin, resolvedDestination, repo, fareService);
+        routeResult = _buildRouteResult(
+          result,
+          resolvedOrigin,
+          resolvedDestination,
+          repo,
+          fareService,
+        );
       }
 
       // Calculate saver route if available
-      final saverRoute = _findSaverRoute(resolvedOrigin, resolvedDestination, routeResult, repo, fareService);
+      final saverRoute = _findSaverRoute(
+        resolvedOrigin,
+        resolvedDestination,
+        routeResult,
+        repo,
+        fareService,
+      );
 
       state = state.copyWith(
         routeResult: routeResult,
@@ -586,7 +709,8 @@ class SearchViewModel extends _$SearchViewModel {
     FareService fareService,
   ) {
     // Only search for saver options if there is an active transit segment
-    if (regularRoute.segments.isEmpty || regularRoute.segments.every((s) => s.lineId == 'WALK')) {
+    if (regularRoute.segments.isEmpty ||
+        regularRoute.segments.every((s) => s.lineId == 'WALK')) {
       return null;
     }
 
@@ -598,17 +722,30 @@ class SearchViewModel extends _$SearchViewModel {
     final originLat = origin.routeLat;
     final originLng = origin.routeLng;
 
-    final candidateDestStations = <({Station station, LatLng entrance, double walkMinutes})>[];
+    final candidateDestStations =
+        <({Station station, LatLng entrance, double walkMinutes})>[];
     for (final station in repo.stations) {
       if (station.id == destinationStationId) continue;
-      
+
       LatLng targetEntrance = LatLng(destLat, destLng);
-      double minDist = Geolocator.distanceBetween(destLat, destLng, station.lat, station.lng);
-      
-      if (destination is CustomLocation && destination.entrances != null && destination.entrances!.isNotEmpty) {
+      double minDist = Geolocator.distanceBetween(
+        destLat,
+        destLng,
+        station.lat,
+        station.lng,
+      );
+
+      if (destination is CustomLocation &&
+          destination.entrances != null &&
+          destination.entrances!.isNotEmpty) {
         double dMin = double.infinity;
         for (final ent in destination.entrances!) {
-          final d = Geolocator.distanceBetween(ent.latitude, ent.longitude, station.lat, station.lng);
+          final d = Geolocator.distanceBetween(
+            ent.latitude,
+            ent.longitude,
+            station.lat,
+            station.lng,
+          );
           if (d < dMin) {
             dMin = d;
             targetEntrance = ent;
@@ -616,7 +753,7 @@ class SearchViewModel extends _$SearchViewModel {
         }
         minDist = dMin;
       }
-      
+
       if (minDist <= 700.0) {
         candidateDestStations.add((
           station: station,
@@ -626,17 +763,30 @@ class SearchViewModel extends _$SearchViewModel {
       }
     }
 
-    final candidateOriginStations = <({Station station, LatLng entrance, double walkMinutes})>[];
+    final candidateOriginStations =
+        <({Station station, LatLng entrance, double walkMinutes})>[];
     for (final station in repo.stations) {
       if (station.id == originStationId) continue;
-      
+
       LatLng targetEntrance = LatLng(originLat, originLng);
-      double minDist = Geolocator.distanceBetween(originLat, originLng, station.lat, station.lng);
-      
-      if (origin is CustomLocation && origin.entrances != null && origin.entrances!.isNotEmpty) {
+      double minDist = Geolocator.distanceBetween(
+        originLat,
+        originLng,
+        station.lat,
+        station.lng,
+      );
+
+      if (origin is CustomLocation &&
+          origin.entrances != null &&
+          origin.entrances!.isNotEmpty) {
         double dMin = double.infinity;
         for (final ent in origin.entrances!) {
-          final d = Geolocator.distanceBetween(ent.latitude, ent.longitude, station.lat, station.lng);
+          final d = Geolocator.distanceBetween(
+            ent.latitude,
+            ent.longitude,
+            station.lat,
+            station.lng,
+          );
           if (d < dMin) {
             dMin = d;
             targetEntrance = ent;
@@ -644,7 +794,7 @@ class SearchViewModel extends _$SearchViewModel {
         }
         minDist = dMin;
       }
-      
+
       if (minDist <= 700.0) {
         candidateOriginStations.add((
           station: station,
@@ -680,8 +830,8 @@ class SearchViewModel extends _$SearchViewModel {
         lng: originLng,
         routeLat: altOriginRouteLat,
         routeLng: altOriginRouteLng,
-        entrances: origin is CustomLocation ? (origin as CustomLocation).entrances : null,
-        walkingPath: origin is CustomLocation ? (origin as CustomLocation).walkingPath : null,
+        entrances: origin is CustomLocation ? (origin).entrances : null,
+        walkingPath: origin is CustomLocation ? (origin).walkingPath : null,
       );
 
       final tempDest = CustomLocation(
@@ -694,23 +844,35 @@ class SearchViewModel extends _$SearchViewModel {
         lng: destLng,
         routeLat: altDestRouteLat,
         routeLng: altDestRouteLng,
-        entrances: destination is CustomLocation ? (destination as CustomLocation).entrances : null,
-        walkingPath: destination is CustomLocation ? (destination as CustomLocation).walkingPath : null,
+        entrances: destination is CustomLocation
+            ? (destination).entrances
+            : null,
+        walkingPath: destination is CustomLocation
+            ? (destination).walkingPath
+            : null,
       );
 
-      final altRoute = _buildRouteResult(dijkstraResult, tempOrigin, tempDest, repo, fareService);
+      final altRoute = _buildRouteResult(
+        dijkstraResult,
+        tempOrigin,
+        tempDest,
+        repo,
+        fareService,
+      );
 
       // Criteria for Saver Route:
       // 1. Lower fare than recommended route
       // 2. Must not be excessively slow (<= 15 minutes slower than regular)
       final isCheaper = altRoute.totalFareThb < regularRoute.totalFareThb;
-      final isNotTooSlow = altRoute.totalMinutes <= regularRoute.totalMinutes + 15.0;
+      final isNotTooSlow =
+          altRoute.totalMinutes <= regularRoute.totalMinutes + 15.0;
 
       if (isCheaper && isNotTooSlow) {
         final currentBest = bestSaverRoute;
-        if (currentBest == null || 
+        if (currentBest == null ||
             altRoute.totalFareThb < currentBest.totalFareThb ||
-            (altRoute.totalFareThb == currentBest.totalFareThb && altRoute.transferCount < currentBest.transferCount)) {
+            (altRoute.totalFareThb == currentBest.totalFareThb &&
+                altRoute.transferCount < currentBest.transferCount)) {
           bestSaverRoute = altRoute;
         }
       }
@@ -776,8 +938,10 @@ class SearchViewModel extends _$SearchViewModel {
     final t = ref.read(translationsProvider);
 
     // ─── 1. If Origin requires walking, add initial Walk Segment ───
-    if (origin.nearestStationId != null && origin.id != origin.nearestStationId) {
-      final nearestStation = repo.getStation(origin.nearestStationId!) as Station?;
+    if (origin.nearestStationId != null &&
+        origin.id != origin.nearestStationId) {
+      final nearestStation =
+          repo.getStation(origin.nearestStationId!) as Station?;
       if (nearestStation != null) {
         StationExit? exit;
         List<LatLng>? walkingPath;
@@ -797,16 +961,24 @@ class SearchViewModel extends _$SearchViewModel {
         }
 
         if (originLandmark != null) {
-          if (nearestStation.id == originLandmark.nearestStationId && originLandmark.walkingPath != null) {
+          if (nearestStation.id == originLandmark.nearestStationId &&
+              originLandmark.walkingPath != null) {
             walkingPath = originLandmark.walkingPath;
             if (originLandmark.exitCode != null) {
               final exits = repo.getExitsForStation(nearestStation.id);
               exit = exits.firstWhere(
                 (e) => e.exitCode == originLandmark!.exitCode,
-                orElse: () => nearestStation.findClosestExit(repo.exits, originLandmark!.routeLat, originLandmark.routeLng, targetNameTh: originLandmark.nameTh, targetNameEn: originLandmark.nameEn),
+                orElse: () => nearestStation.findClosestExit(
+                  repo.exits,
+                  originLandmark!.routeLat,
+                  originLandmark.routeLng,
+                  targetNameTh: originLandmark.nameTh,
+                  targetNameEn: originLandmark.nameEn,
+                ),
               );
             }
-          } else if (originLandmark.alternativeWalks != null && originLandmark.alternativeWalks!.containsKey(nearestStation.id)) {
+          } else if (originLandmark.alternativeWalks != null &&
+              originLandmark.alternativeWalks!.containsKey(nearestStation.id)) {
             final walk = originLandmark.alternativeWalks![nearestStation.id]!;
             walkingPath = walk.walkingPath;
             walkingMinutes = walk.walkingMinutes;
@@ -814,23 +986,40 @@ class SearchViewModel extends _$SearchViewModel {
               final exits = repo.getExitsForStation(nearestStation.id);
               exit = exits.firstWhere(
                 (e) => e.exitCode == walk.exitCode,
-                orElse: () => nearestStation.findClosestExit(repo.exits, originLandmark!.routeLat, originLandmark.routeLng, targetNameTh: originLandmark.nameTh, targetNameEn: originLandmark.nameEn),
+                orElse: () => nearestStation.findClosestExit(
+                  repo.exits,
+                  originLandmark!.routeLat,
+                  originLandmark.routeLng,
+                  targetNameTh: originLandmark.nameTh,
+                  targetNameEn: originLandmark.nameEn,
+                ),
               );
             }
           }
         }
-      
-      if (origin is CustomLocation && origin.walkingPath != null) {
-        walkingPath = origin.walkingPath;
-      }
- 
-        exit ??= nearestStation.findClosestExit(repo.exits, origin.routeLat, origin.routeLng, targetNameTh: origin.nameTh, targetNameEn: origin.nameEn);
-        walkingPath ??= [LatLng(origin.routeLat, origin.routeLng), LatLng(exit.lat, exit.lng)];
+
+        if (origin is CustomLocation && origin.walkingPath != null) {
+          walkingPath = origin.walkingPath;
+        }
+
+        exit ??= nearestStation.findClosestExit(
+          repo.exits,
+          origin.routeLat,
+          origin.routeLng,
+          targetNameTh: origin.nameTh,
+          targetNameEn: origin.nameEn,
+        );
+        walkingPath ??= [
+          LatLng(origin.routeLat, origin.routeLng),
+          LatLng(exit.lat, exit.lng),
+        ];
 
         String direction = t.routeResult.walkToStation;
         String? instructionsTh;
         String? instructionsEn;
-        if (originLandmark != null && originLandmark.alternativeWalks != null && originLandmark.alternativeWalks!.containsKey(nearestStation.id)) {
+        if (originLandmark != null &&
+            originLandmark.alternativeWalks != null &&
+            originLandmark.alternativeWalks!.containsKey(nearestStation.id)) {
           final walk = originLandmark.alternativeWalks![nearestStation.id]!;
           instructionsTh = walk.instructionsTh;
           instructionsEn = walk.instructionsEn;
@@ -839,22 +1028,24 @@ class SearchViewModel extends _$SearchViewModel {
           }
         }
 
-        segments.add(RouteSegment(
-          lineId: 'WALK',
-          lineName: 'Walk',
-          direction: direction,
-          boundIndex: 0,
-          fromStation: origin,
-          toStation: nearestStation,
-          stationCount: 0,
-          estimatedMinutes: walkingMinutes,
-          fareThb: 0,
-          standardFareThb: 0,
-          walkingPath: walkingPath,
-          exit: exit,
-          instructionsTh: instructionsTh,
-          instructionsEn: instructionsEn,
-        ));
+        segments.add(
+          RouteSegment(
+            lineId: 'WALK',
+            lineName: 'Walk',
+            direction: direction,
+            boundIndex: 0,
+            fromStation: origin,
+            toStation: nearestStation,
+            stationCount: 0,
+            estimatedMinutes: walkingMinutes,
+            fareThb: 0,
+            standardFareThb: 0,
+            walkingPath: walkingPath,
+            exit: exit,
+            instructionsTh: instructionsTh,
+            instructionsEn: instructionsEn,
+          ),
+        );
       }
     }
 
@@ -873,7 +1064,8 @@ class SearchViewModel extends _$SearchViewModel {
         if (segmentStart != null && segmentStations.length > 1) {
           final line = repo.getLine(currentLineId);
           final stationCount = segmentStations.length - 1;
-          final bound = line?.getBound(segmentStart.id, segmentStations.last.id) ?? 0;
+          final bound =
+              line?.getBound(segmentStart.id, segmentStations.last.id) ?? 0;
 
           final standardFare = fareService.calculateFare(
             currentLineId,
@@ -887,38 +1079,47 @@ class SearchViewModel extends _$SearchViewModel {
             arlCardType: cardState.arlCardType,
           );
 
-          segments.add(RouteSegment(
-            lineId: currentLineId,
-            lineName: line?.nameEn ?? currentLineId,
-            direction: line?.getDirectionLabel(bound) ?? '',
-            boundIndex: bound,
-            fromStation: segmentStart,
-            toStation: segmentStations.last,
-            intermediateStations: segmentStations.length > 2
-                ? segmentStations.sublist(1, segmentStations.length - 1)
-                : [],
-            stationCount: stationCount,
-            estimatedMinutes: stationCount * TransitConstants.avgTimeBetweenStations,
-            fareThb: discountedFare,
-            standardFareThb: standardFare,
-          ));
+          segments.add(
+            RouteSegment(
+              lineId: currentLineId,
+              lineName: line?.nameEn ?? currentLineId,
+              direction: line?.getDirectionLabel(bound) ?? '',
+              boundIndex: bound,
+              fromStation: segmentStart,
+              toStation: segmentStations.last,
+              intermediateStations: segmentStations.length > 2
+                  ? segmentStations.sublist(1, segmentStations.length - 1)
+                  : [],
+              stationCount: stationCount,
+              estimatedMinutes:
+                  stationCount * TransitConstants.avgTimeBetweenStations,
+              fareThb: discountedFare,
+              standardFareThb: standardFare,
+            ),
+          );
         }
 
         // Record transfer
         if (segmentStations.isNotEmpty) {
-          final nextLineId = i + 1 < dijkstraResult.path.length ? dijkstraResult.path[i + 1].lineId : '';
-          transfers.add(TransferStep(
-            fromStation: segmentStations.last,
-            toStation: station,
-            fromLineId: currentLineId,
-            toLineId: nextLineId,
-          ));
+          final nextLineId = i + 1 < dijkstraResult.path.length
+              ? dijkstraResult.path[i + 1].lineId
+              : '';
+          transfers.add(
+            TransferStep(
+              fromStation: segmentStations.last,
+              toStation: station,
+              fromLineId: currentLineId,
+              toLineId: nextLineId,
+            ),
+          );
         }
 
         segmentStart = station;
         segmentStations.clear();
         segmentStations.add(station);
-        currentLineId = i + 1 < dijkstraResult.path.length ? dijkstraResult.path[i + 1].lineId : '';
+        currentLineId = i + 1 < dijkstraResult.path.length
+            ? dijkstraResult.path[i + 1].lineId
+            : '';
         continue;
       }
 
@@ -930,7 +1131,8 @@ class SearchViewModel extends _$SearchViewModel {
           if (segmentStart != null && segmentStations.length > 1) {
             final line = repo.getLine(currentLineId);
             final stationCount = segmentStations.length - 1;
-            final bound = line?.getBound(segmentStart.id, segmentStations.last.id) ?? 0;
+            final bound =
+                line?.getBound(segmentStart.id, segmentStations.last.id) ?? 0;
 
             final standardFare = fareService.calculateFare(
               currentLineId,
@@ -944,21 +1146,24 @@ class SearchViewModel extends _$SearchViewModel {
               arlCardType: cardState.arlCardType,
             );
 
-            segments.add(RouteSegment(
-              lineId: currentLineId,
-              lineName: line?.nameEn ?? currentLineId,
-              direction: line?.getDirectionLabel(bound) ?? '',
-              boundIndex: bound,
-              fromStation: segmentStart,
-              toStation: segmentStations.last,
-              intermediateStations: segmentStations.length > 2
-                  ? segmentStations.sublist(1, segmentStations.length - 1)
-                  : [],
-              stationCount: stationCount,
-              estimatedMinutes: stationCount * TransitConstants.avgTimeBetweenStations,
-              fareThb: discountedFare,
-              standardFareThb: standardFare,
-            ));
+            segments.add(
+              RouteSegment(
+                lineId: currentLineId,
+                lineName: line?.nameEn ?? currentLineId,
+                direction: line?.getDirectionLabel(bound) ?? '',
+                boundIndex: bound,
+                fromStation: segmentStart,
+                toStation: segmentStations.last,
+                intermediateStations: segmentStations.length > 2
+                    ? segmentStations.sublist(1, segmentStations.length - 1)
+                    : [],
+                stationCount: stationCount,
+                estimatedMinutes:
+                    stationCount * TransitConstants.avgTimeBetweenStations,
+                fareThb: discountedFare,
+                standardFareThb: standardFare,
+              ),
+            );
           }
           currentLineId = step.lineId;
           segmentStart = station;
@@ -977,7 +1182,8 @@ class SearchViewModel extends _$SearchViewModel {
     if (segmentStart != null && segmentStations.length > 1) {
       final line = repo.getLine(currentLineId);
       final stationCount = segmentStations.length - 1;
-      final bound = line?.getBound(segmentStart.id, segmentStations.last.id) ?? 0;
+      final bound =
+          line?.getBound(segmentStart.id, segmentStations.last.id) ?? 0;
 
       final standardFare = fareService.calculateFare(
         currentLineId,
@@ -991,26 +1197,31 @@ class SearchViewModel extends _$SearchViewModel {
         arlCardType: cardState.arlCardType,
       );
 
-      segments.add(RouteSegment(
-        lineId: currentLineId,
-        lineName: line?.nameEn ?? currentLineId,
-        direction: line?.getDirectionLabel(bound) ?? '',
-        boundIndex: bound,
-        fromStation: segmentStart,
-        toStation: segmentStations.last,
-        intermediateStations: segmentStations.length > 2
-            ? segmentStations.sublist(1, segmentStations.length - 1)
-            : [],
-        stationCount: stationCount,
-        estimatedMinutes: stationCount * TransitConstants.avgTimeBetweenStations,
-        fareThb: discountedFare,
-        standardFareThb: standardFare,
-      ));
+      segments.add(
+        RouteSegment(
+          lineId: currentLineId,
+          lineName: line?.nameEn ?? currentLineId,
+          direction: line?.getDirectionLabel(bound) ?? '',
+          boundIndex: bound,
+          fromStation: segmentStart,
+          toStation: segmentStations.last,
+          intermediateStations: segmentStations.length > 2
+              ? segmentStations.sublist(1, segmentStations.length - 1)
+              : [],
+          stationCount: stationCount,
+          estimatedMinutes:
+              stationCount * TransitConstants.avgTimeBetweenStations,
+          fareThb: discountedFare,
+          standardFareThb: standardFare,
+        ),
+      );
     }
 
     // ─── 2. If Destination requires walking, add final Walk Segment ───
-    if (destination.nearestStationId != null && destination.id != destination.nearestStationId) {
-      final nearestStation = repo.getStation(destination.nearestStationId!) as Station?;
+    if (destination.nearestStationId != null &&
+        destination.id != destination.nearestStationId) {
+      final nearestStation =
+          repo.getStation(destination.nearestStationId!) as Station?;
       if (nearestStation != null) {
         StationExit? exit;
         List<LatLng>? walkingPath;
@@ -1030,16 +1241,24 @@ class SearchViewModel extends _$SearchViewModel {
         }
 
         if (destLandmark != null) {
-          if (nearestStation.id == destLandmark.nearestStationId && destLandmark.walkingPath != null) {
+          if (nearestStation.id == destLandmark.nearestStationId &&
+              destLandmark.walkingPath != null) {
             walkingPath = destLandmark.walkingPath;
             if (destLandmark.exitCode != null) {
               final exits = repo.getExitsForStation(nearestStation.id);
               exit = exits.firstWhere(
                 (e) => e.exitCode == destLandmark!.exitCode,
-                orElse: () => nearestStation.findClosestExit(repo.exits, destLandmark!.routeLat, destLandmark.routeLng, targetNameTh: destLandmark.nameTh, targetNameEn: destLandmark.nameEn),
+                orElse: () => nearestStation.findClosestExit(
+                  repo.exits,
+                  destLandmark!.routeLat,
+                  destLandmark.routeLng,
+                  targetNameTh: destLandmark.nameTh,
+                  targetNameEn: destLandmark.nameEn,
+                ),
               );
             }
-          } else if (destLandmark.alternativeWalks != null && destLandmark.alternativeWalks!.containsKey(nearestStation.id)) {
+          } else if (destLandmark.alternativeWalks != null &&
+              destLandmark.alternativeWalks!.containsKey(nearestStation.id)) {
             final walk = destLandmark.alternativeWalks![nearestStation.id]!;
             walkingPath = walk.walkingPath;
             walkingMinutes = walk.walkingMinutes;
@@ -1047,23 +1266,40 @@ class SearchViewModel extends _$SearchViewModel {
               final exits = repo.getExitsForStation(nearestStation.id);
               exit = exits.firstWhere(
                 (e) => e.exitCode == walk.exitCode,
-                orElse: () => nearestStation.findClosestExit(repo.exits, destLandmark!.routeLat, destLandmark.routeLng, targetNameTh: destLandmark.nameTh, targetNameEn: destLandmark.nameEn),
+                orElse: () => nearestStation.findClosestExit(
+                  repo.exits,
+                  destLandmark!.routeLat,
+                  destLandmark.routeLng,
+                  targetNameTh: destLandmark.nameTh,
+                  targetNameEn: destLandmark.nameEn,
+                ),
               );
             }
           }
         }
-      
-      if (destination is CustomLocation && destination.walkingPath != null) {
-        walkingPath = destination.walkingPath;
-      }
- 
-        exit ??= nearestStation.findClosestExit(repo.exits, destination.routeLat, destination.routeLng, targetNameTh: destination.nameTh, targetNameEn: destination.nameEn);
-        walkingPath ??= [LatLng(exit.lat, exit.lng), LatLng(destination.routeLat, destination.routeLng)];
+
+        if (destination is CustomLocation && destination.walkingPath != null) {
+          walkingPath = destination.walkingPath;
+        }
+
+        exit ??= nearestStation.findClosestExit(
+          repo.exits,
+          destination.routeLat,
+          destination.routeLng,
+          targetNameTh: destination.nameTh,
+          targetNameEn: destination.nameEn,
+        );
+        walkingPath ??= [
+          LatLng(exit.lat, exit.lng),
+          LatLng(destination.routeLat, destination.routeLng),
+        ];
 
         String direction = t.routeResult.walkToDestination;
         String? instructionsTh;
         String? instructionsEn;
-        if (destLandmark != null && destLandmark.alternativeWalks != null && destLandmark.alternativeWalks!.containsKey(nearestStation.id)) {
+        if (destLandmark != null &&
+            destLandmark.alternativeWalks != null &&
+            destLandmark.alternativeWalks!.containsKey(nearestStation.id)) {
           final walk = destLandmark.alternativeWalks![nearestStation.id]!;
           instructionsTh = walk.instructionsTh;
           instructionsEn = walk.instructionsEn;
@@ -1072,31 +1308,37 @@ class SearchViewModel extends _$SearchViewModel {
           }
         }
 
-        segments.add(RouteSegment(
-          lineId: 'WALK',
-          lineName: 'Walk',
-          direction: direction,
-          boundIndex: 0,
-          fromStation: nearestStation,
-          toStation: destination,
-          stationCount: 0,
-          estimatedMinutes: walkingMinutes,
-          fareThb: 0,
-          standardFareThb: 0,
-          walkingPath: walkingPath,
-          exit: exit,
-          instructionsTh: instructionsTh,
-          instructionsEn: instructionsEn,
-        ));
+        segments.add(
+          RouteSegment(
+            lineId: 'WALK',
+            lineName: 'Walk',
+            direction: direction,
+            boundIndex: 0,
+            fromStation: nearestStation,
+            toStation: destination,
+            stationCount: 0,
+            estimatedMinutes: walkingMinutes,
+            fareThb: 0,
+            standardFareThb: 0,
+            walkingPath: walkingPath,
+            exit: exit,
+            instructionsTh: instructionsTh,
+            instructionsEn: instructionsEn,
+          ),
+        );
       }
     }
 
     final totalFare = segments.fold<int>(0, (sum, s) => sum + s.fareThb);
-    final totalStandardFare = segments.fold<int>(0, (sum, s) => sum + s.standardFareThb);
+    final totalStandardFare = segments.fold<int>(
+      0,
+      (sum, s) => sum + s.standardFareThb,
+    );
 
     double totalMinutes = dijkstraResult.totalWeight;
     if (origin.walkingMinutes != null) totalMinutes += origin.walkingMinutes!;
-    if (destination.walkingMinutes != null) totalMinutes += destination.walkingMinutes!;
+    if (destination.walkingMinutes != null)
+      totalMinutes += destination.walkingMinutes!;
 
     final totalStations = dijkstraResult.path.length - 1;
 
@@ -1114,7 +1356,10 @@ class SearchViewModel extends _$SearchViewModel {
   }
 
   /// Hydrates all routes asynchronously in the background
-  Future<void> _hydrateAllRoutes(RouteResult recommended, RouteResult? saver) async {
+  Future<void> _hydrateAllRoutes(
+    RouteResult recommended,
+    RouteResult? saver,
+  ) async {
     final hydratedRecommended = await _hydrateRouteWalkingPaths(recommended);
     RouteResult? hydratedSaver;
     if (saver != null) {
@@ -1123,7 +1368,9 @@ class SearchViewModel extends _$SearchViewModel {
 
     if (_mounted) {
       state = state.copyWith(
-        routeResult: state.activeRouteType == 'recommended' ? hydratedRecommended : (hydratedSaver ?? state.routeResult),
+        routeResult: state.activeRouteType == 'recommended'
+            ? hydratedRecommended
+            : (hydratedSaver ?? state.routeResult),
         regularRoute: hydratedRecommended,
         saverRoute: hydratedSaver,
       );
@@ -1140,7 +1387,7 @@ class SearchViewModel extends _$SearchViewModel {
       if (segment.lineId == 'WALK') {
         final from = segment.fromStation;
         final to = segment.toStation;
-        
+
         // Skip if it's already a precalculated landmark path
         bool isPrecalculated = false;
         Landmark? lm;
@@ -1171,7 +1418,8 @@ class SearchViewModel extends _$SearchViewModel {
         if (lm != null && st != null) {
           if (st.id == lm.nearestStationId && lm.walkingPath != null) {
             isPrecalculated = true;
-          } else if (lm.alternativeWalks != null && lm.alternativeWalks!.containsKey(st.id)) {
+          } else if (lm.alternativeWalks != null &&
+              lm.alternativeWalks!.containsKey(st.id)) {
             isPrecalculated = true;
           }
         }
@@ -1209,7 +1457,12 @@ class SearchViewModel extends _$SearchViewModel {
           tLng = toRouteLng;
         }
 
-        List<LatLng> path = await WalkingRouteService.getWalkingPath(fLat, fLng, tLat, tLng);
+        List<LatLng> path = await WalkingRouteService.getWalkingPath(
+          fLat,
+          fLng,
+          tLat,
+          tLng,
+        );
 
         final straightDist = Geolocator.distanceBetween(fLat, fLng, tLat, tLng);
         if (straightDist < 150.0) {
@@ -1218,36 +1471,49 @@ class SearchViewModel extends _$SearchViewModel {
           double pathDist = 0.0;
           for (int idx = 0; idx < path.length - 1; idx++) {
             pathDist += Geolocator.distanceBetween(
-              path[idx].latitude, path[idx].longitude,
-              path[idx + 1].latitude, path[idx + 1].longitude,
+              path[idx].latitude,
+              path[idx].longitude,
+              path[idx + 1].latitude,
+              path[idx + 1].longitude,
             );
           }
           if (pathDist > 2.0 * straightDist) {
-            print("OSRM massive detour detected (OSRM: ${pathDist.toStringAsFixed(1)}m, Straight: ${straightDist.toStringAsFixed(1)}m). Falling back to direct straight-line path.");
+            print(
+              "OSRM massive detour detected (OSRM: ${pathDist.toStringAsFixed(1)}m, Straight: ${straightDist.toStringAsFixed(1)}m). Falling back to direct straight-line path.",
+            );
             path = [LatLng(fLat, fLng), LatLng(tLat, tLng)];
           } else if (pathDist > 1.4 * straightDist) {
-            print("OSRM detour detected (OSRM: ${pathDist.toStringAsFixed(1)}m, Straight: ${straightDist.toStringAsFixed(1)}m). Falling back to smart L-shape path.");
-            path = WalkingRouteService.generateManhattanPath(fLat, fLng, tLat, tLng);
+            print(
+              "OSRM detour detected (OSRM: ${pathDist.toStringAsFixed(1)}m, Straight: ${straightDist.toStringAsFixed(1)}m). Falling back to smart L-shape path.",
+            );
+            path = WalkingRouteService.generateManhattanPath(
+              fLat,
+              fLng,
+              tLat,
+              tLng,
+            );
           }
         }
-        
-        hydratedSegments.add(RouteSegment(
-          lineId: segment.lineId,
-          lineName: segment.lineName,
-          direction: segment.direction,
-          boundIndex: segment.boundIndex,
-          fromStation: segment.fromStation,
-          toStation: segment.toStation,
-          intermediateStations: segment.intermediateStations,
-          stationCount: segment.stationCount,
-          estimatedMinutes: segment.estimatedMinutes,
-          fareThb: segment.fareThb,
-          standardFareThb: segment.standardFareThb,
-          walkingPath: path,
-          exit: segment.exit,
-          instructionsTh: segment.instructionsTh,
-          instructionsEn: segment.instructionsEn,
-        ));
+
+        hydratedSegments.add(
+          RouteSegment(
+            lineId: segment.lineId,
+            lineName: segment.lineName,
+            direction: segment.direction,
+            boundIndex: segment.boundIndex,
+            fromStation: segment.fromStation,
+            toStation: segment.toStation,
+            intermediateStations: segment.intermediateStations,
+            stationCount: segment.stationCount,
+            estimatedMinutes: segment.estimatedMinutes,
+            fareThb: segment.fareThb,
+            standardFareThb: segment.standardFareThb,
+            walkingPath: path,
+            exit: segment.exit,
+            instructionsTh: segment.instructionsTh,
+            instructionsEn: segment.instructionsEn,
+          ),
+        );
         modified = true;
       } else {
         hydratedSegments.add(segment);
@@ -1270,5 +1536,3 @@ class SearchViewModel extends _$SearchViewModel {
     return route;
   }
 }
-
-
