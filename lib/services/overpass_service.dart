@@ -13,12 +13,12 @@ class OverpassService {
     int? osmId,
   }) async {
     String query;
-    if (osmType != null && osmId != null && (osmType == 'W' || osmType == 'R')) {
-      final typeKeyword = osmType == 'W' ? 'way' : 'relation';
-      final setKeyword = osmType == 'W' ? 'w' : 'r';
-      
+    if (osmType != null &&
+        osmId != null &&
+        (osmType == 'W' || osmType == 'R')) {
       if (osmType == 'R') {
-        query = '''
+        query =
+            '''
           [out:json][timeout:10];
           (
             relation($osmId);
@@ -31,7 +31,8 @@ class OverpassService {
           out body;
         ''';
       } else {
-        query = '''
+        query =
+            '''
           [out:json][timeout:10];
           (
             way($osmId);
@@ -42,7 +43,8 @@ class OverpassService {
         ''';
       }
     } else {
-      query = '''
+      query =
+          '''
         [out:json][timeout:10];
         (
           node(around:$radius,$lat,$lon)["entrance"];
@@ -67,12 +69,12 @@ class OverpassService {
               entrances.add(LatLng(element['lat'], element['lon']));
             }
           }
-          
+
           // If a specific OSM-aware query (W/R) returned empty, do NOT fall back to a
           // radius-based search — that would pick up entrances from nearby unrelated
           // buildings (e.g. One Bangkok next to Lumphini Park). Return [] so the caller
           // can fall back to the centroid itself instead.
-          
+
           return entrances;
         }
       } else {

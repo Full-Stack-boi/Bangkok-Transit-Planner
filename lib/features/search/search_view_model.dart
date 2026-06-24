@@ -1336,9 +1336,12 @@ class SearchViewModel extends _$SearchViewModel {
     );
 
     double totalMinutes = dijkstraResult.totalWeight;
-    if (origin.walkingMinutes != null) totalMinutes += origin.walkingMinutes!;
-    if (destination.walkingMinutes != null)
+    if (origin.walkingMinutes != null) {
+      totalMinutes += origin.walkingMinutes!;
+    }
+    if (destination.walkingMinutes != null) {
       totalMinutes += destination.walkingMinutes!;
+    }
 
     final totalStations = dijkstraResult.path.length - 1;
 
