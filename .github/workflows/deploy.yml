@@ -21,13 +21,23 @@ jobs:
       - name: Install Python dependencies
         run: pip install requests Pillow
 
+      - name: Cache Map Bundle
+        id: cache-map-bundle
+        uses: actions/cache@v4
+        with:
+          path: assets/map_tiles.bundle
+          key: ${{ runner.os }}-map-bundle-${{ hashFiles('bin/generate_bundle.py', 'assets/data/stations.json') }}
+          restore-keys: |
+            ${{ runner.os }}-map-bundle-
+
       - name: Generate Map Bundle
+        if: steps.cache-map-bundle.outputs.cache-hit != 'true'
         run: python bin/generate_bundle.py
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.24.0' # อัปเดตเป็นเวอร์ชันที่ใหม่กว่าเพื่อให้รองรับ Dart SDK 3.12.1+
+          flutter-version: '3.44.1' # อัปเดตเป็นเวอร์ชันที่ใหม่กว่าเพื่อให้รองรับ Dart SDK 3.12.1+
           channel: 'stable'
 
       - name: Install Flutter dependencies
@@ -40,6 +50,8 @@ jobs:
         uses: amondnet/vercel-action@v20
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          # legacy name accepted by some versions of the action
+          zeit-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
           vercel-args: '--prod'
