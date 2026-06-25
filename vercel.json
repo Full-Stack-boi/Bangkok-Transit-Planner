@@ -3,11 +3,6 @@
   "rewrites": [
     { "source": "/(.*)", "destination": "/index.html" }
   ],
-  "cleanUrls": true,
-  "framework": null,
-  "buildCommand": null,
-  "installCommand": null,
-  "outputDirectory": "build/web",
   "git": {
     "deploymentEnabled": false
   }

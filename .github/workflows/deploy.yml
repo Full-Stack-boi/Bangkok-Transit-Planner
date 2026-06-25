@@ -51,7 +51,13 @@ jobs:
       - name: Install Vercel CLI
         run: npm install --global vercel@latest
 
+      - name: Prepare Vercel Output
+        run: |
+          mkdir -p .vercel/output/static
+          cp -r build/web/* .vercel/output/static/
+          echo '{"version":3}' > .vercel/output/config.json
+
       - name: Deploy to Vercel
         run: |
           vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }} --yes
-        working-directory: . # รันจาก root แต่เราจะใช้ vercel.json ช่วยบอกทางครับ
+        working-directory: .
