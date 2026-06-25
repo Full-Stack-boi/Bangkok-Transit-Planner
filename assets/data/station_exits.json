@@ -3674,9 +3674,9 @@
     "exit_code": "2",
     "name_th": "ทางออก 2 (ฝั่งใต้)",
     "name_en": "Exit 2 (South)",
-    "lat": 13.697750000000001,
-    "lng": 100.62875000000001,
-    "source": "estimated"
+    "lat": 13.690206,
+    "lng": 100.647311,
+    "source": "google_street_view"
   },
   {
     "id": "MRT_YL15_EX3",
@@ -3684,9 +3684,9 @@
     "exit_code": "3",
     "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
     "name_en": "Exit 3 (West)",
-    "lat": 13.69825,
-    "lng": 100.62875000000001,
-    "source": "estimated"
+    "lat": 13.6902413,
+    "lng": 100.6468389,
+    "source": "google_street_view_estimated"
   },
   {
     "id": "MRT_YL15_EX4",
@@ -3694,9 +3694,9 @@
     "exit_code": "4",
     "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
     "name_en": "Exit 4 (East)",
-    "lat": 13.697750000000001,
-    "lng": 100.62925,
-    "source": "estimated"
+    "lat": 13.691407,
+    "lng": 100.646823,
+    "source": "google_street_view"
   },
   {
     "id": "MRT_YL16_EX1",
@@ -3714,9 +3714,9 @@
     "exit_code": "2",
     "name_th": "ทางออก 2 (ฝั่งใต้)",
     "name_en": "Exit 2 (South)",
-    "lat": 13.68975,
-    "lng": 100.62275000000001,
-    "source": "estimated"
+    "lat": 13.675823,
+    "lng": 100.646183,
+    "source": "google_street_view"
   },
   {
     "id": "MRT_YL16_EX3",
@@ -3724,9 +3724,9 @@
     "exit_code": "3",
     "name_th": "ทางออก 3 (ฝั่งตะวันตก)",
     "name_en": "Exit 3 (West)",
-    "lat": 13.690249999999999,
-    "lng": 100.62275000000001,
-    "source": "estimated"
+    "lat": 13.676191,
+    "lng": 100.645679,
+    "source": "google_street_view"
   },
   {
     "id": "MRT_YL16_EX4",
@@ -3734,9 +3734,9 @@
     "exit_code": "4",
     "name_th": "ทางออก 4 (ฝั่งตะวันออก)",
     "name_en": "Exit 4 (East)",
-    "lat": 13.68975,
-    "lng": 100.62325,
-    "source": "estimated"
+    "lat": 13.677596,
+    "lng": 100.645572,
+    "source": "google_street_view"
   },
   {
     "id": "MRT_YL17_EX1",
