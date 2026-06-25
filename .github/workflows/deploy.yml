@@ -3,6 +3,8 @@ on:
   push:
     branches:
       - main
+      - master  # เพิ่ม master เผื่อไว้ครับ
+  workflow_dispatch: # เพิ่มเพื่อให้กดรันเอง (Manual) ได้ครับ
 
 jobs:
   build-and-deploy:
