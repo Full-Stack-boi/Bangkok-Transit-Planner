@@ -27,8 +27,7 @@ jobs:
         with:
           path: assets/map_tiles.bundle
           key: ${{ runner.os }}-map-bundle-${{ hashFiles('bin/generate_bundle.py', 'assets/data/stations.json') }}
-          restore-keys: |
-            ${{ runner.os }}-map-bundle-
+          # นำ restore-keys ออกชั่วคราวเพื่อความชัวร์ หรือปรับให้ตรงกันครับ
 
       - name: Generate Map Bundle
         if: steps.cache-map-bundle.outputs.cache-hit != 'true'
@@ -54,5 +53,5 @@ jobs:
 
       - name: Deploy to Vercel
         run: |
-          vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
+          vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }} --yes
         working-directory: . # รันจาก root แต่เราจะใช้ vercel.json ช่วยบอกทางครับ
