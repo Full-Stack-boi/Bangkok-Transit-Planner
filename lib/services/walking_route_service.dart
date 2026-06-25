@@ -14,7 +14,7 @@ class WalkingRouteService {
   ) async {
     try {
       final uri = Uri.parse(
-        'http://router.project-osrm.org/route/v1/foot/$fromLng,$fromLat;$toLng,$toLat?overview=full&geometries=geojson'
+        'https://router.project-osrm.org/route/v1/foot/$fromLng,$fromLat;$toLng,$toLat?overview=full&geometries=geojson'
       );
 
       final response = await http.get(

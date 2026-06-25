@@ -15,7 +15,8 @@ class OsrmRouteResult {
 }
 
 class OsrmService {
-  static const String _baseUrl = 'http://router.project-osrm.org/route/v1/foot';
+  // Use HTTPS to prevent Mixed Content errors on Vercel/Production web
+  static const String _baseUrl = 'https://router.project-osrm.org/route/v1/foot';
 
   /// Calculate walking route between two coordinates.
   /// If [fetchGeometry] is true, the response includes polyline coordinates.

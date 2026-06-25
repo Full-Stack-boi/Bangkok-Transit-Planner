@@ -77,19 +77,21 @@ class LocationService {
 
       // Fetch fresh coordinates
       print('Fetching fresh GPS coordinates...');
+      // Increasing timeout for web since browsers can be slow on first lock
+      const fetchTimeout = Duration(seconds: 15);
       final position = await Geolocator.getCurrentPosition(
         locationSettings: kIsWeb 
           ? const LocationSettings(
               accuracy: LocationAccuracy.medium,
-              timeLimit: Duration(seconds: 7),
+              timeLimit: Duration(seconds: 12),
             )
           : AndroidSettings(
               accuracy: LocationAccuracy.medium,
               timeLimit: const Duration(seconds: 10),
               forceLocationManager: false,
             ),
-      ).timeout(const Duration(seconds: 10), onTimeout: () {
-        print('GPS location fetch timed out after 10s.');
+      ).timeout(fetchTimeout, onTimeout: () {
+        print('GPS location fetch timed out after ${fetchTimeout.inSeconds}s.');
         throw TimeoutException('GPS timeout');
       });
 

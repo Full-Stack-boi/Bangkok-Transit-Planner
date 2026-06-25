@@ -3,6 +3,8 @@ import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 
 class OverpassService {
+  // Use a CORS-friendly proxy or a different mirror if needed, 
+  // but first let's ensure we use HTTPS.
   final String _baseUrl = 'https://overpass-api.de/api/interpreter';
 
   Future<List<LatLng>> findEntrances(
