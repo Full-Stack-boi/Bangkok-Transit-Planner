@@ -29,6 +29,7 @@ abstract class BaseCommon {
 }
 
 abstract class BaseNavigation {
+  String get utilityTitle;
   String get searchTitle;
   String get mapTitle;
   String get favoritesTitle;
@@ -192,24 +193,17 @@ abstract class BaseJourney {
 }
 
 abstract class BaseUtility {
-  // ─── Section headings ───
   String get statusSectionTitle;
   String get newsSectionTitle;
   String get cardsSectionTitle;
   String get cardsSubtitle;
-
-  // ─── Card names ───
   String get rabbitCardName;
   String get mrtCardName;
   String get arlCardName;
-
-  // ─── Card option titles ───
   String get optionStandardTitle;
   String get optionStudentTitle;
   String get optionSeniorTitle;
   String get optionTripPackageTitle;
-
-  // ─── Card option subtitles ───
   String get optionStandardSubtitle;
   String get optionStudentBtsSubtitle;
   String get optionSeniorBtsSubtitle;
@@ -218,8 +212,6 @@ abstract class BaseUtility {
   String get optionSeniorMrtSubtitle;
   String get optionStudentArlSubtitle;
   String get optionSeniorArlSubtitle;
-
-  // ─── Debug GPS simulation ───
   String get debugSimGpsTitle;
   String get debugSimGpsDisabled;
   String debugSimGpsActive(String lat, String lng);

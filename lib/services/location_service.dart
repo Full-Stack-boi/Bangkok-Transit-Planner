@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
@@ -12,12 +13,20 @@ class LocationService {
   LocationService([this._ref]);
   /// Request location permissions from the user
   Future<bool> requestLocationPermission() async {
+    if (kIsWeb) {
+      final status = await Geolocator.requestPermission();
+      return status == LocationPermission.whileInUse || status == LocationPermission.always;
+    }
     final status = await Permission.location.request();
     return status.isGranted;
   }
 
   /// Check if location permission is granted
   Future<bool> isLocationPermissionGranted() async {
+    if (kIsWeb) {
+      final status = await Geolocator.checkPermission();
+      return status == LocationPermission.whileInUse || status == LocationPermission.always;
+    }
     return await Permission.location.isGranted;
   }
 
@@ -57,21 +66,34 @@ class LocationService {
       }
 
       // Try last known position first (instant and highly reliable on emulators)
-      final lastKnown = await Geolocator.getLastKnownPosition();
-      if (lastKnown != null) {
-        print('Using last known position: ${lastKnown.latitude}, ${lastKnown.longitude}');
-        return lastKnown;
+      // Note: getLastKnownPosition is not supported on Web.
+      if (!kIsWeb) {
+        final lastKnown = await Geolocator.getLastKnownPosition();
+        if (lastKnown != null) {
+          print('Using last known position: ${lastKnown.latitude}, ${lastKnown.longitude}');
+          return lastKnown;
+        }
       }
 
-      // Fetch fresh coordinates if no last known position is cached
-      print('Fetching fresh GPS coordinates with forceLocationManager: false...');
-      return await Geolocator.getCurrentPosition(
-        locationSettings: AndroidSettings(
-          accuracy: LocationAccuracy.medium,
-          timeLimit: const Duration(seconds: 10),
-          forceLocationManager: false,
-        ),
-      );
+      // Fetch fresh coordinates
+      print('Fetching fresh GPS coordinates...');
+      final position = await Geolocator.getCurrentPosition(
+        locationSettings: kIsWeb 
+          ? const LocationSettings(
+              accuracy: LocationAccuracy.medium,
+              timeLimit: Duration(seconds: 7),
+            )
+          : AndroidSettings(
+              accuracy: LocationAccuracy.medium,
+              timeLimit: const Duration(seconds: 10),
+              forceLocationManager: false,
+            ),
+      ).timeout(const Duration(seconds: 10), onTimeout: () {
+        print('GPS location fetch timed out after 10s.');
+        throw TimeoutException('GPS timeout');
+      });
+
+      return position;
     } catch (e) {
       print('Failed to get current location: $e');
       return null;

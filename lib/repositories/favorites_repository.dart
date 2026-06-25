@@ -51,10 +51,10 @@ class FavoritesRepository {
               'station_id': stationId,
             });
           } else {
-            await client?.from('user_favorites').insert({
+            await client?.from('user_favorites').upsert({
               'user_id': user.id,
               'station_id': stationId,
-            });
+            }, onConflict: 'user_id,station_id');
           }
         }
       } catch (e) {
@@ -127,7 +127,7 @@ class FavoritesRepository {
             'origin_id': originId,
             'destination_id': destinationId,
             'name': routeName,
-          });
+          }, onConflict: 'user_id,origin_id,destination_id');
         }
       } catch (e) {
         print('Supabase route sync failed: $e');
@@ -190,7 +190,10 @@ class FavoritesRepository {
           'station_id': stationId,
         }).toList();
         
-        await client?.from('user_favorites').upsert(favsToInsert);
+        await client?.from('user_favorites').upsert(
+          favsToInsert,
+          onConflict: 'user_id,station_id',
+        );
       }
 
       // 3. Upload local saved routes to Supabase (upsert)
@@ -202,7 +205,10 @@ class FavoritesRepository {
           'name': route['name'] ?? 'Route',
         }).toList();
 
-        await client?.from('saved_routes').upsert(routesToInsert);
+        await client?.from('saved_routes').upsert(
+          routesToInsert,
+          onConflict: 'user_id,origin_id,destination_id',
+        );
       }
 
       // 4. Download remote favorites from Supabase

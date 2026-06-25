@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'dart:io';
+import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
 
@@ -12,20 +12,18 @@ class WalkingRouteService {
     double toLat,
     double toLng,
   ) async {
-    final client = HttpClient();
-    client.userAgent = 'com.bkktransit.bkk_transit_planner';
-
     try {
       final uri = Uri.parse(
         'http://router.project-osrm.org/route/v1/foot/$fromLng,$fromLat;$toLng,$toLat?overview=full&geometries=geojson'
       );
 
-      final request = await client.getUrl(uri).timeout(const Duration(seconds: 4));
-      final response = await request.close();
+      final response = await http.get(
+        uri,
+        headers: {'User-Agent': 'com.bkktransit.bkk_transit_planner'},
+      ).timeout(const Duration(seconds: 4));
 
       if (response.statusCode == 200) {
-        final body = await response.transform(utf8.decoder).join();
-        final Map<String, dynamic> data = json.decode(body);
+        final Map<String, dynamic> data = json.decode(response.body);
 
         if (data['code'] == 'Ok') {
           final routes = data['routes'] as List<dynamic>;
@@ -69,8 +67,6 @@ class WalkingRouteService {
       }
     } catch (e) {
       print('OSRM walking path fetch failed: $e. Falling back to Manhattan grid path.');
-    } finally {
-      client.close();
     }
 
     // Offline / Error Fallback: Manhattan grid path

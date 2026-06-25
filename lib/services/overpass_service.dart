@@ -58,7 +58,7 @@ class OverpassService {
         Uri.parse(_baseUrl),
         body: {'data': query},
         headers: {'User-Agent': 'BkkTransitPlanner/1.0'},
-      );
+      ).timeout(const Duration(seconds: 15));
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);

@@ -1,8 +1,8 @@
 import 'dart:convert';
-import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:http/http.dart' as http;
 import '../models/station.dart';
 import '../models/line.dart';
 import '../models/landmark.dart';
@@ -318,21 +318,19 @@ class TransitRepository {
   Future<List<CustomLocation>> searchOnlinePlaces(String query) async {
     if (query.trim().length < 3) return [];
 
-    final client = HttpClient();
-    client.userAgent = 'com.bkktransit.bkk_transit_planner';
-
     try {
       // Query Photon API with Bangkok location bias (lat=13.7563, lon=100.5018)
       final uri = Uri.parse(
         'https://photon.komoot.io/api/?q=${Uri.encodeComponent(query)}&limit=5&lat=13.7563&lon=100.5018&lang=en'
       );
 
-      final request = await client.getUrl(uri);
-      final response = await request.close();
+      final response = await http.get(
+        uri,
+        headers: {'User-Agent': 'com.bkktransit.bkk_transit_planner'},
+      ).timeout(const Duration(seconds: 5));
 
       if (response.statusCode == 200) {
-        final body = await response.transform(utf8.decoder).join();
-        final Map<String, dynamic> data = json.decode(body);
+        final Map<String, dynamic> data = json.decode(response.body);
         final List<dynamic> features = data['features'] ?? [];
 
         final results = <CustomLocation>[];
@@ -395,8 +393,6 @@ class TransitRepository {
       }
     } catch (e) {
       print('Online place search failed: $e');
-    } finally {
-      client.close();
     }
     return [];
   }

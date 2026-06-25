@@ -56,6 +56,8 @@ class ThaiCommon implements BaseCommon {
 
 class ThaiNavigation implements BaseNavigation {
   @override
+  String get utilityTitle => 'บริการ';
+  @override
   String get searchTitle => 'ค้นหาเส้นทาง';
   @override
   String get mapTitle => 'แผนที่รถไฟฟ้า';
@@ -435,14 +437,12 @@ class ThaiUtility implements BaseUtility {
   @override
   String get cardsSubtitle =>
       'เลือกสิทธิ์ส่วนลดของคุณเพื่อการแสดงผลราคาในระบบเดินทางอย่างถูกต้อง';
-
   @override
   String get rabbitCardName => 'บัตรแรบบิท (Rabbit)';
   @override
   String get mrtCardName => 'บัตรเอ็มอาร์ที (MRT)';
   @override
   String get arlCardName => 'แอร์พอร์ตลิงก์ (ARL)';
-
   @override
   String get optionStandardTitle => 'บุคคลทั่วไป';
   @override
@@ -451,7 +451,6 @@ class ThaiUtility implements BaseUtility {
   String get optionSeniorTitle => 'ผู้สูงอายุ';
   @override
   String get optionTripPackageTitle => 'เหมาเที่ยว (BTS)';
-
   @override
   String get optionStandardSubtitle => 'ราคาปกติ';
   @override
@@ -468,7 +467,6 @@ class ThaiUtility implements BaseUtility {
   String get optionStudentArlSubtitle => 'ลด 20%';
   @override
   String get optionSeniorArlSubtitle => 'ลด 50%';
-
   @override
   String get debugSimGpsTitle => 'จำลองตำแหน่งพิกัด GPS';
   @override

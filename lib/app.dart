@@ -32,7 +32,11 @@ class BkkTransitApp extends ConsumerWidget {
         Locale('th'),
         Locale('en'),
       ],
-      home: const HomeScreen(),
+      // Use a ValueKey based on the locale code to force a clean redraw
+      // of the entire main UI tree when the language changes. 
+      // This is the most robust way to ensure that all state and 
+      // event listeners (especially on Web) are correctly updated.
+      home: HomeScreen(key: ValueKey('home_root_$localeCode')),
     );
   }
 }

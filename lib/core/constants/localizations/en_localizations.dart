@@ -56,6 +56,8 @@ class EnglishCommon implements BaseCommon {
 
 class EnglishNavigation implements BaseNavigation {
   @override
+  String get utilityTitle => 'Utility';
+  @override
   String get searchTitle => 'Search Route';
   @override
   String get mapTitle => 'Transit Map';
@@ -435,14 +437,12 @@ class EnglishUtility implements BaseUtility {
   @override
   String get cardsSubtitle =>
       'Configure your active cards to display customized fares across the map.';
-
   @override
   String get rabbitCardName => 'Rabbit Card';
   @override
   String get mrtCardName => 'MRT Card';
   @override
   String get arlCardName => 'ARL Smart Pass';
-
   @override
   String get optionStandardTitle => 'Standard';
   @override
@@ -451,7 +451,6 @@ class EnglishUtility implements BaseUtility {
   String get optionSeniorTitle => 'Senior';
   @override
   String get optionTripPackageTitle => 'Trip Package';
-
   @override
   String get optionStandardSubtitle => 'Regular fare';
   @override
@@ -468,7 +467,6 @@ class EnglishUtility implements BaseUtility {
   String get optionStudentArlSubtitle => '20% off';
   @override
   String get optionSeniorArlSubtitle => '50% off';
-
   @override
   String get debugSimGpsTitle => 'Simulate GPS Location';
   @override

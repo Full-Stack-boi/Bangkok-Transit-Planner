@@ -21,13 +21,6 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
-  final _screens = const [
-    UtilityScreen(),
-    MapScreen(),
-    FavoritesScreen(),
-    SettingsScreen(),
-  ];
-
   bool _showInAppBanner = false;
   String _bannerTitle = '';
   String _bannerBody = '';
@@ -199,45 +192,71 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final t = ref.watch(translationsProvider);
 
     return Scaffold(
-      body: initState.when(
-        data: (_) => Stack(
-          children: [
-            IndexedStack(
-              index: currentIndex,
-              children: _screens,
-            ),
-            if (_showInAppBanner)
-              Positioned(
-                top: 0,
-                left: 0,
-                right: 0,
-                child: InAppNotificationBanner(
-                  title: _bannerTitle,
-                  body: _bannerBody,
-                  onTap: _onBannerTap,
-                  onDismiss: _onBannerDismiss,
-                ),
+      body: Column(
+        children: [
+          Expanded(
+            child: initState.when(
+              data: (_) => Stack(
+                children: [
+                  IndexedStack(
+                    index: currentIndex,
+                    children: [
+                      UtilityScreen(key: ValueKey('utility_${t.localeCode}')),
+                      MapScreen(key: ValueKey('map_${t.localeCode}')),
+                      FavoritesScreen(key: ValueKey('favorites_${t.localeCode}')),
+                      SettingsScreen(key: ValueKey('settings_${t.localeCode}')),
+                    ],
+                  ),
+                  if (_showInAppBanner)
+                    Positioned(
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      child: InAppNotificationBanner(
+                        title: _bannerTitle,
+                        body: _bannerBody,
+                        onTap: _onBannerTap,
+                        onDismiss: _onBannerDismiss,
+                      ),
+                    ),
+                ],
               ),
-          ],
-        ),
-        loading: () => _LoadingView(t: t),
-        error: (error, _) => _ErrorView(error: error.toString(), t: t),
+              loading: () => _LoadingView(t: t),
+              error: (error, _) => _ErrorView(error: error.toString(), t: t),
+            ),
+          ),
+          // Clean Navigation Bar that reacts directly to the global state.
+          // Using a unique key per locale forces a clean redraw without scoped conflicts.
+          const AppBottomNavigationBar(),
+        ],
       ),
-      bottomNavigationBar: _buildBottomNav(context, currentIndex, t),
     );
   }
+}
 
-  Widget _buildBottomNav(BuildContext context, int currentIndex, AppLocalizations t) {
+class AppBottomNavigationBar extends ConsumerWidget {
+  const AppBottomNavigationBar({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Explicitly watch the locale and translations at this level.
+    final currentIndex = ref.watch(homeTabIndexProvider);
+    final locale = ref.watch(localeProvider);
+    final t = AppLocalizations(locale);
+
     return NavigationBar(
+      key: ValueKey('nav_bar_$locale'),
       selectedIndex: currentIndex,
       onDestinationSelected: (index) {
+        // Use the root provider container to ensure the tab change
+        // propagates correctly even if the local scope is being rebuilt.
         ref.read(homeTabIndexProvider.notifier).setTab(index);
       },
       destinations: [
         NavigationDestination(
           icon: const Icon(Icons.dashboard_customize_outlined),
           selectedIcon: const Icon(Icons.dashboard_customize),
-          label: t.localeCode == 'th' ? 'บริการ' : 'Utility',
+          label: t.navigation.utilityTitle,
         ),
         NavigationDestination(
           icon: const Icon(Icons.map_outlined),
