@@ -5,6 +5,10 @@
       "source": "/api/overpass",
       "destination": "https://lz4.overpass-api.de/api/interpreter"
     },
+    {
+      "source": "/api/overpass/(.*)",
+      "destination": "https://lz4.overpass-api.de/api/interpreter/$1"
+    },
     { "source": "/(.*)", "destination": "/index.html" }
   ],
   "git": {
