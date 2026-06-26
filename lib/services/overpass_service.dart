@@ -1,10 +1,14 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 
 class OverpassService {
-  // Use the LZ4 mirror which is officially supported, fast, and CORS-enabled for web apps.
-  final String _baseUrl = 'https://lz4.overpass-api.de/api/interpreter';
+  // Use the local Vercel rewrite route to bypass CORS on Web.
+  // For other platforms (Android/iOS), use the direct LZ4 mirror URL.
+  final String _baseUrl = kIsWeb
+      ? '/api/overpass'
+      : 'https://lz4.overpass-api.de/api/interpreter';
 
   Future<List<LatLng>> findEntrances(
     double lat,
