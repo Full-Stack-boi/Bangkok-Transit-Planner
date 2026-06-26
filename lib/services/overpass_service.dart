@@ -3,9 +3,8 @@ import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 
 class OverpassService {
-  // Use a CORS-friendly proxy or a different mirror if needed, 
-  // but first let's ensure we use HTTPS.
-  final String _baseUrl = 'https://overpass-api.de/api/interpreter';
+  // Use the LZ4 mirror which is officially supported, fast, and CORS-enabled for web apps.
+  final String _baseUrl = 'https://lz4.overpass-api.de/api/interpreter';
 
   Future<List<LatLng>> findEntrances(
     double lat,
@@ -21,7 +20,7 @@ class OverpassService {
       if (osmType == 'R') {
         query =
             '''
-          [out:json][timeout:10];
+          [out:json][timeout:5];
           (
             relation($osmId);
             node(r)["barrier"];
@@ -35,7 +34,7 @@ class OverpassService {
       } else {
         query =
             '''
-          [out:json][timeout:10];
+          [out:json][timeout:5];
           (
             way($osmId);
             node(w)["barrier"];
@@ -47,7 +46,7 @@ class OverpassService {
     } else {
       query =
           '''
-        [out:json][timeout:10];
+        [out:json][timeout:5];
         (
           node(around:$radius,$lat,$lon)["entrance"];
         );
@@ -59,8 +58,12 @@ class OverpassService {
       final response = await http.post(
         Uri.parse(_baseUrl),
         body: {'data': query},
-        headers: {'User-Agent': 'BkkTransitPlanner/1.0'},
-      ).timeout(const Duration(seconds: 15));
+        headers: {
+          'User-Agent': 'BkkTransitPlanner/1.0',
+          'Accept': 'application/json',
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+      ).timeout(const Duration(seconds: 4)); // ลดเหลือ 4 วินาที เพื่อให้ Fail-Fast ทันใจขึ้น
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);

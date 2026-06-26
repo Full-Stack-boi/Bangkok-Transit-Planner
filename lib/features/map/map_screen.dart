@@ -61,6 +61,13 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     PaintingBinding.instance.imageCache.clearLiveImages();
     _fetchUserLocation();
     _initOfflineMap();
+    
+    // Trigger Namtang stops loading when map is opened
+    // Added a small delay to ensure UI remains responsive during transition
+    Future.delayed(const Duration(milliseconds: 100), () {
+      if (mounted) ref.read(transitRepositoryProvider).loadNamtangStops();
+    });
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         final routeResult = ref.read(searchViewModelProvider).routeResult;
@@ -678,6 +685,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     final markers = List<Marker>.from(_cachedBaseMarkers);
 
     // Add Namtang stops overlay when zoomed in
+    // Optimization for mobile: Filter only visible markers within viewport
+    // Zoom threshold: only show bus stops when zoomed in (>= 15.0) to avoid DOM overload in HTML renderer
     if (_currentZoom >= 15.0 && !isRouteActive) {
       try {
         final bounds = _mapController.camera.visibleBounds;
@@ -893,8 +902,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                         duration: Duration(milliseconds: 300),
                       ),
                     ),
-                    PolylineLayer(polylines: polylines),
-                    MarkerLayer(markers: markers),
+                    MobileLayerTransformer(child: PolylineLayer(polylines: polylines)),
+                    MobileLayerTransformer(child: MarkerLayer(markers: markers)),
                   ],
                 ),
               ),

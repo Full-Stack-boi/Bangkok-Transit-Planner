@@ -101,6 +101,9 @@ class SearchViewModel extends _$SearchViewModel {
 
     final repo = ref.read(transitRepositoryProvider);
 
+    // Trigger Namtang stops loading if it hasn't started yet
+    repo.loadNamtangStops();
+
     // 1. Search local places (stations + landmarks) instantly
     final localResults = repo.searchLocalPlaces(query);
     state = state.copyWith(searchResults: localResults);
@@ -1490,14 +1493,14 @@ class SearchViewModel extends _$SearchViewModel {
               path[idx + 1].longitude,
             );
           }
-          if (pathDist > 2.0 * straightDist) {
+          if (pathDist > 3.0 * straightDist) {
             print(
-              "OSRM massive detour detected (OSRM: ${pathDist.toStringAsFixed(1)}m, Straight: ${straightDist.toStringAsFixed(1)}m). Falling back to direct straight-line path.",
+              "OSRM extreme detour detected (OSRM: ${pathDist.toStringAsFixed(1)}m, Straight: ${straightDist.toStringAsFixed(1)}m). Falling back to direct straight-line path.",
             );
             path = [LatLng(fLat, fLng), LatLng(tLat, tLng)];
-          } else if (pathDist > 1.4 * straightDist) {
+          } else if (pathDist > 1.8 * straightDist) {
             print(
-              "OSRM detour detected (OSRM: ${pathDist.toStringAsFixed(1)}m, Straight: ${straightDist.toStringAsFixed(1)}m). Falling back to smart L-shape path.",
+              "OSRM significant detour detected (OSRM: ${pathDist.toStringAsFixed(1)}m, Straight: ${straightDist.toStringAsFixed(1)}m). Falling back to smart L-shape path.",
             );
             path = WalkingRouteService.generateManhattanPath(
               fLat,

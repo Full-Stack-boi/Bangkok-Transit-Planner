@@ -45,8 +45,15 @@ jobs:
       - name: Run build_runner
         run: flutter pub run build_runner build --delete-conflicting-outputs
 
+      - name: Optimize Pubspec and Assets for Web
+        run: |
+          # Remove the map_tiles.bundle line from pubspec.yaml to avoid inclusion in build
+          sed -i '/- assets\/map_tiles.bundle/d' pubspec.yaml
+          # Delete the file itself to be safe and save space in runner
+          rm -f assets/map_tiles.bundle
+
       - name: Build Web
-        run: flutter build web --release
+        run: flutter build web --release --tree-shake-icons --dart-define=FLUTTER_WEB_RENDERER=html
 
       - name: Install Vercel CLI
         run: npm install --global vercel@latest

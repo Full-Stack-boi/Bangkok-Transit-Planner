@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math' as math;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
@@ -40,7 +41,7 @@ class TransitRepository {
   List<StationExit> get exits => _exits;
   TransitGraph get graph => _graph!;
 
-  /// Initialize repository by loading all static data
+  /// Initialize repository by loading core static data (Trains, Lines, Landmarks)
   Future<void> initialize() async {
     if (_initialized) return;
 
@@ -50,8 +51,6 @@ class TransitRepository {
       _loadLandmarks(),
       _loadExits(),
     ]);
-
-    await _loadNamtangStops();
 
     _buildGraph();
     _initialized = true;
@@ -138,29 +137,70 @@ class TransitRepository {
     }
   }
 
-  Future<void> _loadNamtangStops() async {
+  bool _namtangLoading = false;
+  Future<void> loadNamtangStops() async {
+    if (_namtangStops != null || _namtangLoading) return;
+    _namtangLoading = true;
     try {
       final jsonStr = await rootBundle.loadString('assets/data/namtang_stops.json');
-      final List<dynamic> jsonList = json.decode(jsonStr);
-      final rawStops = jsonList.map((j) => NamtangStop.fromJson(j as Map<String, dynamic>)).toList();
       
-      // Calculate nearest stations for all stops
-      _namtangStops = rawStops.map((stop) {
-        final nearest = _findNearestStationFast(stop.lat, stop.lng);
-        if (nearest != null) {
-          final dist = Geolocator.distanceBetween(stop.lat, stop.lng, nearest.lat, nearest.lng);
-          final walkMin = (dist / 80.0).clamp(1.0, 30.0);
-          return stop.copyWith(
-            nearestStationId: nearest.id,
-            walkingMinutes: walkMin,
-          );
-        }
-        return stop;
-      }).toList();
+      // Use compute to parse and process the large 2MB JSON in a background isolate
+      // to prevent blocking the main UI thread.
+      final processedStops = await compute(_parseAndProcessStops, {
+        'jsonStr': jsonStr,
+        'stations': _stations,
+      });
+      
+      _namtangStops = processedStops;
     } catch (e) {
       _namtangStops = [];
       print('Failed to load Namtang stops: $e');
+    } finally {
+      _namtangLoading = false;
     }
+  }
+
+  // Top-level or static function for compute
+  static List<NamtangStop> _parseAndProcessStops(Map<String, dynamic> params) {
+    final String jsonStr = params['jsonStr'];
+    final List<Station>? stations = params['stations'];
+    
+    final List<dynamic> jsonList = json.decode(jsonStr);
+    final rawStops = jsonList.map((j) => NamtangStop.fromJson(j as Map<String, dynamic>)).toList();
+    
+    if (stations == null || stations.isEmpty) return rawStops;
+
+    // Calculate nearest stations for all stops
+    return rawStops.map((stop) {
+      Station? closest;
+      double minDistSq = double.infinity;
+
+      for (final station in stations) {
+        final dLat = stop.lat - station.lat;
+        final dLon = stop.lng - station.lng;
+        final distSq = dLat * dLat + dLon * dLon;
+        if (distSq < minDistSq) {
+          minDistSq = distSq;
+          closest = station;
+        }
+      }
+
+      if (closest != null) {
+        // Simple distance math (fast) instead of Geolocator.distanceBetween (slow/isolate-dependent)
+        // 1 deg lat ~= 111km, 1 deg lon ~= 111km * cos(lat)
+        // This is accurate enough for "nearest station" detection.
+        final dLatM = (stop.lat - closest.lat) * 111320.0;
+        final dLonM = (stop.lng - closest.lng) * 111320.0 * 0.97; // cos(13.7 deg) approx 0.97
+        final dist = math.sqrt(dLatM * dLatM + dLonM * dLonM);
+        
+        final walkMin = (dist / 80.0).clamp(1.0, 30.0);
+        return stop.copyWith(
+          nearestStationId: closest.id,
+          walkingMinutes: walkMin,
+        );
+      }
+      return stop;
+    }).toList();
   }
 
   Station? _findNearestStationFast(double lat, double lon) {

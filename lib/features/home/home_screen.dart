@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../providers/providers.dart';
 import '../utility/utility_screen.dart';
-import '../map/map_screen.dart';
+import '../map/map_screen.dart' deferred as map_screen;
 import '../favorites/favorites_screen.dart';
 import '../settings/settings_screen.dart';
 import '../../core/constants/translation_helper.dart';
@@ -202,7 +202,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     index: currentIndex,
                     children: [
                       UtilityScreen(key: ValueKey('utility_${t.localeCode}')),
-                      MapScreen(key: ValueKey('map_${t.localeCode}')),
+                      // Use deferred loading for MapScreen to reduce initial bundle size
+                      // Only trigger loadLibrary when this tab is selected to maximize performance
+                      if (currentIndex == 1)
+                        FutureBuilder(
+                          future: map_screen.loadLibrary(),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.done) {
+                              return map_screen.MapScreen(key: ValueKey('map_${t.localeCode}'));
+                            }
+                            return const Center(child: CircularProgressIndicator());
+                          },
+                        )
+                      else
+                        const SizedBox.shrink(),
                       FavoritesScreen(key: ValueKey('favorites_${t.localeCode}')),
                       SettingsScreen(key: ValueKey('settings_${t.localeCode}')),
                     ],
