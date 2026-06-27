@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/constants/translation_helper.dart';
+import '../../../models/custom_location.dart';
 
 class RouteResultBanner extends StatelessWidget {
   final dynamic result;
@@ -16,8 +17,13 @@ class RouteResultBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final hasWarning = (result.origin is CustomLocation && (result.origin as CustomLocation).hasAccuracyWarning) ||
+                       (result.destination is CustomLocation && (result.destination as CustomLocation).hasAccuracyWarning);
+
     return Card(
-      color: theme.colorScheme.primary.withValues(alpha: 0.1),
+      color: hasWarning
+          ? Colors.amber.withValues(alpha: 0.1)
+          : theme.colorScheme.primary.withValues(alpha: 0.1),
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(16),
@@ -25,7 +31,10 @@ class RouteResultBanner extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           child: Row(
             children: [
-              Icon(Icons.route_rounded, color: theme.colorScheme.primary),
+              Icon(
+                hasWarning ? Icons.warning_amber_rounded : Icons.route_rounded,
+                color: hasWarning ? Colors.amber[800] : theme.colorScheme.primary,
+              ),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(

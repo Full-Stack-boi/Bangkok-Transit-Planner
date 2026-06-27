@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'dart:ui' as ui;
@@ -42,6 +43,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   bool _isLocating = false;
   bool _isPrefetchExpanded = true;
   double _currentZoom = 12.0;
+  bool _isOfflineMapInitializing = false;
 
   // Caches for Map Layer Optimization
   List<Polyline> _cachedPolylines = [];
@@ -89,10 +91,21 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   }
 
   Future<void> _initOfflineMap() async {
+    if (kIsWeb) return;
+    if (Platform.environment.containsKey('FLUTTER_TEST')) return;
+    setState(() {
+      _isOfflineMapInitializing = true;
+    });
     try {
       await CachedTileProvider.getCachePath();
     } catch (e) {
       print('Failed to initialize offline map: $e');
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isOfflineMapInitializing = false;
+        });
+      }
     }
   }
 
@@ -1038,6 +1051,37 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                 theme,
                 t,
                 localeCode,
+              ),
+            ),
+
+          if (_isOfflineMapInitializing)
+            Positioned.fill(
+              child: Container(
+                color: Colors.black.withValues(alpha: 0.65),
+                child: Center(
+                  child: Card(
+                    margin: const EdgeInsets.symmetric(horizontal: 32),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const CircularProgressIndicator(),
+                          const SizedBox(height: 16),
+                          Text(
+                            localeCode == 'th'
+                                ? 'กำลังจัดเตรียมแผนที่สำหรับใช้งานออฟไลน์...'
+                                : 'Preparing offline map tiles...',
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
               ),
             ),
         ],

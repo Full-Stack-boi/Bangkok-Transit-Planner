@@ -4,6 +4,7 @@ import '../../core/theme/transit_colors.dart';
 import '../../models/route_result.dart';
 import '../../models/station.dart';
 import '../../models/searchable_item.dart';
+import '../../models/custom_location.dart';
 
 import '../../models/crowd_report.dart';
 import '../../providers/providers.dart';
@@ -71,6 +72,13 @@ class RouteResultSheet extends ConsumerWidget {
               if (saverRoute != null) ...[
                 const SizedBox(height: 16),
                 _buildRouteTypeSelector(context, ref, activeRouteType, regularRoute, saverRoute, theme, t),
+              ],
+
+              // Accuracy Warning if overpass failed
+              if (result.origin is CustomLocation && (result.origin as CustomLocation).hasAccuracyWarning ||
+                  result.destination is CustomLocation && (result.destination as CustomLocation).hasAccuracyWarning) ...[
+                const SizedBox(height: 12),
+                _buildAccuracyWarningWidget(context, theme, localeCode),
               ],
 
               const SizedBox(height: 24),
@@ -1093,6 +1101,107 @@ class RouteResultSheet extends ConsumerWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildAccuracyWarningWidget(
+    BuildContext context,
+    ThemeData theme,
+    String localeCode,
+  ) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.amber.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.amber.withValues(alpha: 0.4)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(Icons.warning_amber_rounded, color: Colors.amber[800]),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  localeCode == 'th'
+                      ? 'เส้นทางนี้อาจไม่แม่นยำ 100%'
+                      : 'Route may not be 100% accurate',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.amber[800],
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  localeCode == 'th'
+                      ? 'เนื่องจากไม่สามารถดึงข้อมูลทางออกสถานีจากดาวเทียมได้ในขณะนี้'
+                      : 'Because station entrance data could not be fetched from the network at this time.',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.8),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                GestureDetector(
+                  onTap: () => _showReportDialog(context, localeCode, theme),
+                  child: Text(
+                    localeCode == 'th' ? 'คลิกที่นี่เพื่อรายงานปัญหา' : 'Click here to report issue',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.primary,
+                      decoration: TextDecoration.underline,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showReportDialog(
+    BuildContext context,
+    String localeCode,
+    ThemeData theme,
+  ) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(
+          localeCode == 'th' ? 'รายงานปัญหาเส้นทาง' : 'Report Route Issue',
+        ),
+        content: Text(
+          localeCode == 'th'
+              ? 'ระบบจะส่งพิกัดและข้อมูลของเส้นทางนี้ไปยังผู้พัฒนาเพื่อทำการปรับปรุงประสิทธิภาพในอนาคต ขอบคุณครับ!'
+              : 'The system will submit the coordinate details of this route to our developers for future optimization. Thank you!',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(localeCode == 'th' ? 'ยกเลิก' : 'Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    localeCode == 'th'
+                        ? 'ส่งรายงานปัญหาเรียบร้อยแล้ว!'
+                        : 'Report submitted successfully!',
+                  ),
+                  backgroundColor: theme.colorScheme.primary,
+                ),
+              );
+            },
+            child: Text(localeCode == 'th' ? 'ส่งรายงาน' : 'Submit'),
+          ),
+        ],
       ),
     );
   }
