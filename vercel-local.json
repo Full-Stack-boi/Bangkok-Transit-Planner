@@ -1,0 +1,25 @@
+{
+  "version": 2,
+  "buildCommand": null,
+  "installCommand": null,
+  "framework": null,
+  "cleanUrls": true,
+  "rewrites": [
+    {
+      "source": "/api/overpass",
+      "destination": "/api/overpass.js"
+    },
+    {
+      "source": "/assets/(.*)",
+      "destination": "/build/web/assets/$1"
+    },
+    {
+      "source": "/(.*)\\.(js|json|png|jpg|wasm|data|txt)",
+      "destination": "/build/web/$1.$2"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/build/web/index.html"
+    }
+  ]
+}

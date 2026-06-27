@@ -3,13 +3,12 @@
   "rewrites": [
     {
       "source": "/api/overpass",
-      "destination": "https://lz4.overpass-api.de/api/interpreter"
+      "destination": "/api/overpass.js"
     },
     {
-      "source": "/api/overpass/(.*)",
-      "destination": "https://lz4.overpass-api.de/api/interpreter/$1"
-    },
-    { "source": "/(.*)", "destination": "/index.html" }
+      "source": "/(.*)",
+      "destination": "/build/web/$1"
+    }
   ],
   "git": {
     "deploymentEnabled": false
