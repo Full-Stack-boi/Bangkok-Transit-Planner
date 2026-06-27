@@ -53,7 +53,7 @@ jobs:
           rm -f assets/map_tiles.bundle
 
       - name: Build Web
-        run: flutter build web --release --tree-shake-icons --dart-define=FLUTTER_WEB_RENDERER=html
+        run: flutter build web --release --tree-shake-icons --web-renderer canvaskit
 
       - name: Install Vercel CLI
         run: npm install --global vercel@latest
