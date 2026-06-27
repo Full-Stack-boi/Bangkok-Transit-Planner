@@ -1,6 +1,9 @@
 {
   "version": 2,
   "regions": ["sin1"],
+  "buildCommand": null,
+  "installCommand": null,
+  "framework": null,
   "rewrites": [
     {
       "source": "/api/overpass",
