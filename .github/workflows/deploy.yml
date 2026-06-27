@@ -65,7 +65,8 @@ jobs:
           cp -r build/web/* dist_vercel/build/web/
           cp -r api/* dist_vercel/api/
           cp vercel.json dist_vercel/vercel.json
-          cp -r .vercel dist_vercel/.vercel
+          mkdir -p dist_vercel/.vercel
+          echo '{"projectId":"${{ secrets.VERCEL_PROJECT_ID }}","orgId":"${{ secrets.VERCEL_ORG_ID }}","projectName":"bangkok-transit-planner"}' > dist_vercel/.vercel/project.json
 
       - name: Deploy to Vercel
         run: |
