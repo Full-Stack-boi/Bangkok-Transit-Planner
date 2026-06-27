@@ -54,6 +54,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   RouteResult? _lastRouteResultForMarkers;
   Brightness? _lastBrightnessForMarkers;
   String? _lastCurrentStationId;
+  double? _lastZoomForMarkers;
 
   @override
   void initState() {
@@ -374,10 +375,12 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     final currentStationId = trackerState?.currentStation?.id;
     if (_lastRouteResultForMarkers != routeResult ||
         _lastBrightnessForMarkers != themeBrightness ||
-        _lastCurrentStationId != currentStationId) {
+        _lastCurrentStationId != currentStationId ||
+        _lastZoomForMarkers != _currentZoom) {
       _lastRouteResultForMarkers = routeResult;
       _lastBrightnessForMarkers = themeBrightness;
       _lastCurrentStationId = currentStationId;
+      _lastZoomForMarkers = _currentZoom;
       final newMarkers = <Marker>[];
 
       if (isRouteActive) {
@@ -398,70 +401,47 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         }
 
         // Add markers for only these stations
+        LatLngBounds? bounds;
+        try {
+          bounds = _mapController.camera.visibleBounds;
+        } catch (_) {
+          // Fallback if camera is not initialized yet
+        }
+
         for (final station in routeStations) {
+          final point = LatLng(station.lat, station.lng);
+          if (bounds != null && !bounds.contains(point)) continue;
+
           final lineColor = TransitColors.getLineColor(station.lineId);
           final isInterchange = station.interchange.isNotEmpty;
           final isCurrentStation =
               isTrackingActive &&
               trackerState?.currentStation?.id == station.id;
 
+          final double scale = (0.75 + (_currentZoom - 12.0) * 0.16).clamp(0.6, 2.0);
+          final double baseSize = isCurrentStation ? 44.0 : (isInterchange ? 32.0 : 24.0);
+          final double sizeValue = baseSize * scale;
+
           newMarkers.add(
             Marker(
-              point: LatLng(station.lat, station.lng),
-              width: isCurrentStation ? 44 : (isInterchange ? 32 : 24),
-              height: isCurrentStation ? 44 : (isInterchange ? 32 : 24),
-              child: GestureDetector(
-                onTap: () {
-                  setState(() => _selectedStation = station);
-                },
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: isCurrentStation
-                        ? Colors.green
-                        : (theme.brightness == Brightness.dark
-                              ? const Color(0xFF1E293B)
-                              : Colors.white),
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: isCurrentStation ? Colors.white : lineColor,
-                      width: isCurrentStation
-                          ? 4.0
-                          : (isInterchange ? 4.0 : 3.0),
+              point: point,
+              width: sizeValue,
+              height: sizeValue,
+              alignment: Alignment.center,
+              child: RepaintBoundary(
+                child: GestureDetector(
+                  onTap: () {
+                    setState(() => _selectedStation = station);
+                  },
+                  child: CustomPaint(
+                    size: Size(sizeValue, sizeValue),
+                    painter: StationMarkerPainter(
+                      lineColor: lineColor,
+                      isInterchange: isInterchange,
+                      brightness: theme.brightness,
+                      isCurrentStation: isCurrentStation,
+                      scale: scale,
                     ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: isCurrentStation
-                            ? Colors.green.withValues(alpha: 0.5)
-                            : Colors.black26,
-                        blurRadius: isCurrentStation ? 8 : 4,
-                        spreadRadius: isCurrentStation ? 2 : 0,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Center(
-                    child: isCurrentStation
-                        ? const Icon(
-                            Icons.navigation_rounded,
-                            size: 20,
-                            color: Colors.white,
-                          )
-                        : (isInterchange
-                              ? Icon(
-                                  Icons.swap_horiz_rounded,
-                                  size: 14,
-                                  color: theme.brightness == Brightness.dark
-                                      ? Colors.white
-                                      : Colors.black,
-                                )
-                              : Container(
-                                  width: 6,
-                                  height: 6,
-                                  decoration: BoxDecoration(
-                                    color: lineColor,
-                                    shape: BoxShape.circle,
-                                  ),
-                                )),
                   ),
                 ),
               ),
@@ -476,33 +456,39 @@ class _MapScreenState extends ConsumerState<MapScreen> {
             if (segment.fromStation is! Station) continue;
 
             final exit = segment.exit!;
+            final point = LatLng(exit.lat, exit.lng);
+            if (bounds != null && !bounds.contains(point)) continue;
+
             newMarkers.add(
               Marker(
-                point: LatLng(exit.lat, exit.lng),
+                point: point,
                 width: 32,
                 height: 32,
-                child: Tooltip(
-                  message: t.routeResult.exitLabel(exit.exitCode),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.orange.shade800,
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white, width: 2.0),
-                      boxShadow: const [
-                        BoxShadow(
-                          color: Colors.black26,
-                          blurRadius: 4,
-                          offset: Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: Center(
-                      child: Text(
-                        exit.exitCode,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
+                alignment: Alignment.center,
+                child: RepaintBoundary(
+                  child: Tooltip(
+                    message: t.routeResult.exitLabel(exit.exitCode),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.orange.shade800,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white, width: 2.0),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Colors.black26,
+                            blurRadius: 4,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Center(
+                        child: Text(
+                          exit.exitCode,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ),
@@ -522,14 +508,16 @@ class _MapScreenState extends ConsumerState<MapScreen> {
             point: LatLng(originLat, originLng),
             width: 40,
             height: 44,
-            alignment: Alignment.topCenter,
-            child: Tooltip(
-              message: routeResult.origin.displayName(
-                isEnglish: localeCode == 'en',
-              ),
-              child: CustomMapPin(
-                color: Colors.green.shade600,
-                icon: Icons.trip_origin_rounded,
+            alignment: Alignment.bottomCenter,
+            child: RepaintBoundary(
+              child: Tooltip(
+                message: routeResult.origin.displayName(
+                  isEnglish: localeCode == 'en',
+                ),
+                child: CustomMapPin(
+                  color: Colors.green.shade600,
+                  icon: Icons.trip_origin_rounded,
+                ),
               ),
             ),
           ),
@@ -543,14 +531,16 @@ class _MapScreenState extends ConsumerState<MapScreen> {
             point: LatLng(destLat, destLng),
             width: 40,
             height: 44,
-            alignment: Alignment.topCenter,
-            child: Tooltip(
-              message: routeResult.destination.displayName(
-                isEnglish: localeCode == 'en',
-              ),
-              child: CustomMapPin(
-                color: Colors.red.shade600,
-                icon: Icons.flag_rounded,
+            alignment: Alignment.bottomCenter,
+            child: RepaintBoundary(
+              child: Tooltip(
+                message: routeResult.destination.displayName(
+                  isEnglish: localeCode == 'en',
+                ),
+                child: CustomMapPin(
+                  color: Colors.red.shade600,
+                  icon: Icons.flag_rounded,
+                ),
               ),
             ),
           ),
@@ -576,6 +566,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                   (p1.latitude + p2.latitude) / 2,
                   (p1.longitude + p2.longitude) / 2,
                 );
+                if (bounds != null && !bounds.contains(midpoint)) continue;
 
                 // Calculate bearing in radians
                 final lat1 = p1.latitude * math.pi / 180.0;
@@ -594,36 +585,39 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                     point: midpoint,
                     width: 20,
                     height: 20,
-                    child: IgnorePointer(
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: theme.brightness == Brightness.dark
-                              ? Colors.black
-                              : Colors.white,
-                          shape: BoxShape.circle,
-                          border: Border.all(
+                    alignment: Alignment.center,
+                    child: RepaintBoundary(
+                      child: IgnorePointer(
+                        child: Container(
+                          decoration: BoxDecoration(
                             color: theme.brightness == Brightness.dark
-                                ? Colors.white30
-                                : Colors.black12,
-                            width: 1.0,
-                          ),
-                          boxShadow: const [
-                            BoxShadow(
-                              color: Colors.black12,
-                              blurRadius: 2,
-                              offset: Offset(0, 1),
-                            ),
-                          ],
-                        ),
-                        child: Center(
-                          child: Transform.rotate(
-                            angle: bearing,
-                            child: Icon(
-                              Icons.arrow_upward_rounded,
-                              size: 11,
+                                ? Colors.black
+                                : Colors.white,
+                            shape: BoxShape.circle,
+                            border: Border.all(
                               color: theme.brightness == Brightness.dark
-                                  ? Colors.white
-                                  : Colors.black,
+                                  ? Colors.white30
+                                  : Colors.black12,
+                              width: 1.0,
+                            ),
+                            boxShadow: const [
+                              BoxShadow(
+                                color: Colors.black12,
+                                blurRadius: 2,
+                                offset: Offset(0, 1),
+                              ),
+                            ],
+                          ),
+                          child: Center(
+                            child: Transform.rotate(
+                              angle: bearing,
+                              child: Icon(
+                                Icons.arrow_upward_rounded,
+                                size: 11,
+                                color: theme.brightness == Brightness.dark
+                                    ? Colors.white
+                                    : Colors.black,
+                              ),
                             ),
                           ),
                         ),
@@ -638,53 +632,32 @@ class _MapScreenState extends ConsumerState<MapScreen> {
       } else {
         // Show all stations
         for (final station in transitRepo.stations) {
+          final point = LatLng(station.lat, station.lng);
+
           final lineColor = TransitColors.getLineColor(station.lineId);
           final isInterchange = station.interchange.isNotEmpty;
+          final double scale = (0.75 + (_currentZoom - 12.0) * 0.16).clamp(0.6, 2.0);
+          final double sizeValue = (isInterchange ? 32.0 : 24.0) * scale;
 
           newMarkers.add(
             Marker(
-              point: LatLng(station.lat, station.lng),
-              width: isInterchange ? 32 : 24,
-              height: isInterchange ? 32 : 24,
-              child: GestureDetector(
-                onTap: () {
-                  setState(() => _selectedStation = station);
-                },
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: themeBrightness == Brightness.dark
-                        ? const Color(0xFF1E293B)
-                        : Colors.white,
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: lineColor,
-                      width: isInterchange ? 4.0 : 3.0,
+              point: point,
+              width: sizeValue,
+              height: sizeValue,
+              alignment: Alignment.center,
+              child: RepaintBoundary(
+                child: GestureDetector(
+                  onTap: () {
+                    setState(() => _selectedStation = station);
+                  },
+                  child: CustomPaint(
+                    size: Size(sizeValue, sizeValue),
+                    painter: StationMarkerPainter(
+                      lineColor: lineColor,
+                      isInterchange: isInterchange,
+                      brightness: themeBrightness,
+                      scale: scale,
                     ),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Colors.black26,
-                        blurRadius: 4,
-                        offset: Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Center(
-                    child: isInterchange
-                        ? Icon(
-                            Icons.swap_horiz_rounded,
-                            size: 14,
-                            color: themeBrightness == Brightness.dark
-                                ? Colors.white
-                                : Colors.black,
-                          )
-                        : Container(
-                            width: 6,
-                            height: 6,
-                            decoration: BoxDecoration(
-                              color: lineColor,
-                              shape: BoxShape.circle,
-                            ),
-                          ),
                   ),
                 ),
               ),
@@ -711,49 +684,52 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                 point: stopPoint,
                 width: 24,
                 height: 24,
-                child: GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _selectedNamtangStop = stop;
-                      _selectedStation = null;
-                      _customSelectedLocation = null;
-                    });
-                  },
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: themeBrightness == Brightness.dark
-                          ? const Color(0xFF1E293B)
-                          : Colors.white,
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: stop.type == 'boat'
-                            ? Colors.blue.shade700
-                            : (stop.type == 'commuter_train'
-                                  ? Colors.red.shade700
-                                  : Colors.green.shade700),
-                        width: 2.0,
-                      ),
-                      boxShadow: const [
-                        BoxShadow(
-                          color: Colors.black26,
-                          blurRadius: 4,
-                          offset: Offset(0, 1),
+                alignment: Alignment.center,
+                child: RepaintBoundary(
+                  child: GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _selectedNamtangStop = stop;
+                        _selectedStation = null;
+                        _customSelectedLocation = null;
+                      });
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: themeBrightness == Brightness.dark
+                            ? const Color(0xFF1E293B)
+                            : Colors.white,
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: stop.type == 'boat'
+                              ? Colors.blue.shade700
+                              : (stop.type == 'commuter_train'
+                                    ? Colors.red.shade700
+                                    : Colors.green.shade700),
+                          width: 2.0,
                         ),
-                      ],
-                    ),
-                    child: Center(
-                      child: Icon(
-                        stop.type == 'boat'
-                            ? Icons.directions_boat_rounded
-                            : (stop.type == 'commuter_train'
-                                  ? Icons.train_rounded
-                                  : Icons.directions_bus_rounded),
-                        size: 12,
-                        color: stop.type == 'boat'
-                            ? Colors.blue.shade700
-                            : (stop.type == 'commuter_train'
-                                  ? Colors.red.shade700
-                                  : Colors.green.shade700),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Colors.black26,
+                            blurRadius: 4,
+                            offset: Offset(0, 1),
+                          ),
+                        ],
+                      ),
+                      child: Center(
+                        child: Icon(
+                          stop.type == 'boat'
+                              ? Icons.directions_boat_rounded
+                              : (stop.type == 'commuter_train'
+                                    ? Icons.train_rounded
+                                    : Icons.directions_bus_rounded),
+                          size: 12,
+                          color: stop.type == 'boat'
+                              ? Colors.blue.shade700
+                              : (stop.type == 'commuter_train'
+                                    ? Colors.red.shade700
+                                    : Colors.green.shade700),
+                        ),
                       ),
                     ),
                   ),
@@ -774,25 +750,28 @@ class _MapScreenState extends ConsumerState<MapScreen> {
           point: LatLng(_userPosition!.latitude, _userPosition!.longitude),
           width: 24,
           height: 24,
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.blue.withValues(alpha: 0.2),
-              shape: BoxShape.circle,
-            ),
-            child: Center(
-              child: Container(
-                width: 12,
-                height: 12,
-                decoration: const BoxDecoration(
-                  color: Colors.blue,
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.blueAccent,
-                      blurRadius: 6,
-                      spreadRadius: 2,
-                    ),
-                  ],
+          alignment: Alignment.center,
+          child: RepaintBoundary(
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.blue.withValues(alpha: 0.2),
+                shape: BoxShape.circle,
+              ),
+              child: Center(
+                child: Container(
+                  width: 12,
+                  height: 12,
+                  decoration: const BoxDecoration(
+                    color: Colors.blue,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.blueAccent,
+                        blurRadius: 6,
+                        spreadRadius: 2,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -811,10 +790,12 @@ class _MapScreenState extends ConsumerState<MapScreen> {
           ),
           width: 40,
           height: 44,
-          alignment: Alignment.topCenter,
-          child: CustomMapPin(
-            color: theme.colorScheme.primary,
-            icon: Icons.push_pin_rounded,
+          alignment: Alignment.bottomCenter,
+          child: RepaintBoundary(
+            child: CustomMapPin(
+              color: theme.colorScheme.primary,
+              icon: Icons.push_pin_rounded,
+            ),
           ),
         ),
       );
@@ -915,8 +896,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                         duration: Duration(milliseconds: 300),
                       ),
                     ),
-                    MobileLayerTransformer(child: PolylineLayer(polylines: polylines)),
-                    MobileLayerTransformer(child: MarkerLayer(markers: markers)),
+                    PolylineLayer(polylines: polylines),
+                    MarkerLayer(markers: markers),
                   ],
                 ),
               ),
@@ -2497,5 +2478,101 @@ class _RoundedRectangleProgressPainter extends CustomPainter {
         oldDelegate.backgroundColor != backgroundColor ||
         oldDelegate.strokeWidth != strokeWidth ||
         oldDelegate.borderRadius != borderRadius;
+  }
+}
+
+class StationMarkerPainter extends CustomPainter {
+  final Color lineColor;
+  final bool isInterchange;
+  final Brightness brightness;
+  final bool isCurrentStation;
+  final double scale;
+
+  StationMarkerPainter({
+    required this.lineColor,
+    required this.isInterchange,
+    required this.brightness,
+    this.isCurrentStation = false,
+    this.scale = 1.0,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final radius = size.width / 2;
+
+    // 1. Draw Drop Shadow
+    final shadowPaint = Paint()
+      ..color = isCurrentStation
+          ? Colors.green.withValues(alpha: 0.3)
+          : Colors.black.withValues(alpha: 0.26)
+      ..maskFilter = MaskFilter.blur(BlurStyle.normal, (isCurrentStation ? 4.0 : 2.0) * scale);
+
+    canvas.drawCircle(
+      center + Offset(0, 1.5 * scale),
+      radius - (1.5 * scale),
+      shadowPaint,
+    );
+
+    // 2. Draw Outer Circle (Background)
+    final bgPaint = Paint()
+      ..color = isCurrentStation
+          ? Colors.green
+          : (brightness == Brightness.dark ? const Color(0xFF1E293B) : Colors.white)
+      ..style = PaintingStyle.fill;
+    canvas.drawCircle(center, radius - (1.5 * scale), bgPaint);
+
+    // 3. Draw Border
+    final borderPaint = Paint()
+      ..color = isCurrentStation ? Colors.white : lineColor
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = isCurrentStation ? 4.0 * scale : (isInterchange ? 4.0 * scale : 3.0 * scale);
+    canvas.drawCircle(center, radius - (1.5 * scale) - (borderPaint.strokeWidth / 2), borderPaint);
+
+    // 4. Draw Center Content
+    if (isCurrentStation) {
+      // Draw navigation triangle pointing up
+      final path = ui.Path()
+        ..moveTo(center.dx, center.dy - 6 * scale)
+        ..lineTo(center.dx - 5 * scale, center.dy + 5 * scale)
+        ..lineTo(center.dx, center.dy + 2 * scale)
+        ..lineTo(center.dx + 5 * scale, center.dy + 5 * scale)
+        ..close();
+      canvas.drawPath(path, Paint()..color = Colors.white);
+    } else if (isInterchange) {
+      // Render the exact Material icon glyph directly on the canvas
+      final textPainter = TextPainter(
+        textDirection: TextDirection.ltr,
+      );
+      textPainter.text = TextSpan(
+        text: String.fromCharCode(Icons.swap_horiz_rounded.codePoint),
+        style: TextStyle(
+          fontSize: 14.0 * scale,
+          fontFamily: Icons.swap_horiz_rounded.fontFamily,
+          package: Icons.swap_horiz_rounded.fontPackage,
+          color: brightness == Brightness.dark ? Colors.white : Colors.black,
+        ),
+      );
+      textPainter.layout();
+      textPainter.paint(
+        canvas,
+        center - Offset(textPainter.width / 2, textPainter.height / 2),
+      );
+    } else {
+      // Draw Inner Dot
+      final dotPaint = Paint()
+        ..color = lineColor
+        ..style = PaintingStyle.fill;
+      canvas.drawCircle(center, 3.0 * scale, dotPaint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant StationMarkerPainter oldDelegate) {
+    return oldDelegate.lineColor != lineColor ||
+        oldDelegate.isInterchange != isInterchange ||
+        oldDelegate.brightness != brightness ||
+        oldDelegate.isCurrentStation != isCurrentStation ||
+        oldDelegate.scale != scale;
   }
 }
