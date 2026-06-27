@@ -440,7 +440,8 @@ class TransitRepository {
   /// Resolves the best entrance for a CustomLocation using Overpass and OSRM
   Future<CustomLocation?> resolveOnlinePlaceAsync(CustomLocation place) async {
     // 1. Fetch entrances around the centroid (or use existing if provided)
-    final List<LatLng> entrances;
+    List<LatLng> entrances;
+    bool hasWarning = false;
     if (place.entrances != null && place.entrances!.isNotEmpty) {
       entrances = List<LatLng>.from(place.entrances!);
     } else {
@@ -453,13 +454,19 @@ class TransitRepository {
           osmId = int.tryParse(parts[2]);
         }
       }
-      entrances = await _overpassService.findEntrances(
-        place.lat,
-        place.lng,
-        radius: 800.0,
-        osmType: osmType,
-        osmId: osmId,
-      );
+      try {
+        entrances = await _overpassService.findEntrances(
+          place.lat,
+          place.lng,
+          radius: 800.0,
+          osmType: osmType,
+          osmId: osmId,
+        );
+      } catch (e) {
+        print('Overpass resolution failed after retries: $e');
+        entrances = [];
+        hasWarning = true;
+      }
     }
     
     if (entrances.isEmpty) {
@@ -470,9 +477,10 @@ class TransitRepository {
           nearestStationId: result.station.id,
           walkingMinutes: result.osrmResult?.durationSeconds != null ? (result.osrmResult!.durationSeconds / 60.0).clamp(1.0, 30.0) : place.walkingMinutes,
           walkingPath: result.osrmResult?.coordinates,
+          hasAccuracyWarning: hasWarning,
         );
       }
-      return place;
+      return place.copyWith(hasAccuracyWarning: hasWarning);
     }
 
     // 2. We have entrances. Find the one that gives the shortest OSRM path to its nearest station.

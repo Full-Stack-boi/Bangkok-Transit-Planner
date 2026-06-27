@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 
 class OverpassService {
-  // Use the local Vercel rewrite route to bypass CORS on Web.
+  // Use Vercel Serverless Function proxy on Web to bypass CORS and avoid 404s.
   // For other platforms (Android/iOS), use the direct LZ4 mirror URL.
   final String _baseUrl = kIsWeb
       ? '/api/overpass'
@@ -58,39 +58,41 @@ class OverpassService {
       ''';
     }
 
-    try {
-      final response = await http.post(
-        Uri.parse(_baseUrl),
-        body: {'data': query},
-        headers: {
-          'User-Agent': 'BkkTransitPlanner/1.0',
-          'Accept': 'application/json',
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-      ).timeout(const Duration(seconds: 4)); // ลดเหลือ 4 วินาที เพื่อให้ Fail-Fast ทันใจขึ้น
+    int attempts = 2;
+    int timeoutSeconds = 7;
 
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        if (data['elements'] != null && data['elements'] is List) {
-          final List<LatLng> entrances = [];
-          for (var element in data['elements']) {
-            if (element['lat'] != null && element['lon'] != null) {
-              entrances.add(LatLng(element['lat'], element['lon']));
+    for (int i = 0; i < attempts; i++) {
+      try {
+        final response = await http.post(
+          Uri.parse(_baseUrl),
+          body: {'data': query},
+          headers: {
+            'User-Agent': 'BkkTransitPlanner/1.0',
+            'Accept': 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+        ).timeout(Duration(seconds: timeoutSeconds));
+
+        if (response.statusCode == 200) {
+          final data = json.decode(response.body);
+          if (data['elements'] != null && data['elements'] is List) {
+            final List<LatLng> entrances = [];
+            for (var element in data['elements']) {
+              if (element['lat'] != null && element['lon'] != null) {
+                entrances.add(LatLng(element['lat'], element['lon']));
+              }
             }
+            return entrances;
           }
-
-          // If a specific OSM-aware query (W/R) returned empty, do NOT fall back to a
-          // radius-based search — that would pick up entrances from nearby unrelated
-          // buildings (e.g. One Bangkok next to Lumphini Park). Return [] so the caller
-          // can fall back to the centroid itself instead.
-
-          return entrances;
+        } else {
+          print('Overpass API error on attempt ${i + 1}: ${response.statusCode}');
         }
-      } else {
-        print('Overpass API error: ${response.statusCode}');
+      } catch (e) {
+        print('Exception calling Overpass API on attempt ${i + 1}: $e');
+        if (i == attempts - 1) {
+          rethrow; // Rethrow on last attempt so caller knows it failed
+        }
       }
-    } catch (e) {
-      print('Exception calling Overpass API: $e');
     }
 
     // If the OSM-aware query fails/errors out, return [] — do NOT fall back to radius.

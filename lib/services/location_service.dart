@@ -32,12 +32,14 @@ class LocationService {
 
   /// Request notification permission (Android 13+)
   Future<bool> requestNotificationPermission() async {
+    if (kIsWeb) return false;
     final status = await Permission.notification.request();
     return status.isGranted;
   }
 
   /// Open Android/iOS App settings screen directly
   Future<bool> openSettings() async {
+    if (kIsWeb) return false;
     return await openAppSettings();
   }
 

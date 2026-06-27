@@ -26,6 +26,7 @@ class CustomLocation extends SearchableItem {
 
   final List<LatLng>? walkingPath;
   final List<LatLng>? entrances;
+  final bool hasAccuracyWarning;
 
   const CustomLocation({
     required this.id,
@@ -39,6 +40,7 @@ class CustomLocation extends SearchableItem {
     double? routeLng,
     this.walkingPath,
     this.entrances,
+    this.hasAccuracyWarning = false,
   }) : routeLat = routeLat ?? lat,
        routeLng = routeLng ?? lng;
 
@@ -54,6 +56,7 @@ class CustomLocation extends SearchableItem {
     double? routeLng,
     List<LatLng>? walkingPath,
     List<LatLng>? entrances,
+    bool? hasAccuracyWarning,
     bool clearWalkingPath = false,
   }) {
     return CustomLocation(
@@ -68,6 +71,7 @@ class CustomLocation extends SearchableItem {
       routeLng: routeLng ?? this.routeLng,
       walkingPath: clearWalkingPath ? null : (walkingPath ?? this.walkingPath),
       entrances: entrances ?? this.entrances,
+      hasAccuracyWarning: hasAccuracyWarning ?? this.hasAccuracyWarning,
     );
   }
 }

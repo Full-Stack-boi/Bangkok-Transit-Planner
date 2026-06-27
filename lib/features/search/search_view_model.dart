@@ -77,7 +77,7 @@ class SearchState {
 }
 
 /// ViewModel for search feature
-@riverpod
+@Riverpod(keepAlive: true)
 class SearchViewModel extends _$SearchViewModel {
   bool _mounted = true;
 
@@ -143,31 +143,36 @@ class SearchViewModel extends _$SearchViewModel {
   Future<SearchableItem> _resolveItem(SearchableItem item) async {
     if (item is! CustomLocation) return item;
 
-    state = state.copyWith(isCalculating: true, clearError: true);
-    final repo = ref.read(transitRepositoryProvider);
+    try {
+      state = state.copyWith(isCalculating: true, clearError: true);
+      final repo = ref.read(transitRepositoryProvider);
 
-    // First, try matching with local landmarks (like MBK Center) by name to use curated entrances
-    final queryLower = item.nameTh.toLowerCase();
-    for (final l in repo.landmarks) {
-      if (l.nameTh.toLowerCase() == queryLower ||
-          l.nameEn.toLowerCase() == item.nameEn.toLowerCase() ||
-          l.nameTh.toLowerCase().contains(queryLower)) {
-        return l; // Return the perfectly curated local landmark instead
+      // First, try matching with local landmarks (like MBK Center) by name to use curated entrances
+      final queryLower = item.nameTh.toLowerCase();
+      for (final l in repo.landmarks) {
+        if (l.nameTh.toLowerCase() == queryLower ||
+            l.nameEn.toLowerCase() == item.nameEn.toLowerCase() ||
+            l.nameTh.toLowerCase().contains(queryLower)) {
+          return l; // Return the perfectly curated local landmark instead
+        }
       }
-    }
 
-    // Second, snap to a local landmark if the coordinates are extremely close (e.g., within 250 meters)
-    // This catches aliases like "MBK", "มาบุญครอง", or user tapping on the map near the mall.
-    for (final l in repo.landmarks) {
-      final dist = Geolocator.distanceBetween(item.lat, item.lng, l.lat, l.lng);
-      if (dist <= 250.0) {
-        return l; // Snap to perfectly curated local landmark
+      // Second, snap to a local landmark if the coordinates are extremely close (e.g., within 250 meters)
+      // This catches aliases like "MBK", "มาบุญครอง", or user tapping on the map near the mall.
+      for (final l in repo.landmarks) {
+        final dist = Geolocator.distanceBetween(item.lat, item.lng, l.lat, l.lng);
+        if (dist <= 250.0) {
+          return l; // Snap to perfectly curated local landmark
+        }
       }
-    }
 
-    // Deep resolve via Overpass + OSRM
-    final resolved = await repo.resolveOnlinePlaceAsync(item);
-    return resolved ?? item;
+      // Deep resolve via Overpass + OSRM
+      final resolved = await repo.resolveOnlinePlaceAsync(item);
+      return resolved ?? item;
+    } catch (e, stack) {
+      print('Error resolving item in _resolveItem: $e\n$stack');
+      return item; // Safe fallback
+    }
   }
 
   /// Set origin station or place
@@ -201,20 +206,30 @@ class SearchViewModel extends _$SearchViewModel {
     SearchableItem origin,
     SearchableItem destination,
   ) async {
-    state = state.copyWith(isCalculating: true, clearError: true);
-    final results = await Future.wait([
-      _resolveItem(origin),
-      _resolveItem(destination),
-    ]);
-    if (!_mounted) return;
-    state = state.copyWith(
-      origin: results[0],
-      destination: results[1],
-      clearRoute: true,
-      clearError: true,
-      isCalculating: false,
-    );
-    _tryCalculateRoute();
+    try {
+      state = state.copyWith(isCalculating: true, clearError: true);
+      final results = await Future.wait([
+        _resolveItem(origin),
+        _resolveItem(destination),
+      ]);
+      if (!_mounted) return;
+      state = state.copyWith(
+        origin: results[0],
+        destination: results[1],
+        clearRoute: true,
+        clearError: true,
+        isCalculating: false,
+      );
+      _tryCalculateRoute();
+    } catch (e, stack) {
+      print('Error in setRoute: $e\n$stack');
+      if (_mounted) {
+        state = state.copyWith(
+          isCalculating: false,
+          error: e.toString(),
+        );
+      }
+    }
   }
 
   /// Swap origin and destination
@@ -1376,20 +1391,24 @@ class SearchViewModel extends _$SearchViewModel {
     RouteResult recommended,
     RouteResult? saver,
   ) async {
-    final hydratedRecommended = await _hydrateRouteWalkingPaths(recommended);
-    RouteResult? hydratedSaver;
-    if (saver != null) {
-      hydratedSaver = await _hydrateRouteWalkingPaths(saver);
-    }
+    try {
+      final hydratedRecommended = await _hydrateRouteWalkingPaths(recommended);
+      RouteResult? hydratedSaver;
+      if (saver != null) {
+        hydratedSaver = await _hydrateRouteWalkingPaths(saver);
+      }
 
-    if (_mounted) {
-      state = state.copyWith(
-        routeResult: state.activeRouteType == 'recommended'
-            ? hydratedRecommended
-            : (hydratedSaver ?? state.routeResult),
-        regularRoute: hydratedRecommended,
-        saverRoute: hydratedSaver,
-      );
+      if (_mounted) {
+        state = state.copyWith(
+          routeResult: state.activeRouteType == 'recommended'
+              ? hydratedRecommended
+              : (hydratedSaver ?? state.routeResult),
+          regularRoute: hydratedRecommended,
+          saverRoute: hydratedSaver,
+        );
+      }
+    } catch (e, stack) {
+      print('Error hydrating walking paths: $e\n$stack');
     }
   }
 
