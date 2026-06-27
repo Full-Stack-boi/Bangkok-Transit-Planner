@@ -402,8 +402,15 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
         final String routeDisplayName = (routeName == null || routeName.isEmpty || routeName == 'เส้นทางไม่มีชื่อ')
             ? t.favorites.unnamedRoute
             : routeName;
-        final originName = route['origin_name'] ?? '';
-        final destinationName = route['destination_name'] ?? '';
+        String originName = route['origin_name'] ?? '';
+        String destinationName = route['destination_name'] ?? '';
+        if (originName.isEmpty || destinationName.isEmpty) {
+          final nameParts = (route['name'] ?? '').split(' - ');
+          if (nameParts.length >= 2) {
+            if (originName.isEmpty) originName = nameParts[0];
+            if (destinationName.isEmpty) destinationName = nameParts[1];
+          }
+        }
         final originLatStr = route['origin_lat'];
         final originLngStr = route['origin_lng'];
         final destLatStr = route['destination_lat'];

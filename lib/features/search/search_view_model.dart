@@ -149,11 +149,13 @@ class SearchViewModel extends _$SearchViewModel {
 
       // First, try matching with local landmarks (like MBK Center) by name to use curated entrances
       final queryLower = item.nameTh.toLowerCase();
-      for (final l in repo.landmarks) {
-        if (l.nameTh.toLowerCase() == queryLower ||
-            l.nameEn.toLowerCase() == item.nameEn.toLowerCase() ||
-            l.nameTh.toLowerCase().contains(queryLower)) {
-          return l; // Return the perfectly curated local landmark instead
+      if (queryLower.isNotEmpty) {
+        for (final l in repo.landmarks) {
+          if (l.nameTh.toLowerCase() == queryLower ||
+              l.nameEn.toLowerCase() == item.nameEn.toLowerCase() ||
+              l.nameTh.toLowerCase().contains(queryLower)) {
+            return l; // Return the perfectly curated local landmark instead
+          }
         }
       }
 
