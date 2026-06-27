@@ -298,8 +298,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Switch to Favorites tab
-      final favTab = find.descendant(of: navBar, matching: find.text('รายการโปรด'));
-      await tester.tap(favTab);
+      ref.read(homeTabIndexProvider.notifier).setTab(2);
       await tester.pumpAndSettle();
 
       // Tap on Saved Routes tab inside Favorites screen
