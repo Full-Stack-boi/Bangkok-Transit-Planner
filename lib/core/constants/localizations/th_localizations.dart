@@ -85,6 +85,8 @@ class ThaiSearch implements BaseSearch {
   @override
   String get loadingStations => 'กำลังโหลดข้อมูลสถานี...';
   @override
+  String get calculatingRoute => 'กำลังค้นหาเส้นทางที่ดีที่สุด...';
+  @override
   String get searchDesc => 'พิมพ์ชื่อสถานีเพื่อค้นหา\nรองรับ BTS, MRT, Airport Rail Link';
   @override
   String get noStationFound => 'ไม่พบสถานี';

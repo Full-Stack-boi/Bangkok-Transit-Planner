@@ -45,6 +45,7 @@ abstract class BaseSearch {
   String get selectStationTitle;
   String get selectStationSubtitle;
   String get loadingStations;
+  String get calculatingRoute;
   String get searchDesc;
   String get noStationFound;
   String get popularLandmark;

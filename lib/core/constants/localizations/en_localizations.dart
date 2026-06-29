@@ -85,6 +85,8 @@ class EnglishSearch implements BaseSearch {
   @override
   String get loadingStations => 'Loading station data...';
   @override
+  String get calculatingRoute => 'Calculating optimal route...';
+  @override
   String get searchDesc => 'Type station name to search\nSupports BTS, MRT, Airport Rail Link';
   @override
   String get noStationFound => 'No station found';

@@ -17,6 +17,8 @@ import '../../models/route_result.dart';
 import '../../providers/providers.dart';
 import '../../repositories/favorites_repository.dart';
 import '../search/search_view_model.dart';
+import '../utility/route_calculating_overlay.dart';
+
 import '../../core/constants/translation_helper.dart';
 import 'widgets/map_search_overlay.dart';
 import 'widgets/route_result_banner.dart';
@@ -1034,6 +1036,17 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                 localeCode,
               ),
             ),
+
+          // ─── Route Calculating Overlay ───
+          Consumer(
+            builder: (context, ref, child) {
+              final isCalculating = ref.watch(
+                searchViewModelProvider.select((s) => s.isCalculating),
+              );
+              if (!isCalculating) return const SizedBox.shrink();
+              return RouteCalculatingOverlay(theme: theme, t: t);
+            },
+          ),
 
           if (_isOfflineMapInitializing)
             Positioned.fill(

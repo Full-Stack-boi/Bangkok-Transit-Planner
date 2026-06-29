@@ -8,6 +8,8 @@ import '../../models/station.dart';
 import '../../models/custom_location.dart';
 import '../../providers/providers.dart';
 import '../search/search_view_model.dart';
+import '../utility/route_calculating_overlay.dart';
+
 import 'favorites_view_model.dart';
 import '../../core/constants/translation_helper.dart';
 import '../../repositories/transit_repository.dart';
@@ -42,34 +44,49 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
     final t = ref.watch(translationsProvider);
     final localeCode = ref.watch(localeProvider);
 
-    return DefaultTabController(
-      length: 2,
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(t.navigation.favoritesTitle),
-          bottom: TabBar(
-            tabs: [
-              Tab(
-                icon: const Icon(Icons.favorite_rounded),
-                text: t.favorites.favStationsTab,
+    return Stack(
+      children: [
+        DefaultTabController(
+          length: 2,
+          child: Scaffold(
+            appBar: AppBar(
+              title: Text(t.navigation.favoritesTitle),
+              bottom: TabBar(
+                tabs: [
+                  Tab(
+                    icon: const Icon(Icons.favorite_rounded),
+                    text: t.favorites.favStationsTab,
+                  ),
+                  Tab(
+                    icon: const Icon(Icons.route_rounded),
+                    text: t.favorites.favRoutesTab,
+                  ),
+                ],
+                indicatorColor: theme.colorScheme.primary,
+                labelColor: theme.colorScheme.primary,
+                unselectedLabelColor: theme.colorScheme.onSurface.withValues(alpha: 0.6),
               ),
-              Tab(
-                icon: const Icon(Icons.route_rounded),
-                text: t.favorites.favRoutesTab,
-              ),
-            ],
-            indicatorColor: theme.colorScheme.primary,
-            labelColor: theme.colorScheme.primary,
-            unselectedLabelColor: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+            ),
+            body: TabBarView(
+              children: [
+                _buildStationsTab(context, state, vm, theme, t, localeCode),
+                _buildRoutesTab(context, state, vm, theme, t, localeCode),
+              ],
+            ),
           ),
         ),
-        body: TabBarView(
-          children: [
-            _buildStationsTab(context, state, vm, theme, t, localeCode),
-            _buildRoutesTab(context, state, vm, theme, t, localeCode),
-          ],
+
+        // ─── Route Calculating Overlay ───
+        Consumer(
+          builder: (context, ref, child) {
+            final isCalculating = ref.watch(
+              searchViewModelProvider.select((s) => s.isCalculating),
+            );
+            if (!isCalculating) return const SizedBox.shrink();
+            return RouteCalculatingOverlay(theme: theme, t: t);
+          },
         ),
-      ),
+      ],
     );
   }
 
