@@ -182,6 +182,7 @@ abstract class BaseSettings {
 
 abstract class BaseJourney {
   String get startJourneyBtn;
+  String get simulateJourneyBtn;
   String get endJourneyBtn;
   String get currentStationLabel;
   String get nextStationLabel;

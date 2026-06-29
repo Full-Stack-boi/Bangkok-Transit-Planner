@@ -156,31 +156,74 @@ class RouteTracker extends Notifier<RouteTrackerState> {
   void updateLocation(Position position) {
     if (state.activeRoute == null || !state.isActive || state.hasArrived) return;
 
-    // Proximity threshold of 200 meters to trigger station arrival
-    const double threshold = 200.0;
+    final segment = state.currentSegment;
+    if (segment == null) return;
 
-    final stations = state.currentSegmentStations;
-    if (stations.isEmpty) return;
+    final isWalk = segment.lineId == 'WALK';
 
-    final nextIdx = state.currentStationIndex + 1;
-    if (nextIdx >= stations.length) {
-      _advanceSegment();
-      return;
-    }
+    if (isWalk) {
+      // For walking segments, track progress towards the destination of the segment
+      final to = segment.toStation;
+      final dist = Geolocator.distanceBetween(
+        position.latitude,
+        position.longitude,
+        to.lat,
+        to.lng,
+      );
 
-    final next = stations[nextIdx];
-    final dist = Geolocator.distanceBetween(
-      position.latitude,
-      position.longitude,
-      next.lat,
-      next.lng,
-    );
-    
-    if (dist <= threshold) {
-      if (nextIdx == stations.length - 1) {
+      // Walking arrival threshold: 80 meters
+      if (dist <= 80.0) {
         _advanceSegment();
-      } else {
-        state = state.copyWith(currentStationIndex: nextIdx);
+      }
+    } else {
+      // For transit line segments, track progress station-by-station
+      final stations = state.currentSegmentStations;
+      if (stations.isEmpty) {
+        // Fallback: if somehow stations list is empty, check distance to segment destination
+        final dist = Geolocator.distanceBetween(
+          position.latitude,
+          position.longitude,
+          segment.toStation.lat,
+          segment.toStation.lng,
+        );
+        if (dist <= 150.0) {
+          _advanceSegment();
+        }
+        return;
+      }
+
+      final nextIdx = state.currentStationIndex + 1;
+      if (nextIdx >= stations.length) {
+        // We are already at the last station of this segment
+        // Check if we are close to the final station to advance segment
+        final lastStation = stations.last;
+        final dist = Geolocator.distanceBetween(
+          position.latitude,
+          position.longitude,
+          lastStation.lat,
+          lastStation.lng,
+        );
+        if (dist <= 150.0) {
+          _advanceSegment();
+        }
+        return;
+      }
+
+      final next = stations[nextIdx];
+      final dist = Geolocator.distanceBetween(
+        position.latitude,
+        position.longitude,
+        next.lat,
+        next.lng,
+      );
+
+      // Transit station arrival threshold: 150 meters
+      if (dist <= 150.0) {
+        if (nextIdx == stations.length - 1) {
+          _advanceSegment();
+        } else {
+          state = state.copyWith(currentStationIndex: nextIdx);
+        }
       }
     }
   }

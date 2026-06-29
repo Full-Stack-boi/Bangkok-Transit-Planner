@@ -355,6 +355,8 @@ class ThaiJourney implements BaseJourney {
   @override
   String get startJourneyBtn => 'เริ่มการเดินทาง';
   @override
+  String get simulateJourneyBtn => 'จำลองการเดินทาง';
+  @override
   String get endJourneyBtn => 'สิ้นสุดการเดินทาง';
   @override
   String get currentStationLabel => 'สถานีปัจจุบัน';

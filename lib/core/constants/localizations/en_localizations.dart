@@ -355,6 +355,8 @@ class EnglishJourney implements BaseJourney {
   @override
   String get startJourneyBtn => 'Start Journey';
   @override
+  String get simulateJourneyBtn => 'Simulate Journey';
+  @override
   String get endJourneyBtn => 'End Journey';
   @override
   String get currentStationLabel => 'Current Station';

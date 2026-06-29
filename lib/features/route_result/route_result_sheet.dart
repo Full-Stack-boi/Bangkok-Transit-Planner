@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/transit_colors.dart';
@@ -196,20 +197,41 @@ class RouteResultSheet extends ConsumerWidget {
           ],
         ),
         const SizedBox(height: 12),
-        ElevatedButton.icon(
-          onPressed: () {
-            // Start the journey with simulation mode enabled by default for easy testing
-            ref.read(routeTrackerProvider.notifier).startTracking(result, simulation: true);
-            Navigator.pop(context);
-          },
-          icon: const Icon(Icons.navigation_rounded),
-          label: Text(t.journey.startJourneyBtn),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: theme.colorScheme.primary,
-            foregroundColor: theme.colorScheme.onPrimary,
-            minimumSize: const Size.fromHeight(48),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          ),
+        Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ElevatedButton.icon(
+              onPressed: () {
+                ref.read(routeTrackerProvider.notifier).startTracking(result, simulation: false);
+                Navigator.pop(context);
+              },
+              icon: const Icon(Icons.navigation_rounded),
+              label: Text(t.journey.startJourneyBtn),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: theme.colorScheme.primary,
+                foregroundColor: theme.colorScheme.onPrimary,
+                minimumSize: const Size.fromHeight(48),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+            ),
+            if (kDebugMode) ...[
+              const SizedBox(height: 8),
+              OutlinedButton.icon(
+                onPressed: () {
+                  ref.read(routeTrackerProvider.notifier).startTracking(result, simulation: true);
+                  Navigator.pop(context);
+                },
+                icon: const Icon(Icons.videogame_asset_outlined),
+                label: Text(t.journey.simulateJourneyBtn),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: theme.colorScheme.primary,
+                  minimumSize: const Size.fromHeight(48),
+                  side: BorderSide(color: theme.colorScheme.primary),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+              ),
+            ],
+          ],
         ),
       ],
     );
