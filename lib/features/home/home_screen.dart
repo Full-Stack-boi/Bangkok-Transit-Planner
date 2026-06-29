@@ -192,57 +192,49 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final t = ref.watch(translationsProvider);
 
     return Scaffold(
-      body: Column(
-        children: [
-          Expanded(
-            child: initState.when(
-              data: (_) => Stack(
-                children: [
-                  IndexedStack(
-                    index: currentIndex,
-                    children: [
-                      UtilityScreen(key: ValueKey('utility_${t.localeCode}')),
-                      // Use deferred loading for MapScreen to reduce initial bundle size
-                      // Only trigger loadLibrary when this tab is selected to maximize performance
-                      if (currentIndex == 1)
-                        FutureBuilder(
-                          future: map_screen.loadLibrary(),
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState == ConnectionState.done) {
-                              return map_screen.MapScreen(key: ValueKey('map_${t.localeCode}'));
-                            }
-                            return const Center(child: CircularProgressIndicator());
-                          },
-                        )
-                      else
-                        const SizedBox.shrink(),
-                      FavoritesScreen(key: ValueKey('favorites_${t.localeCode}')),
-                      SettingsScreen(key: ValueKey('settings_${t.localeCode}')),
-                    ],
-                  ),
-                  if (_showInAppBanner)
-                    Positioned(
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      child: InAppNotificationBanner(
-                        title: _bannerTitle,
-                        body: _bannerBody,
-                        onTap: _onBannerTap,
-                        onDismiss: _onBannerDismiss,
-                      ),
-                    ),
-                ],
-              ),
-              loading: () => _LoadingView(t: t),
-              error: (error, _) => _ErrorView(error: error.toString(), t: t),
+      body: initState.when(
+        data: (_) => Stack(
+          children: [
+            IndexedStack(
+              index: currentIndex,
+              children: [
+                UtilityScreen(key: ValueKey('utility_${t.localeCode}')),
+                // Use deferred loading for MapScreen to reduce initial bundle size
+                // Only trigger loadLibrary when this tab is selected to maximize performance
+                if (currentIndex == 1)
+                  FutureBuilder(
+                    future: map_screen.loadLibrary(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.done) {
+                        return map_screen.MapScreen(key: ValueKey('map_${t.localeCode}'));
+                      }
+                      return const Center(child: CircularProgressIndicator());
+                    },
+                  )
+                else
+                  const SizedBox.shrink(),
+                FavoritesScreen(key: ValueKey('favorites_${t.localeCode}')),
+                SettingsScreen(key: ValueKey('settings_${t.localeCode}')),
+              ],
             ),
-          ),
-          // Clean Navigation Bar that reacts directly to the global state.
-          // Using a unique key per locale forces a clean redraw without scoped conflicts.
-          const AppBottomNavigationBar(),
-        ],
+            if (_showInAppBanner)
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                child: InAppNotificationBanner(
+                  title: _bannerTitle,
+                  body: _bannerBody,
+                  onTap: _onBannerTap,
+                  onDismiss: _onBannerDismiss,
+                ),
+              ),
+          ],
+        ),
+        loading: () => _LoadingView(t: t),
+        error: (error, _) => _ErrorView(error: error.toString(), t: t),
       ),
+      bottomNavigationBar: const AppBottomNavigationBar(),
     );
   }
 }
@@ -258,6 +250,7 @@ class AppBottomNavigationBar extends ConsumerWidget {
     final t = AppLocalizations(locale);
 
     return NavigationBar(
+      height: 66.0,
       key: ValueKey('nav_bar_$locale'),
       selectedIndex: currentIndex,
       onDestinationSelected: (index) {

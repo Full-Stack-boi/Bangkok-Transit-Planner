@@ -1,8 +1,11 @@
 import 'dart:async';
+import 'package:flutter/services.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import '../models/route_result.dart';
 import '../models/station.dart';
+import '../services/journey_activity_service.dart';
 
 class RouteTrackerState {
   final RouteResult? activeRoute;
@@ -95,6 +98,60 @@ class RouteTracker extends Notifier<RouteTrackerState> {
     return RouteTrackerState();
   }
 
+  void _setupActionChannelListener() {
+    try {
+      const channel = MethodChannel('bkktransit/journey_actions');
+      channel.setMethodCallHandler((call) async {
+        if (call.method == 'ACTION_NEXT_STATION') {
+          advanceSimulation();
+        } else if (call.method == 'ACTION_STOP_JOURNEY') {
+          stopTracking();
+        }
+      });
+    } catch (e) {
+      debugPrint("Skipping action channel handler setup in unit test: $e");
+    }
+  }
+
+  void _subscribeToPositionStream() {
+    _positionSubscription?.cancel();
+    if (state.isSimulation || !state.isActive || state.hasArrived) return;
+
+    final segment = state.currentSegment;
+    final isWalk = segment?.lineId == 'WALK';
+
+    LocationSettings settings;
+    if (kIsWeb) {
+      settings = const LocationSettings(accuracy: LocationAccuracy.high, distanceFilter: 10);
+    } else if (defaultTargetPlatform == TargetPlatform.android) {
+      settings = AndroidSettings(
+        accuracy: LocationAccuracy.high,
+        distanceFilter: isWalk ? 15 : 30,
+        intervalDuration: Duration(seconds: isWalk ? 10 : 8),
+      );
+    } else {
+      settings = AppleSettings(
+        accuracy: LocationAccuracy.high,
+        distanceFilter: isWalk ? 15 : 30,
+        activityType: isWalk ? ActivityType.fitness : ActivityType.otherNavigation,
+        pauseLocationUpdatesAutomatically: true,
+        showBackgroundLocationIndicator: true,
+      );
+    }
+
+    _positionSubscription = Geolocator.getPositionStream(
+      locationSettings: settings,
+    ).listen(
+      (Position position) {
+        updateLocation(position);
+      },
+      onError: (error) {
+        debugPrint("Location stream error (likely location service disabled): $error");
+      },
+      cancelOnError: false,
+    );
+  }
+
   void startTracking(RouteResult route, {bool simulation = false}) {
     state = RouteTrackerState(
       activeRoute: route,
@@ -105,22 +162,26 @@ class RouteTracker extends Notifier<RouteTrackerState> {
       hasArrived: false,
     );
 
-    _positionSubscription?.cancel();
+    _setupActionChannelListener();
+    JourneyActivityService.start(state);
+
     if (!simulation) {
-      _positionSubscription = Geolocator.getPositionStream(
-        locationSettings: const LocationSettings(
-          accuracy: LocationAccuracy.high,
-          distanceFilter: 10,
-        ),
-      ).listen((Position position) {
-        updateLocation(position);
-      });
+      _subscribeToPositionStream();
     }
   }
 
   void stopTracking() {
     _positionSubscription?.cancel();
     _positionSubscription = null;
+    
+    try {
+      const channel = MethodChannel('bkktransit/journey_actions');
+      channel.setMethodCallHandler(null);
+    } catch (e) {
+      // Ignore missing binary messenger in unit tests
+    }
+    
+    JourneyActivityService.stop();
     state = RouteTrackerState();
   }
 
@@ -134,6 +195,7 @@ class RouteTracker extends Notifier<RouteTrackerState> {
     final stations = state.currentSegmentStations;
     if (stations.isNotEmpty && state.currentStationIndex < stations.length - 1) {
       state = state.copyWith(currentStationIndex: state.currentStationIndex + 1);
+      JourneyActivityService.update(state);
     } else {
       _advanceSegment();
     }
@@ -148,8 +210,14 @@ class RouteTracker extends Notifier<RouteTrackerState> {
         currentSegmentIndex: state.currentSegmentIndex + 1,
         currentStationIndex: 0,
       );
+      
+      if (!state.isSimulation) {
+        _subscribeToPositionStream();
+      }
+      JourneyActivityService.update(state);
     } else {
       state = state.copyWith(hasArrived: true);
+      JourneyActivityService.stop();
     }
   }
 
@@ -162,7 +230,6 @@ class RouteTracker extends Notifier<RouteTrackerState> {
     final isWalk = segment.lineId == 'WALK';
 
     if (isWalk) {
-      // For walking segments, track progress towards the destination of the segment
       final to = segment.toStation;
       final dist = Geolocator.distanceBetween(
         position.latitude,
@@ -171,21 +238,30 @@ class RouteTracker extends Notifier<RouteTrackerState> {
         to.lng,
       );
 
-      // Walking arrival threshold: 80 meters
+      JourneyActivityService.update(
+        state,
+        speedKmh: position.speed * 3.6,
+        walkMeters: dist.round(),
+      );
+
       if (dist <= 80.0) {
         _advanceSegment();
       }
     } else {
-      // For transit line segments, track progress station-by-station
       final stations = state.currentSegmentStations;
       if (stations.isEmpty) {
-        // Fallback: if somehow stations list is empty, check distance to segment destination
         final dist = Geolocator.distanceBetween(
           position.latitude,
           position.longitude,
           segment.toStation.lat,
           segment.toStation.lng,
         );
+        
+        JourneyActivityService.update(
+          state,
+          speedKmh: position.speed * 3.6,
+        );
+
         if (dist <= 150.0) {
           _advanceSegment();
         }
@@ -194,8 +270,6 @@ class RouteTracker extends Notifier<RouteTrackerState> {
 
       final nextIdx = state.currentStationIndex + 1;
       if (nextIdx >= stations.length) {
-        // We are already at the last station of this segment
-        // Check if we are close to the final station to advance segment
         final lastStation = stations.last;
         final dist = Geolocator.distanceBetween(
           position.latitude,
@@ -203,6 +277,12 @@ class RouteTracker extends Notifier<RouteTrackerState> {
           lastStation.lat,
           lastStation.lng,
         );
+        
+        JourneyActivityService.update(
+          state,
+          speedKmh: position.speed * 3.6,
+        );
+
         if (dist <= 150.0) {
           _advanceSegment();
         }
@@ -217,12 +297,17 @@ class RouteTracker extends Notifier<RouteTrackerState> {
         next.lng,
       );
 
-      // Transit station arrival threshold: 150 meters
+      JourneyActivityService.update(
+        state,
+        speedKmh: position.speed * 3.6,
+      );
+
       if (dist <= 150.0) {
         if (nextIdx == stations.length - 1) {
           _advanceSegment();
         } else {
           state = state.copyWith(currentStationIndex: nextIdx);
+          JourneyActivityService.update(state, speedKmh: position.speed * 3.6);
         }
       }
     }

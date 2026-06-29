@@ -403,16 +403,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         }
 
         // Add markers for only these stations
-        LatLngBounds? bounds;
-        try {
-          bounds = _mapController.camera.visibleBounds;
-        } catch (_) {
-          // Fallback if camera is not initialized yet
-        }
 
         for (final station in routeStations) {
           final point = LatLng(station.lat, station.lng);
-          if (bounds != null && !bounds.contains(point)) continue;
 
           final lineColor = TransitColors.getLineColor(station.lineId);
           final isInterchange = station.interchange.isNotEmpty;
@@ -459,7 +452,6 @@ class _MapScreenState extends ConsumerState<MapScreen> {
 
             final exit = segment.exit!;
             final point = LatLng(exit.lat, exit.lng);
-            if (bounds != null && !bounds.contains(point)) continue;
 
             newMarkers.add(
               Marker(
@@ -568,7 +560,6 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                   (p1.latitude + p2.latitude) / 2,
                   (p1.longitude + p2.longitude) / 2,
                 );
-                if (bounds != null && !bounds.contains(midpoint)) continue;
 
                 // Calculate bearing in radians
                 final lat1 = p1.latitude * math.pi / 180.0;
