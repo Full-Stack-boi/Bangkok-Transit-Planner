@@ -3,8 +3,13 @@ on:
   push:
     branches:
       - main
-      - master # เพิ่ม master เผื่อไว้ครับ
-  workflow_dispatch: # เพิ่มเพื่อให้กดรันเอง (Manual) ได้ครับ
+      - master
+    paths-ignore:
+      - '**.md'
+      - '.gitignore'
+      - 'config.example.json'
+      - 'LICENSE'
+  workflow_dispatch:
 
 jobs:
   build-and-deploy:
@@ -27,7 +32,6 @@ jobs:
         with:
           path: assets/map_tiles.bundle
           key: ${{ runner.os }}-map-bundle-${{ hashFiles('bin/generate_bundle.py', 'assets/data/stations.json') }}
-          # นำ restore-keys ออกชั่วคราวเพื่อความชัวร์ หรือปรับให้ตรงกันครับ
 
       - name: Generate Map Bundle
         if: steps.cache-map-bundle.outputs.cache-hit != 'true'

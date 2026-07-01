@@ -6,9 +6,20 @@ import 'package:latlong2/latlong.dart';
 class OverpassService {
   // Use Vercel Serverless Function proxy on Web to bypass CORS and avoid 404s.
   // For other platforms (Android/iOS), use the direct LZ4 mirror URL.
-  final String _baseUrl = kIsWeb
-      ? '/api/overpass'
-      : 'https://lz4.overpass-api.de/api/interpreter';
+  final String _baseUrl = () {
+    const envUrl = String.fromEnvironment('OVERPASS_BASE_URL');
+    if (kIsWeb) {
+      // Direct Overpass API calls will always fail on Web due to CORS.
+      // Force the local Vercel serverless proxy if the URL is empty or direct.
+      if (envUrl.isEmpty || envUrl.contains('overpass-api.de') || envUrl.contains('openstreetmap.org')) {
+        return '/api/overpass';
+      }
+      return envUrl;
+    }
+    return envUrl.isNotEmpty
+        ? envUrl
+        : 'https://lz4.overpass-api.de/api/interpreter';
+  }();
 
   Future<List<LatLng>> findEntrances(
     double lat,

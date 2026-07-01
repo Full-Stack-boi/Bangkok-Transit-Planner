@@ -12,8 +12,15 @@ class SupabaseService {
 
     try {
       // In production, these would be loaded from environment config
-      const supabaseUrl = 'https://REDACTED_SUPABASE_PROJECT_ID.supabase.co';
-      const supabaseAnonKey = 'REDACTED_SUPABASE_ANON_KEY';
+      const envUrl = String.fromEnvironment('SUPABASE_URL');
+      const envKey = String.fromEnvironment('SUPABASE_ANON_KEY');
+
+      final supabaseUrl = envUrl.isNotEmpty
+          ? envUrl
+          : 'https://REDACTED_SUPABASE_PROJECT_ID.supabase.co';
+      final supabaseAnonKey = envKey.isNotEmpty
+          ? envKey
+          : 'REDACTED_SUPABASE_ANON_KEY';
 
       // Simple validation to ensure non-empty strings before initializing
       if (supabaseUrl.isNotEmpty && supabaseAnonKey.isNotEmpty && !supabaseUrl.contains('PLACEHOLDER')) {
