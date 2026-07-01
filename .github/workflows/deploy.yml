@@ -53,7 +53,12 @@ jobs:
           rm -f assets/map_tiles.bundle
 
       - name: Build Web
-        run: flutter build web --release --tree-shake-icons
+        run: |
+          flutter build web --release --tree-shake-icons \
+            --dart-define=SUPABASE_URL=${{ secrets.SUPABASE_URL }} \
+            --dart-define=SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }} \
+            --dart-define=OSRM_BASE_URL=${{ secrets.OSRM_BASE_URL }} \
+            --dart-define=OVERPASS_BASE_URL=${{ secrets.OVERPASS_BASE_URL }}
 
       - name: Install Vercel CLI
         run: npm install --global vercel@latest
