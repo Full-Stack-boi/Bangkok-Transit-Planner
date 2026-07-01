@@ -1,0 +1,6 @@
+{
+  "SUPABASE_URL": "PLACEHOLDER_SUPABASE_URL",
+  "SUPABASE_ANON_KEY": "PLACEHOLDER_SUPABASE_ANON_KEY",
+  "OSRM_BASE_URL": "https://router.project-osrm.org/route/v1/foot",
+  "OVERPASS_BASE_URL": "https://lz4.overpass-api.de/api/interpreter"
+}

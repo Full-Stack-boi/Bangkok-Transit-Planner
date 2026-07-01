@@ -66,3 +66,6 @@ app.*.map.json
 /assets/map_tiles.bundle
 .vercel
 .env*
+
+# Local compile-time config (use config.example.json as template)
+config.json
