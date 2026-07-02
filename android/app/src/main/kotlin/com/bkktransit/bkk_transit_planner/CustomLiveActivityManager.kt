@@ -48,14 +48,22 @@ class CustomLiveActivityManager(context: Context) : LiveActivityManager(context)
         val isWalking = data["isWalking"] as? Boolean ?: false
         val isSimulation = data["isSimulation"] as? Boolean ?: false
 
+        val directionText = data["directionText"] as? String ?: ""
+        val walkText = data["walkText"] as? String ?: ""
+        val etaText = data["etaText"] as? String ?: ""
+        val speedText = data["speedText"] as? String ?: ""
+        val travelModeText = data["travelModeText"] as? String ?: ""
+        val walkingAction = data["walkingAction"] as? String ?: ""
+        val contentText = data["contentText"] as? String ?: ""
+
         remoteViews.setTextViewText(R.id.tv_line_name, lineName)
         
         if (isWalking) {
-            remoteViews.setTextViewText(R.id.tv_direction, "เดินเท้า")
-            remoteViews.setTextViewText(R.id.tv_walk_meters, "🚶 เดินเท้าอีก ${walkMeters} ม.")
+            remoteViews.setTextViewText(R.id.tv_direction, walkingAction)
+            remoteViews.setTextViewText(R.id.tv_walk_meters, walkText)
         } else {
-            remoteViews.setTextViewText(R.id.tv_direction, "มุ่งหน้า ${destinationStation}")
-            remoteViews.setTextViewText(R.id.tv_walk_meters, "🚇 นั่งรถไฟฟ้า")
+            remoteViews.setTextViewText(R.id.tv_direction, directionText)
+            remoteViews.setTextViewText(R.id.tv_walk_meters, travelModeText)
         }
 
         remoteViews.setProgressBar(R.id.pb_progress, stationsTotal, stationsDone, false)
@@ -70,8 +78,8 @@ class CustomLiveActivityManager(context: Context) : LiveActivityManager(context)
         remoteViews.setTextViewText(R.id.tv_current_station, currentStation)
         remoteViews.setTextViewText(R.id.tv_next_station, nextStation)
         
-        remoteViews.setTextViewText(R.id.tv_eta, "⏱ อีก ${etaMinutes} นาที")
-        remoteViews.setTextViewText(R.id.tv_speed, String.format("💨 %.1f กม./ชม", speedKmh))
+        remoteViews.setTextViewText(R.id.tv_eta, etaText)
+        remoteViews.setTextViewText(R.id.tv_speed, speedText)
 
         val nextIntent = Intent(context, JourneyNotificationReceiver::class.java).apply {
             action = "ACTION_NEXT_STATION"
@@ -101,7 +109,7 @@ class CustomLiveActivityManager(context: Context) : LiveActivityManager(context)
             .setOngoing(true)
             .setSmallIcon(R.drawable.ic_train)
             .setContentTitle(lineName)
-            .setContentText("มุ่งหน้า ${destinationStation}")
+            .setContentText(contentText)
             .setContentIntent(pendingIntent)
             .setCategory(Notification.CATEGORY_NAVIGATION)
             .setVisibility(Notification.VISIBILITY_PUBLIC)
@@ -112,7 +120,6 @@ class CustomLiveActivityManager(context: Context) : LiveActivityManager(context)
         try {
             val color = Color.parseColor(lineColorHex)
             builder.setColor(color)
-            builder.setColorized(true)
         } catch (e: Exception) {
             // Ignore color parsing failures
         }

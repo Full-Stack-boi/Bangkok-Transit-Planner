@@ -18,20 +18,20 @@
         
         <TextView
             android:id="@+id/tv_line_name"
+            style="@style/TextAppearance.Compat.Notification.Title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="BTS สุขุมวิท"
-            android:textColor="#FFFFFF"
             android:textSize="16sp"
             android:textStyle="bold" />
             
         <TextView
             android:id="@+id/tv_direction"
+            style="@style/TextAppearance.Compat.Notification"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="มุ่งหน้า เคหะฯ"
-            android:textColor="#94A3B8"
             android:textSize="12sp" />
     </LinearLayout>
 
@@ -56,11 +56,11 @@
         
         <TextView
             android:id="@+id/tv_current_station"
+            style="@style/TextAppearance.Compat.Notification"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="อโศก"
-            android:textColor="#E2E8F0"
             android:textSize="14sp" />
             
         <TextView
@@ -72,11 +72,11 @@
             
         <TextView
             android:id="@+id/tv_next_station"
+            style="@style/TextAppearance.Compat.Notification.Title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="พร้อมพงษ์"
-            android:textColor="#F8FAFC"
             android:textSize="14sp"
             android:textStyle="bold"
             android:gravity="right" />
