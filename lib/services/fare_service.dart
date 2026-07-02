@@ -63,6 +63,34 @@ class FareService {
     45,  // 10+ stations
   ];
 
+  // ─── MRT Pink Line Fare Table ───
+  static const List<int> _mrtPinkFareTable = [
+    15,  // 0 stations
+    15,  // 1 station
+    20,  // 2 stations
+    25,  // 3 stations
+    28,  // 4 stations
+    30,  // 5 stations
+    33,  // 6 stations
+    35,  // 7 stations
+    38,  // 8 stations
+    40,  // 9 stations
+    45,  // 10+ stations
+  ];
+
+  // ─── SRT Red Line Fare Table ───
+  static const List<int> _srtRedFareTable = [
+    12,  // 0 stations
+    16,  // 1 station
+    20,  // 2 stations
+    24,  // 3 stations
+    28,  // 4 stations
+    32,  // 5 stations
+    36,  // 6 stations
+    40,  // 7 stations
+    42,  // 8+ stations
+  ];
+
   // ─── Airport Rail Link (ARL) Fare Table ───
   // Fixed fare by station pair (simplified: by number of stops)
   static const List<int> _arlFareTable = [
@@ -83,6 +111,7 @@ class FareService {
     String btsCardType = 'standard',
     String mrtCardType = 'standard',
     String arlCardType = 'standard',
+    String srtCardType = 'standard',
   }) {
     final table = _getFareTable(lineId);
     if (table == null) return 0;
@@ -94,6 +123,7 @@ class FareService {
     final isBts = lineId.startsWith('BTS');
     final isMrt = lineId.startsWith('MRT');
     final isArl = lineId == 'ARL';
+    final isSrt = lineId.startsWith('SRT');
 
     if (isBts) {
       if (btsCardType == 'senior') {
@@ -116,6 +146,12 @@ class FareService {
       } else if (arlCardType == 'senior') {
         return (standardFare * 0.5).round(); // 50% Senior discount
       }
+    } else if (isSrt) {
+      if (srtCardType == 'student') {
+        return (standardFare * 0.9).round(); // 10% Student discount
+      } else if (srtCardType == 'senior') {
+        return (standardFare * 0.5).round(); // 50% Senior discount
+      }
     }
 
     return standardFare;
@@ -127,6 +163,7 @@ class FareService {
     String btsCardType = 'standard',
     String mrtCardType = 'standard',
     String arlCardType = 'standard',
+    String srtCardType = 'standard',
   }) {
     int total = 0;
     for (final segment in segments) {
@@ -136,6 +173,7 @@ class FareService {
         btsCardType: btsCardType,
         mrtCardType: mrtCardType,
         arlCardType: arlCardType,
+        srtCardType: srtCardType,
       );
     }
     return total;
@@ -153,6 +191,12 @@ class FareService {
         return _mrtPurpleFareTable;
       case 'MRT_YELLOW':
         return _mrtYellowFareTable;
+      case 'MRT_PINK':
+      case 'MRT_PINK_BRANCH':
+        return _mrtPinkFareTable;
+      case 'SRT_RED_NORTH':
+      case 'SRT_RED_WEST':
+        return _srtRedFareTable;
       case 'ARL':
         return _arlFareTable;
       default:

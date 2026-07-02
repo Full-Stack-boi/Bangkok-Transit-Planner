@@ -90,6 +90,7 @@ class TransitRepository {
       if (!kDebugMode) {
         stationsList = stationsList.where((s) => 
           s.lineId != 'MRT_PINK' && 
+          s.lineId != 'MRT_PINK_BRANCH' && 
           s.lineId != 'SRT_RED_NORTH' && 
           s.lineId != 'SRT_RED_WEST'
         ).toList();
@@ -113,6 +114,7 @@ class TransitRepository {
       if (!kDebugMode) {
         linesList = linesList.where((l) => 
           l.id != 'MRT_PINK' && 
+          l.id != 'MRT_PINK_BRANCH' && 
           l.id != 'SRT_RED_NORTH' && 
           l.id != 'SRT_RED_WEST'
         ).toList();
@@ -484,10 +486,15 @@ class TransitRepository {
     }
 
     // 2. We have entrances. Find the one that gives the shortest OSRM path to its nearest station.
-    // Limit to top 5 entrances closest to the centroid by straight line to balance performance and accuracy.
-    entrances.sort((a, b) => 
-      Geolocator.distanceBetween(place.lat, place.lng, a.latitude, a.longitude)
-      .compareTo(Geolocator.distanceBetween(place.lat, place.lng, b.latitude, b.longitude))
+    // Sort by distance to the nearest transit station (not the POI centroid) so that for large
+    // complex POIs like airports, we prefer entrances on the station-facing side rather than
+    // far-away perimeter gates that would require routing around the entire building.
+    final anchorStation = findNearestStation(place.lat, place.lng);
+    final anchorLat = anchorStation?.lat ?? place.lat;
+    final anchorLng = anchorStation?.lng ?? place.lng;
+    entrances.sort((a, b) =>
+      Geolocator.distanceBetween(anchorLat, anchorLng, a.latitude, a.longitude)
+      .compareTo(Geolocator.distanceBetween(anchorLat, anchorLng, b.latitude, b.longitude))
     );
     final topEntrances = entrances.take(5).toList();
 

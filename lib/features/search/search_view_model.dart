@@ -1107,6 +1107,7 @@ class SearchViewModel extends _$SearchViewModel {
             btsCardType: cardState.btsCardType,
             mrtCardType: cardState.mrtCardType,
             arlCardType: cardState.arlCardType,
+            srtCardType: cardState.srtCardType,
           );
 
           segments.add(
@@ -1174,6 +1175,7 @@ class SearchViewModel extends _$SearchViewModel {
               btsCardType: cardState.btsCardType,
               mrtCardType: cardState.mrtCardType,
               arlCardType: cardState.arlCardType,
+              srtCardType: cardState.srtCardType,
             );
 
             segments.add(
@@ -1225,6 +1227,7 @@ class SearchViewModel extends _$SearchViewModel {
         btsCardType: cardState.btsCardType,
         mrtCardType: cardState.mrtCardType,
         arlCardType: cardState.arlCardType,
+        srtCardType: cardState.srtCardType,
       );
 
       segments.add(

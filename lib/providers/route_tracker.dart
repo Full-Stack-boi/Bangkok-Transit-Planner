@@ -6,6 +6,7 @@ import 'package:geolocator/geolocator.dart';
 import '../models/route_result.dart';
 import '../models/station.dart';
 import '../services/journey_activity_service.dart';
+import 'providers.dart';
 
 class RouteTrackerState {
   final RouteResult? activeRoute;
@@ -163,7 +164,8 @@ class RouteTracker extends Notifier<RouteTrackerState> {
     );
 
     _setupActionChannelListener();
-    JourneyActivityService.start(state);
+    final t = ref.read(translationsProvider);
+    JourneyActivityService.start(state, t: t);
 
     if (!simulation) {
       _subscribeToPositionStream();
@@ -195,7 +197,8 @@ class RouteTracker extends Notifier<RouteTrackerState> {
     final stations = state.currentSegmentStations;
     if (stations.isNotEmpty && state.currentStationIndex < stations.length - 1) {
       state = state.copyWith(currentStationIndex: state.currentStationIndex + 1);
-      JourneyActivityService.update(state);
+      final t = ref.read(translationsProvider);
+      JourneyActivityService.update(state, t: t);
     } else {
       _advanceSegment();
     }
@@ -214,7 +217,8 @@ class RouteTracker extends Notifier<RouteTrackerState> {
       if (!state.isSimulation) {
         _subscribeToPositionStream();
       }
-      JourneyActivityService.update(state);
+      final t = ref.read(translationsProvider);
+      JourneyActivityService.update(state, t: t);
     } else {
       state = state.copyWith(hasArrived: true);
       JourneyActivityService.stop();
@@ -238,10 +242,12 @@ class RouteTracker extends Notifier<RouteTrackerState> {
         to.lng,
       );
 
+      final t = ref.read(translationsProvider);
       JourneyActivityService.update(
         state,
         speedKmh: position.speed * 3.6,
         walkMeters: dist.round(),
+        t: t,
       );
 
       if (dist <= 80.0) {
@@ -257,9 +263,11 @@ class RouteTracker extends Notifier<RouteTrackerState> {
           segment.toStation.lng,
         );
         
+        final t = ref.read(translationsProvider);
         JourneyActivityService.update(
           state,
           speedKmh: position.speed * 3.6,
+          t: t,
         );
 
         if (dist <= 150.0) {
@@ -278,9 +286,11 @@ class RouteTracker extends Notifier<RouteTrackerState> {
           lastStation.lng,
         );
         
+        final t = ref.read(translationsProvider);
         JourneyActivityService.update(
           state,
           speedKmh: position.speed * 3.6,
+          t: t,
         );
 
         if (dist <= 150.0) {
@@ -297,9 +307,11 @@ class RouteTracker extends Notifier<RouteTrackerState> {
         next.lng,
       );
 
+      final t = ref.read(translationsProvider);
       JourneyActivityService.update(
         state,
         speedKmh: position.speed * 3.6,
+        t: t,
       );
 
       if (dist <= 150.0) {
@@ -307,7 +319,8 @@ class RouteTracker extends Notifier<RouteTrackerState> {
           _advanceSegment();
         } else {
           state = state.copyWith(currentStationIndex: nextIdx);
-          JourneyActivityService.update(state, speedKmh: position.speed * 3.6);
+          final t = ref.read(translationsProvider);
+          JourneyActivityService.update(state, speedKmh: position.speed * 3.6, t: t);
         }
       }
     }

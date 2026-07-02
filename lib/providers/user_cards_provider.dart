@@ -7,22 +7,26 @@ class UserCardsState {
   final String btsCardType; // 'standard', 'student', 'senior', 'trip_package'
   final String mrtCardType; // 'standard', 'student', 'senior'
   final String arlCardType; // 'standard', 'student', 'senior'
+  final String srtCardType; // 'standard', 'student', 'senior'
 
   const UserCardsState({
     this.btsCardType = 'standard',
     this.mrtCardType = 'standard',
     this.arlCardType = 'standard',
+    this.srtCardType = 'standard',
   });
 
   UserCardsState copyWith({
     String? btsCardType,
     String? mrtCardType,
     String? arlCardType,
+    String? srtCardType,
   }) {
     return UserCardsState(
       btsCardType: btsCardType ?? this.btsCardType,
       mrtCardType: mrtCardType ?? this.mrtCardType,
       arlCardType: arlCardType ?? this.arlCardType,
+      srtCardType: srtCardType ?? this.srtCardType,
     );
   }
 }
@@ -43,15 +47,17 @@ class UserCardsNotifier extends Notifier<UserCardsState> {
       final bts = prefs.getString('bts_card_type') ?? 'standard';
       final mrt = prefs.getString('mrt_card_type') ?? 'standard';
       final arl = prefs.getString('arl_card_type') ?? 'standard';
+      final srt = prefs.getString('srt_card_type') ?? 'standard';
       state = UserCardsState(
         btsCardType: bts,
         mrtCardType: mrt,
         arlCardType: arl,
+        srtCardType: srt,
       );
     } catch (_) {}
   }
 
-  /// Set the card type for a specific transit network ('BTS', 'MRT', or 'ARL')
+  /// Set the card type for a specific transit network ('BTS', 'MRT', 'ARL', or 'SRT')
   Future<void> setCardType(String network, String type) async {
     UserCardsState newState;
     if (network == 'BTS') {
@@ -60,6 +66,8 @@ class UserCardsNotifier extends Notifier<UserCardsState> {
       newState = state.copyWith(mrtCardType: type);
     } else if (network == 'ARL') {
       newState = state.copyWith(arlCardType: type);
+    } else if (network == 'SRT') {
+      newState = state.copyWith(srtCardType: type);
     } else {
       return;
     }
@@ -79,6 +87,7 @@ class UserCardsNotifier extends Notifier<UserCardsState> {
         btsCardType: state.btsCardType,
         mrtCardType: state.mrtCardType,
         arlCardType: state.arlCardType,
+        srtCardType: state.srtCardType,
       );
     }
   }
@@ -88,11 +97,13 @@ class UserCardsNotifier extends Notifier<UserCardsState> {
     required String btsCardType,
     required String mrtCardType,
     required String arlCardType,
+    required String srtCardType,
   }) {
     state = UserCardsState(
       btsCardType: btsCardType,
       mrtCardType: mrtCardType,
       arlCardType: arlCardType,
+      srtCardType: srtCardType,
     );
 
     // Persist locally
@@ -100,6 +111,7 @@ class UserCardsNotifier extends Notifier<UserCardsState> {
       prefs.setString('bts_card_type', btsCardType);
       prefs.setString('mrt_card_type', mrtCardType);
       prefs.setString('arl_card_type', arlCardType);
+      prefs.setString('srt_card_type', srtCardType);
     }).catchError((_) {});
   }
 }

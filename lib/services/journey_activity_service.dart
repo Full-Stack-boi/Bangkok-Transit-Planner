@@ -4,11 +4,13 @@ import 'package:flutter/services.dart';
 import 'package:live_activities/live_activities.dart';
 import '../providers/route_tracker.dart';
 import '../core/theme/transit_colors.dart';
+import '../core/constants/translation_helper.dart';
 
 class JourneyActivityService {
   static final _plugin = LiveActivities();
   static bool _initialized = false;
   static const String _activityId = 'journey_tracking';
+  static AppLocalizations _t = AppLocalizations('th');
 
   static Future<void> init() async {
     if (_initialized) return;
@@ -21,7 +23,8 @@ class JourneyActivityService {
     }
   }
 
-  static Future<void> start(RouteTrackerState state) async {
+  static Future<void> start(RouteTrackerState state, {required AppLocalizations t}) async {
+    _t = t;
     if (kIsWeb) return;
     await init();
     if (!_initialized) return;
@@ -33,12 +36,23 @@ class JourneyActivityService {
     }
   }
 
-  static Future<void> update(RouteTrackerState state, {double speedKmh = 0, int walkMeters = 0}) async {
+  static Future<void> update(RouteTrackerState state, {double speedKmh = 0, int walkMeters = 0, AppLocalizations? t}) async {
+    if (t != null) {
+      _t = t;
+    }
     if (kIsWeb) return;
     if (!_initialized) return;
     try {
       final data = _buildPayload(state, speedKmh: speedKmh);
       data['walkMeters'] = walkMeters;
+      
+      // Update walkText and contentText with the dynamic walking distance
+      if (state.currentSegment?.lineId == 'WALK') {
+        final walkMetersStr = walkMeters.toString();
+        data['walkText'] = _t.journey.walkRemaining(walkMetersStr);
+        data['contentText'] = _t.journey.walkRemaining(walkMetersStr);
+      }
+      
       await _plugin.updateActivity(_activityId, data);
     } catch (e) {
       debugPrint("Failed to update live activity: $e");
@@ -111,6 +125,7 @@ class JourneyActivityService {
       }
     }
     
+    final isTh = _t.isTh;
     final isWalk = seg?.lineId == 'WALK';
     final lineId = isWalk ? 'WALK' : (seg?.lineId ?? '');
     final color = TransitColors.getLineColor(lineId);
@@ -119,14 +134,33 @@ class JourneyActivityService {
     final colorHex = _colorToHex(color);
     final textColorHex = _colorToHex(textColor);
 
-    final currentStnName = state.currentStation?.nameTh ?? (seg?.fromStation.nameTh ?? '');
+    final currentStnName = isTh
+        ? (state.currentStation?.nameTh ?? (seg?.fromStation.nameTh ?? ''))
+        : (state.currentStation?.nameEn ?? (seg?.fromStation.nameEn ?? ''));
+
     final nextStn = state.nextStation;
-    final nextStnName = nextStn != null ? nextStn.nameTh : (seg?.toStation.nameTh ?? 'ถึงจุดหมายแล้ว');
-    final destStnName = route?.destination.nameTh ?? '';
+    final nextStnName = nextStn != null 
+        ? (isTh ? nextStn.nameTh : nextStn.nameEn) 
+        : (seg?.toStation != null 
+            ? (isTh ? seg!.toStation.nameTh : seg!.toStation.nameEn) 
+            : _t.journey.arrivedText);
+
+    final destStnName = isTh 
+        ? (route?.destination.nameTh ?? '') 
+        : (route?.destination.nameEn ?? '');
+
+    final directionText = _t.journey.headingTo(destStnName);
+    final walkText = _t.journey.walkRemaining('0');
+    final etaText = _t.journey.etaRemaining(etaMinutes.round());
+    final speedText = _t.journey.speedMeasure(speedKmh.toStringAsFixed(1));
+    final travelModeText = isWalk ? _t.journey.walkingAction : _t.journey.transitRideAction;
+    final contentText = isWalk ? _t.journey.walkRemaining('0') : _t.journey.headingTo(destStnName);
 
     return {
       'lineId': lineId,
-      'lineName': isWalk ? 'เดินเท้าเชื่อมต่อ' : (seg?.lineName ?? 'กำลังเดินทาง'),
+      'lineName': isWalk 
+          ? _t.journey.walkingConnection
+          : (seg?.lineName ?? _t.journey.travelingStatus),
       'lineColorHex': colorHex,
       'lineTextColorHex': textColorHex,
       'currentStation': currentStnName,
@@ -139,6 +173,15 @@ class JourneyActivityService {
       'speedKmh': speedKmh,
       'isWalking': isWalk,
       'isSimulation': state.isSimulation,
+      
+      // Localized notification strings
+      'directionText': directionText,
+      'walkText': walkText,
+      'etaText': etaText,
+      'speedText': speedText,
+      'travelModeText': travelModeText,
+      'walkingAction': _t.journey.walkingAction,
+      'contentText': contentText,
     };
   }
 }

@@ -75,10 +75,12 @@ class AuthNotifier extends _$AuthNotifier {
         final bts = userMetadata['bts_card_type'] as String? ?? 'standard';
         final mrt = userMetadata['mrt_card_type'] as String? ?? 'standard';
         final arl = userMetadata['arl_card_type'] as String? ?? 'standard';
+        final srt = userMetadata['srt_card_type'] as String? ?? 'standard';
         ref.read(userCardsProvider.notifier).updateFromSync(
           btsCardType: bts,
           mrtCardType: mrt,
           arlCardType: arl,
+          srtCardType: srt,
         );
 
         // Perform offline sync to upload locally saved routes and favorites

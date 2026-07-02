@@ -142,6 +142,7 @@ class AuthRepository {
     required String btsCardType,
     required String mrtCardType,
     required String arlCardType,
+    required String srtCardType,
   }) async {
     final client = _client;
     if (client == null) return;
@@ -152,6 +153,7 @@ class AuthRepository {
             'bts_card_type': btsCardType,
             'mrt_card_type': mrtCardType,
             'arl_card_type': arlCardType,
+            'srt_card_type': srtCardType,
           },
         ),
       );
