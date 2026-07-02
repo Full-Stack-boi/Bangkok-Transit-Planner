@@ -244,6 +244,20 @@ class ThaiDirections implements BaseDirections {
   String get dirToSuvarnabhumi => 'ไปสุวรรณภูมิ';
   @override
   String get dirToPhayaThai => 'ไปพญาไท';
+  @override
+  String get dirToMinBuri => 'ไปมีนบุรี';
+  @override
+  String get dirToNonthaburiCivicCenter => 'ไปศูนย์ราชการนนทบุรี';
+  @override
+  String get dirToMuangThongThaniLake => 'ไปทะเลสาบเมืองทองธานี';
+  @override
+  String get dirToSiRatMuangThongThani => 'ไปศรีรัช (เมืองทองธานี)';
+  @override
+  String get dirToRangsit => 'ไปรังสิต';
+  @override
+  String get dirToKrungThepAphiwat => 'ไปกรุงเทพอภิวัฒน์';
+  @override
+  String get dirToTalingChan => 'ไปตลิ่งชัน';
 
   @override
   String getDirectionLabel(String lineId, int boundIndex, String fallback) {
@@ -262,6 +276,14 @@ class ThaiDirections implements BaseDirections {
         return boundIndex == 0 ? dirToLatPhrao : dirToSamrong;
       case 'ARL':
         return boundIndex == 0 ? dirToPhayaThai : dirToSuvarnabhumi;
+      case 'MRT_PINK':
+        return boundIndex == 0 ? dirToMinBuri : dirToNonthaburiCivicCenter;
+      case 'MRT_PINK_BRANCH':
+        return boundIndex == 0 ? dirToMuangThongThaniLake : dirToSiRatMuangThongThani;
+      case 'SRT_RED_NORTH':
+        return boundIndex == 0 ? dirToRangsit : dirToKrungThepAphiwat;
+      case 'SRT_RED_WEST':
+        return boundIndex == 0 ? dirToTalingChan : dirToKrungThepAphiwat;
       default:
         return fallback;
     }
@@ -374,6 +396,24 @@ class ThaiJourney implements BaseJourney {
   String get nextSimulationBtn => 'สถานีถัดไป (จำลอง)';
   @override
   String get stationsCount => 'สถานี';
+  @override
+  String get walkingConnection => 'เดินเท้าเชื่อมต่อ';
+  @override
+  String get travelingStatus => 'กำลังเดินทาง';
+  @override
+  String get walkingAction => 'เดินเท้า';
+  @override
+  String walkRemaining(String meters) => '🚶 เดินเท้าอีก $meters ม.';
+  @override
+  String headingTo(String dest) => 'มุ่งหน้า $dest';
+  @override
+  String get transitRideAction => '🚇 นั่งรถไฟฟ้า';
+  @override
+  String etaRemaining(int minutes) => '⏱ อีก $minutes นาที';
+  @override
+  String speedMeasure(String speed) => '💨 $speed กม./ชม';
+  @override
+  String get arrivedText => 'ถึงจุดหมายแล้ว';
 }
 
 class ThaiAuth implements BaseAuth {
@@ -448,6 +488,8 @@ class ThaiUtility implements BaseUtility {
   @override
   String get arlCardName => 'แอร์พอร์ตลิงก์ (ARL)';
   @override
+  String get srtCardName => 'รถไฟสายสีแดง (SRT)';
+  @override
   String get optionStandardTitle => 'บุคคลทั่วไป';
   @override
   String get optionStudentTitle => 'นักเรียน/นักศึกษา';
@@ -471,6 +513,10 @@ class ThaiUtility implements BaseUtility {
   String get optionStudentArlSubtitle => 'ลด 20%';
   @override
   String get optionSeniorArlSubtitle => 'ลด 50%';
+  @override
+  String get optionStudentSrtSubtitle => 'ลด 10%';
+  @override
+  String get optionSeniorSrtSubtitle => 'ลด 50%';
   @override
   String get debugSimGpsTitle => 'จำลองตำแหน่งพิกัด GPS';
   @override

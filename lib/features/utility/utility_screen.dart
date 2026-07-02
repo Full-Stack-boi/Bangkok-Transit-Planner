@@ -343,6 +343,38 @@ class UtilityScreen extends ConsumerWidget {
                 ],
                 width: cardWidth,
               ),
+              _buildCompactCardPreview(
+                context: context,
+                ref: ref,
+                theme: theme,
+                t: t,
+                networkId: 'SRT',
+                cardName: t.utility.srtCardName,
+                gradient: LinearGradient(
+                  colors: [Colors.red.shade800, Colors.red.shade900],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                activeType: cardState.srtCardType,
+                options: [
+                  _CardOption(
+                    value: 'standard',
+                    title: t.utility.optionStandardTitle,
+                    subtitle: t.utility.optionStandardSubtitle,
+                  ),
+                  _CardOption(
+                    value: 'student',
+                    title: t.utility.optionStudentTitle,
+                    subtitle: t.utility.optionStudentSrtSubtitle,
+                  ),
+                  _CardOption(
+                    value: 'senior',
+                    title: t.utility.optionSeniorTitle,
+                    subtitle: t.utility.optionSeniorSrtSubtitle,
+                  ),
+                ],
+                width: cardWidth,
+              ),
             ],
           ),
         ),
@@ -658,6 +690,7 @@ class _CardDetailBottomSheetContentState
     Color networkColor = Colors.green.shade600;
     if (widget.networkId == 'MRT') networkColor = Colors.blue.shade700;
     if (widget.networkId == 'ARL') networkColor = Colors.red.shade700;
+    if (widget.networkId == 'SRT') networkColor = Colors.red.shade800;
 
     return SafeArea(
       child: Padding(

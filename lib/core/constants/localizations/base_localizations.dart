@@ -131,6 +131,13 @@ abstract class BaseDirections {
   String get dirToSamrong;
   String get dirToSuvarnabhumi;
   String get dirToPhayaThai;
+  String get dirToMinBuri;
+  String get dirToNonthaburiCivicCenter;
+  String get dirToMuangThongThaniLake;
+  String get dirToSiRatMuangThongThani;
+  String get dirToRangsit;
+  String get dirToKrungThepAphiwat;
+  String get dirToTalingChan;
   String getDirectionLabel(String lineId, int boundIndex, String fallback);
 }
 
@@ -192,6 +199,15 @@ abstract class BaseJourney {
   String get simulationMode;
   String get nextSimulationBtn;
   String get stationsCount;
+  String get walkingConnection;
+  String get travelingStatus;
+  String get walkingAction;
+  String walkRemaining(String meters);
+  String headingTo(String dest);
+  String get transitRideAction;
+  String etaRemaining(int minutes);
+  String speedMeasure(String speed);
+  String get arrivedText;
 }
 
 abstract class BaseUtility {
@@ -202,6 +218,7 @@ abstract class BaseUtility {
   String get rabbitCardName;
   String get mrtCardName;
   String get arlCardName;
+  String get srtCardName;
   String get optionStandardTitle;
   String get optionStudentTitle;
   String get optionSeniorTitle;
@@ -214,6 +231,8 @@ abstract class BaseUtility {
   String get optionSeniorMrtSubtitle;
   String get optionStudentArlSubtitle;
   String get optionSeniorArlSubtitle;
+  String get optionStudentSrtSubtitle;
+  String get optionSeniorSrtSubtitle;
   String get debugSimGpsTitle;
   String get debugSimGpsDisabled;
   String debugSimGpsActive(String lat, String lng);

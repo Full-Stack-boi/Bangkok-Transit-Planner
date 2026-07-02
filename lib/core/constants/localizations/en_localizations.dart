@@ -244,6 +244,20 @@ class EnglishDirections implements BaseDirections {
   String get dirToSuvarnabhumi => 'to Suvarnabhumi';
   @override
   String get dirToPhayaThai => 'to Phaya Thai';
+  @override
+  String get dirToMinBuri => 'to Min Buri';
+  @override
+  String get dirToNonthaburiCivicCenter => 'to Nonthaburi Civic Center';
+  @override
+  String get dirToMuangThongThaniLake => 'to Muang Thong Thani Lake';
+  @override
+  String get dirToSiRatMuangThongThani => 'to Si Rat (Muang Thong Thani)';
+  @override
+  String get dirToRangsit => 'to Rangsit';
+  @override
+  String get dirToKrungThepAphiwat => 'to Krung Thep Aphiwat';
+  @override
+  String get dirToTalingChan => 'to Taling Chan';
 
   @override
   String getDirectionLabel(String lineId, int boundIndex, String fallback) {
@@ -262,6 +276,14 @@ class EnglishDirections implements BaseDirections {
         return boundIndex == 0 ? dirToLatPhrao : dirToSamrong;
       case 'ARL':
         return boundIndex == 0 ? dirToPhayaThai : dirToSuvarnabhumi;
+      case 'MRT_PINK':
+        return boundIndex == 0 ? dirToMinBuri : dirToNonthaburiCivicCenter;
+      case 'MRT_PINK_BRANCH':
+        return boundIndex == 0 ? dirToMuangThongThaniLake : dirToSiRatMuangThongThani;
+      case 'SRT_RED_NORTH':
+        return boundIndex == 0 ? dirToRangsit : dirToKrungThepAphiwat;
+      case 'SRT_RED_WEST':
+        return boundIndex == 0 ? dirToTalingChan : dirToKrungThepAphiwat;
       default:
         return fallback;
     }
@@ -374,6 +396,24 @@ class EnglishJourney implements BaseJourney {
   String get nextSimulationBtn => 'Next Station (Sim)';
   @override
   String get stationsCount => 'stations';
+  @override
+  String get walkingConnection => 'Walking connection';
+  @override
+  String get travelingStatus => 'Traveling';
+  @override
+  String get walkingAction => 'Walking';
+  @override
+  String walkRemaining(String meters) => '🚶 Walk $meters m';
+  @override
+  String headingTo(String dest) => 'Heading to $dest';
+  @override
+  String get transitRideAction => '🚇 Transit Ride';
+  @override
+  String etaRemaining(int minutes) => '⏱ $minutes mins';
+  @override
+  String speedMeasure(String speed) => '💨 $speed km/h';
+  @override
+  String get arrivedText => 'Arrived';
 }
 
 class EnglishAuth implements BaseAuth {
@@ -448,6 +488,8 @@ class EnglishUtility implements BaseUtility {
   @override
   String get arlCardName => 'ARL Smart Pass';
   @override
+  String get srtCardName => 'SRT Smart Pass';
+  @override
   String get optionStandardTitle => 'Standard';
   @override
   String get optionStudentTitle => 'Student';
@@ -471,6 +513,10 @@ class EnglishUtility implements BaseUtility {
   String get optionStudentArlSubtitle => '20% off';
   @override
   String get optionSeniorArlSubtitle => '50% off';
+  @override
+  String get optionStudentSrtSubtitle => '10% off';
+  @override
+  String get optionSeniorSrtSubtitle => '50% off';
   @override
   String get debugSimGpsTitle => 'Simulate GPS Location';
   @override
