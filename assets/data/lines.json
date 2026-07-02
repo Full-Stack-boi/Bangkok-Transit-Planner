@@ -288,7 +288,22 @@
       "MRT_PK27",
       "MRT_PK28",
       "MRT_PK29",
-      "MRT_PK30",
+      "MRT_PK30"
+    ]
+  },
+  {
+    "id": "MRT_PINK_BRANCH",
+    "name_th": "สายสีชมพู (ส่วนต่อขยายเมืองทองธานี)",
+    "name_en": "Pink Line (Muang Thong Thani Extension)",
+    "operator": "MRT",
+    "color_hex": "#E9008C",
+    "bound_0_label": "ไปทะเลสาบเมืองทองธานี",
+    "bound_1_label": "ไปศรีรัช (เมืองทองธานี)",
+    "is_loop": false,
+    "peak_interval_min": 10,
+    "off_peak_interval_min": 10,
+    "station_ids": [
+      "MRT_PK10",
       "MRT_MT01",
       "MRT_MT02"
     ]

@@ -32,6 +32,16 @@ class TransitColors {
   static const Color arl = Color(0xFFDC2626);
   static const Color arlDark = Color(0xFFB91C1C);
 
+  // MRT Pink Line & Branch — Pink
+  static const Color mrtPink = Color(0xFFE9008C);
+  static const Color mrtPinkDark = Color(0xFFC00072);
+
+  // SRT Red Lines — Red
+  static const Color srtRedNorth = Color(0xFFCF142B);
+  static const Color srtRedNorthDark = Color(0xFF9E0B1C);
+  static const Color srtRedWest = Color(0xFFE2001A);
+  static const Color srtRedWestDark = Color(0xFFB30012);
+
   /// Get color for a given line ID
   static Color getLineColor(String lineId) {
     switch (lineId) {
@@ -49,6 +59,13 @@ class TransitColors {
         return mrtYellow;
       case 'ARL':
         return arl;
+      case 'MRT_PINK':
+      case 'MRT_PINK_BRANCH':
+        return mrtPink;
+      case 'SRT_RED_NORTH':
+        return srtRedNorth;
+      case 'SRT_RED_WEST':
+        return srtRedWest;
       default:
         return Colors.grey;
     }
@@ -71,6 +88,13 @@ class TransitColors {
         return mrtYellowDark;
       case 'ARL':
         return arlDark;
+      case 'MRT_PINK':
+      case 'MRT_PINK_BRANCH':
+        return mrtPinkDark;
+      case 'SRT_RED_NORTH':
+        return srtRedNorthDark;
+      case 'SRT_RED_WEST':
+        return srtRedWestDark;
       default:
         return Colors.grey.shade700;
     }

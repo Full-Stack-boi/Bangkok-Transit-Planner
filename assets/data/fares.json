@@ -36,5 +36,17 @@
     "currency": "THB",
     "updated": "2025-01-01",
     "fare_by_stations": [15, 15, 20, 25, 30, 35, 40, 45]
+  },
+  "mrt_pink": {
+    "description": "MRT Pink Line fare table (distance-based)",
+    "currency": "THB",
+    "updated": "2026-07-03",
+    "fare_by_stations": [15, 15, 20, 25, 28, 30, 33, 35, 38, 40, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45, 45]
+  },
+  "srt_red": {
+    "description": "SRT Red Line fare table (distance-based)",
+    "currency": "THB",
+    "updated": "2026-07-03",
+    "fare_by_stations": [12, 16, 20, 24, 28, 32, 36, 40, 42, 42, 42, 42, 42, 42, 42, 42]
   }
 }
