@@ -144,9 +144,10 @@ class MockNotificationService extends NotificationService {
 }
 
 void main() {
-  setUp(() {
+  setUp(() async {
     // จำลอง SharedPreferences สำหรับรันเทสต์ เพื่อไม่ให้พึ่งพาระบบไฟล์ของแพลตฟอร์มจริง
     SharedPreferences.setMockInitialValues({});
+    testSharedPreferencesInstance = await SharedPreferences.getInstance();
   });
 
   group('BkkTransitApp Widget Tests', () {

@@ -5,7 +5,15 @@ import 'package:bkk_transit_planner/models/station.dart';
 import 'package:bkk_transit_planner/models/route_result.dart';
 import 'package:bkk_transit_planner/providers/route_tracker.dart';
 
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:bkk_transit_planner/providers/providers.dart';
+
 void main() {
+  setUp(() async {
+    SharedPreferences.setMockInitialValues({});
+    testSharedPreferencesInstance = await SharedPreferences.getInstance();
+  });
+
   group('RouteTracker Tests', () {
     final stationA = const Station(
       id: 'BTS_A',

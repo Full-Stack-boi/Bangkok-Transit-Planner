@@ -5,11 +5,15 @@ import 'package:bkk_transit_planner/services/location_service.dart';
 import 'package:bkk_transit_planner/models/station.dart';
 import 'package:bkk_transit_planner/providers/providers.dart';
 
+import 'package:shared_preferences/shared_preferences.dart';
+
 void main() {
   group('LocationService Proximity & Geofencing Tests', () {
     late LocationService locationService;
 
-    setUp(() {
+    setUp(() async {
+      SharedPreferences.setMockInitialValues({});
+      testSharedPreferencesInstance = await SharedPreferences.getInstance();
       locationService = LocationService();
     });
 

@@ -3,14 +3,17 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:bkk_transit_planner/repositories/favorites_repository.dart';
 import 'package:bkk_transit_planner/services/supabase_service.dart';
 
+import 'package:bkk_transit_planner/providers/providers.dart';
+
 class MockSupabaseService extends SupabaseService {
   @override
   bool get isInitialized => false; // Mock offline state
 }
 
 void main() {
-  setUp(() {
+  setUp(() async {
     SharedPreferences.setMockInitialValues({});
+    testSharedPreferencesInstance = await SharedPreferences.getInstance();
   });
 
   test('FavoritesRepository offline favorite toggle test', () async {

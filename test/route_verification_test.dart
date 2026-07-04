@@ -3,7 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:bkk_transit_planner/providers/providers.dart';
 import 'package:bkk_transit_planner/features/search/search_view_model.dart';
 
+import 'package:shared_preferences/shared_preferences.dart';
+
 void main() {
+  setUp(() async {
+    SharedPreferences.setMockInitialValues({});
+    testSharedPreferencesInstance = await SharedPreferences.getInstance();
+  });
+
   test('Verify Route Calculation and Walking Instructions between Siam and MBK', () async {
     TestWidgetsFlutterBinding.ensureInitialized();
     

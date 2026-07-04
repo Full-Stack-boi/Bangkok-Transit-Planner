@@ -123,8 +123,9 @@ class MockSearchTransitRepository extends TransitRepository {
 }
 
 void main() {
-  setUp(() {
+  setUp(() async {
     SharedPreferences.setMockInitialValues({});
+    testSharedPreferencesInstance = await SharedPreferences.getInstance();
   });
 
   group('SearchViewModel Route Segment Tests', () {

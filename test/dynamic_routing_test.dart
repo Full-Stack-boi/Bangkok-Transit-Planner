@@ -7,6 +7,8 @@ import 'package:flutter/widgets.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:shared_preferences/shared_preferences.dart';
+
 class MockTransitRepository extends TransitRepository {
   @override
   Future<CustomLocation?> resolveOnlinePlaceAsync(CustomLocation place) async {
@@ -15,6 +17,11 @@ class MockTransitRepository extends TransitRepository {
 }
 
 void main() {
+  setUp(() async {
+    SharedPreferences.setMockInitialValues({});
+    testSharedPreferencesInstance = await SharedPreferences.getInstance();
+  });
+
   test('Verify Dynamic Entrance Resolution based on Route Origin', () async {
     WidgetsFlutterBinding.ensureInitialized();
     final repo = MockTransitRepository();
