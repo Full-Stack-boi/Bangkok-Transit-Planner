@@ -6,52 +6,103 @@
     android:paddingLeft="0dp"
     android:paddingRight="16dp"
     android:paddingBottom="12dp"
-    android:paddingTop="4dp">
+    android:paddingTop="8dp">
 
-    <!-- Header: Line name & direction -->
+    <!-- Header: Dynamic Line Badge, Title Stack, and Premium ETA Chip -->
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
-        android:layout_marginBottom="8dp">
+        android:layout_marginBottom="12dp">
         
-        <TextView
-            android:id="@+id/tv_line_name"
-            style="@style/TextAppearance.Compat.Notification.Title"
+        <!-- Round Line Badge -->
+        <FrameLayout
+            android:id="@+id/view_badge_bg"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginRight="12dp"
+            android:background="@drawable/bg_badge_round">
+            <ImageView
+                android:id="@+id/iv_badge_icon"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_train"
+                android:contentDescription="line icon" />
+        </FrameLayout>
+
+        <!-- Title Stack -->
+        <LinearLayout
+            android:orientation="vertical"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="BTS สุขุมวิท"
-            android:textSize="16sp"
-            android:textStyle="bold" />
+            android:layout_weight="1">
             
-        <TextView
-            android:id="@+id/tv_direction"
-            style="@style/TextAppearance.Compat.Notification"
+            <TextView
+                android:id="@+id/tv_line_name"
+                style="@style/TextAppearance.Compat.Notification.Title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+                
+            <TextView
+                android:id="@+id/tv_direction"
+                style="@style/TextAppearance.Compat.Notification"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="11sp" />
+        </LinearLayout>
+
+        <!-- Premium ETA Chip -->
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="มุ่งหน้า เคหะฯ"
-            android:textSize="12sp" />
+            android:orientation="horizontal"
+            android:background="@drawable/bg_chip_eta"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:paddingTop="6dp"
+            android:paddingBottom="6dp"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:layout_marginRight="6dp"
+                android:src="@drawable/ic_clock"
+                android:tint="?android:attr/textColorSecondary"
+                android:contentDescription="clock" />
+
+            <TextView
+                android:id="@+id/tv_eta"
+                style="@style/TextAppearance.Compat.Notification.Title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+        </LinearLayout>
     </LinearLayout>
 
-    <!-- Progress bar -->
+    <!-- Route Progress Bar -->
     <ProgressBar
         android:id="@+id/pb_progress"
         style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="match_parent"
-        android:layout_height="8dp"
+        android:layout_height="6dp"
         android:progress="2"
         android:max="10"
         android:progressTint="#7DC242"
-        android:progressBackgroundTint="#334155"
-        android:layout_marginBottom="8dp" />
+        android:progressBackgroundTint="#1A888888"
+        android:layout_marginBottom="10dp" />
 
-    <!-- Stations names -->
+    <!-- Station Indicator Details -->
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="center_vertical"
         android:layout_marginBottom="12dp">
         
         <TextView
@@ -60,15 +111,18 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="อโศก"
-            android:textSize="14sp" />
+            android:textSize="14sp"
+            android:ellipsize="end"
+            android:maxLines="1" />
             
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text=" ➔ "
-            android:textColor="#64748B"
-            android:textSize="14sp" />
+        <ImageView
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:src="@drawable/ic_arrow_right"
+            android:tint="?android:attr/textColorSecondary"
+            android:contentDescription="to arrow" />
             
         <TextView
             android:id="@+id/tv_next_station"
@@ -76,98 +130,123 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="พร้อมพงษ์"
             android:textSize="14sp"
             android:textStyle="bold"
-            android:gravity="right" />
+            android:gravity="right"
+            android:ellipsize="end"
+            android:maxLines="1" />
     </LinearLayout>
 
-    <!-- Divider line (Using ImageView as it is fully supported by RemoteViews, whereas generic View is not) -->
+    <!-- Premium 10% opacity divider -->
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="#334155"
+        android:background="#1A888888"
         android:layout_marginBottom="12dp"
         android:contentDescription="divider" />
 
-    <!-- Info row & action buttons -->
+    <!-- Info Row & Action Capsule Buttons -->
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical">
         
-        <!-- Info: Walk / ETA / Speed -->
+        <!-- Metrics Row -->
         <LinearLayout
-            android:orientation="vertical"
+            android:orientation="horizontal"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1.2">
+            android:layout_weight="1.1"
+            android:gravity="center_vertical">
             
-            <TextView
-                android:id="@+id/tv_walk_meters"
+            <!-- Walk Distance -->
+            <LinearLayout
+                android:id="@+id/layout_walk"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="🚶 เดินอีก 80 ม."
-                android:textColor="#38BDF8"
-                android:textSize="12sp"
-                android:layout_marginBottom="2dp" />
-                
-            <LinearLayout
                 android:orientation="horizontal"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
-                
+                android:gravity="center_vertical"
+                android:layout_marginRight="14dp">
+                <ImageView
+                    android:layout_width="14dp"
+                    android:layout_height="14dp"
+                    android:layout_marginRight="4dp"
+                    android:src="@drawable/ic_walk"
+                    android:tint="#38BDF8"
+                    android:contentDescription="walk" />
                 <TextView
-                    android:id="@+id/tv_eta"
+                    android:id="@+id/tv_walk_meters"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="⏱ อีก 14 นาที"
-                    android:textColor="#34D399"
-                    android:textSize="12sp"
-                    android:layout_marginRight="8dp" />
-                    
+                    android:textColor="#38BDF8"
+                    android:textSize="12sp" />
+            </LinearLayout>
+                
+            <!-- Speed Gauge -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+                <ImageView
+                    android:layout_width="14dp"
+                    android:layout_height="14dp"
+                    android:layout_marginRight="4dp"
+                    android:src="@drawable/ic_speed"
+                    android:tint="#FB923C"
+                    android:contentDescription="speed" />
                 <TextView
                     android:id="@+id/tv_speed"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="💨 5.2 กม./ชม"
                     android:textColor="#FB923C"
                     android:textSize="12sp" />
             </LinearLayout>
         </LinearLayout>
 
-        <!-- Actions (Removing custom style dependencies for clean rendering on all vendor ROMs) -->
+        <!-- Capsule Action Buttons -->
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="0.8"
-            android:gravity="right">
+            android:layout_weight="0.9"
+            android:gravity="right|center_vertical">
             
             <TextView
                 android:id="@+id/btn_next"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="ถัดไป"
-                android:textColor="#38BDF8"
-                android:textSize="14sp"
+                android:background="@drawable/bg_btn_next"
+                android:textColor="#FFFFFF"
+                android:textSize="13sp"
                 android:textStyle="bold"
-                android:padding="8dp"
+                android:paddingLeft="14dp"
+                android:paddingRight="14dp"
+                android:paddingTop="6dp"
+                android:paddingBottom="6dp"
+                android:layout_marginRight="8dp"
+                android:gravity="center"
                 android:clickable="true"
-                android:focusable="true" />
+                android:focusable="true"
+                android:text="ถัดไป" />
 
             <TextView
                 android:id="@+id/btn_stop"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="จบ"
+                android:background="@drawable/bg_btn_stop"
                 android:textColor="#EF4444"
-                android:textSize="14sp"
+                android:textSize="13sp"
                 android:textStyle="bold"
-                android:padding="8dp"
+                android:paddingLeft="14dp"
+                android:paddingRight="14dp"
+                android:paddingTop="6dp"
+                android:paddingBottom="6dp"
+                android:gravity="center"
                 android:clickable="true"
-                android:focusable="true" />
+                android:focusable="true"
+                android:text="จบ" />
         </LinearLayout>
     </LinearLayout>
 

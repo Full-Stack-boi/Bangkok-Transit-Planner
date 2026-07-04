@@ -205,23 +205,6 @@ class TransitRepository {
     }).toList();
   }
 
-  Station? _findNearestStationFast(double lat, double lon) {
-    if (_stations == null || _stations!.isEmpty) return null;
-
-    Station? closest;
-    double minDistSq = double.infinity;
-
-    for (final station in _stations!) {
-      final dLat = lat - station.lat;
-      final dLon = lon - station.lng;
-      final distSq = dLat * dLat + dLon * dLon;
-      if (distSq < minDistSq) {
-        minDistSq = distSq;
-        closest = station;
-      }
-    }
-    return closest;
-  }
 
   void _buildGraph() {
     _graph = TransitGraph();

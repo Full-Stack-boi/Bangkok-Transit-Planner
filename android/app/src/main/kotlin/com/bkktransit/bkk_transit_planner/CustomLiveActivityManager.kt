@@ -60,11 +60,22 @@ class CustomLiveActivityManager(context: Context) : LiveActivityManager(context)
         
         if (isWalking) {
             remoteViews.setTextViewText(R.id.tv_direction, walkingAction)
-            remoteViews.setTextViewText(R.id.tv_walk_meters, walkText)
+            remoteViews.setImageViewResource(R.id.iv_badge_icon, R.drawable.ic_walk)
+            try {
+                val grayColor = Color.parseColor("#94A3B8")
+                remoteViews.setColorStateList(R.id.view_badge_bg, "setBackgroundTintList", android.content.res.ColorStateList.valueOf(grayColor))
+            } catch (e: Exception) {}
         } else {
             remoteViews.setTextViewText(R.id.tv_direction, directionText)
-            remoteViews.setTextViewText(R.id.tv_walk_meters, travelModeText)
+            remoteViews.setImageViewResource(R.id.iv_badge_icon, R.drawable.ic_train)
+            try {
+                val color = Color.parseColor(lineColorHex)
+                remoteViews.setColorStateList(R.id.view_badge_bg, "setBackgroundTintList", android.content.res.ColorStateList.valueOf(color))
+            } catch (e: Exception) {}
         }
+
+        val walkVisibility = if (isWalking) android.view.View.VISIBLE else android.view.View.GONE
+        remoteViews.setViewVisibility(R.id.layout_walk, walkVisibility)
 
         remoteViews.setProgressBar(R.id.pb_progress, stationsTotal, stationsDone, false)
         
@@ -78,8 +89,13 @@ class CustomLiveActivityManager(context: Context) : LiveActivityManager(context)
         remoteViews.setTextViewText(R.id.tv_current_station, currentStation)
         remoteViews.setTextViewText(R.id.tv_next_station, nextStation)
         
-        remoteViews.setTextViewText(R.id.tv_eta, etaText)
-        remoteViews.setTextViewText(R.id.tv_speed, speedText)
+        val walkClean = walkText.replace("🚶", "").trim()
+        val speedClean = speedText.replace("💨", "").trim()
+        val etaClean = etaText.replace("⏱", "").trim()
+
+        remoteViews.setTextViewText(R.id.tv_walk_meters, walkClean)
+        remoteViews.setTextViewText(R.id.tv_speed, speedClean)
+        remoteViews.setTextViewText(R.id.tv_eta, etaClean)
 
         val nextIntent = Intent(context, JourneyNotificationReceiver::class.java).apply {
             action = "ACTION_NEXT_STATION"
