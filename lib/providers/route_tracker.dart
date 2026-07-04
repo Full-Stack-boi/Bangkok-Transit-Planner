@@ -95,6 +95,9 @@ class RouteTracker extends Notifier<RouteTrackerState> {
   RouteTrackerState build() {
     ref.onDispose(() {
       _positionSubscription?.cancel();
+      try {
+        const MethodChannel('bkktransit/journey_actions').setMethodCallHandler(null);
+      } catch (_) {}
     });
     return RouteTrackerState();
   }

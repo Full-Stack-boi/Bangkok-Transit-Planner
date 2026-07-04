@@ -24,6 +24,7 @@ import 'widgets/map_search_overlay.dart';
 import 'widgets/route_result_banner.dart';
 import '../route_result/route_result_sheet.dart';
 import '../../providers/route_tracker.dart';
+import '../favorites/favorites_view_model.dart';
 import 'cached_tile_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -1202,7 +1203,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                     color: isFav ? Colors.red : null,
                   ),
                   onPressed: () async {
-                    await favoritesRepo.toggleFavoriteStation(station.id);
+                    await ref
+                        .read(favoritesViewModelProvider.notifier)
+                        .toggleFavoriteStation(station.id);
                     setState(() {}); // Rebuild to toggle icon
                   },
                 ),
@@ -1277,9 +1280,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                       Icon(
                         Icons.access_time_rounded,
                         size: 16,
-                        color: theme.colorScheme.onSurface.withValues(
-                          alpha: 0.6,
-                        ),
+                        color: Colors.amber.shade300,
                       ),
                       const SizedBox(width: 6),
                       Expanded(
@@ -1288,7 +1289,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                           style: theme.textTheme.bodyMedium?.copyWith(
                             color: minutesUntilNext == 0
                                 ? Colors.amber.shade700
-                                : null,
+                                : Colors.amber.shade200,
                             fontWeight: minutesUntilNext == 0
                                 ? FontWeight.bold
                                 : null,
@@ -1936,7 +1937,10 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                 ),
               ),
               IconButton(
-                icon: const Icon(Icons.swap_vert_rounded),
+                icon: Icon(
+                  Icons.swap_vert_rounded,
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                ),
                 tooltip: t.localeCode == 'th'
                     ? 'สลับต้นทาง/ปลายทาง'
                     : 'Swap Origin/Destination',

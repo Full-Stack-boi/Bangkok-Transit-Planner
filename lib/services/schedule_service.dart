@@ -28,6 +28,22 @@ class ScheduleService {
       'weekday': {'first': '05:30', 'last': '23:30'},
       'weekend': {'first': '05:30', 'last': '23:30'},
     },
+    'MRT_PINK': {
+      'weekday': {'first': '06:00', 'last': '00:00'},
+      'weekend': {'first': '06:00', 'last': '00:00'},
+    },
+    'MRT_PINK_BRANCH': {
+      'weekday': {'first': '06:00', 'last': '00:00'},
+      'weekend': {'first': '06:00', 'last': '00:00'},
+    },
+    'SRT_RED_NORTH': {
+      'weekday': {'first': '05:00', 'last': '00:00'},
+      'weekend': {'first': '05:00', 'last': '00:00'},
+    },
+    'SRT_RED_WEST': {
+      'weekday': {'first': '05:00', 'last': '00:00'},
+      'weekend': {'first': '05:00', 'last': '00:00'},
+    },
     'ARL': {
       'weekday': {'first': '05:30', 'last': '00:00'},
       'weekend': {'first': '05:30', 'last': '00:00'},

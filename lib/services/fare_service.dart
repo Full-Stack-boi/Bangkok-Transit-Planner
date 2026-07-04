@@ -166,6 +166,8 @@ class FareService {
     String srtCardType = 'standard',
   }) {
     int total = 0;
+    
+    // Calculate standard fares for each segment
     for (final segment in segments) {
       total += calculateFare(
         segment.lineId,
@@ -176,7 +178,74 @@ class FareService {
         srtCardType: srtCardType,
       );
     }
-    return total;
+    
+    // Apply transfer promotions and waive entry fees for adjacent rail segments
+    final railIndices = <int>[];
+    for (int i = 0; i < segments.length; i++) {
+      if (segments[i].lineId != 'WALK') {
+        railIndices.add(i);
+      }
+    }
+    
+    for (int k = 0; k < railIndices.length - 1; k++) {
+      final i1 = railIndices[k];
+      final i2 = railIndices[k + 1];
+      final s1 = segments[i1];
+      final s2 = segments[i2];
+      
+      if (_qualifiesForTransferWaiver(s1.lineId, s2.lineId)) {
+        final entryFee = _getEntryFee(s2.lineId);
+        int discountedWaiver = entryFee;
+        
+        final isMrt2 = s2.lineId.startsWith('MRT');
+        final isSrt2 = s2.lineId.startsWith('SRT');
+        
+        if (isMrt2) {
+          if (mrtCardType == 'student') {
+            discountedWaiver = (entryFee * 0.9).round();
+          } else if (mrtCardType == 'senior') {
+            discountedWaiver = (entryFee * 0.5).round();
+          }
+        } else if (isSrt2) {
+          if (srtCardType == 'student') {
+            discountedWaiver = (entryFee * 0.9).round();
+          } else if (srtCardType == 'senior') {
+            discountedWaiver = (entryFee * 0.5).round();
+          }
+        }
+        
+        total -= discountedWaiver;
+      }
+    }
+    
+    // Ensure total fare never drops below minimum possible fare (0 THB)
+    return total < 0 ? 0 : total;
+  }
+
+  int _getEntryFee(String lineId) {
+    if (lineId.startsWith('BTS_SUKHUMVIT') || lineId.startsWith('BTS_SILOM')) return 17;
+    if (lineId == 'BTS_GOLD') return 15;
+    if (lineId == 'MRT_BLUE') return 17;
+    if (lineId == 'MRT_PURPLE') return 14;
+    if (lineId == 'MRT_YELLOW') return 15;
+    if (lineId == 'MRT_PINK' || lineId == 'MRT_PINK_BRANCH') return 15;
+    if (lineId.startsWith('SRT')) return 12;
+    if (lineId == 'ARL') return 15;
+    return 0;
+  }
+
+  bool _qualifiesForTransferWaiver(String line1, String line2) {
+    final isMrt1 = line1.startsWith('MRT');
+    final isMrt2 = line2.startsWith('MRT');
+    final isSrt1 = line1.startsWith('SRT');
+    final isSrt2 = line2.startsWith('SRT');
+    
+    // MRT <-> MRT (Blue, Purple, Yellow, Pink)
+    if (isMrt1 && isMrt2) return true;
+    // MRT <-> SRT Red
+    if ((isMrt1 && isSrt2) || (isSrt1 && isMrt2)) return true;
+    
+    return false;
   }
 
   List<int>? _getFareTable(String lineId) {

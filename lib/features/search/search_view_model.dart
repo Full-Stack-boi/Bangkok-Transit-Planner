@@ -1403,7 +1403,11 @@ class SearchViewModel extends _$SearchViewModel {
         hydratedSaver = await _hydrateRouteWalkingPaths(saver);
       }
 
-      if (_mounted) {
+      if (_mounted &&
+          state.origin != null &&
+          state.destination != null &&
+          state.origin!.id == recommended.origin.id &&
+          state.destination!.id == recommended.destination.id) {
         state = state.copyWith(
           routeResult: state.activeRouteType == 'recommended'
               ? hydratedRecommended

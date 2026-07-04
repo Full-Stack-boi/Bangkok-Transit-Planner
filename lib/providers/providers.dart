@@ -90,6 +90,15 @@ final transitInitProvider = FutureProvider<void>((ref) async {
 
 // ─── UI Providers ───
 
+SharedPreferences? testSharedPreferencesInstance;
+
+final sharedPreferencesProvider = Provider<SharedPreferences>((ref) {
+  if (testSharedPreferencesInstance != null) {
+    return testSharedPreferencesInstance!;
+  }
+  throw UnimplementedError('sharedPreferencesProvider must be overridden in ProviderScope overrides');
+});
+
 @riverpod
 class HomeTabIndex extends _$HomeTabIndex {
   @override
@@ -107,28 +116,18 @@ final themeModeProvider = NotifierProvider<ThemeModeNotifier, ThemeMode>(() {
 class ThemeModeNotifier extends Notifier<ThemeMode> {
   @override
   ThemeMode build() {
-    _loadTheme();
-    return ThemeMode.dark;
-  }
-
-  Future<void> _loadTheme() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final themeStr = prefs.getString('theme_mode');
-      if (themeStr == 'light') {
-        state = ThemeMode.light;
-      } else if (themeStr == 'dark') {
-        state = ThemeMode.dark;
-      } else if (themeStr == 'system') {
-        state = ThemeMode.system;
-      }
-    } catch (_) {}
+    final prefs = ref.watch(sharedPreferencesProvider);
+    final themeStr = prefs.getString('theme_mode');
+    if (themeStr == 'light') return ThemeMode.light;
+    if (themeStr == 'dark') return ThemeMode.dark;
+    if (themeStr == 'system') return ThemeMode.system;
+    return ThemeMode.dark; // Default theme
   }
 
   Future<void> setTheme(ThemeMode mode) async {
     state = mode;
     try {
-      final prefs = await SharedPreferences.getInstance();
+      final prefs = ref.read(sharedPreferencesProvider);
       await prefs.setString('theme_mode', mode.name);
     } catch (_) {}
   }
@@ -141,22 +140,14 @@ final localeProvider = NotifierProvider<LocaleNotifier, String>(() {
 class LocaleNotifier extends Notifier<String> {
   @override
   String build() {
-    _loadLocale();
-    return 'th';
-  }
-
-  Future<void> _loadLocale() async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final lang = prefs.getString('language_code') ?? 'th';
-      state = lang;
-    } catch (_) {}
+    final prefs = ref.watch(sharedPreferencesProvider);
+    return prefs.getString('language_code') ?? 'th';
   }
 
   Future<void> setLocale(String langCode) async {
     state = langCode;
     try {
-      final prefs = await SharedPreferences.getInstance();
+      final prefs = ref.read(sharedPreferencesProvider);
       await prefs.setString('language_code', langCode);
     } catch (_) {}
   }

@@ -1,11 +1,16 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'app.dart';
 import 'features/map/cached_tile_provider.dart';
+import 'providers/providers.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Pre-initialize SharedPreferences to avoid theme/locale flickering
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
 
   // Pre-initialize map tile cache path so it is synchronously available to TileProvider from frame 1
   try {
@@ -29,8 +34,11 @@ Future<void> main() async {
   };
 
   runApp(
-    const ProviderScope(
-      child: BkkTransitApp(),
+    ProviderScope(
+      overrides: [
+        sharedPreferencesProvider.overrideWithValue(prefs),
+      ],
+      child: const BkkTransitApp(),
     ),
   );
 }

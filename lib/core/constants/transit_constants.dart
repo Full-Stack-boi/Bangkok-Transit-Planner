@@ -18,6 +18,8 @@ class TransitConstants {
   static const int mrtBluePeakInterval = 3;
   static const int mrtPurplePeakInterval = 5;
   static const int mrtYellowPeakInterval = 5;
+  static const int mrtPinkPeakInterval = 5;
+  static const int srtRedPeakInterval = 10;
   static const int arlPeakInterval = 12;
   static const int btsGoldPeakInterval = 5;
 
@@ -26,6 +28,8 @@ class TransitConstants {
   static const int mrtBlueOffPeakInterval = 5;
   static const int mrtPurpleOffPeakInterval = 7;
   static const int mrtYellowOffPeakInterval = 8;
+  static const int mrtPinkOffPeakInterval = 10;
+  static const int srtRedOffPeakInterval = 15;
   static const int arlOffPeakInterval = 15;
   static const int btsGoldOffPeakInterval = 10;
 
@@ -55,6 +59,12 @@ class TransitConstants {
         return isPeak ? mrtPurplePeakInterval : mrtPurpleOffPeakInterval;
       case 'MRT_YELLOW':
         return isPeak ? mrtYellowPeakInterval : mrtYellowOffPeakInterval;
+      case 'MRT_PINK':
+      case 'MRT_PINK_BRANCH':
+        return isPeak ? mrtPinkPeakInterval : mrtPinkOffPeakInterval;
+      case 'SRT_RED_NORTH':
+      case 'SRT_RED_WEST':
+        return isPeak ? srtRedPeakInterval : srtRedOffPeakInterval;
       case 'ARL':
         return isPeak ? arlPeakInterval : arlOffPeakInterval;
       default:
