@@ -258,15 +258,143 @@ class SettingsScreen extends ConsumerWidget {
               subtitle: const Text('BKK Transit Planner'),
               trailing: const Icon(Icons.chevron_right),
               onTap: () {
-                showAboutDialog(
+                showDialog(
                   context: context,
-                  applicationName: 'BKK Transit Planner',
-                  applicationVersion: '1.0.0',
-                  applicationIcon: const Icon(Icons.directions_transit_rounded, size: 48),
-                  children: [
-                    const SizedBox(height: 8),
-                    Text(t.settings.aboutDesc),
-                  ],
+                  builder: (context) => AlertDialog(
+                    backgroundColor: theme.cardColor,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      side: BorderSide(
+                        color: theme.colorScheme.outline.withValues(alpha: 0.2),
+                        width: 1,
+                      ),
+                    ),
+                    contentPadding: const EdgeInsets.all(24),
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // Premium Transit Icon
+                        Container(
+                          width: 64,
+                          height: 64,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                theme.colorScheme.primary,
+                                theme.colorScheme.secondary,
+                              ],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: theme.colorScheme.primary.withValues(alpha: 0.3),
+                                blurRadius: 12,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: const Icon(
+                            Icons.directions_transit_rounded,
+                            size: 32,
+                            color: Colors.white,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        // App Name
+                        Text(
+                          'BKK Transit Planner',
+                          style: theme.textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: -0.5,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        // Version
+                        Text(
+                          localeCode == 'th' ? 'เวอร์ชัน 1.0.0' : 'Version 1.0.0',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        const Divider(),
+                        const SizedBox(height: 12),
+                        // Description
+                        Text(
+                          t.settings.aboutDesc,
+                          textAlign: TextAlign.center,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            fontWeight: FontWeight.w500,
+                            height: 1.4,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        // Legalese Disclaimer Box
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.surface.withValues(alpha: 0.5),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: theme.colorScheme.outline.withValues(alpha: 0.1),
+                            ),
+                          ),
+                          child: Text(
+                            localeCode == 'th'
+                                ? 'ข้อเสนอแนะเส้นทาง ตารางเวลา และค่าโดยสารในแอปพลิเคชันนี้จัดทำขึ้นเพื่อใช้ประกอบการวางแผนเดินทางเบื้องต้นเท่านั้น ข้อมูลจริงอาจแตกต่างไปตามการปรับปรุงของหน่วยงานผู้ให้บริการเดินรถ'
+                                : 'Route options, schedules, and fare calculations are provided for informational and planning purposes only. Actual transit details may vary based on official operator updates.',
+                            textAlign: TextAlign.center,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                              height: 1.5,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        // Copyright Text
+                        Text(
+                          localeCode == 'th'
+                              ? '© 2026 BKK Transit Planner. สงวนลิขสิทธิ์'
+                              : '© 2026 BKK Transit Planner Developers. All rights reserved.',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            fontSize: 10,
+                            color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
+                          ),
+                        ),
+                      ],
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          showLicensePage(
+                            context: context,
+                            applicationName: 'BKK Transit Planner',
+                            applicationVersion: '1.0.0',
+                            applicationIcon: const Padding(
+                              padding: EdgeInsets.all(16),
+                              child: Icon(Icons.directions_transit_rounded, size: 48),
+                            ),
+                            applicationLegalese: localeCode == 'th'
+                                ? '© 2026 BKK Transit Planner. สงวนลิขสิทธิ์'
+                                : '© 2026 BKK Transit Planner Developers. All rights reserved.',
+                          );
+                        },
+                        child: Text(localeCode == 'th' ? 'ดูลิขสิทธิ์ซอฟต์แวร์' : 'View Licenses'),
+                      ),
+                      ElevatedButton(
+                        onPressed: () => Navigator.pop(context),
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        child: Text(localeCode == 'th' ? 'ปิด' : 'Close'),
+                      ),
+                    ],
+                  ),
                 );
               },
             ),

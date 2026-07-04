@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/transit_colors.dart';
+import '../../../core/theme/app_theme.dart';
 import '../../../models/station.dart';
 import '../../../models/searchable_item.dart';
 import '../../../models/custom_location.dart';
@@ -244,7 +245,11 @@ class _MapSearchOverlayState extends ConsumerState<MapSearchOverlay> {
                   const SizedBox(width: 8),
                   // Swap Button
                   IconButton(
-                    icon: const Icon(Icons.swap_vert_rounded, size: 26),
+                    icon: Icon(
+                      Icons.swap_vert_rounded,
+                      size: 26,
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                    ),
                     onPressed: state.origin != null || state.destination != null
                         ? () {
                             vm.swapStations();
@@ -405,6 +410,17 @@ class _MapSearchOverlayState extends ConsumerState<MapSearchOverlay> {
     final displayItems = isExpanded ? items : items.take(2).toList();
     final hasMore = items.length > 2 && !isExpanded;
     final t = ref.watch(translationsProvider);
+
+    Color categoryColor = theme.colorScheme.primary;
+    if (icon == Icons.train_rounded) {
+      categoryColor = theme.colorScheme.primary;
+    } else if (icon == Icons.domain_rounded) {
+      categoryColor = theme.appColors.landmarkColor ?? const Color(0xFFF97316);
+    } else if (icon == Icons.directions_bus_rounded) {
+      categoryColor = Colors.green;
+    } else if (icon == Icons.place_rounded) {
+      categoryColor = theme.appColors.landmarkColor ?? const Color(0xFFF97316);
+    }
     
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -428,10 +444,10 @@ class _MapSearchOverlayState extends ConsumerState<MapSearchOverlay> {
             leading: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: theme.colorScheme.primary.withValues(alpha: 0.1),
+                color: categoryColor.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: Icon(icon, color: theme.colorScheme.primary, size: 18),
+              child: Icon(icon, color: categoryColor, size: 18),
             ),
             title: Text(
               title,
@@ -726,7 +742,7 @@ class _StationListTile extends ConsumerWidget {
 
     final title = station.displayName(isEnglish: localeCode == 'en');
     String subtitle = '';
-    Color itemColor = theme.colorScheme.primary;
+    Color itemColor = theme.colorScheme.onSurface.withValues(alpha: 0.6);
     Widget leadingWidget;
 
     if (isStation) {
@@ -761,7 +777,7 @@ class _StationListTile extends ConsumerWidget {
           nearestStation?.displayName(isEnglish: localeCode == 'en') ?? '';
       final walkTime = station.walkingMinutes?.toInt() ?? 5;
 
-      itemColor = theme.colorScheme.secondary;
+      itemColor = theme.colorScheme.onSurface.withValues(alpha: 0.6);
       subtitle = t.proximity.nearStationWalk(nearestName, '$walkTime');
 
       IconData leadingIcon = Icons.place_rounded;
@@ -777,6 +793,21 @@ class _StationListTile extends ConsumerWidget {
           leadingIcon = Icons.train_rounded;
           itemColor = Colors.red.shade700;
         }
+      } else if (station is CustomLocation) {
+        final cl = station as CustomLocation;
+        if (cl.id.startsWith('coord_') ||
+            cl.nameEn.toLowerCase().contains('pin') ||
+            cl.nameEn.toLowerCase().contains('current') ||
+            cl.nameEn.toLowerCase().contains('location')) {
+          leadingIcon = Icons.my_location_rounded;
+          itemColor = theme.appColors.gpsPinColor ?? const Color(0xFF2DD4BF);
+        } else {
+          leadingIcon = Icons.business_rounded; // Building icon for named places/landmarks
+          itemColor = theme.appColors.landmarkColor ?? const Color(0xFFF97316);
+        }
+      } else if (station is Landmark) {
+        leadingIcon = Icons.business_rounded; // Building icon for Landmarks
+        itemColor = theme.appColors.landmarkColor ?? const Color(0xFFF97316);
       }
 
       leadingWidget = Container(

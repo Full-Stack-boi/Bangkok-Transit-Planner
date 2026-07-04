@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/transit_colors.dart';
+import '../../core/theme/app_theme.dart';
 import '../../models/route_result.dart';
 import '../../models/station.dart';
 import '../../models/searchable_item.dart';
@@ -159,6 +160,7 @@ class RouteResultSheet extends ConsumerWidget {
                 icon: Icons.timer_outlined,
                 label: '~${result.totalMinutes.toInt()} ${t.common.minutesUnit}',
                 theme: theme,
+                iconColor: theme.appColors.timeColor,
               ),
             ),
             Flexible(
@@ -168,6 +170,7 @@ class RouteResultSheet extends ConsumerWidget {
                     ? '${result.totalFareThb} ${t.common.currencyUnit} (-${result.totalDiscountThb} ฿)'
                     : '${result.totalFareThb} ${t.common.currencyUnit}',
                 theme: theme,
+                iconColor: theme.appColors.moneyColor,
               ),
             ),
             Flexible(
@@ -175,6 +178,7 @@ class RouteResultSheet extends ConsumerWidget {
                 icon: Icons.swap_horiz_rounded,
                 label: '${result.transferCount} ${t.routeResult.transfersCount}',
                 theme: theme,
+                iconColor: theme.appColors.routeColor,
               ),
             ),
           ],
@@ -185,12 +189,29 @@ class RouteResultSheet extends ConsumerWidget {
           children: [
             const SizedBox(width: 48), // Balanced spacing for bookmark button
             Expanded(
-              child: Text(
-                '$originName → $destName',
-                style: theme.textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+              child: RichText(
                 textAlign: TextAlign.center,
+                text: TextSpan(
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: theme.colorScheme.onSurface,
+                  ),
+                  children: [
+                    TextSpan(text: originName),
+                    WidgetSpan(
+                      alignment: PlaceholderAlignment.middle,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        child: Icon(
+                          Icons.arrow_forward_rounded,
+                          size: 20,
+                          color: theme.colorScheme.primary,
+                        ),
+                      ),
+                    ),
+                    TextSpan(text: destName),
+                  ],
+                ),
               ),
             ),
             _buildBookmarkButton(context, ref, result, theme, t, localeCode),
@@ -251,7 +272,7 @@ class RouteResultSheet extends ConsumerWidget {
     return IconButton(
       icon: Icon(
         isSaved ? Icons.bookmark_rounded : Icons.bookmark_border_rounded,
-        color: isSaved ? theme.colorScheme.primary : null,
+        color: isSaved ? theme.appColors.favoriteColor : null,
       ),
       onPressed: () async {
         if (isSaved) {
@@ -302,8 +323,7 @@ class RouteResultSheet extends ConsumerWidget {
               onPressed: () async {
                 final name = controller.text.trim();
                 if (name.isNotEmpty) {
-                  final favoritesRepo = ref.read(favoritesRepositoryProvider);
-                  await favoritesRepo.saveRoute(
+                  await ref.read(favoritesViewModelProvider.notifier).saveRoute(
                     originId: result.origin.id,
                     destinationId: result.destination.id,
                     originName: result.origin.nameTh,
@@ -314,7 +334,6 @@ class RouteResultSheet extends ConsumerWidget {
                     destinationLat: result.destination.lat,
                     destinationLng: result.destination.lng,
                   );
-                  ref.read(favoritesViewModelProvider.notifier).refresh();
                   if (context.mounted) {
                     Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -442,6 +461,7 @@ class RouteResultSheet extends ConsumerWidget {
     required IconData icon,
     required String label,
     required ThemeData theme,
+    Color? iconColor,
   }) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -453,7 +473,7 @@ class RouteResultSheet extends ConsumerWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 18, color: theme.colorScheme.primary),
+          Icon(icon, size: 18, color: iconColor ?? theme.colorScheme.primary),
           const SizedBox(width: 6),
           Flexible(
             child: Text(
@@ -584,7 +604,7 @@ class RouteResultSheet extends ConsumerWidget {
                       Icon(
                         Icons.access_time_rounded,
                         size: 14,
-                        color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                        color: theme.appColors.timeColor,
                       ),
                       const SizedBox(width: 4),
                       Text(
@@ -592,7 +612,7 @@ class RouteResultSheet extends ConsumerWidget {
                         style: theme.textTheme.bodyMedium?.copyWith(
                           color: minutesUntilNext == 0
                               ? Colors.amber.shade700
-                              : theme.colorScheme.onSurface.withValues(alpha: 0.8),
+                              : theme.appColors.timeColor,
                           fontWeight: minutesUntilNext == 0 ? FontWeight.bold : null,
                         ),
                       ),

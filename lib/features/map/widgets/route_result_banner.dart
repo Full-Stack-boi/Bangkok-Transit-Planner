@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../core/constants/translation_helper.dart';
 import '../../../models/custom_location.dart';
+import '../../../core/theme/app_theme.dart';
 
 class RouteResultBanner extends StatelessWidget {
   final dynamic result;
@@ -23,7 +24,7 @@ class RouteResultBanner extends StatelessWidget {
     return Card(
       color: hasWarning
           ? Colors.amber.withValues(alpha: 0.1)
-          : theme.colorScheme.primary.withValues(alpha: 0.1),
+          : (theme.appColors.routeColor ?? const Color(0xFF818CF8)).withValues(alpha: 0.1),
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(16),
@@ -33,7 +34,7 @@ class RouteResultBanner extends StatelessWidget {
             children: [
               Icon(
                 hasWarning ? Icons.warning_amber_rounded : Icons.route_rounded,
-                color: hasWarning ? Colors.amber[800] : theme.colorScheme.primary,
+                color: hasWarning ? Colors.amber[800] : (theme.appColors.routeColor ?? const Color(0xFF818CF8)),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -45,7 +46,7 @@ class RouteResultBanner extends StatelessWidget {
                           ? '~${result.totalMinutes.toInt()} ${t.common.minutesUnit} · ${result.totalFareThb} ${t.common.currencyUnit} (-${result.totalDiscountThb} ฿)'
                           : '~${result.totalMinutes.toInt()} ${t.common.minutesUnit} · ${result.totalFareThb} ${t.common.currencyUnit}',
                       style: theme.textTheme.titleMedium?.copyWith(
-                        color: theme.colorScheme.primary,
+                        color: theme.colorScheme.onSurface,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -56,7 +57,7 @@ class RouteResultBanner extends StatelessWidget {
                   ],
                 ),
               ),
-              Icon(Icons.chevron_right, color: theme.colorScheme.primary),
+              Icon(Icons.chevron_right, color: theme.colorScheme.onSurface.withValues(alpha: 0.4)),
             ],
           ),
         ),

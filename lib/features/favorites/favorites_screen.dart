@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import '../../core/theme/transit_colors.dart';
+import '../../core/theme/app_theme.dart';
 import '../../models/crowd_report.dart';
 import '../../models/searchable_item.dart';
 import '../../models/station.dart';
@@ -54,16 +55,38 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
               bottom: TabBar(
                 tabs: [
                   Tab(
-                    icon: const Icon(Icons.favorite_rounded),
+                    icon: Builder(
+                      builder: (context) {
+                        final controller = DefaultTabController.of(context);
+                        final isSelected = controller.index == 0;
+                        return Icon(
+                          Icons.favorite_rounded,
+                          color: isSelected
+                              ? theme.appColors.favoriteColor
+                              : theme.appColors.favoriteColor?.withValues(alpha: 0.5),
+                        );
+                      },
+                    ),
                     text: t.favorites.favStationsTab,
                   ),
                   Tab(
-                    icon: const Icon(Icons.route_rounded),
+                    icon: Builder(
+                      builder: (context) {
+                        final controller = DefaultTabController.of(context);
+                        final isSelected = controller.index == 1;
+                        return Icon(
+                          Icons.route_rounded,
+                          color: isSelected
+                              ? theme.appColors.routeColor
+                              : theme.appColors.routeColor?.withValues(alpha: 0.5),
+                        );
+                      },
+                    ),
                     text: t.favorites.favRoutesTab,
                   ),
                 ],
-                indicatorColor: theme.colorScheme.primary,
-                labelColor: theme.colorScheme.primary,
+                indicatorColor: theme.colorScheme.onSurface,
+                labelColor: theme.colorScheme.onSurface,
                 unselectedLabelColor: theme.colorScheme.onSurface.withValues(alpha: 0.6),
               ),
             ),
@@ -215,14 +238,16 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
                           Icon(
                             Icons.access_time_rounded,
                             size: 14,
-                            color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                            color: theme.appColors.timeColor,
                           ),
                           const SizedBox(width: 4),
                           Expanded(
                             child: Text(
                               trainStatusText,
                               style: theme.textTheme.bodyMedium?.copyWith(
-                                color: minutesUntilNext == 0 ? Colors.amber.shade700 : null,
+                                color: minutesUntilNext == 0
+                                    ? Colors.amber.shade700
+                                    : theme.appColors.timeColor,
                                 fontWeight: minutesUntilNext == 0 ? FontWeight.bold : null,
                               ),
                               overflow: TextOverflow.ellipsis,
@@ -463,8 +488,8 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
           child: ListTile(
             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             leading: CircleAvatar(
-              backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.1),
-              child: Icon(Icons.route_rounded, color: theme.colorScheme.primary),
+              backgroundColor: theme.appColors.routeColor?.withValues(alpha: 0.1),
+              child: Icon(Icons.route_rounded, color: theme.appColors.routeColor),
             ),
             title: Text(
               routeDisplayName,
@@ -474,9 +499,27 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
             ),
             subtitle: Padding(
               padding: const EdgeInsets.only(top: 4),
-              child: Text(
-                '$originDisplayName → $destDisplayName',
-                style: theme.textTheme.bodyMedium,
+              child: RichText(
+                text: TextSpan(
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                  ),
+                  children: [
+                    TextSpan(text: originDisplayName),
+                    WidgetSpan(
+                      alignment: PlaceholderAlignment.middle,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        child: Icon(
+                          Icons.arrow_forward_rounded,
+                          size: 14,
+                          color: theme.colorScheme.primary,
+                        ),
+                      ),
+                    ),
+                    TextSpan(text: destDisplayName),
+                  ],
+                ),
               ),
             ),
             trailing: Row(

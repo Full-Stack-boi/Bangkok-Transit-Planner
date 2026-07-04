@@ -1,8 +1,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../providers/providers.dart';
 import '../utility/utility_screen.dart';
+import '../../core/theme/app_theme.dart';
 import '../map/map_screen.dart' deferred as map_screen;
 import '../favorites/favorites_screen.dart';
 import '../settings/settings_screen.dart';
@@ -122,7 +124,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         }
       }
     } catch (e) {
-      print('Failed to perform passive GPS proximity check: $e');
+      debugPrint('Failed to perform passive GPS proximity check: $e');
     }
   }
 
@@ -190,51 +192,125 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final initState = ref.watch(transitInitProvider);
     final currentIndex = ref.watch(homeTabIndexProvider);
     final t = ref.watch(translationsProvider);
+    final isWide = MediaQuery.of(context).size.width >= 900;
 
-    return Scaffold(
-      body: initState.when(
-        data: (_) => Stack(
-          children: [
-            IndexedStack(
-              index: currentIndex,
-              children: [
-                UtilityScreen(key: ValueKey('utility_${t.localeCode}')),
-                // Use deferred loading for MapScreen to reduce initial bundle size
-                // Only trigger loadLibrary when this tab is selected to maximize performance
-                if (currentIndex == 1)
-                  FutureBuilder(
-                    future: map_screen.loadLibrary(),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.done) {
-                        return map_screen.MapScreen(key: ValueKey('map_${t.localeCode}'));
-                      }
-                      return const Center(child: CircularProgressIndicator());
-                    },
-                  )
-                else
-                  const SizedBox.shrink(),
-                FavoritesScreen(key: ValueKey('favorites_${t.localeCode}')),
-                SettingsScreen(key: ValueKey('settings_${t.localeCode}')),
-              ],
-            ),
-            if (_showInAppBanner)
-              Positioned(
-                top: 0,
-                left: 0,
-                right: 0,
-                child: InAppNotificationBanner(
-                  title: _bannerTitle,
-                  body: _bannerBody,
-                  onTap: _onBannerTap,
-                  onDismiss: _onBannerDismiss,
-                ),
+    final content = initState.when(
+      data: (_) => Stack(
+        children: [
+          IndexedStack(
+            index: currentIndex,
+            children: const [
+              UtilityScreen(),
+              _DeferredMapScreen(),
+              FavoritesScreen(),
+              SettingsScreen(),
+            ],
+          ),
+          if (_showInAppBanner)
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: InAppNotificationBanner(
+                title: _bannerTitle,
+                body: _bannerBody,
+                onTap: _onBannerTap,
+                onDismiss: _onBannerDismiss,
               ),
+            ),
+        ],
+      ),
+      loading: () => _LoadingView(t: t),
+      error: (error, _) => _ErrorView(error: error.toString(), t: t),
+    );
+
+    if (isWide && initState.hasValue) {
+      return Scaffold(
+        body: Row(
+          children: [
+            const AppNavigationRail(),
+            const VerticalDivider(width: 1, thickness: 1),
+            Expanded(child: content),
           ],
         ),
-        loading: () => _LoadingView(t: t),
-        error: (error, _) => _ErrorView(error: error.toString(), t: t),
-      ),
+      );
+    }
+
+    return Scaffold(
+      body: content,
       bottomNavigationBar: const AppBottomNavigationBar(),
+    );
+  }
+}
+
+class AppNavigationRail extends ConsumerWidget {
+  const AppNavigationRail({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final currentIndex = ref.watch(homeTabIndexProvider);
+    final locale = ref.watch(localeProvider);
+    final t = AppLocalizations(locale);
+    final theme = Theme.of(context);
+
+    final activeColors = [
+      theme.colorScheme.primary, // Seafoam Sage for Transit Lines
+      theme.appColors.routeColor ?? const Color(0xFF818CF8), // Soft Lavender for Map
+      theme.appColors.favoriteColor ?? const Color(0xFFF472B6), // Coral Pink for Favorites (Heart)
+      theme.appColors.timeColor ?? const Color(0xFFF59E0B), // Warm Amber for Settings
+    ];
+    final activeColor = activeColors[currentIndex];
+
+    return Theme(
+      data: theme.copyWith(
+        navigationRailTheme: theme.navigationRailTheme.copyWith(
+          indicatorColor: activeColor.withValues(alpha: 0.15),
+          selectedIconTheme: IconThemeData(color: activeColor, size: 24),
+          selectedLabelTextStyle: GoogleFonts.outfit(
+            color: activeColor,
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+          ),
+          unselectedIconTheme: const IconThemeData(
+            color: Color(0xFF64748B),
+            size: 24,
+          ),
+          unselectedLabelTextStyle: GoogleFonts.outfit(
+            color: const Color(0xFF64748B),
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ),
+      child: NavigationRail(
+        selectedIndex: currentIndex,
+        onDestinationSelected: (index) {
+          ref.read(homeTabIndexProvider.notifier).setTab(index);
+        },
+        labelType: NavigationRailLabelType.all,
+        destinations: [
+          NavigationRailDestination(
+            icon: const Icon(Icons.dashboard_customize_outlined),
+            selectedIcon: Icon(Icons.dashboard_customize, color: activeColors[0]),
+            label: Text(t.navigation.utilityTitle),
+          ),
+          NavigationRailDestination(
+            icon: const Icon(Icons.map_outlined),
+            selectedIcon: Icon(Icons.map_rounded, color: activeColors[1]),
+            label: Text(t.navigation.mapTitle),
+          ),
+          NavigationRailDestination(
+            icon: const Icon(Icons.favorite_outline_rounded),
+            selectedIcon: Icon(Icons.favorite_rounded, color: activeColors[2]),
+            label: Text(t.navigation.favoritesTitle),
+          ),
+          NavigationRailDestination(
+            icon: const Icon(Icons.settings_outlined),
+            selectedIcon: Icon(Icons.settings_rounded, color: activeColors[3]),
+            label: Text(t.navigation.settingsTitle),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -244,42 +320,69 @@ class AppBottomNavigationBar extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Explicitly watch the locale and translations at this level.
     final currentIndex = ref.watch(homeTabIndexProvider);
     final locale = ref.watch(localeProvider);
     final t = AppLocalizations(locale);
+    final theme = Theme.of(context);
 
-    return NavigationBar(
-      height: 66.0,
-      key: ValueKey('nav_bar_$locale'),
-      selectedIndex: currentIndex,
-      onDestinationSelected: (index) {
-        // Use the root provider container to ensure the tab change
-        // propagates correctly even if the local scope is being rebuilt.
-        ref.read(homeTabIndexProvider.notifier).setTab(index);
-      },
-      destinations: [
-        NavigationDestination(
-          icon: const Icon(Icons.dashboard_customize_outlined),
-          selectedIcon: const Icon(Icons.dashboard_customize),
-          label: t.navigation.utilityTitle,
+    final activeColors = [
+      theme.colorScheme.primary, // Seafoam Sage for Transit Lines
+      theme.appColors.routeColor ?? const Color(0xFF818CF8), // Soft Lavender for Map
+      theme.appColors.favoriteColor ?? const Color(0xFFF472B6), // Coral Pink for Favorites (Heart)
+      theme.appColors.timeColor ?? const Color(0xFFF59E0B), // Warm Amber for Settings
+    ];
+    final activeColor = activeColors[currentIndex];
+
+    return Theme(
+      data: theme.copyWith(
+        navigationBarTheme: theme.navigationBarTheme.copyWith(
+          indicatorColor: activeColor.withValues(alpha: 0.15),
+          labelTextStyle: WidgetStateProperty.resolveWith((states) {
+            if (states.contains(WidgetState.selected)) {
+              return GoogleFonts.outfit(
+                color: activeColor,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              );
+            }
+            return GoogleFonts.outfit(
+              color: const Color(0xFF64748B),
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+            );
+          }),
         ),
-        NavigationDestination(
-          icon: const Icon(Icons.map_outlined),
-          selectedIcon: const Icon(Icons.map_rounded),
-          label: t.navigation.mapTitle,
-        ),
-        NavigationDestination(
-          icon: const Icon(Icons.favorite_outline_rounded),
-          selectedIcon: const Icon(Icons.favorite_rounded),
-          label: t.navigation.favoritesTitle,
-        ),
-        NavigationDestination(
-          icon: const Icon(Icons.settings_outlined),
-          selectedIcon: const Icon(Icons.settings_rounded),
-          label: t.navigation.settingsTitle,
-        ),
-      ],
+      ),
+      child: NavigationBar(
+        height: 66.0,
+        key: ValueKey('nav_bar_$locale'),
+        selectedIndex: currentIndex,
+        onDestinationSelected: (index) {
+          ref.read(homeTabIndexProvider.notifier).setTab(index);
+        },
+        destinations: [
+          NavigationDestination(
+            icon: const Icon(Icons.dashboard_customize_outlined),
+            selectedIcon: Icon(Icons.dashboard_customize, color: activeColors[0]),
+            label: t.navigation.utilityTitle,
+          ),
+          NavigationDestination(
+            icon: const Icon(Icons.map_outlined),
+            selectedIcon: Icon(Icons.map_rounded, color: activeColors[1]),
+            label: t.navigation.mapTitle,
+          ),
+          NavigationDestination(
+            icon: const Icon(Icons.favorite_outline_rounded),
+            selectedIcon: Icon(Icons.favorite_rounded, color: activeColors[2]),
+            label: t.navigation.favoritesTitle,
+          ),
+          NavigationDestination(
+            icon: const Icon(Icons.settings_outlined),
+            selectedIcon: Icon(Icons.settings_rounded, color: activeColors[3]),
+            label: t.navigation.settingsTitle,
+          ),
+        ],
+      ),
     );
   }
 }
@@ -338,6 +441,48 @@ class _ErrorView extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _DeferredMapScreen extends StatefulWidget {
+  const _DeferredMapScreen();
+
+  @override
+  State<_DeferredMapScreen> createState() => _DeferredMapScreenState();
+}
+
+class _DeferredMapScreenState extends State<_DeferredMapScreen> {
+  bool _loaded = false;
+  Future<void>? _loadFuture;
+
+  void _load() {
+    if (_loadFuture != null) return;
+    _loadFuture = map_screen.loadLibrary().then((_) {
+      if (mounted) {
+        setState(() {
+          _loaded = true;
+        });
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_loaded) {
+      return map_screen.MapScreen();
+    }
+
+    return Consumer(
+      builder: (context, ref, child) {
+        final currentIndex = ref.watch(homeTabIndexProvider);
+        if (currentIndex == 1) {
+          _load();
+        }
+        return const Center(
+          child: CircularProgressIndicator(strokeWidth: 3),
+        );
+      },
     );
   }
 }
