@@ -133,13 +133,14 @@ class MockLocationService extends LocationService {
 
 class MockNotificationService extends NotificationService {
   @override
-  Future<void> initialize() async {}
+  Future<void> initialize(Ref ref) async {}
 
   @override
   Future<void> showNotification({
     required int id,
     required String title,
     required String body,
+    String? payload,
   }) async {}
 }
 

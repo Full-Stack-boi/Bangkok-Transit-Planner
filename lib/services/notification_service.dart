@@ -1,14 +1,18 @@
 import 'dart:ui';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../providers/providers.dart';
 
 /// Service to handle local push notifications (e.g. proximity geofence alerts)
 class NotificationService {
   final FlutterLocalNotificationsPlugin _notificationsPlugin = FlutterLocalNotificationsPlugin();
   bool _isInitialized = false;
+  Ref? _ref;
 
   /// Initialize notification settings for Android
-  Future<void> initialize() async {
+  Future<void> initialize(Ref ref) async {
     if (_isInitialized) return;
+    _ref = ref;
 
     const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('@mipmap/ic_launcher');
@@ -20,6 +24,13 @@ class NotificationService {
     try {
       await _notificationsPlugin.initialize(
         settings: initializationSettings,
+        onDidReceiveNotificationResponse: (NotificationResponse response) {
+          final payload = response.payload;
+          if (payload != null && _ref != null) {
+            // Set the state so the UI listener triggers the bottom sheet popup
+            _ref!.read(activeNotificationPayloadProvider.notifier).setPayload(payload);
+          }
+        },
       );
       _isInitialized = true;
     } catch (e) {
@@ -32,9 +43,8 @@ class NotificationService {
     required int id,
     required String title,
     required String body,
+    String? payload,
   }) async {
-    await initialize();
-
     const AndroidNotificationDetails androidPlatformChannelSpecifics =
         AndroidNotificationDetails(
       'bkk_transit_proximity_channel',
@@ -57,6 +67,7 @@ class NotificationService {
         title: title,
         body: body,
         notificationDetails: platformChannelSpecifics,
+        payload: payload,
       );
     } catch (e) {
       print('Failed to show notification: $e');

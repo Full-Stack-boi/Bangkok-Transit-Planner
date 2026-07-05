@@ -29,6 +29,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   List<MapEntry<Station, double>> _nearestStations = [];
   double _gpsAccuracy = 10.0;
 
+  // Dwell Time geofence tracking variables
+  String? _currentStationId;
+  DateTime? _enteredStationAt;
+  bool _promptShownForCurrentPresence = false;
+
   void _onBannerTap() {
     setState(() {
       _showInAppBanner = false;
@@ -117,10 +122,41 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         final distance = closestEntry.value;
         
         if (distance <= 50.0) {
+          final stationId = closestStation.id;
+          
+          if (_currentStationId != stationId) {
+            _currentStationId = stationId;
+            _enteredStationAt = DateTime.now();
+            _promptShownForCurrentPresence = false;
+          } else {
+            if (_enteredStationAt != null && !_promptShownForCurrentPresence) {
+              final duration = DateTime.now().difference(_enteredStationAt!);
+              // In debug or mock location mode, set threshold to 1 minute to simplify testing.
+              // In production, set to 10 minutes.
+              final thresholdMinutes = (kDebugMode || ref.read(mockLocationProvider) != null) ? 1 : 10;
+              
+              if (duration.inMinutes >= thresholdMinutes) {
+                _promptShownForCurrentPresence = true;
+                
+                final notifier = ref.read(notificationServiceProvider);
+                notifier.showNotification(
+                  id: 999,
+                  title: t.isTh ? 'คุณติดอยู่ที่สถานี ${closestStation.nameTh} หรือไม่?' : 'Are you delayed at ${closestStation.nameEn}?',
+                  body: t.isTh ? 'แตะที่นี่เพื่อยืนยันว่ารถไฟฟ้ามีความล่าช้าหรือปกติ' : 'Tap here to confirm if there is a delay.',
+                  payload: 'prompt_report:$stationId',
+                );
+              }
+            }
+          }
+          
           await crowdRepo.reportPresence(
-            stationId: closestStation.id,
+            stationId: stationId,
             accuracy: position.accuracy,
           );
+        } else {
+          _currentStationId = null;
+          _enteredStationAt = null;
+          _promptShownForCurrentPresence = false;
         }
       }
     } catch (e) {
@@ -182,8 +218,150 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
+  void _showProactiveReportBottomSheet(BuildContext context, Station station) {
+    final theme = Theme.of(context);
+    final t = ref.read(translationsProvider);
+    
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: theme.scaffoldBackgroundColor,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (context) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.outline.withValues(alpha: 0.3),
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Icon(
+                  Icons.report_problem_outlined,
+                  color: theme.colorScheme.error,
+                  size: 40,
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  t.isTh 
+                      ? 'คุณติดอยู่ที่สถานี ${station.nameTh} หรือไม่?' 
+                      : 'Are you delayed at ${station.nameEn}?',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  t.isTh 
+                      ? 'ระบบตรวจพบว่าคุณอยู่ที่สถานีนี้นานกว่าปกติ โปรดช่วยยืนยันสถานะการเดินรถเพื่อแจ้งเพื่อนผู้โดยสารท่านอื่น' 
+                      : 'You have been at this station longer than usual. Please help confirm transit status for other passengers.',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 24),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: Text(t.isTh ? 'เดินรถปกติ' : 'Normal'),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          Navigator.pop(context);
+                          final crowdRepo = ref.read(crowdRepositoryProvider);
+                          await crowdRepo.submitCrowdReport(
+                            stationId: station.id,
+                            level: 4, // High delay/crowd
+                          );
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  t.isTh 
+                                      ? 'ขอบคุณที่ร่วมรายงานข้อมูลสถานการณ์' 
+                                      : 'Thank you for your report!',
+                                ),
+                                backgroundColor: Colors.green,
+                              ),
+                            );
+                          }
+                          // Refresh the line status provider
+                          ref.invalidate(transitLineStatusProvider);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: theme.colorScheme.error,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: Text(t.isTh ? 'ใช่ ล่าช้า/ขัดข้อง' : 'Yes, Delayed'),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    // Listen for proactive report triggers from local notifications
+    ref.listen<String?>(activeNotificationPayloadProvider, (previous, next) {
+      if (next != null && next.startsWith('prompt_report:')) {
+        final stationId = next.replaceFirst('prompt_report:', '');
+        
+        final transitRepo = ref.read(transitRepositoryProvider);
+        final station = transitRepo.stations.firstWhere(
+          (s) => s.id == stationId,
+          orElse: () => Station(
+            id: stationId,
+            code: '',
+            nameTh: stationId,
+            nameEn: stationId,
+            lineId: '',
+            lat: 0,
+            lng: 0,
+          ),
+        );
+        
+        ref.read(activeNotificationPayloadProvider.notifier).setPayload(null);
+        _showProactiveReportBottomSheet(context, station);
+      }
+    });
+
     // Listen for mock location updates to re-trigger proximity checks instantly
     ref.listen(mockLocationProvider, (previous, next) {
       _initGPSProximityCheck();
@@ -229,7 +407,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         body: Row(
           children: [
             const AppNavigationRail(),
-            const VerticalDivider(width: 1, thickness: 1),
             Expanded(child: content),
           ],
         ),
