@@ -391,7 +391,7 @@ class UtilityScreen extends ConsumerWidget {
                   ),
                   const SizedBox(width: 10),
                   Text(
-                    t.isTh ? 'ข่าวประชาสัมพันธ์' : 'Official Announcement',
+                    t.utility.officialAnnouncementTitle,
                     style: theme.textTheme.labelMedium?.copyWith(
                       color: theme.colorScheme.onSurfaceVariant,
                       fontWeight: FontWeight.bold,
@@ -977,7 +977,7 @@ class UtilityScreen extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      t.isTh ? 'รายงานปัญหาหรือความล่าช้า' : 'Report Delay or Congestion',
+                      t.utility.reportDelayTitle,
                       style: theme.textTheme.titleSmall?.copyWith(
                         fontWeight: FontWeight.bold,
                         color: theme.colorScheme.primary,
@@ -1022,14 +1022,14 @@ class UtilityScreen extends ConsumerWidget {
     int selectedLevel = 3;
     
     final lines = [
-      {'id': 'BTS_SUKHUMVIT', 'nameTh': 'BTS สายสุขุมวิท', 'nameEn': 'BTS Sukhumvit Line'},
-      {'id': 'BTS_SILOM', 'nameTh': 'BTS สายสีลม', 'nameEn': 'BTS Silom Line'},
-      {'id': 'MRT_BLUE', 'nameTh': 'MRT สายสีน้ำเงิน', 'nameEn': 'MRT Blue Line'},
-      {'id': 'MRT_PURPLE', 'nameTh': 'MRT สายสีม่วง', 'nameEn': 'MRT Purple Line'},
-      {'id': 'MRT_YELLOW', 'nameTh': 'MRT สายสีเหลือง', 'nameEn': 'MRT Yellow Line'},
-      {'id': 'MRT_PINK', 'nameTh': 'MRT สายสีชมพู', 'nameEn': 'MRT Pink Line'},
-      {'id': 'ARL', 'nameTh': 'แอร์พอร์ตลิงก์', 'nameEn': 'Airport Rail Link'},
-      {'id': 'SRT_RED_NORTH', 'nameTh': 'สายสีแดง', 'nameEn': 'SRT Red Line'},
+      {'id': 'BTS_SUKHUMVIT', 'name': t.utility.lineBtsSukhumvit},
+      {'id': 'BTS_SILOM', 'name': t.utility.lineBtsSilom},
+      {'id': 'MRT_BLUE', 'name': t.utility.lineMrtBlue},
+      {'id': 'MRT_PURPLE', 'name': t.utility.lineMrtPurple},
+      {'id': 'MRT_YELLOW', 'name': t.utility.lineMrtYellow},
+      {'id': 'MRT_PINK', 'name': t.utility.lineMrtPink},
+      {'id': 'ARL', 'name': t.utility.lineArl},
+      {'id': 'SRT_RED_NORTH', 'name': t.utility.lineSrtRed},
     ];
     
     showModalBottomSheet(
@@ -1090,7 +1090,7 @@ class UtilityScreen extends ConsumerWidget {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      t.isTh ? 'รายงานปัญหาจราจรและเหตุล่าช้า' : 'Submit Crowd/Delay Report',
+                      t.utility.submitReportTitle,
                       style: theme.textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
@@ -1099,7 +1099,7 @@ class UtilityScreen extends ConsumerWidget {
                     const SizedBox(height: 20),
                     
                     Text(
-                      t.isTh ? 'เลือกสายรถไฟฟ้า' : 'Select Transit Line',
+                      t.utility.selectLineLabel,
                       style: theme.textTheme.labelMedium?.copyWith(fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 8),
@@ -1112,12 +1112,12 @@ class UtilityScreen extends ConsumerWidget {
                       child: DropdownButtonHideUnderline(
                         child: DropdownButton<String>(
                           value: selectedLineId,
-                          hint: Text(t.isTh ? 'กรุณาเลือกสายรถไฟฟ้า' : 'Select a transit line'),
+                          hint: Text(t.utility.selectLineHint),
                           isExpanded: true,
                           items: lines.map((l) {
                             return DropdownMenuItem<String>(
                               value: l['id'],
-                              child: Text(t.isTh ? l['nameTh']! : l['nameEn']!),
+                              child: Text(l['name']!),
                             );
                           }).toList(),
                           onChanged: (val) {
@@ -1132,7 +1132,7 @@ class UtilityScreen extends ConsumerWidget {
                     const SizedBox(height: 16),
 
                     Text(
-                      t.isTh ? 'เลือกสถานีรถไฟฟ้า' : 'Select Station',
+                      t.utility.selectStationLabel,
                       style: theme.textTheme.labelMedium?.copyWith(fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 8),
@@ -1147,8 +1147,8 @@ class UtilityScreen extends ConsumerWidget {
                           value: selectedStation,
                           hint: Text(
                             selectedLineId == null
-                                ? (t.isTh ? 'กรุณาเลือกสายรถไฟฟ้าก่อน' : 'Please select line first')
-                                : (t.isTh ? 'กรุณาเลือกสถานี' : 'Select a station')
+                                ? t.utility.selectLineFirstHint
+                                : t.utility.selectStationHint
                           ),
                           isExpanded: true,
                           items: filteredStations.map((s) {
@@ -1170,7 +1170,7 @@ class UtilityScreen extends ConsumerWidget {
                     const SizedBox(height: 18),
                     
                     Text(
-                      t.isTh ? 'ระดับความหนาแน่น / ล่าช้า' : 'Delay & Crowding Intensity',
+                      t.utility.delayIntensityLabel,
                       style: theme.textTheme.labelMedium?.copyWith(fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 12),
@@ -1224,11 +1224,11 @@ class UtilityScreen extends ConsumerWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          t.isTh ? 'ปกติ/สะดวกสบาย' : 'Normal/Smooth',
+                          t.utility.normalSmoothLabel,
                           style: TextStyle(fontSize: 10, color: theme.colorScheme.onSurfaceVariant),
                         ),
                         Text(
-                          t.isTh ? 'แน่นมาก/รถไฟขัดข้อง' : 'Severe Delay/Crowded',
+                          t.utility.severeDelayLabel,
                           style: TextStyle(fontSize: 10, color: theme.colorScheme.onSurfaceVariant),
                         ),
                       ],
@@ -1247,9 +1247,7 @@ class UtilityScreen extends ConsumerWidget {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text(
-                                t.isTh 
-                                    ? 'ส่งรายงานสำเร็จแล้ว' 
-                                    : 'Report submitted successfully!',
+                                t.utility.reportSuccessSnack,
                               ),
                               backgroundColor: Colors.green,
                             ),
@@ -1266,7 +1264,7 @@ class UtilityScreen extends ConsumerWidget {
                         ),
                       ),
                       child: Text(
-                        t.isTh ? 'ส่งรายงานข้อมูล' : 'Submit Report',
+                        t.utility.submitReportBtn,
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -1290,7 +1288,7 @@ class UtilityScreen extends ConsumerWidget {
             const SizedBox(width: 12),
             Expanded(
               child: Text(
-                t.isTh ? 'เกิดข้อผิดพลาดในการโหลดข้อมูล' : 'Error loading transit status',
+                t.utility.errorLoadingStatus,
                 style: TextStyle(color: theme.colorScheme.error),
               ),
             ),

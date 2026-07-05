@@ -342,6 +342,16 @@ class ThaiProximity implements BaseProximity {
   String checkinSuccess(String stationName) => 'เช็คอินสถานี $stationName สำเร็จ และตั้งเป็นต้นทางแล้ว!';
   @override
   String nearStationWalk(String stationName, String time) => 'ใกล้สถานี$stationName · เดิน ~$time นาที';
+  @override
+  String promptDelayAtStation(String stationName) => 'คุณติดอยู่ที่สถานี $stationName หรือไม่?';
+  @override
+  String get promptDelayBody => 'แตะที่นี่เพื่อยืนยันว่ารถไฟฟ้ามีความล่าช้าหรือปกติ';
+  @override
+  String get normalStatusLabel => 'เดินรถปกติ';
+  @override
+  String get yesDelayedLabel => 'ใช่ ล่าช้า/ขัดข้อง';
+  @override
+  String get thankYouReportLabel => 'ขอบคุณที่ร่วมรายงานข้อมูลสถานการณ์';
 }
 
 class ThaiSettings implements BaseSettings {
@@ -535,4 +545,48 @@ class ThaiUtility implements BaseUtility {
   @override
   String debugSimGpsEnabledSnack(String stationName) =>
       'กำลังจำลองตำแหน่งที่ $stationName';
+  @override
+  String get officialAnnouncementTitle => 'ข่าวประชาสัมพันธ์';
+  @override
+  String get reportDelayTitle => 'รายงานปัญหาหรือความล่าช้า';
+  @override
+  String get submitReportTitle => 'รายงานปัญหาจราจรและเหตุล่าช้า';
+  @override
+  String get selectLineLabel => 'เลือกสายรถไฟฟ้า';
+  @override
+  String get selectLineHint => 'กรุณาเลือกสายรถไฟฟ้า';
+  @override
+  String get selectStationLabel => 'เลือกสถานีรถไฟฟ้า';
+  @override
+  String get selectLineFirstHint => 'กรุณาเลือกสายรถไฟฟ้าก่อน';
+  @override
+  String get selectStationHint => 'กรุณาเลือกสถานี';
+  @override
+  String get delayIntensityLabel => 'ระดับความหนาแน่น / ล่าช้า';
+  @override
+  String get normalSmoothLabel => 'ปกติ/สะดวกสบาย';
+  @override
+  String get severeDelayLabel => 'แน่นมาก/รถไฟขัดข้อง';
+  @override
+  String get submitReportBtn => 'ส่งรายงานข้อมูล';
+  @override
+  String get errorLoadingStatus => 'เกิดข้อผิดพลาดในการโหลดข้อมูล';
+  @override
+  String get reportSuccessSnack => 'ส่งรายงานสำเร็จแล้ว';
+  @override
+  String get lineBtsSukhumvit => 'BTS สายสุขุมวิท';
+  @override
+  String get lineBtsSilom => 'BTS สายสีลม';
+  @override
+  String get lineMrtBlue => 'MRT สายสีน้ำเงิน';
+  @override
+  String get lineMrtPurple => 'MRT สายสีม่วง';
+  @override
+  String get lineMrtYellow => 'MRT สายสีเหลือง';
+  @override
+  String get lineMrtPink => 'MRT สายสีชมพู';
+  @override
+  String get lineArl => 'แอร์พอร์ตลิงก์';
+  @override
+  String get lineSrtRed => 'สายสีแดง';
 }

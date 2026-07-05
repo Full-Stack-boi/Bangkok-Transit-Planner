@@ -141,8 +141,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 final notifier = ref.read(notificationServiceProvider);
                 notifier.showNotification(
                   id: 999,
-                  title: t.isTh ? 'คุณติดอยู่ที่สถานี ${closestStation.nameTh} หรือไม่?' : 'Are you delayed at ${closestStation.nameEn}?',
-                  body: t.isTh ? 'แตะที่นี่เพื่อยืนยันว่ารถไฟฟ้ามีความล่าช้าหรือปกติ' : 'Tap here to confirm if there is a delay.',
+                  title: t.proximity.promptDelayAtStation(t.isTh ? closestStation.nameTh : closestStation.nameEn),
+                  body: t.proximity.promptDelayBody,
                   payload: 'prompt_report:$stationId',
                 );
               }
@@ -287,7 +287,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        child: Text(t.isTh ? 'เดินรถปกติ' : 'Normal'),
+                        child: Text(t.proximity.normalStatusLabel),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -304,9 +304,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text(
-                                  t.isTh 
-                                      ? 'ขอบคุณที่ร่วมรายงานข้อมูลสถานการณ์' 
-                                      : 'Thank you for your report!',
+                                  t.proximity.thankYouReportLabel,
                                 ),
                                 backgroundColor: Colors.green,
                               ),
@@ -323,7 +321,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        child: Text(t.isTh ? 'ใช่ ล่าช้า/ขัดข้อง' : 'Yes, Delayed'),
+                        child: Text(t.proximity.yesDelayedLabel),
                       ),
                     ),
                   ],

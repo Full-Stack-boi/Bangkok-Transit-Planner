@@ -342,6 +342,16 @@ class EnglishProximity implements BaseProximity {
   String checkinSuccess(String stationName) => 'Checked in to $stationName and set as origin!';
   @override
   String nearStationWalk(String stationName, String time) => 'Near $stationName station · ~$time min walk';
+  @override
+  String promptDelayAtStation(String stationName) => 'Are you delayed at $stationName?';
+  @override
+  String get promptDelayBody => 'Tap here to confirm if there is a delay.';
+  @override
+  String get normalStatusLabel => 'Normal';
+  @override
+  String get yesDelayedLabel => 'Yes, Delayed';
+  @override
+  String get thankYouReportLabel => 'Thank you for your report!';
 }
 
 class EnglishSettings implements BaseSettings {
@@ -535,4 +545,48 @@ class EnglishUtility implements BaseUtility {
   @override
   String debugSimGpsEnabledSnack(String stationName) =>
       'Simulating at $stationName';
+  @override
+  String get officialAnnouncementTitle => 'Official Announcement';
+  @override
+  String get reportDelayTitle => 'Report Delay or Congestion';
+  @override
+  String get submitReportTitle => 'Submit Crowd/Delay Report';
+  @override
+  String get selectLineLabel => 'Select Transit Line';
+  @override
+  String get selectLineHint => 'Select a transit line';
+  @override
+  String get selectStationLabel => 'Select Station';
+  @override
+  String get selectLineFirstHint => 'Please select line first';
+  @override
+  String get selectStationHint => 'Select a station';
+  @override
+  String get delayIntensityLabel => 'Delay & Crowding Intensity';
+  @override
+  String get normalSmoothLabel => 'Normal/Smooth';
+  @override
+  String get severeDelayLabel => 'Severe Delay/Crowded';
+  @override
+  String get submitReportBtn => 'Submit Report';
+  @override
+  String get errorLoadingStatus => 'Error loading transit status';
+  @override
+  String get reportSuccessSnack => 'Report submitted successfully!';
+  @override
+  String get lineBtsSukhumvit => 'BTS Sukhumvit Line';
+  @override
+  String get lineBtsSilom => 'BTS Silom Line';
+  @override
+  String get lineMrtBlue => 'MRT Blue Line';
+  @override
+  String get lineMrtPurple => 'MRT Purple Line';
+  @override
+  String get lineMrtYellow => 'MRT Yellow Line';
+  @override
+  String get lineMrtPink => 'MRT Pink Line';
+  @override
+  String get lineArl => 'Airport Rail Link';
+  @override
+  String get lineSrtRed => 'SRT Red Line';
 }

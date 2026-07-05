@@ -169,6 +169,11 @@ abstract class BaseProximity {
   String get interconnectText;
   String checkinSuccess(String stationName);
   String nearStationWalk(String stationName, String time);
+  String promptDelayAtStation(String stationName);
+  String get promptDelayBody;
+  String get normalStatusLabel;
+  String get yesDelayedLabel;
+  String get thankYouReportLabel;
 }
 
 abstract class BaseSettings {
@@ -241,6 +246,28 @@ abstract class BaseUtility {
   String get debugSimGpsDisableSubtitle;
   String get debugSimGpsDisabledSnack;
   String debugSimGpsEnabledSnack(String stationName);
+  String get officialAnnouncementTitle;
+  String get reportDelayTitle;
+  String get submitReportTitle;
+  String get selectLineLabel;
+  String get selectLineHint;
+  String get selectStationLabel;
+  String get selectLineFirstHint;
+  String get selectStationHint;
+  String get delayIntensityLabel;
+  String get normalSmoothLabel;
+  String get severeDelayLabel;
+  String get submitReportBtn;
+  String get errorLoadingStatus;
+  String get reportSuccessSnack;
+  String get lineBtsSukhumvit;
+  String get lineBtsSilom;
+  String get lineMrtBlue;
+  String get lineMrtPurple;
+  String get lineMrtYellow;
+  String get lineMrtPink;
+  String get lineArl;
+  String get lineSrtRed;
 }
 
 abstract class BaseAuth {
