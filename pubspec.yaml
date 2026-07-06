@@ -21,8 +21,7 @@ dependencies:
   # Backend + Auth
   supabase_flutter: ^2.9.0
 
-  # Navigation
-  go_router: ^17.3.0
+
 
   # Map
   flutter_map: ^8.3.0
