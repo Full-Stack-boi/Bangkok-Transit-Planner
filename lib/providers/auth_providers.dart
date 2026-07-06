@@ -4,6 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../repositories/auth_repository.dart';
 import 'providers.dart';
 import '../features/favorites/favorites_view_model.dart';
+import 'package:bkk_transit_planner/core/utils/logger.dart';
 
 part 'auth_providers.g.dart';
 
@@ -92,7 +93,7 @@ class AuthNotifier extends _$AuthNotifier {
           // Refresh favorites screen view model to load updated synced listings
           ref.read(favoritesViewModelProvider.notifier).refresh();
         } catch (e) {
-          print('Background sync failed on login: $e');
+          AppLogger.error('Background sync failed on login: $e', error: e);
         }
       } else {
         if (!ref.mounted) return;

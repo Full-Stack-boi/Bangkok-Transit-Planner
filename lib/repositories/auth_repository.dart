@@ -1,6 +1,7 @@
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../services/supabase_service.dart';
+import 'package:bkk_transit_planner/core/utils/logger.dart';
 
 /// Repository for handling all Authentication actions via Supabase Auth & Google Sign-In
 class AuthRepository {
@@ -42,7 +43,7 @@ class AuthRepository {
       );
       return response;
     } catch (e) {
-      print('Sign up error in AuthRepository: $e');
+      AppLogger.error('Sign up error in AuthRepository: $e', error: e);
       rethrow;
     }
   }
@@ -64,7 +65,7 @@ class AuthRepository {
       );
       return response;
     } catch (e) {
-      print('Sign in error in AuthRepository: $e');
+      AppLogger.error('Sign in error in AuthRepository: $e', error: e);
       rethrow;
     }
   }
@@ -102,7 +103,7 @@ class AuthRepository {
 
       return response;
     } catch (e) {
-      print('Native Google Sign-In error in AuthRepository: $e');
+      AppLogger.error('Native Google Sign-In error in AuthRepository: $e', error: e);
       rethrow;
     }
   }
@@ -115,7 +116,7 @@ class AuthRepository {
       await client.auth.signOut();
       await GoogleSignIn.instance.signOut();
     } catch (e) {
-      print('Sign out error in AuthRepository: $e');
+      AppLogger.error('Sign out error in AuthRepository: $e', error: e);
     }
   }
 
@@ -132,7 +133,7 @@ class AuthRepository {
           .maybeSingle();
       return data;
     } catch (e) {
-      print('Failed to load profile in AuthRepository: $e');
+      AppLogger.error('Failed to load profile in AuthRepository: $e', error: e);
       return null;
     }
   }
@@ -158,7 +159,7 @@ class AuthRepository {
         ),
       );
     } catch (e) {
-      print('Failed to update user cards metadata: $e');
+      AppLogger.error('Failed to update user cards metadata: $e', error: e);
     }
   }
 }

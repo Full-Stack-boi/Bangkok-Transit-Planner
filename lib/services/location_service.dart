@@ -5,6 +5,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
 import '../models/station.dart';
 import '../providers/location_providers.dart';
+import 'package:bkk_transit_planner/core/utils/logger.dart';
 
 /// Service for handling GPS permissions, user location, and proximity detection
 class LocationService {
@@ -50,20 +51,20 @@ class LocationService {
       if (kDebugMode && _ref != null) {
         final mockPos = _ref.read(mockLocationProvider);
         if (mockPos != null) {
-          print('Using simulated mock location: ${mockPos.latitude}, ${mockPos.longitude}');
+          AppLogger.info('Using simulated mock location: ${mockPos.latitude}, ${mockPos.longitude}');
           return mockPos;
         }
       }
 
       final isServiceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!isServiceEnabled) {
-        print('GPS Location Services are globally disabled in the device settings.');
+        AppLogger.info('GPS Location Services are globally disabled in the device settings.');
         return null;
       }
 
       final permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
-        print('Location permission check returned denied or deniedForever.');
+        AppLogger.info('Location permission check returned denied or deniedForever.');
         return null;
       }
 
@@ -72,13 +73,13 @@ class LocationService {
       if (!kIsWeb) {
         final lastKnown = await Geolocator.getLastKnownPosition();
         if (lastKnown != null) {
-          print('Using last known position: ${lastKnown.latitude}, ${lastKnown.longitude}');
+          AppLogger.info('Using last known position: ${lastKnown.latitude}, ${lastKnown.longitude}');
           return lastKnown;
         }
       }
 
       // Fetch fresh coordinates
-      print('Fetching fresh GPS coordinates...');
+      AppLogger.info('Fetching fresh GPS coordinates...');
       // Increasing timeout for web since browsers can be slow on first lock
       const fetchTimeout = Duration(seconds: 15);
       final position = await Geolocator.getCurrentPosition(
@@ -93,13 +94,13 @@ class LocationService {
               forceLocationManager: false,
             ),
       ).timeout(fetchTimeout, onTimeout: () {
-        print('GPS location fetch timed out after ${fetchTimeout.inSeconds}s.');
+        AppLogger.info('GPS location fetch timed out after ${fetchTimeout.inSeconds}s.');
         throw TimeoutException('GPS timeout');
       });
 
       return position;
     } catch (e) {
-      print('Failed to get current location: $e');
+      AppLogger.error('Failed to get current location: $e', error: e);
       return null;
     }
   }

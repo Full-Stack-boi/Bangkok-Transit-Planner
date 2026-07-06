@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/supabase_service.dart';
+import 'package:bkk_transit_planner/core/utils/logger.dart';
 
 /// Repository for managing user favorite stations and saved routes
 class FavoritesRepository {
@@ -58,7 +59,7 @@ class FavoritesRepository {
           }
         }
       } catch (e) {
-        print('Supabase favorites sync failed: $e');
+        AppLogger.error('Supabase favorites sync failed: $e', error: e);
       }
     }
 
@@ -130,7 +131,7 @@ class FavoritesRepository {
           }, onConflict: 'user_id,origin_id,destination_id');
         }
       } catch (e) {
-        print('Supabase route sync failed: $e');
+        AppLogger.error('Supabase route sync failed: $e', error: e);
       }
     }
   }
@@ -158,7 +159,7 @@ class FavoritesRepository {
           });
         }
       } catch (e) {
-        print('Supabase route deletion sync failed: $e');
+        AppLogger.error('Supabase route deletion sync failed: $e', error: e);
       }
     }
   }
@@ -270,7 +271,7 @@ class FavoritesRepository {
         await _prefs?.setStringList('saved_routes', serialized);
       }
     } catch (e) {
-      print('Bidirectional Supabase sync failed: $e');
+      AppLogger.error('Bidirectional Supabase sync failed: $e', error: e);
       rethrow;
     }
   }

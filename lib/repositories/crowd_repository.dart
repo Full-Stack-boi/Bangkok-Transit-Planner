@@ -1,4 +1,5 @@
 import '../services/supabase_service.dart';
+import 'package:bkk_transit_planner/core/utils/logger.dart';
 
 /// Repository for handling crowd reports and presence signals
 class CrowdRepository {
@@ -13,7 +14,7 @@ class CrowdRepository {
     String? userId,
   }) async {
     final now = DateTime.now().toIso8601String();
-    print('Passive GPS check-in reported locally: Station: $stationId, Accuracy: $accuracy meters, Time: $now');
+    AppLogger.info('Passive GPS check-in reported locally: Station: $stationId, Accuracy: $accuracy meters, Time: $now');
 
     if (_supabaseService.isInitialized) {
       try {
@@ -27,7 +28,7 @@ class CrowdRepository {
           'accuracy_meters': accuracy,
         });
       } catch (e) {
-        print('Supabase passive check-in sync failed: $e');
+        AppLogger.error('Supabase passive check-in sync failed: $e', error: e);
       }
     }
   }
@@ -40,7 +41,7 @@ class CrowdRepository {
     String? userId,
   }) async {
     final now = DateTime.now().toIso8601String();
-    print('Active crowd report submitted locally: Station: $stationId, Level: $level, Direction: $direction, Time: $now');
+    AppLogger.info('Active crowd report submitted locally: Station: $stationId, Level: $level, Direction: $direction, Time: $now');
 
     if (_supabaseService.isInitialized) {
       try {
@@ -55,7 +56,7 @@ class CrowdRepository {
           'direction': direction,
         });
       } catch (e) {
-        print('Supabase active crowd report sync failed: $e');
+        AppLogger.error('Supabase active crowd report sync failed: $e', error: e);
       }
     }
   }

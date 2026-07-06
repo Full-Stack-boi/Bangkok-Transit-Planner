@@ -1,4 +1,5 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:bkk_transit_planner/core/utils/logger.dart';
 
 /// Service for managing Supabase integration and offline fallback
 class SupabaseService {
@@ -32,11 +33,11 @@ class SupabaseService {
           ),
         );
         _isInitialized = true;
-        print('Supabase initialized successfully.');
+        AppLogger.success('Supabase initialized successfully.');
       }
     } catch (e) {
       _isInitialized = false;
-      print('Supabase initialization failed: $e. Running in offline/fallback mode.');
+      AppLogger.error('Supabase initialization failed: $e. Running in offline/fallback mode.', error: e);
     }
   }
 

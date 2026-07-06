@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/providers.dart';
+import 'package:bkk_transit_planner/core/utils/logger.dart';
 
 /// Service to handle local push notifications (e.g. proximity geofence alerts)
 class NotificationService {
@@ -34,7 +35,7 @@ class NotificationService {
       );
       _isInitialized = true;
     } catch (e) {
-      print('Failed to initialize local notifications: $e');
+      AppLogger.error('Failed to initialize local notifications: $e', error: e);
     }
   }
 
@@ -70,7 +71,7 @@ class NotificationService {
         payload: payload,
       );
     } catch (e) {
-      print('Failed to show notification: $e');
+      AppLogger.error('Failed to show notification: $e', error: e);
     }
   }
 }

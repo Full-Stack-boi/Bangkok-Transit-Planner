@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:bkk_transit_planner/core/utils/logger.dart';
 
 /// Service for generating realistic walking routes (online via OSRM, offline via Manhattan grid fallback)
 class WalkingRouteService {
@@ -66,7 +67,7 @@ class WalkingRouteService {
         }
       }
     } catch (e) {
-      print('OSRM walking path fetch failed: $e. Falling back to Manhattan grid path.');
+      AppLogger.error('OSRM walking path fetch failed: $e. Falling back to Manhattan grid path.', error: e);
     }
 
     // Offline / Error Fallback: Manhattan grid path

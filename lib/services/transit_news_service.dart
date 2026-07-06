@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
+import 'package:bkk_transit_planner/core/utils/logger.dart';
 
 class TransitLineStatus {
   final String lineId;
@@ -76,7 +77,7 @@ class TransitNewsService {
         throw Exception('Server returned status code ${response.statusCode}');
       }
     } catch (e) {
-      print('Error fetching DRT news: $e');
+      AppLogger.error('Error fetching DRT news: $e', error: e);
       if (kDebugMode) {
         // Fallback to official mock announcements in debug mode only
         return _getMockDrtArticles().where((art) => _isCommuterRelevant(art.titleTh, art.bodyTh)).toList();

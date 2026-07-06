@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
+import 'package:bkk_transit_planner/core/utils/logger.dart';
 
 class OsrmRouteResult {
   final double distanceMeters;
@@ -64,7 +65,7 @@ class OsrmService {
       }
       return null;
     } catch (e) {
-      print('OSRM error: $e');
+      AppLogger.error('OSRM error: $e', error: e);
       return null;
     }
   }

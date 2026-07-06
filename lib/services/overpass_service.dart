@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
+import 'package:bkk_transit_planner/core/utils/logger.dart';
 
 class OverpassService {
   // Use Vercel Serverless Function proxy on Web to bypass CORS and avoid 404s.
@@ -96,10 +97,10 @@ class OverpassService {
             return entrances;
           }
         } else {
-          print('Overpass API error on attempt ${i + 1}: ${response.statusCode}');
+          AppLogger.error('Overpass API error on attempt ${i + 1}: ${response.statusCode}');
         }
       } catch (e) {
-        print('Exception calling Overpass API on attempt ${i + 1}: $e');
+        AppLogger.error('Exception calling Overpass API on attempt ${i + 1}: $e', error: e);
         if (i == attempts - 1) {
           rethrow; // Rethrow on last attempt so caller knows it failed
         }
