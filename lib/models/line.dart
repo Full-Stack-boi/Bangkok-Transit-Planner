@@ -1,62 +1,28 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+part 'line.freezed.dart';
+part 'line.g.dart';
+
 /// Transit line model
-class TransitLine {
-  final String id;           // e.g. "BTS_SUKHUMVIT"
-  final String nameTh;       // e.g. "สายสุขุมวิท"
-  final String nameEn;       // e.g. "Sukhumvit Line"
-  final String operator;     // e.g. "BTS", "MRT", "ARL"
-  final String colorHex;     // e.g. "#7DC242"
-  final List<String> stationIds;  // Ordered station IDs along the line
-  final String bound0Label;  // Direction label for bound 0 (e.g. "ไปหมอชิต")
-  final String bound1Label;  // Direction label for bound 1 (e.g. "ไปเคหะฯ")
-  final bool isLoop;         // True for MRT Blue Line (circular)
-  final int peakIntervalMin;
-  final int offPeakIntervalMin;
+@freezed
+abstract class TransitLine with _$TransitLine {
+  const TransitLine._(); // Allows custom methods/getters
 
-  const TransitLine({
-    required this.id,
-    required this.nameTh,
-    required this.nameEn,
-    required this.operator,
-    required this.colorHex,
-    required this.stationIds,
-    required this.bound0Label,
-    required this.bound1Label,
-    this.isLoop = false,
-    required this.peakIntervalMin,
-    required this.offPeakIntervalMin,
-  });
+  const factory TransitLine({
+    required String id,           // e.g. "BTS_SUKHUMVIT"
+    @JsonKey(name: 'name_th') required String nameTh,       // e.g. "สายสุขุมวิท"
+    @JsonKey(name: 'name_en') required String nameEn,       // e.g. "Sukhumvit Line"
+    required String operator,     // e.g. "BTS", "MRT", "ARL"
+    @JsonKey(name: 'color_hex') required String colorHex,     // e.g. "#7DC242"
+    @JsonKey(name: 'station_ids') required List<String> stationIds,  // Ordered station IDs along the line
+    @JsonKey(name: 'bound_0_label') required String bound0Label,  // Direction label for bound 0 (e.g. "ไปหมอชิต")
+    @JsonKey(name: 'bound_1_label') required String bound1Label,  // Direction label for bound 1 (e.g. "ไปเคหะฯ")
+    @Default(false) @JsonKey(name: 'is_loop') bool isLoop,         // True for MRT Blue Line (circular)
+    @JsonKey(name: 'peak_interval_min') required int peakIntervalMin,
+    @JsonKey(name: 'off_peak_interval_min') required int offPeakIntervalMin,
+  }) = _TransitLine;
 
-  factory TransitLine.fromJson(Map<String, dynamic> json) {
-    return TransitLine(
-      id: json['id'] as String,
-      nameTh: json['name_th'] as String,
-      nameEn: json['name_en'] as String,
-      operator: json['operator'] as String,
-      colorHex: json['color_hex'] as String,
-      stationIds: (json['station_ids'] as List<dynamic>)
-          .map((e) => e as String)
-          .toList(),
-      bound0Label: json['bound_0_label'] as String,
-      bound1Label: json['bound_1_label'] as String,
-      isLoop: json['is_loop'] as bool? ?? false,
-      peakIntervalMin: json['peak_interval_min'] as int,
-      offPeakIntervalMin: json['off_peak_interval_min'] as int,
-    );
-  }
-
-  Map<String, dynamic> toJson() => {
-        'id': id,
-        'name_th': nameTh,
-        'name_en': nameEn,
-        'operator': operator,
-        'color_hex': colorHex,
-        'station_ids': stationIds,
-        'bound_0_label': bound0Label,
-        'bound_1_label': bound1Label,
-        'is_loop': isLoop,
-        'peak_interval_min': peakIntervalMin,
-        'off_peak_interval_min': offPeakIntervalMin,
-      };
+  factory TransitLine.fromJson(Map<String, dynamic> json) => _$TransitLineFromJson(json);
 
   /// Get the direction label for a given bound index
   String getDirectionLabel(int bound) {
@@ -80,7 +46,4 @@ class TransitLine {
   String displayName({bool isEnglish = false}) {
     return isEnglish ? nameEn : nameTh;
   }
-
-  @override
-  String toString() => 'TransitLine($id: $nameEn)';
 }

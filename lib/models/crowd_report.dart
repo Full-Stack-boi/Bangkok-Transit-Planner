@@ -1,58 +1,35 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+part 'crowd_report.freezed.dart';
+part 'crowd_report.g.dart';
+
 /// Crowd report from a user (active report)
-class CrowdReport {
-  final String id;
-  final String stationId;
-  final String userId;
-  final int level;         // 1-5
-  final DateTime reportedAt;
-  final String? direction;
+@freezed
+abstract class CrowdReport with _$CrowdReport {
+  const factory CrowdReport({
+    required String id,
+    @JsonKey(name: 'station_id') required String stationId,
+    @JsonKey(name: 'user_id') required String userId,
+    required int level,         // 1-5
+    @JsonKey(name: 'reported_at') required DateTime reportedAt,
+    String? direction,
+  }) = _CrowdReport;
 
-  const CrowdReport({
-    required this.id,
-    required this.stationId,
-    required this.userId,
-    required this.level,
-    required this.reportedAt,
-    this.direction,
-  });
-
-  factory CrowdReport.fromJson(Map<String, dynamic> json) {
-    return CrowdReport(
-      id: json['id'] as String,
-      stationId: json['station_id'] as String,
-      userId: json['user_id'] as String,
-      level: json['level'] as int,
-      reportedAt: DateTime.parse(json['reported_at'] as String),
-      direction: json['direction'] as String?,
-    );
-  }
+  factory CrowdReport.fromJson(Map<String, dynamic> json) => _$CrowdReportFromJson(json);
 }
 
 /// Passive GPS presence detection
-class CrowdPresence {
-  final String id;
-  final String stationId;
-  final String userId;
-  final DateTime detectedAt;
-  final double? accuracyMeters;
+@freezed
+abstract class CrowdPresence with _$CrowdPresence {
+  const factory CrowdPresence({
+    required String id,
+    @JsonKey(name: 'station_id') required String stationId,
+    @JsonKey(name: 'user_id') required String userId,
+    @JsonKey(name: 'detected_at') required DateTime detectedAt,
+    @JsonKey(name: 'accuracy_meters') double? accuracyMeters,
+  }) = _CrowdPresence;
 
-  const CrowdPresence({
-    required this.id,
-    required this.stationId,
-    required this.userId,
-    required this.detectedAt,
-    this.accuracyMeters,
-  });
-
-  factory CrowdPresence.fromJson(Map<String, dynamic> json) {
-    return CrowdPresence(
-      id: json['id'] as String,
-      stationId: json['station_id'] as String,
-      userId: json['user_id'] as String,
-      detectedAt: DateTime.parse(json['detected_at'] as String),
-      accuracyMeters: (json['accuracy_meters'] as num?)?.toDouble(),
-    );
-  }
+  factory CrowdPresence.fromJson(Map<String, dynamic> json) => _$CrowdPresenceFromJson(json);
 }
 
 /// Aggregated crowd level for a station

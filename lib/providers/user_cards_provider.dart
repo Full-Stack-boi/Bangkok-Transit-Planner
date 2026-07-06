@@ -1,6 +1,8 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'auth_providers.dart';
+
+part 'user_cards_provider.g.dart';
 
 /// State representation for the user's transit cards and subscriptions
 class UserCardsState {
@@ -33,7 +35,8 @@ class UserCardsState {
 
 /// Notifier that manages transit card state, persistence in SharedPreferences,
 /// and cloud synchronization via Supabase User Metadata when authenticated.
-class UserCardsNotifier extends Notifier<UserCardsState> {
+@riverpod
+class UserCards extends _$UserCards {
   @override
   UserCardsState build() {
     _loadCards();
@@ -115,8 +118,3 @@ class UserCardsNotifier extends Notifier<UserCardsState> {
     }).catchError((_) {});
   }
 }
-
-/// Provider exposing the active user card settings
-final userCardsProvider = NotifierProvider<UserCardsNotifier, UserCardsState>(() {
-  return UserCardsNotifier();
-});

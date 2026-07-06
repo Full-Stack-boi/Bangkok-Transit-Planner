@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../core/constants/translation_helper.dart';
@@ -14,6 +13,7 @@ import '../services/location_service.dart';
 import '../services/notification_service.dart';
 import '../services/transit_news_service.dart';
 import 'auth_providers.dart';
+import 'package:bkk_transit_planner/core/utils/logger.dart';
 
 export 'auth_providers.dart';
 export 'location_providers.dart';
@@ -23,49 +23,59 @@ part 'providers.g.dart';
 
 // ─── Repository Providers ───
 
-final transitRepositoryProvider = Provider<TransitRepository>((ref) {
+@Riverpod(keepAlive: true)
+TransitRepository transitRepository(Ref ref) {
   return TransitRepository();
-});
+}
 
-final favoritesRepositoryProvider = Provider<FavoritesRepository>((ref) {
+@Riverpod(keepAlive: true)
+FavoritesRepository favoritesRepository(Ref ref) {
   final supabase = ref.watch(supabaseServiceProvider);
   return FavoritesRepository(supabase);
-});
+}
 
-final crowdRepositoryProvider = Provider<CrowdRepository>((ref) {
+@Riverpod(keepAlive: true)
+CrowdRepository crowdRepository(Ref ref) {
   final supabase = ref.watch(supabaseServiceProvider);
   return CrowdRepository(supabase);
-});
+}
 
 // ─── Service Providers ───
 
-final fareServiceProvider = Provider<FareService>((ref) {
+@Riverpod(keepAlive: true)
+FareService fareService(Ref ref) {
   return FareService();
-});
+}
 
-final scheduleServiceProvider = Provider<ScheduleService>((ref) {
+@Riverpod(keepAlive: true)
+ScheduleService scheduleService(Ref ref) {
   return ScheduleService();
-});
+}
 
-final crowdServiceProvider = Provider<CrowdService>((ref) {
+@Riverpod(keepAlive: true)
+CrowdService crowdService(Ref ref) {
   return CrowdService();
-});
+}
 
-final supabaseServiceProvider = Provider<SupabaseService>((ref) {
+@Riverpod(keepAlive: true)
+SupabaseService supabaseService(Ref ref) {
   return SupabaseService();
-});
+}
 
-final locationServiceProvider = Provider<LocationService>((ref) {
+@Riverpod(keepAlive: true)
+LocationService locationService(Ref ref) {
   return LocationService(ref);
-});
+}
 
-final notificationServiceProvider = Provider<NotificationService>((ref) {
+@Riverpod(keepAlive: true)
+NotificationService notificationService(Ref ref) {
   return NotificationService();
-});
+}
 
 // ─── Initialization Provider ───
 
-final transitInitProvider = FutureProvider<void>((ref) async {
+@riverpod
+Future<void> transitInit(Ref ref) async {
   final supabase = ref.read(supabaseServiceProvider);
   await supabase.initialize();
 
@@ -80,25 +90,26 @@ final transitInitProvider = FutureProvider<void>((ref) async {
     try {
       await favorites.syncOfflineDataWithSupabase();
     } catch (e) {
-      print('Favorites startup sync failed: $e');
+      // ignore: avoid_print
+      AppLogger.error('Favorites startup sync failed: $e', error: e);
     }
   }
 
   final repo = ref.read(transitRepositoryProvider);
   await repo.initialize();
-});
-
+}
 
 // ─── UI Providers ───
 
 SharedPreferences? testSharedPreferencesInstance;
 
-final sharedPreferencesProvider = Provider<SharedPreferences>((ref) {
+@Riverpod(keepAlive: true)
+SharedPreferences sharedPreferences(Ref ref) {
   if (testSharedPreferencesInstance != null) {
     return testSharedPreferencesInstance!;
   }
   throw UnimplementedError('sharedPreferencesProvider must be overridden in ProviderScope overrides');
-});
+}
 
 @riverpod
 class HomeTabIndex extends _$HomeTabIndex {
@@ -110,11 +121,8 @@ class HomeTabIndex extends _$HomeTabIndex {
   }
 }
 
-final themeModeProvider = NotifierProvider<ThemeModeNotifier, ThemeMode>(() {
-  return ThemeModeNotifier();
-});
-
-class ThemeModeNotifier extends Notifier<ThemeMode> {
+@riverpod
+class AppThemeMode extends _$AppThemeMode {
   @override
   ThemeMode build() {
     final prefs = ref.watch(sharedPreferencesProvider);
@@ -134,11 +142,11 @@ class ThemeModeNotifier extends Notifier<ThemeMode> {
   }
 }
 
-final localeProvider = NotifierProvider<LocaleNotifier, String>(() {
-  return LocaleNotifier();
-});
+/// Backwards compatibility alias for themeModeProvider
+final themeModeProvider = appThemeModeProvider;
 
-class LocaleNotifier extends Notifier<String> {
+@riverpod
+class AppLocale extends _$AppLocale {
   @override
   String build() {
     final prefs = ref.watch(sharedPreferencesProvider);
@@ -154,10 +162,14 @@ class LocaleNotifier extends Notifier<String> {
   }
 }
 
-final translationsProvider = Provider<AppLocalizations>((ref) {
+/// Backwards compatibility alias for localeProvider
+final localeProvider = appLocaleProvider;
+
+@riverpod
+AppLocalizations translations(Ref ref) {
   final lang = ref.watch(localeProvider);
   return AppLocalizations(lang);
-});
+}
 
 class MapPrefetchProgress {
   final bool isPrefetching;
@@ -201,7 +213,8 @@ class MapPrefetchProgress {
   }
 }
 
-class MapPrefetchNotifier extends Notifier<MapPrefetchProgress> {
+@riverpod
+class MapPrefetch extends _$MapPrefetch {
   @override
   MapPrefetchProgress build() {
     return const MapPrefetchProgress();
@@ -242,13 +255,10 @@ class MapPrefetchNotifier extends Notifier<MapPrefetchProgress> {
   }
 }
 
-final mapPrefetchProvider = NotifierProvider<MapPrefetchNotifier, MapPrefetchProgress>(() {
-  return MapPrefetchNotifier();
-});
-
 // ─── Utility Screen Future Providers ───
 
-class ActiveNotificationPayloadNotifier extends Notifier<String?> {
+@riverpod
+class ActiveNotificationPayload extends _$ActiveNotificationPayload {
   @override
   String? build() => null;
   
@@ -257,16 +267,14 @@ class ActiveNotificationPayloadNotifier extends Notifier<String?> {
   }
 }
 
-final activeNotificationPayloadProvider = NotifierProvider<ActiveNotificationPayloadNotifier, String?>(() {
-  return ActiveNotificationPayloadNotifier();
-});
-
-final drtNewsProvider = FutureProvider<List<TransitNewsArticle>>((ref) async {
+@riverpod
+Future<List<TransitNewsArticle>> drtNews(Ref ref) async {
   final newsService = ref.watch(transitNewsServiceProvider);
   return newsService.fetchDrtNews();
-});
+}
 
-final transitLineStatusProvider = FutureProvider<List<TransitLineStatus>>((ref) async {
+@riverpod
+Future<List<TransitLineStatus>> transitLineStatus(Ref ref) async {
   // 1. Fetch official announcements from DRT to see if any contain delay alerts
   final List<TransitNewsArticle> disruptions = [];
   try {
@@ -278,7 +286,8 @@ final transitLineStatusProvider = FutureProvider<List<TransitLineStatus>>((ref) 
       }
     }
   } catch (e) {
-    print('Failed to read DRT news for line status: $e');
+    // ignore: avoid_print
+    AppLogger.error('Failed to read DRT news for line status: $e', error: e);
   }
   
   // 2. Fetch active crowd reports from Supabase if initialized
@@ -311,7 +320,8 @@ final transitLineStatusProvider = FutureProvider<List<TransitLineStatus>>((ref) 
         });
       }
     } catch (e) {
-      print('Failed to load real-time crowd reports for line status: $e');
+      // ignore: avoid_print
+      AppLogger.error('Failed to load real-time crowd reports for line status: $e', error: e);
     }
   }
 
@@ -397,4 +407,4 @@ final transitLineStatusProvider = FutureProvider<List<TransitLineStatus>>((ref) 
   }
 
   return statuses;
-});
+}

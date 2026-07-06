@@ -15,6 +15,7 @@ import 'package:latlong2/latlong.dart';
 import '../models/custom_location.dart';
 import '../models/searchable_item.dart';
 import '../models/namtang_stop.dart';
+import 'package:bkk_transit_planner/core/utils/logger.dart';
 
 /// Repository for loading and accessing static transit data
 class TransitRepository {
@@ -60,7 +61,13 @@ class TransitRepository {
     try {
       final jsonStr = await rootBundle.loadString('assets/data/station_exits.json');
       final List<dynamic> jsonList = json.decode(jsonStr);
-      var exitsList = jsonList.map((j) => StationExit.fromJson(j as Map<String, dynamic>)).toList();
+      var exitsList = jsonList.map((j) {
+        final map = Map<String, dynamic>.from(j as Map);
+        final exitCodeVal = map['exit_code'] as String? ?? '';
+        map['name_th'] = map['name_th'] as String? ?? 'ทางออก $exitCodeVal';
+        map['name_en'] = map['name_en'] as String? ?? 'Exit $exitCodeVal';
+        return StationExit.fromJson(map);
+      }).toList();
       if (!kDebugMode) {
         exitsList = exitsList.where((e) {
           final id = e.stationId;
@@ -74,7 +81,7 @@ class TransitRepository {
       _exits = exitsList;
     } catch (e) {
       _exits = [];
-      print('Failed to load station exits: $e');
+      AppLogger.error('Failed to load station exits: $e', error: e);
     }
   }
 
@@ -156,7 +163,7 @@ class TransitRepository {
       _namtangStops = processedStops;
     } catch (e) {
       _namtangStops = [];
-      print('Failed to load Namtang stops: $e');
+      AppLogger.error('Failed to load Namtang stops: $e', error: e);
     } finally {
       _namtangLoading = false;
     }
@@ -417,7 +424,7 @@ class TransitRepository {
         return results;
       }
     } catch (e) {
-      print('Online place search failed: $e');
+      AppLogger.error('Online place search failed: $e', error: e);
     }
     return [];
   }
@@ -448,7 +455,7 @@ class TransitRepository {
           osmId: osmId,
         );
       } catch (e) {
-        print('Overpass resolution failed after retries: $e');
+        AppLogger.error('Overpass resolution failed after retries: $e', error: e);
         entrances = [];
         hasWarning = true;
       }
@@ -520,8 +527,8 @@ class TransitRepository {
       // Use routeLat/routeLng (not lat/lng) so the map display pin stays at the
       // original centroid while only the routing/walking coordinate moves to the entrance.
       return place.copyWith(
-        routeLat: bestMatch.entrance.latitude,
-        routeLng: bestMatch.entrance.longitude,
+        customRouteLat: bestMatch.entrance.latitude,
+        customRouteLng: bestMatch.entrance.longitude,
         nearestStationId: bestMatch.station.id,
         walkingMinutes: (bestMatch.osrmResult!.durationSeconds / 60.0).clamp(1.0, 30.0),
         walkingPath: bestMatch.osrmResult!.coordinates,

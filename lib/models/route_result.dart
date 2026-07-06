@@ -1,88 +1,66 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:latlong2/latlong.dart';
 import 'station.dart';
 import 'searchable_item.dart';
 import 'station_exit.dart';
 
-/// A single segment of a route (travel on one line)
-class RouteSegment {
-  final String lineId;
-  final String lineName;
-  final String direction;    // e.g. "ไปสุวรรณภูมิ"
-  final int boundIndex;      // 0 or 1
-  final SearchableItem fromStation;
-  final SearchableItem toStation;
-  final List<Station> intermediateStations;
-  final int stationCount;
-  final double estimatedMinutes;
-  final int fareThb;
-  final int standardFareThb; // Standard fare (without discount)
-  final List<LatLng>? walkingPath;
-  final StationExit? exit;
-  final String? instructionsTh;
-  final String? instructionsEn;
+part 'route_result.freezed.dart';
 
-  const RouteSegment({
-    required this.lineId,
-    required this.lineName,
-    required this.direction,
-    required this.boundIndex,
-    required this.fromStation,
-    required this.toStation,
-    this.intermediateStations = const [],
-    required this.stationCount,
-    required this.estimatedMinutes,
-    required this.fareThb,
-    required this.standardFareThb,
-    this.walkingPath,
-    this.exit,
-    this.instructionsTh,
-    this.instructionsEn,
-  });
+/// A single segment of a route (travel on one line)
+@freezed
+abstract class RouteSegment with _$RouteSegment {
+  const RouteSegment._(); // Allows custom methods/getters
+
+  const factory RouteSegment({
+    required String lineId,
+    required String lineName,
+    required String direction,    // e.g. "ไปสุวรรณภูมิ"
+    required int boundIndex,      // 0 or 1
+    required SearchableItem fromStation,
+    required SearchableItem toStation,
+    @Default([]) List<Station> intermediateStations,
+    required int stationCount,
+    required double estimatedMinutes,
+    required int fareThb,
+    required int standardFareThb, // Standard fare (without discount)
+    List<LatLng>? walkingPath,
+    StationExit? exit,
+    String? instructionsTh,
+    String? instructionsEn,
+  }) = _RouteSegment;
 
   /// Total stations including origin and destination
   int get totalStops => stationCount + 1;
 }
 
 /// A transfer between two lines
-class TransferStep {
-  final Station fromStation;
-  final Station toStation;
-  final String fromLineId;
-  final String toLineId;
-  final double walkingMinutes;
-
-  const TransferStep({
-    required this.fromStation,
-    required this.toStation,
-    required this.fromLineId,
-    required this.toLineId,
-    this.walkingMinutes = 5.0,
-  });
+@freezed
+abstract class TransferStep with _$TransferStep {
+  const factory TransferStep({
+    required Station fromStation,
+    required Station toStation,
+    required String fromLineId,
+    required String toLineId,
+    @Default(5.0) double walkingMinutes,
+  }) = _TransferStep;
 }
 
 /// Complete route result from origin to destination
-class RouteResult {
-  final SearchableItem origin;
-  final SearchableItem destination;
-  final List<RouteSegment> segments;
-  final List<TransferStep> transfers;
-  final double totalMinutes;
-  final int totalFareThb;
-  final int totalStandardFareThb; // Standard fare (without discount)
-  final int totalStations;
-  final DateTime calculatedAt;
+@freezed
+abstract class RouteResult with _$RouteResult {
+  const RouteResult._(); // Allows custom methods/getters
 
-  const RouteResult({
-    required this.origin,
-    required this.destination,
-    required this.segments,
-    required this.transfers,
-    required this.totalMinutes,
-    required this.totalFareThb,
-    required this.totalStandardFareThb,
-    required this.totalStations,
-    required this.calculatedAt,
-  });
+  const factory RouteResult({
+    required SearchableItem origin,
+    required SearchableItem destination,
+    required List<RouteSegment> segments,
+    required List<TransferStep> transfers,
+    required double totalMinutes,
+    required int totalFareThb,
+    required int totalStandardFareThb, // Standard fare (without discount)
+    required int totalStations,
+    required DateTime calculatedAt,
+  }) = _RouteResult;
 
   /// Number of line transfers
   int get transferCount => transfers.length;
