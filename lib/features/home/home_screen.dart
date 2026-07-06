@@ -11,6 +11,7 @@ import '../settings/settings_screen.dart';
 import '../../core/constants/translation_helper.dart';
 import '../../services/location_service.dart';
 import '../../models/station.dart';
+import '../../models/location_permission_status.dart';
 import 'widgets/nearest_stations_sheet.dart';
 import 'widgets/in_app_notification_banner.dart';
 
@@ -82,12 +83,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         final isGranted = await locationService.isLocationPermissionGranted();
         if (!isGranted) {
           // Request permission
-          final requested = await locationService.requestLocationPermission();
-          if (!requested) {
-            // Show alert dialog to guide user to open Settings directly
+          final status = await locationService.requestLocationPermission();
+          if (status != LocationPermissionStatus.granted) {
             if (mounted) {
               final t = ref.read(translationsProvider);
-              _showPermissionDialog(context, locationService, t);
+              if (status == LocationPermissionStatus.permanentlyDenied) {
+                // User selected "Don't ask again" — must open Settings
+                await locationService.openSettings();
+              } else {
+                _showPermissionDialog(context, locationService, t);
+              }
             }
             return;
           }

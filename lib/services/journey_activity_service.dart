@@ -1,10 +1,10 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:live_activities/live_activities.dart';
 import '../providers/route_tracker.dart';
 import '../core/theme/transit_colors.dart';
 import '../core/constants/translation_helper.dart';
+import 'package:bkk_transit_planner/core/utils/logger.dart';
 
 class JourneyActivityService {
   static final _plugin = LiveActivities();
@@ -19,7 +19,7 @@ class JourneyActivityService {
       await _plugin.init(appGroupId: 'group.com.bkktransit');
       _initialized = true;
     } catch (e) {
-      debugPrint("Failed to initialize LiveActivities plugin: $e");
+      AppLogger.error('Failed to initialize LiveActivities plugin: $e', error: e);
     }
   }
 
@@ -28,11 +28,17 @@ class JourneyActivityService {
     if (kIsWeb) return;
     await init();
     if (!_initialized) return;
+    // Check if device supports Live Activities before attempting to create one
+    final enabled = await _plugin.areActivitiesEnabled();
+    if (enabled != true) {
+      AppLogger.warning('Live Activities not supported or disabled on this device');
+      return;
+    }
     try {
       final data = _buildPayload(state, speedKmh: 0);
       await _plugin.createActivity(_activityId, data);
     } catch (e) {
-      debugPrint("Failed to create live activity: $e");
+      AppLogger.error('Failed to create live activity: $e', error: e);
     }
   }
 
@@ -55,7 +61,7 @@ class JourneyActivityService {
       
       await _plugin.updateActivity(_activityId, data);
     } catch (e) {
-      debugPrint("Failed to update live activity: $e");
+      AppLogger.error('Failed to update live activity: $e', error: e);
     }
   }
 
@@ -71,7 +77,7 @@ class JourneyActivityService {
     try {
       await _plugin.endActivity(_activityId);
     } catch (e) {
-      debugPrint("Failed to end live activity: $e");
+      AppLogger.error('Failed to end live activity: $e', error: e);
     }
   }
 

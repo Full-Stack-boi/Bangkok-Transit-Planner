@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
+import '../models/location_permission_status.dart';
 import '../models/station.dart';
 import '../providers/location_providers.dart';
 import 'package:bkk_transit_planner/core/utils/logger.dart';
@@ -13,13 +14,22 @@ class LocationService {
 
   LocationService([this._ref]);
   /// Request location permissions from the user
-  Future<bool> requestLocationPermission() async {
+  Future<LocationPermissionStatus> requestLocationPermission() async {
     if (kIsWeb) {
       final status = await Geolocator.requestPermission();
-      return status == LocationPermission.whileInUse || status == LocationPermission.always;
+      if (status == LocationPermission.whileInUse ||
+          status == LocationPermission.always) {
+        return LocationPermissionStatus.granted;
+      }
+      if (status == LocationPermission.deniedForever) {
+        return LocationPermissionStatus.permanentlyDenied;
+      }
+      return LocationPermissionStatus.denied;
     }
     final status = await Permission.location.request();
-    return status.isGranted;
+    if (status.isPermanentlyDenied) return LocationPermissionStatus.permanentlyDenied;
+    if (status.isGranted) return LocationPermissionStatus.granted;
+    return LocationPermissionStatus.denied;
   }
 
   /// Check if location permission is granted

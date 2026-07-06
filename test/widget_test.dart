@@ -15,6 +15,7 @@ import 'package:bkk_transit_planner/features/map/widgets/route_result_banner.dar
 import 'package:bkk_transit_planner/features/route_result/route_result_sheet.dart';
 import 'package:bkk_transit_planner/features/search/search_view_model.dart';
 import 'package:bkk_transit_planner/features/map/map_screen.dart';
+import 'package:bkk_transit_planner/models/location_permission_status.dart';
 
 // ─── หัวข้อการเรียนรู้: Widget Test คืออะไร? ───
 // Widget Test คือการทดสอบองค์ประกอบส่วนติดต่อผู้ใช้ (UI Components/Widgets) ในสภาพแวดล้อมจำลอง
@@ -119,7 +120,8 @@ class MockLocationService extends LocationService {
   Future<bool> isLocationPermissionGranted() async => true;
 
   @override
-  Future<bool> requestLocationPermission() async => true;
+  Future<LocationPermissionStatus> requestLocationPermission() async =>
+      LocationPermissionStatus.granted;
 
   @override
   Future<bool> requestNotificationPermission() async => true;

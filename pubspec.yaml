@@ -12,6 +12,7 @@ dependencies:
   flutter_localizations:
     sdk: flutter
 
+  # Required by GlobalCupertinoLocalizations.delegate in app.dart
   cupertino_icons: ^1.0.8
 
   # State Management (MVVM glue)

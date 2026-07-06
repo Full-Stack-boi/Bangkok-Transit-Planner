@@ -11,6 +11,7 @@ import '../../../models/landmark.dart';
 import '../../search/search_view_model.dart';
 import '../../../providers/providers.dart';
 import '../../../core/constants/translation_helper.dart';
+import '../../../models/location_permission_status.dart';
 
 /// Fullscreen search overlay for origin and destination station selection
 class MapSearchOverlay extends ConsumerStatefulWidget {
@@ -634,16 +635,20 @@ class _MapSearchOverlayState extends ConsumerState<MapSearchOverlay> {
       final hasMock = kDebugMode && ref.read(mockLocationProvider) != null;
       if (!hasMock) {
         // Request permission
-        final hasPermission = await locationService.requestLocationPermission();
-        if (!hasPermission) {
+        final status = await locationService.requestLocationPermission();
+        if (status != LocationPermissionStatus.granted) {
           if (mounted) Navigator.pop(context); // Dismiss loading
-          scaffoldMessenger.showSnackBar(
-            SnackBar(
-              content: Text(
-                t.search.locationDeniedSnack,
+          if (status == LocationPermissionStatus.permanentlyDenied) {
+            await locationService.openSettings();
+          } else {
+            scaffoldMessenger.showSnackBar(
+              SnackBar(
+                content: Text(
+                  t.search.locationDeniedSnack,
+                ),
               ),
-            ),
-          );
+            );
+          }
           return;
         }
       }

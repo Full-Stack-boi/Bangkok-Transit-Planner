@@ -10,7 +10,7 @@ class NotificationService {
   bool _isInitialized = false;
   Ref? _ref;
 
-  /// Initialize notification settings for Android
+  /// Initialize notification settings for Android and iOS
   Future<void> initialize(Ref ref) async {
     if (_isInitialized) return;
     _ref = ref;
@@ -18,8 +18,17 @@ class NotificationService {
     const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('@mipmap/ic_launcher');
 
+    const DarwinInitializationSettings initializationSettingsDarwin =
+        DarwinInitializationSettings(
+      requestAlertPermission: true,
+      requestBadgePermission: true,
+      requestSoundPermission: true,
+    );
+
     const InitializationSettings initializationSettings = InitializationSettings(
       android: initializationSettingsAndroid,
+      iOS: initializationSettingsDarwin,
+      macOS: initializationSettingsDarwin,
     );
 
     try {
@@ -58,8 +67,17 @@ class NotificationService {
       colorized: true,          // Allow system tinting of the notification card when supported
     );
 
+    const DarwinNotificationDetails darwinNotificationDetails =
+        DarwinNotificationDetails(
+      presentAlert: true,
+      presentBadge: true,
+      presentSound: true,
+    );
+
     const NotificationDetails platformChannelSpecifics = NotificationDetails(
       android: androidPlatformChannelSpecifics,
+      iOS: darwinNotificationDetails,
+      macOS: darwinNotificationDetails,
     );
 
     try {
