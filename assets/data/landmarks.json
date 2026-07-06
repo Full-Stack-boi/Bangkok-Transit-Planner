@@ -270,6 +270,63 @@
     }
   },
   {
+    "id": "LM_SIAM_DISCOVERY",
+    "name_th": "สยามดิสคัฟเวอรี",
+    "name_en": "Siam Discovery",
+    "nearest_station_id": "BTS_CEN",
+    "walking_minutes": 4.0,
+    "lat": 13.7466,
+    "lng": 100.5315,
+    "walking_path": [
+      [13.745807, 100.533557],
+      [13.746097, 100.531941],
+      [13.746203, 100.531342],
+      [13.746257, 100.530996],
+      [13.7466, 100.5315]
+    ],
+    "exit_code": "1",
+    "alternative_walks": {
+      "BTS_W1": {
+        "walking_path": [
+          [13.746232, 100.529863],
+          [13.7466, 100.5315]
+        ],
+        "exit_code": "4",
+        "walking_minutes": 3.0,
+        "instructions_th": "เดินจากทางออก 4 ผ่านทางเชื่อมลอยฟ้า (Skywalk) เข้าสู่สยามดิสคัฟเวอรีโดยตรง",
+        "instructions_en": "Walk from Exit 4 along the elevated Skywalk directly into Siam Discovery"
+      }
+    }
+  },
+  {
+    "id": "LM_SIAM_CENTER",
+    "name_th": "สยามเซ็นเตอร์",
+    "name_en": "Siam Center",
+    "nearest_station_id": "BTS_CEN",
+    "walking_minutes": 2.0,
+    "lat": 13.7462,
+    "lng": 100.5328,
+    "walking_path": [
+      [13.745807, 100.533557],
+      [13.746097, 100.531941],
+      [13.7462, 100.5328]
+    ],
+    "exit_code": "1",
+    "alternative_walks": {
+      "BTS_W1": {
+        "walking_path": [
+          [13.746232, 100.529863],
+          [13.746097, 100.531941],
+          [13.7462, 100.5328]
+        ],
+        "exit_code": "4",
+        "walking_minutes": 4.0,
+        "instructions_th": "เดินทะลุผ่าน Siam Discovery เข้าสู่ Siam Center",
+        "instructions_en": "Walk through Siam Discovery into Siam Center"
+      }
+    }
+  },
+  {
     "id": "LM_ICONSIAM",
     "name_th": "ไอคอนสยาม",
     "name_en": "ICONSIAM",
