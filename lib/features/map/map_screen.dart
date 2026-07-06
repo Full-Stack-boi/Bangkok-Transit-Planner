@@ -27,6 +27,7 @@ import '../../providers/route_tracker.dart';
 import '../favorites/favorites_view_model.dart';
 import 'cached_tile_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:bkk_transit_planner/core/utils/logger.dart';
 
 /// Map screen showing an interactive transit map with overlays
 class MapScreen extends ConsumerStatefulWidget {
@@ -103,7 +104,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     try {
       await CachedTileProvider.getCachePath();
     } catch (e) {
-      print('Failed to initialize offline map: $e');
+      AppLogger.error('Failed to initialize offline map: $e', error: e);
     } finally {
       if (mounted) {
         setState(() {
@@ -142,7 +143,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
             final prefs = await SharedPreferences.getInstance();
             await prefs.setBool('map_prefetch_completed_v6_greater', true);
           } catch (e) {
-            print('Failed to save prefetching completion status: $e');
+            AppLogger.error('Failed to save prefetching completion status: $e', error: e);
           }
         } else {
           ref.read(mapPrefetchProvider.notifier).pausePrefetch();
@@ -259,7 +260,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         }
       }
     } catch (e) {
-      print('Error fetching location: $e');
+      AppLogger.error('Error fetching location: $e', error: e);
     } finally {
       if (mounted) {
         setState(() => _isLocating = false);
@@ -733,7 +734,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
           }
         }
       } catch (e) {
-        print('Error rendering Namtang stops: $e');
+        AppLogger.error('Error rendering Namtang stops: $e', error: e);
       }
     }
 
@@ -1422,10 +1423,10 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   ) {
     final searchVm = ref.read(searchViewModelProvider.notifier);
     final transitRepo = ref.read(transitRepositoryProvider);
-    final nearest = transitRepo.getStation(location.nearestStationId);
+    final nearest = transitRepo.getStation(location.nearestStationId ?? '');
     final nearestName =
         nearest?.displayName(isEnglish: localeCode == 'en') ?? '';
-    final walkMin = location.walkingMinutes.toInt();
+    final walkMin = location.walkingMinutes?.toInt() ?? 0;
 
     final stationName = localeCode == 'th' ? location.nameTh : location.nameEn;
 
