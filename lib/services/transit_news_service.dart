@@ -49,10 +49,26 @@ class TransitNewsService {
 
   TransitNewsService([http.Client? client]) : _client = client ?? http.Client();
 
-  /// Fetch official public announcements from Department of Rail Transport (DRT) RSS feed
+  // Use Vercel Serverless Function proxy on Web to bypass CORS.
+  // For other platforms (Android/iOS), use the direct DRT feed URL.
+  final String _feedUrl = () {
+    const envUrl = String.fromEnvironment('DRT_FEED_URL');
+    if (kIsWeb) {
+      // Direct RSS requests to external Department of Rail Transport website are blocked by browser CORS.
+      // Force local Vercel serverless proxy if the URL is empty or direct.
+      if (envUrl.isEmpty || envUrl.contains('drt.go.th')) {
+        return '/api/drt-feed';
+      }
+      return envUrl;
+    }
+    return envUrl.isNotEmpty
+        ? envUrl
+        : 'https://www.drt.go.th/feed';
+  }();
+
   Future<List<TransitNewsArticle>> fetchDrtNews() async {
     try {
-      final url = Uri.parse('https://www.drt.go.th/feed');
+      final url = Uri.parse(_feedUrl);
       final response = await _client.get(url).timeout(const Duration(seconds: 8));
       if (response.statusCode == 200) {
         return _parseDrtRss(response.body);
@@ -62,7 +78,7 @@ class TransitNewsService {
     } catch (e) {
       print('Error fetching DRT news: $e');
       if (kDebugMode) {
-        // Fallback to official mock announcements in debug mode
+        // Fallback to official mock announcements in debug mode only
         return _getMockDrtArticles().where((art) => _isCommuterRelevant(art.titleTh, art.bodyTh)).toList();
       }
       rethrow;
