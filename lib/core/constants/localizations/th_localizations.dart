@@ -487,6 +487,8 @@ class ThaiUtility implements BaseUtility {
   @override
   String get newsSectionTitle => 'ข่าวสารและประกาศ';
   @override
+  String get noNewsAnnouncements => 'ไม่มีข่าวสารหรือประกาศเดินรถขัดข้องในขณะนี้';
+  @override
   String get cardsSectionTitle => 'บัตรโดยสารและสิทธิ์ของฉัน';
   @override
   String get cardsSubtitle =>

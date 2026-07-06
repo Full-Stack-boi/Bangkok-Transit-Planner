@@ -487,6 +487,8 @@ class EnglishUtility implements BaseUtility {
   @override
   String get newsSectionTitle => 'Transit News & Alerts';
   @override
+  String get noNewsAnnouncements => 'No active transit alerts or announcements at this time.';
+  @override
   String get cardsSectionTitle => 'My Transit Cards & Passes';
   @override
   String get cardsSubtitle =>

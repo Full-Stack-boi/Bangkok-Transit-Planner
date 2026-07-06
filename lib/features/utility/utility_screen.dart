@@ -433,7 +433,6 @@ class UtilityScreen extends ConsumerWidget {
     AppLocalizations t,
     List<TransitNewsArticle> articles,
   ) {
-    if (articles.isEmpty) return const SizedBox();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -444,7 +443,35 @@ class UtilityScreen extends ConsumerWidget {
           ),
         ),
         const SizedBox(height: 12),
-        ...articles.map((item) {
+        if (articles.isEmpty)
+          Card(
+            margin: const EdgeInsets.only(bottom: 12),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+              child: Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.notifications_off_outlined,
+                      size: 40,
+                      color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      t.utility.noNewsAnnouncements,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          )
+        else
+          ...articles.map((item) {
           final lineColor = TransitColors.getLineColor(item.lineId);
           return Card(
             margin: const EdgeInsets.only(bottom: 12),

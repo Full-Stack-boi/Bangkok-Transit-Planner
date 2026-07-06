@@ -218,6 +218,7 @@ abstract class BaseJourney {
 abstract class BaseUtility {
   String get statusSectionTitle;
   String get newsSectionTitle;
+  String get noNewsAnnouncements;
   String get cardsSectionTitle;
   String get cardsSubtitle;
   String get rabbitCardName;
