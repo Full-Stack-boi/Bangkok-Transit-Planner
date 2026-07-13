@@ -14,6 +14,15 @@ import '../../models/station.dart';
 import '../../models/location_permission_status.dart';
 import 'widgets/nearest_stations_sheet.dart';
 import 'widgets/in_app_notification_banner.dart';
+import 'widgets/animated_indexed_stack.dart';
+
+const double _kRailWidth = 100.0;
+const double _kRailHeight = 350.0;
+const double _kRailRadius = 28.0;
+const double _kRailOpacity = 0.75;
+const double _kRailIconSize = 28.0;
+const double _kRailFontSize = 13.0;
+const double _kRailPadding = 16.0;
 
 /// Main home screen with bottom navigation
 class HomeScreen extends ConsumerStatefulWidget {
@@ -125,10 +134,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         final closestEntry = nearestEntries.first;
         final closestStation = closestEntry.key;
         final distance = closestEntry.value;
-        
+
         if (distance <= 50.0) {
           final stationId = closestStation.id;
-          
+
           if (_currentStationId != stationId) {
             _currentStationId = stationId;
             _enteredStationAt = DateTime.now();
@@ -138,22 +147,27 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               final duration = DateTime.now().difference(_enteredStationAt!);
               // In debug or mock location mode, set threshold to 1 minute to simplify testing.
               // In production, set to 10 minutes.
-              final thresholdMinutes = (kDebugMode || ref.read(mockLocationProvider) != null) ? 1 : 10;
-              
+              final thresholdMinutes =
+                  (kDebugMode || ref.read(mockLocationProvider) != null)
+                  ? 1
+                  : 10;
+
               if (duration.inMinutes >= thresholdMinutes) {
                 _promptShownForCurrentPresence = true;
-                
+
                 final notifier = ref.read(notificationServiceProvider);
                 notifier.showNotification(
                   id: 999,
-                  title: t.proximity.promptDelayAtStation(t.isTh ? closestStation.nameTh : closestStation.nameEn),
+                  title: t.proximity.promptDelayAtStation(
+                    t.isTh ? closestStation.nameTh : closestStation.nameEn,
+                  ),
                   body: t.proximity.promptDelayBody,
                   payload: 'prompt_report:$stationId',
                 );
               }
             }
           }
-          
+
           await crowdRepo.reportPresence(
             stationId: stationId,
             accuracy: position.accuracy,
@@ -180,15 +194,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       builder: (BuildContext context) {
         final theme = Theme.of(context);
         return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
           title: Row(
             children: [
-              Icon(Icons.location_off_rounded, color: theme.colorScheme.error, size: 28),
+              Icon(
+                Icons.location_off_rounded,
+                color: theme.colorScheme.error,
+                size: 28,
+              ),
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
                   t.settings.locationPermissionRequired,
-                  style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ],
@@ -213,7 +235,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: theme.colorScheme.primary,
                 foregroundColor: theme.colorScheme.onPrimary,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
               ),
               child: Text(t.settings.openSettingsBtn),
             ),
@@ -226,7 +250,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   void _showProactiveReportBottomSheet(BuildContext context, Station station) {
     final theme = Theme.of(context);
     final t = ref.read(translationsProvider);
-    
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -260,8 +284,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  t.isTh 
-                      ? 'คุณติดอยู่ที่สถานี ${station.nameTh} หรือไม่?' 
+                  t.isTh
+                      ? 'คุณติดอยู่ที่สถานี ${station.nameTh} หรือไม่?'
                       : 'Are you delayed at ${station.nameEn}?',
                   style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
@@ -270,8 +294,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  t.isTh 
-                      ? 'ระบบตรวจพบว่าคุณอยู่ที่สถานีนี้นานกว่าปกติ โปรดช่วยยืนยันสถานะการเดินรถเพื่อแจ้งเพื่อนผู้โดยสารท่านอื่น' 
+                  t.isTh
+                      ? 'ระบบตรวจพบว่าคุณอยู่ที่สถานีนี้นานกว่าปกติ โปรดช่วยยืนยันสถานะการเดินรถเพื่อแจ้งเพื่อนผู้โดยสารท่านอื่น'
                       : 'You have been at this station longer than usual. Please help confirm transit status for other passengers.',
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
@@ -308,9 +332,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           if (context.mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: Text(
-                                  t.proximity.thankYouReportLabel,
-                                ),
+                                content: Text(t.proximity.thankYouReportLabel),
                                 backgroundColor: Colors.green,
                               ),
                             );
@@ -345,7 +367,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     ref.listen<String?>(activeNotificationPayloadProvider, (previous, next) {
       if (next != null && next.startsWith('prompt_report:')) {
         final stationId = next.replaceFirst('prompt_report:', '');
-        
+
         final transitRepo = ref.read(transitRepositoryProvider);
         final station = transitRepo.stations.firstWhere(
           (s) => s.id == stationId,
@@ -359,7 +381,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             lng: 0,
           ),
         );
-        
+
         ref.read(activeNotificationPayloadProvider.notifier).setPayload(null);
         _showProactiveReportBottomSheet(context, station);
       }
@@ -373,12 +395,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final initState = ref.watch(transitInitProvider);
     final currentIndex = ref.watch(homeTabIndexProvider);
     final t = ref.watch(translationsProvider);
-    final isWide = MediaQuery.of(context).size.width >= 900;
+    final isWide = MediaQuery.sizeOf(context).width >= 900;
 
     final content = initState.when(
       data: (_) => Stack(
         children: [
-          IndexedStack(
+          AnimatedIndexedStack(
             index: currentIndex,
             children: const [
               UtilityScreen(),
@@ -406,11 +428,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
 
     if (isWide && initState.hasValue) {
+      final double leftContentPadding = currentIndex == 1 ? 0.0 : _kRailWidth;
       return Scaffold(
-        body: Row(
+        body: Stack(
           children: [
-            const AppNavigationRail(),
-            Expanded(child: content),
+            AnimatedPadding(
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeInOutCubic,
+              padding: EdgeInsets.only(left: leftContentPadding),
+              child: content,
+            ),
+            const Positioned(
+              left: 0,
+              top: 0,
+              bottom: 0,
+              child: AppNavigationRail(),
+            ),
           ],
         ),
       );
@@ -432,64 +465,174 @@ class AppNavigationRail extends ConsumerWidget {
     final locale = ref.watch(localeProvider);
     final t = AppLocalizations(locale);
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final screenHeight = MediaQuery.sizeOf(context).height;
+    final double verticalMargin = (screenHeight - _kRailHeight) / 2;
 
     final activeColors = [
       theme.colorScheme.primary, // Seafoam Sage for Transit Lines
-      theme.appColors.routeColor ?? const Color(0xFF818CF8), // Soft Lavender for Map
-      theme.appColors.favoriteColor ?? const Color(0xFFF472B6), // Coral Pink for Favorites (Heart)
-      theme.appColors.timeColor ?? const Color(0xFFF59E0B), // Warm Amber for Settings
+      theme.appColors.routeColor ??
+          const Color(0xFF818CF8), // Soft Lavender for Map
+      theme.appColors.favoriteColor ??
+          const Color(0xFFF472B6), // Coral Pink for Favorites (Heart)
+      theme.appColors.timeColor ??
+          const Color(0xFFF59E0B), // Warm Amber for Settings
     ];
     final activeColor = activeColors[currentIndex];
+    final isFloating = currentIndex == 1; // Float only on Map Screen (tab 1)
+
+    final BorderRadius borderRadius = isFloating
+        ? BorderRadius.circular(_kRailRadius)
+        : BorderRadius.zero;
+
+    // Use uniform Border.all in both states to prevent Flutter paint assertions,
+    // fading the color to transparent when solid.
+    final BoxBorder border = Border.all(
+      color: isFloating
+          ? theme.colorScheme.outline.withValues(alpha: isDark ? 0.15 : 0.08)
+          : Colors.transparent,
+    );
+
+    final List<BoxShadow>? boxShadow = isFloating
+        ? [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.06),
+              blurRadius: 16,
+              offset: const Offset(4, 4),
+            ),
+          ]
+        : null;
+
+    final EdgeInsets margin = isFloating
+        ? EdgeInsets.fromLTRB(
+            _kRailPadding,
+            verticalMargin > 0 ? verticalMargin : 0.0,
+            0,
+            verticalMargin > 0 ? verticalMargin : 0.0,
+          )
+        : EdgeInsets.zero;
 
     return Theme(
       data: theme.copyWith(
         navigationRailTheme: theme.navigationRailTheme.copyWith(
+          backgroundColor: Colors.transparent,
           indicatorColor: activeColor.withValues(alpha: 0.15),
-          selectedIconTheme: IconThemeData(color: activeColor, size: 24),
+          selectedIconTheme: IconThemeData(
+            color: activeColor,
+            size: _kRailIconSize,
+          ),
           selectedLabelTextStyle: GoogleFonts.outfit(
             color: activeColor,
-            fontSize: 12,
+            fontSize: _kRailFontSize,
             fontWeight: FontWeight.w600,
           ),
           unselectedIconTheme: const IconThemeData(
             color: Color(0xFF64748B),
-            size: 24,
+            size: _kRailIconSize,
           ),
           unselectedLabelTextStyle: GoogleFonts.outfit(
-            color: const Color(0xFF64748B),
-            fontSize: 12,
+            color: Color(0xFF64748B),
+            fontSize: _kRailFontSize,
             fontWeight: FontWeight.w500,
           ),
         ),
       ),
-      child: NavigationRail(
-        selectedIndex: currentIndex,
-        onDestinationSelected: (index) {
-          ref.read(homeTabIndexProvider.notifier).setTab(index);
-        },
-        labelType: NavigationRailLabelType.all,
-        destinations: [
-          NavigationRailDestination(
-            icon: const Icon(Icons.dashboard_customize_outlined),
-            selectedIcon: Icon(Icons.dashboard_customize, color: activeColors[0]),
-            label: Text(t.navigation.utilityTitle),
-          ),
-          NavigationRailDestination(
-            icon: const Icon(Icons.map_outlined),
-            selectedIcon: Icon(Icons.map_rounded, color: activeColors[1]),
-            label: Text(t.navigation.mapTitle),
-          ),
-          NavigationRailDestination(
-            icon: const Icon(Icons.favorite_outline_rounded),
-            selectedIcon: Icon(Icons.favorite_rounded, color: activeColors[2]),
-            label: Text(t.navigation.favoritesTitle),
-          ),
-          NavigationRailDestination(
-            icon: const Icon(Icons.settings_outlined),
-            selectedIcon: Icon(Icons.settings_rounded, color: activeColors[3]),
-            label: Text(t.navigation.settingsTitle),
-          ),
-        ],
+      child: SizedBox(
+        width:
+            _kRailWidth + _kRailPadding + 8.0, // Dynamic parent container width
+        height: screenHeight,
+        child: Stack(
+          children: [
+            // 1. Animated background decoration
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeInOutCubic,
+              width: _kRailWidth,
+              height: isFloating ? _kRailHeight : screenHeight,
+              margin: margin,
+              decoration: BoxDecoration(
+                color: isFloating
+                    ? theme.colorScheme.surface.withValues(alpha: _kRailOpacity)
+                    : theme.colorScheme.surface,
+                borderRadius: borderRadius,
+                border: border,
+                boxShadow: boxShadow,
+              ),
+            ),
+
+            // 2. Animated position, but static layout size for NavigationRail
+            AnimatedPositioned(
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeInOutCubic,
+              left: isFloating ? _kRailPadding : 0.0,
+              top: isFloating ? verticalMargin : 0.0,
+              width: _kRailWidth,
+              height: isFloating ? _kRailHeight : screenHeight,
+              child: NavigationRail(
+                groupAlignment:
+                    0.0, // Keep vertical position identical to prevent item shifting
+                backgroundColor: Colors.transparent,
+                selectedIndex: currentIndex,
+                onDestinationSelected: (index) {
+                  ref.read(homeTabIndexProvider.notifier).setTab(index);
+                },
+                labelType: NavigationRailLabelType.all,
+                destinations: [
+                  NavigationRailDestination(
+                    icon: const Icon(Icons.dashboard_customize_outlined),
+                    selectedIcon: Icon(
+                      Icons.dashboard_customize,
+                      color: activeColors[0],
+                    ),
+                    label: Text(t.navigation.utilityTitle),
+                  ),
+                  NavigationRailDestination(
+                    icon: const Icon(Icons.map_outlined),
+                    selectedIcon: Icon(
+                      Icons.map_rounded,
+                      color: activeColors[1],
+                    ),
+                    label: Text(t.navigation.mapTitle),
+                  ),
+                  NavigationRailDestination(
+                    icon: const Icon(Icons.favorite_outline_rounded),
+                    selectedIcon: Icon(
+                      Icons.favorite_rounded,
+                      color: activeColors[2],
+                    ),
+                    label: Text(t.navigation.favoritesTitle),
+                  ),
+                  NavigationRailDestination(
+                    icon: const Icon(Icons.settings_outlined),
+                    selectedIcon: Icon(
+                      Icons.settings_rounded,
+                      color: activeColors[3],
+                    ),
+                    label: Text(t.navigation.settingsTitle),
+                  ),
+                ],
+              ),
+            ),
+
+            // 3. Right edge border line for solid sidebar state
+            Positioned(
+              left:
+                  _kRailWidth - 1.0, // Dynamic right edge align for solid state
+              top: 0,
+              bottom: 0,
+              width: 1.0,
+              child: AnimatedOpacity(
+                duration: const Duration(milliseconds: 300),
+                opacity: isFloating ? 0.0 : 1.0,
+                child: Container(
+                  color: theme.colorScheme.outline.withValues(
+                    alpha: isDark ? 0.15 : 0.08,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -507,9 +650,12 @@ class AppBottomNavigationBar extends ConsumerWidget {
 
     final activeColors = [
       theme.colorScheme.primary, // Seafoam Sage for Transit Lines
-      theme.appColors.routeColor ?? const Color(0xFF818CF8), // Soft Lavender for Map
-      theme.appColors.favoriteColor ?? const Color(0xFFF472B6), // Coral Pink for Favorites (Heart)
-      theme.appColors.timeColor ?? const Color(0xFFF59E0B), // Warm Amber for Settings
+      theme.appColors.routeColor ??
+          const Color(0xFF818CF8), // Soft Lavender for Map
+      theme.appColors.favoriteColor ??
+          const Color(0xFFF472B6), // Coral Pink for Favorites (Heart)
+      theme.appColors.timeColor ??
+          const Color(0xFFF59E0B), // Warm Amber for Settings
     ];
     final activeColor = activeColors[currentIndex];
 
@@ -543,7 +689,10 @@ class AppBottomNavigationBar extends ConsumerWidget {
         destinations: [
           NavigationDestination(
             icon: const Icon(Icons.dashboard_customize_outlined),
-            selectedIcon: Icon(Icons.dashboard_customize, color: activeColors[0]),
+            selectedIcon: Icon(
+              Icons.dashboard_customize,
+              color: activeColors[0],
+            ),
             label: t.navigation.utilityTitle,
           ),
           NavigationDestination(
@@ -659,9 +808,7 @@ class _DeferredMapScreenState extends State<_DeferredMapScreen> {
         if (currentIndex == 1) {
           _load();
         }
-        return const Center(
-          child: CircularProgressIndicator(strokeWidth: 3),
-        );
+        return const Center(child: CircularProgressIndicator(strokeWidth: 3));
       },
     );
   }
