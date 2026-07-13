@@ -97,10 +97,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     // Title
                     Hero(
                       tag: 'app_logo',
-                      child: Icon(
-                        Icons.directions_transit_rounded,
-                        size: 64,
-                        color: theme.colorScheme.primary,
+                      child: Image.asset(
+                        'assets/images/logo.png',
+                        height: 64,
+                        fit: BoxFit.contain,
                       ),
                     ),
                     const SizedBox(height: 16),

@@ -115,10 +115,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     // Brand Icon & Title
                     Hero(
                       tag: 'app_logo',
-                      child: Icon(
-                        Icons.directions_transit_rounded,
-                        size: 72,
-                        color: theme.colorScheme.primary,
+                      child: Image.asset(
+                        'assets/images/logo.png',
+                        height: 72,
+                        fit: BoxFit.contain,
                       ),
                     ),
                     const SizedBox(height: 16),

@@ -273,33 +273,11 @@ class SettingsScreen extends ConsumerWidget {
                     content: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        // Premium Transit Icon
-                        Container(
+                        Image.asset(
+                          'assets/images/logo.png',
                           width: 64,
                           height: 64,
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                theme.colorScheme.primary,
-                                theme.colorScheme.secondary,
-                              ],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            ),
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                color: theme.colorScheme.primary.withValues(alpha: 0.3),
-                                blurRadius: 12,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                          child: const Icon(
-                            Icons.directions_transit_rounded,
-                            size: 32,
-                            color: Colors.white,
-                          ),
+                          fit: BoxFit.contain,
                         ),
                         const SizedBox(height: 16),
                         // App Name
@@ -372,9 +350,14 @@ class SettingsScreen extends ConsumerWidget {
                             context: context,
                             applicationName: 'BKK Transit Planner',
                             applicationVersion: '1.0.0',
-                            applicationIcon: const Padding(
-                              padding: EdgeInsets.all(16),
-                              child: Icon(Icons.directions_transit_rounded, size: 48),
+                            applicationIcon: Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: Image.asset(
+                                'assets/images/logo.png',
+                                width: 48,
+                                height: 48,
+                                fit: BoxFit.contain,
+                              ),
                             ),
                             applicationLegalese: localeCode == 'th'
                                 ? '© 2026 BKK Transit Planner. สงวนลิขสิทธิ์'
