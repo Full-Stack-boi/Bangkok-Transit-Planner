@@ -69,3 +69,9 @@ app.*.map.json
 
 # Local compile-time config (use config.example.json as template)
 config.json
+
+# Node/web dependencies
+node_modules/
+
+# Temporary scratch folders
+scratch/
