@@ -1828,31 +1828,34 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     final hasDest = searchState.destination != null;
 
     if (!hasOrigin && !hasDest) {
-      return Card(
-        elevation: 6,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        child: InkWell(
-          onTap: () {
-            _openSearchOverlay(context);
-          },
-          borderRadius: BorderRadius.circular(16),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            child: Row(
-              children: [
-                Icon(Icons.search_rounded, color: theme.colorScheme.primary),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    t.localeCode == 'th'
-                        ? 'ค้นหาเส้นทาง...'
-                        : 'Plan a Journey...',
-                    style: theme.textTheme.bodyLarge?.copyWith(
-                      color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+      return Hero(
+        tag: 'search_bar_card',
+        child: Card(
+          elevation: 6,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          child: InkWell(
+            onTap: () {
+              _openSearchOverlay(context);
+            },
+            borderRadius: BorderRadius.circular(16),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              child: Row(
+                children: [
+                  Icon(Icons.search_rounded, color: theme.colorScheme.primary),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      t.localeCode == 'th'
+                          ? 'ค้นหาเส้นทาง...'
+                          : 'Plan a Journey...',
+                      style: theme.textTheme.bodyLarge?.copyWith(
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -1860,96 +1863,99 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     }
 
     if (hasOrigin && hasDest) {
-      return Card(
-        elevation: 6,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-          child: Row(
-            children: [
-              IconButton(
-                icon: const Icon(Icons.close_rounded),
-                tooltip: t.localeCode == 'th' ? 'ล้างเส้นทาง' : 'Clear Route',
-                onPressed: () {
-                  ref.read(searchViewModelProvider.notifier).clear();
-                },
-              ),
-              Expanded(
-                child: InkWell(
-                  onTap: () {
-                    _openSearchOverlay(context);
+      return Hero(
+        tag: 'search_bar_card',
+        child: Card(
+          elevation: 6,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+            child: Row(
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.close_rounded),
+                  tooltip: t.localeCode == 'th' ? 'ล้างเส้นทาง' : 'Clear Route',
+                  onPressed: () {
+                    ref.read(searchViewModelProvider.notifier).clear();
                   },
-                  borderRadius: BorderRadius.circular(8),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Row(
-                          children: [
-                            const Icon(
-                              Icons.trip_origin_rounded,
-                              color: Colors.green,
-                              size: 14,
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                searchState.origin!.displayName(
-                                  isEnglish: localeCode == 'en',
-                                ),
-                                style: theme.textTheme.bodyMedium?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                overflow: TextOverflow.ellipsis,
+                ),
+                Expanded(
+                  child: InkWell(
+                    onTap: () {
+                      _openSearchOverlay(context);
+                    },
+                    borderRadius: BorderRadius.circular(8),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.trip_origin_rounded,
+                                color: Colors.green,
+                                size: 14,
                               ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 2),
-                        Row(
-                          children: [
-                            const Icon(
-                              Icons.location_on_rounded,
-                              color: Colors.red,
-                              size: 14,
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                searchState.destination!.displayName(
-                                  isEnglish: localeCode == 'en',
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  searchState.origin!.displayName(
+                                    isEnglish: localeCode == 'en',
+                                  ),
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
                                 ),
-                                style: theme.textTheme.bodyMedium?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                overflow: TextOverflow.ellipsis,
                               ),
-                            ),
-                          ],
-                        ),
-                      ],
+                            ],
+                          ),
+                          const SizedBox(height: 2),
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.location_on_rounded,
+                                color: Colors.red,
+                                size: 14,
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  searchState.destination!.displayName(
+                                    isEnglish: localeCode == 'en',
+                                  ),
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-              IconButton(
-                icon: Icon(
-                  Icons.swap_vert_rounded,
-                  color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                IconButton(
+                  icon: Icon(
+                    Icons.swap_vert_rounded,
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                  ),
+                  tooltip: t.localeCode == 'th'
+                      ? 'สลับต้นทาง/ปลายทาง'
+                      : 'Swap Origin/Destination',
+                  onPressed: () {
+                    ref.read(searchViewModelProvider.notifier).swapStations();
+                  },
                 ),
-                tooltip: t.localeCode == 'th'
-                    ? 'สลับต้นทาง/ปลายทาง'
-                    : 'Swap Origin/Destination',
-                onPressed: () {
-                  ref.read(searchViewModelProvider.notifier).swapStations();
-                },
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       );
@@ -1959,51 +1965,54 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     final setItem = hasOrigin ? searchState.origin : searchState.destination;
     final isOrigin = hasOrigin;
 
-    return Card(
-      elevation: 6,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: InkWell(
-        onTap: () {
-          _openSearchOverlay(context, focusDestination: isOrigin);
-        },
-        borderRadius: BorderRadius.circular(16),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          child: Row(
-            children: [
-              Icon(
-                isOrigin
-                    ? Icons.trip_origin_rounded
-                    : Icons.location_on_rounded,
-                color: isOrigin ? Colors.green : Colors.red,
-                size: 20,
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  '${isOrigin ? (t.localeCode == 'th' ? 'ต้นทาง: ' : 'From: ') : (t.localeCode == 'th' ? 'ปลายทาง: ' : 'To: ')}'
-                  '${setItem!.displayName(isEnglish: localeCode == 'en')}',
+    return Hero(
+      tag: 'search_bar_card',
+      child: Card(
+        elevation: 6,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: InkWell(
+          onTap: () {
+            _openSearchOverlay(context, focusDestination: isOrigin);
+          },
+          borderRadius: BorderRadius.circular(16),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Row(
+              children: [
+                Icon(
+                  isOrigin
+                      ? Icons.trip_origin_rounded
+                      : Icons.location_on_rounded,
+                  color: isOrigin ? Colors.green : Colors.red,
+                  size: 20,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    '${isOrigin ? (t.localeCode == 'th' ? 'ต้นทาง: ' : 'From: ') : (t.localeCode == 'th' ? 'ปลายทาง: ' : 'To: ')}'
+                    '${setItem!.displayName(isEnglish: localeCode == 'en')}',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  isOrigin
+                      ? (t.localeCode == 'th'
+                            ? 'เลือกปลายทาง...'
+                            : 'Choose destination...')
+                      : (t.localeCode == 'th'
+                            ? 'เลือกต้นทาง...'
+                            : 'Choose origin...'),
                   style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.primary,
                     fontWeight: FontWeight.bold,
                   ),
-                  overflow: TextOverflow.ellipsis,
                 ),
-              ),
-              const SizedBox(width: 8),
-              Text(
-                isOrigin
-                    ? (t.localeCode == 'th'
-                          ? 'เลือกปลายทาง...'
-                          : 'Choose destination...')
-                    : (t.localeCode == 'th'
-                          ? 'เลือกต้นทาง...'
-                          : 'Choose origin...'),
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.primary,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
