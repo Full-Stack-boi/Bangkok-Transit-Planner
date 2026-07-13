@@ -30,6 +30,12 @@ class TransitRepository {
   TransitGraph? _graph;
   bool _initialized = false;
 
+  // Cache maps for precomputed normalized search names to avoid redundant RegEx parsing on keypress
+  Map<String, String>? _normalizedNamtangTh;
+  Map<String, String>? _normalizedNamtangEn;
+  Map<String, String>? _normalizedLandmarkTh;
+  Map<String, String>? _normalizedLandmarkEn;
+
   final Map<String, Station> _stationCache = {};
   final Map<String, TransitLine> _lineCache = {};
   final Map<String, List<Station>> _lineStationsCache = {};
@@ -140,7 +146,16 @@ class TransitRepository {
     try {
       final jsonStr = await rootBundle.loadString('assets/data/landmarks.json');
       final List<dynamic> jsonList = json.decode(jsonStr);
-      _landmarks = jsonList.map((j) => Landmark.fromJson(j as Map<String, dynamic>)).toList();
+      final list = jsonList.map((j) => Landmark.fromJson(j as Map<String, dynamic>)).toList();
+      _landmarks = list;
+
+      // Precompute normalized search strings
+      _normalizedLandmarkTh = {
+        for (final l in list) l.id: l.nameTh.toLowerCase().replaceAll(RegExp(r'\s+'), '')
+      };
+      _normalizedLandmarkEn = {
+        for (final l in list) l.id: l.nameEn.toLowerCase().replaceAll(RegExp(r'\s+'), '')
+      };
     } catch (e) {
       _landmarks = [];
     }
@@ -161,6 +176,14 @@ class TransitRepository {
       });
       
       _namtangStops = processedStops;
+
+      // Precompute normalized search strings
+      _normalizedNamtangTh = {
+        for (final s in processedStops) s.id: s.nameTh.toLowerCase().replaceAll(RegExp(r'\s+'), '')
+      };
+      _normalizedNamtangEn = {
+        for (final s in processedStops) s.id: s.nameEn.toLowerCase().replaceAll(RegExp(r'\s+'), '')
+      };
     } catch (e) {
       _namtangStops = [];
       AppLogger.error('Failed to load Namtang stops: $e', error: e);
@@ -330,17 +353,15 @@ class TransitRepository {
     final matchingStations = searchStations(query);
 
     final matchingLandmarks = (_landmarks ?? []).where((l) {
-      final normalizedTh = l.nameTh.toLowerCase().replaceAll(RegExp(r'\s+'), '');
-      final normalizedEn = l.nameEn.toLowerCase().replaceAll(RegExp(r'\s+'), '');
-      return normalizedTh.contains(q) ||
-             normalizedEn.contains(q);
+      final normTh = _normalizedLandmarkTh?[l.id] ?? '';
+      final normEn = _normalizedLandmarkEn?[l.id] ?? '';
+      return normTh.contains(q) || normEn.contains(q);
     }).toList();
 
     final matchingNamtangStops = (_namtangStops ?? []).where((s) {
-      final normalizedTh = s.nameTh.toLowerCase().replaceAll(RegExp(r'\s+'), '');
-      final normalizedEn = s.nameEn.toLowerCase().replaceAll(RegExp(r'\s+'), '');
-      return normalizedTh.contains(q) ||
-             normalizedEn.contains(q);
+      final normTh = _normalizedNamtangTh?[s.id] ?? '';
+      final normEn = _normalizedNamtangEn?[s.id] ?? '';
+      return normTh.contains(q) || normEn.contains(q);
     }).take(20).toList();
 
     return [...matchingStations, ...matchingLandmarks, ...matchingNamtangStops];

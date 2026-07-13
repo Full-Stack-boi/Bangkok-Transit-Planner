@@ -22,6 +22,7 @@ class CachedTileProvider extends TileProvider {
   static bool _isPrefetching = false;
   static bool isPaused = false;
   static const String _bundleVersion = '2026-06-21-v3';
+  static final Set<String> _looseTilePaths = {};
 
   /// Get the local cache directory path for map tiles
   static Future<String> getCachePath() async {
@@ -60,6 +61,22 @@ class CachedTileProvider extends TileProvider {
     
     // Auto initialize MapBundleManager once target directory path is resolved
     await MapBundleManager.instance.init(bundleFile.path);
+    
+    // Scan updates folder to populate in-memory loose file path tracker
+    try {
+      _looseTilePaths.clear();
+      final updatesDir = Directory('$_resolvedCachePath/updates');
+      if (await updatesDir.exists()) {
+        final entities = updatesDir.listSync(recursive: true);
+        for (final entity in entities) {
+          if (entity is File && entity.path.endsWith('.png')) {
+            _looseTilePaths.add(entity.path);
+          }
+        }
+      }
+    } catch (e) {
+      AppLogger.error('Failed to populate loose tile paths: $e', tag: 'MapCache');
+    }
     
     return _resolvedCachePath!;
   }
@@ -359,14 +376,15 @@ class CachedTileProvider extends TileProvider {
         final bytes = response.bodyBytes;
         await tileFile.parent.create(recursive: true);
         await tileFile.writeAsBytes(bytes);
+        _looseTilePaths.add(tileFile.path);
 
         final etag = response.headers['etag'];
         final lastModified = response.headers['last-modified'];
         
         await metaFile.parent.create(recursive: true);
         await metaFile.writeAsString(jsonEncode({
-          'etag': ?etag,
-          'lastModified': ?lastModified,
+          'etag': etag,
+          'lastModified': lastModified,
         }));
         return _tileSuccess;
       } else if (response.statusCode == 304) {
@@ -460,7 +478,7 @@ class CachedTileImageProvider extends ImageProvider<CachedTileImageProvider> {
   ) async {
     try {
       // 1. Check updates folder (loose downloaded tiles) first
-      final fileExists = await key.tileFile.exists();
+      final fileExists = CachedTileProvider._looseTilePaths.contains(key.tileFile.path);
       if (kDebugMode) {
         AppLogger.info('Loading tile (${key.z}, ${key.x}, ${key.y}). Loose file exists: $fileExists, Path: ${key.tileFile.path}', tag: 'MapTile');
       }
@@ -470,6 +488,7 @@ class CachedTileImageProvider extends ImageProvider<CachedTileImageProvider> {
         if (length == 0) {
           try {
             await key.tileFile.delete();
+            CachedTileProvider._looseTilePaths.remove(key.tileFile.path);
           } catch (_) {}
         } else {
           final Uint8List bytes = await key.tileFile.readAsBytes();
@@ -487,6 +506,7 @@ class CachedTileImageProvider extends ImageProvider<CachedTileImageProvider> {
             AppLogger.error('Error decoding tile (${key.z}, ${key.x}, ${key.y}) from updates: $e\n$stackTrace', tag: 'MapTile', error: e);
             try {
               await key.tileFile.delete();
+              CachedTileProvider._looseTilePaths.remove(key.tileFile.path);
             } catch (_) {}
           }
         }
@@ -631,6 +651,7 @@ class CachedTileImageProvider extends ImageProvider<CachedTileImageProvider> {
         // Write to disk
         await key.tileFile.parent.create(recursive: true);
         await key.tileFile.writeAsBytes(bytes);
+        CachedTileProvider._looseTilePaths.add(key.tileFile.path);
 
         // Store ETag/Last-Modified metadata
         final etag = response.headers['etag'];
@@ -638,8 +659,8 @@ class CachedTileImageProvider extends ImageProvider<CachedTileImageProvider> {
         
         await key.metaFile.parent.create(recursive: true);
         await key.metaFile.writeAsString(jsonEncode({
-          'etag': ?etag,
-          'lastModified': ?lastModified,
+          'etag': etag,
+          'lastModified': lastModified,
         }));
 
         return bytes;
@@ -652,6 +673,18 @@ class CachedTileImageProvider extends ImageProvider<CachedTileImageProvider> {
 
   /// Perform asynchronous HTTP Headers verification in the background
   Future<void> _validateCacheInBackground(CachedTileImageProvider key) async {
+    try {
+      if (await key.metaFile.exists()) {
+        final lastMod = await key.metaFile.lastModified();
+        if (DateTime.now().difference(lastMod).inDays < 7) {
+          // Skip verification if checked within the last 7 days
+          return;
+        }
+      }
+    } catch (_) {
+      // If error reading file mod time, proceed with fallback check
+    }
+
     await _bgSemaphore.acquire();
     try {
       final Map<String, String> headers = {
@@ -673,13 +706,20 @@ class CachedTileImageProvider extends ImageProvider<CachedTileImageProvider> {
         final bytes = response.bodyBytes;
         await key.tileFile.parent.create(recursive: true);
         await key.tileFile.writeAsBytes(bytes);
+        CachedTileProvider._looseTilePaths.add(key.tileFile.path);
 
         final etag = response.headers['etag'];
         final lastModified = response.headers['last-modified'];
         await key.metaFile.writeAsString(jsonEncode({
-          'etag': ?etag,
-          'lastModified': ?lastModified,
+          'etag': etag,
+          'lastModified': lastModified,
         }));
+      } else if (response.statusCode == 304) {
+        // Tile is still unmodified. Reset the 7-day validation window
+        // by updating the metadata file's modification time.
+        try {
+          await key.metaFile.setLastModified(DateTime.now());
+        } catch (_) {}
       }
     } catch (_) {
       // Ignore background network errors (e.g. user is offline)
@@ -691,11 +731,15 @@ class CachedTileImageProvider extends ImageProvider<CachedTileImageProvider> {
   @override
   bool operator ==(Object other) {
     if (other.runtimeType != runtimeType) return false;
-    return other is CachedTileImageProvider && other.url == url;
+    return other is CachedTileImageProvider &&
+        other.folderHash == folderHash &&
+        other.z == z &&
+        other.x == x &&
+        other.y == y;
   }
 
   @override
-  int get hashCode => url.hashCode;
+  int get hashCode => Object.hash(folderHash, z, x, y);
 }
 
 // 1x1 transparent PNG fallback bytes
@@ -717,6 +761,19 @@ class MapBundleManager {
   final Map<String, List<int>> _index = {};
   bool _initialized = false;
   final _FutureChain _lock = _FutureChain();
+  final LinkedHashMap<String, Uint8List> _tileBytesCache = LinkedHashMap();
+  int _maxCacheLimit = 64;
+
+  void setMaxCacheLimit(int limit) {
+    _maxCacheLimit = limit;
+    while (_tileBytesCache.length > _maxCacheLimit) {
+      _tileBytesCache.remove(_tileBytesCache.keys.first);
+    }
+  }
+
+  void clearCache() {
+    _tileBytesCache.clear();
+  }
 
   Future<void> init(String bundlePath) async {
     if (_initialized) return;
@@ -785,6 +842,16 @@ class MapBundleManager {
   Future<Uint8List?> readTile(String folderHash, int z, int x, int y) async {
     if (!_initialized || _bundleFile == null) return null;
     final key = '$folderHash/$z/$x/$y.webp';
+
+    // Check in-memory LRU bytes cache
+    final cachedBytes = _tileBytesCache[key];
+    if (cachedBytes != null) {
+      // Move to end of LinkedHashMap (MRU order)
+      _tileBytesCache.remove(key);
+      _tileBytesCache[key] = cachedBytes;
+      return cachedBytes;
+    }
+
     final range = _index[key];
     if (range == null) return null;
     
@@ -793,11 +860,20 @@ class MapBundleManager {
     
     try {
       // Synchronize sets and reads to prevent race conditions on RandomAccessFile position
-      return await _lock.synchronized(() async {
+      final bytes = await _lock.synchronized(() async {
         await _bundleFile!.setPosition(offset);
-        final bytes = await _bundleFile!.read(length);
-        return bytes;
+        final readBytes = await _bundleFile!.read(length);
+        return readBytes;
       });
+
+      if (bytes.isNotEmpty) {
+        // Enforce dynamic limit
+        if (_tileBytesCache.length >= _maxCacheLimit) {
+          _tileBytesCache.remove(_tileBytesCache.keys.first); // remove oldest
+        }
+        _tileBytesCache[key] = bytes;
+      }
+      return bytes;
     } catch (e, stackTrace) {
       AppLogger.error('Error reading tile $key from bundle: $e\n$stackTrace', tag: 'MapBundle', error: key);
       return null;
@@ -807,6 +883,7 @@ class MapBundleManager {
   Future<void> close() async {
     _initialized = false;
     _index.clear();
+    _tileBytesCache.clear();
     try {
       await _bundleFile?.close();
     } catch (_) {}
