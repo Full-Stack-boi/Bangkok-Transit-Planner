@@ -207,58 +207,61 @@ class _MapSearchOverlayState extends ConsumerState<MapSearchOverlay> {
                         color: theme.colorScheme.outline.withValues(alpha: 0.1),
                       ),
                     ),
-                    child: Row(
-                      children: [
-                        // Left track indicator placeholder
-                        Column(
-                          mainAxisSize: MainAxisSize.min,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(width: 12, height: 12, decoration: BoxDecoration(color: shimmerColor, shape: BoxShape.circle)),
-                            Container(width: 2, height: 24, color: shimmerColor),
-                            Container(width: 12, height: 12, decoration: BoxDecoration(color: shimmerColor, shape: BoxShape.circle)),
-                          ],
-                        ),
-                        const SizedBox(width: 16),
-                        // Input fields placeholders
-                        Expanded(
-                          child: Column(
+                    child: SingleChildScrollView(
+                      physics: const NeverScrollableScrollPhysics(),
+                      child: Row(
+                        children: [
+                          // Left track indicator placeholder
+                          Column(
                             mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Container(
-                                width: double.infinity,
-                                height: 18,
-                                decoration: BoxDecoration(
-                                  color: shimmerColor,
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                              ),
-                              const SizedBox(height: 12),
-                              Container(width: double.infinity, height: 1, color: theme.colorScheme.outline.withValues(alpha: 0.15)),
-                              const SizedBox(height: 12),
-                              Container(
-                                width: 140,
-                                height: 18,
-                                decoration: BoxDecoration(
-                                  color: shimmerColor,
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                              ),
+                              Container(width: 12, height: 12, decoration: BoxDecoration(color: shimmerColor, shape: BoxShape.circle)),
+                              Container(width: 2, height: 24, color: shimmerColor),
+                              Container(width: 12, height: 12, decoration: BoxDecoration(color: shimmerColor, shape: BoxShape.circle)),
                             ],
                           ),
-                        ),
-                        const SizedBox(width: 16),
-                        // Swap button placeholder
-                        Container(
-                          width: 36,
-                          height: 36,
-                          decoration: BoxDecoration(
-                            color: shimmerColor,
-                            shape: BoxShape.circle,
+                          const SizedBox(width: 16),
+                          // Input fields placeholders
+                          Expanded(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  width: double.infinity,
+                                  height: 18,
+                                  decoration: BoxDecoration(
+                                    color: shimmerColor,
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                ),
+                                const SizedBox(height: 12),
+                                Container(width: double.infinity, height: 1, color: theme.colorScheme.outline.withValues(alpha: 0.15)),
+                                const SizedBox(height: 12),
+                                Container(
+                                  width: 140,
+                                  height: 18,
+                                  decoration: BoxDecoration(
+                                    color: shimmerColor,
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
+                          const SizedBox(width: 16),
+                          // Swap button placeholder
+                          Container(
+                            width: 36,
+                            height: 36,
+                            decoration: BoxDecoration(
+                              color: shimmerColor,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 );
@@ -282,118 +285,121 @@ class _MapSearchOverlayState extends ConsumerState<MapSearchOverlay> {
                       color: theme.colorScheme.outline.withValues(alpha: 0.1),
                     ),
                   ),
-                  child: Row(
-                    children: [
-                      // Left track connecting indicator
-                      Column(
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.trip_origin_rounded, color: Colors.green, size: 20),
-                          SizedBox(
-                            width: 2,
-                            height: 36,
-                            child: DecoratedBox(
-                              decoration: BoxDecoration(
-                                color: Colors.white24,
+                  child: SingleChildScrollView(
+                    physics: const NeverScrollableScrollPhysics(),
+                    child: Row(
+                      children: [
+                        // Left track connecting indicator
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.trip_origin_rounded, color: Colors.green, size: 20),
+                            SizedBox(
+                              width: 2,
+                              height: 36,
+                              child: DecoratedBox(
+                                decoration: BoxDecoration(
+                                  color: Colors.white24,
+                                ),
                               ),
                             ),
-                          ),
-                          Icon(Icons.location_on_rounded, color: Colors.red, size: 20),
-                        ],
-                      ),
-                      const SizedBox(width: 16),
-                      // Input Fields
-                      Expanded(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                              // Origin Field
-                              TextField(
-                                controller: _originController,
-                                focusNode: _originFocusNode,
-                                onTap: () => _startEditingOrigin(state),
-                                onChanged: (query) => vm.search(query),
-                                style: theme.textTheme.titleMedium,
-                                decoration: InputDecoration(
-                                  hintText: t.search.originHint,
-                                  border: InputBorder.none,
-                                  hintStyle: theme.textTheme.titleMedium?.copyWith(
-                                    color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
+                            Icon(Icons.location_on_rounded, color: Colors.red, size: 20),
+                          ],
+                        ),
+                        const SizedBox(width: 16),
+                        // Input Fields
+                        Expanded(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                                // Origin Field
+                                TextField(
+                                  controller: _originController,
+                                  focusNode: _originFocusNode,
+                                  onTap: () => _startEditingOrigin(state),
+                                  onChanged: (query) => vm.search(query),
+                                  style: theme.textTheme.titleMedium,
+                                  decoration: InputDecoration(
+                                    hintText: t.search.originHint,
+                                    border: InputBorder.none,
+                                    hintStyle: theme.textTheme.titleMedium?.copyWith(
+                                      color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
+                                    ),
+                                    suffixIcon: _isSelectingOrigin && _originController.text.isNotEmpty
+                                        ? IconButton(
+                                            icon: const Icon(Icons.clear, size: 18),
+                                            onPressed: () {
+                                              _originController.clear();
+                                              vm.search('');
+                                            },
+                                          )
+                                        : null,
                                   ),
-                                  suffixIcon: _isSelectingOrigin && _originController.text.isNotEmpty
-                                      ? IconButton(
-                                          icon: const Icon(Icons.clear, size: 18),
-                                          onPressed: () {
-                                            _originController.clear();
-                                            vm.search('');
-                                          },
-                                        )
-                                      : null,
                                 ),
-                              ),
-                              Divider(color: theme.colorScheme.outline.withValues(alpha: 0.15), height: 1),
-                              // Destination Field
-                              TextField(
-                                controller: _destController,
-                                focusNode: _destFocusNode,
-                                onTap: () => _startEditingDest(state),
-                                onChanged: (query) => vm.search(query),
-                                style: theme.textTheme.titleMedium,
-                                decoration: InputDecoration(
-                                  hintText: t.search.destHint,
-                                  border: InputBorder.none,
-                                  hintStyle: theme.textTheme.titleMedium?.copyWith(
-                                    color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
+                                Divider(color: theme.colorScheme.outline.withValues(alpha: 0.15), height: 1),
+                                // Destination Field
+                                TextField(
+                                  controller: _destController,
+                                  focusNode: _destFocusNode,
+                                  onTap: () => _startEditingDest(state),
+                                  onChanged: (query) => vm.search(query),
+                                  style: theme.textTheme.titleMedium,
+                                  decoration: InputDecoration(
+                                    hintText: t.search.destHint,
+                                    border: InputBorder.none,
+                                    hintStyle: theme.textTheme.titleMedium?.copyWith(
+                                      color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
+                                    ),
+                                    suffixIcon: !_isSelectingOrigin && _destController.text.isNotEmpty
+                                        ? IconButton(
+                                            icon: const Icon(Icons.clear, size: 18),
+                                            onPressed: () {
+                                              _destController.clear();
+                                              vm.search('');
+                                            },
+                                          )
+                                        : null,
                                   ),
-                                  suffixIcon: !_isSelectingOrigin && _destController.text.isNotEmpty
-                                      ? IconButton(
-                                          icon: const Icon(Icons.clear, size: 18),
-                                          onPressed: () {
-                                            _destController.clear();
-                                            vm.search('');
-                                          },
-                                        )
-                                      : null,
                                 ),
-                              ),
-                            ],
-                          ),
-                      ),
-                      const SizedBox(width: 8),
-                      // Swap Button
-                      IconButton(
-                        onPressed: state.origin != null || state.destination != null
-                            ? () {
-                                vm.swapStations();
-                                final nextState = ref.read(searchViewModelProvider);
-                                _originController.text = nextState.origin != null
-                                    ? nextState.origin!.displayName(isEnglish: localeCode == 'en')
-                                    : '';
-                                _destController.text = nextState.destination != null
-                                    ? nextState.destination!.displayName(isEnglish: localeCode == 'en')
-                                    : '';
-                                if (_isSelectingOrigin) {
-                                  _startEditingOrigin(nextState);
-                                } else {
-                                  _startEditingDest(nextState);
+                              ],
+                            ),
+                        ),
+                        const SizedBox(width: 8),
+                        // Swap Button
+                        IconButton(
+                          onPressed: state.origin != null || state.destination != null
+                              ? () {
+                                  vm.swapStations();
+                                  final nextState = ref.read(searchViewModelProvider);
+                                  _originController.text = nextState.origin != null
+                                      ? nextState.origin!.displayName(isEnglish: localeCode == 'en')
+                                      : '';
+                                  _destController.text = nextState.destination != null
+                                      ? nextState.destination!.displayName(isEnglish: localeCode == 'en')
+                                      : '';
+                                  if (_isSelectingOrigin) {
+                                    _startEditingOrigin(nextState);
+                                  } else {
+                                    _startEditingDest(nextState);
+                                  }
                                 }
-                              }
-                            : null,
-                        icon: Icon(
-                          Icons.swap_vert_rounded,
-                          size: 26,
-                          color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
-                        ),
-                        style: IconButton.styleFrom(
-                          backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.08),
-                          foregroundColor: theme.colorScheme.primary,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                              : null,
+                          icon: Icon(
+                            Icons.swap_vert_rounded,
+                            size: 26,
+                            color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                          ),
+                          style: IconButton.styleFrom(
+                            backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.08),
+                            foregroundColor: theme.colorScheme.primary,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),

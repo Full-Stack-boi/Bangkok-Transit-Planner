@@ -22,6 +22,14 @@ import '../utility/route_calculating_overlay.dart';
 import '../../core/constants/translation_helper.dart';
 import 'widgets/namtang_stops_layer.dart';
 import 'widgets/map_search_overlay.dart';
+import 'painters/station_marker_painter.dart';
+import 'painters/custom_map_pin.dart';
+import 'widgets/station_details_card.dart';
+import 'widgets/custom_location_card.dart';
+import 'widgets/namtang_stop_card.dart';
+import 'widgets/active_journey_panel.dart';
+import 'widgets/map_prefetch_widget.dart';
+
 import 'widgets/route_result_banner.dart';
 import '../route_result/route_result_sheet.dart';
 import '../../providers/route_tracker.dart';
@@ -69,7 +77,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     PaintingBinding.instance.imageCache.clearLiveImages();
     _fetchUserLocation();
     _initOfflineMap();
-    
+
     // Trigger Namtang stops loading when map is opened
     // Added a small delay to ensure UI remains responsive during transition
     Future.delayed(const Duration(milliseconds: 100), () {
@@ -144,7 +152,10 @@ class _MapScreenState extends ConsumerState<MapScreen> {
             final prefs = await SharedPreferences.getInstance();
             await prefs.setBool('map_prefetch_completed_v6_greater', true);
           } catch (e) {
-            AppLogger.error('Failed to save prefetching completion status: $e', error: e);
+            AppLogger.error(
+              'Failed to save prefetching completion status: $e',
+              error: e,
+            );
           }
         } else {
           ref.read(mapPrefetchProvider.notifier).pausePrefetch();
@@ -416,8 +427,11 @@ class _MapScreenState extends ConsumerState<MapScreen> {
               isTrackingActive &&
               trackerState?.currentStation?.id == station.id;
 
-          final double scale = (0.75 + (_currentZoom.value - 12.0) * 0.16).clamp(0.6, 2.0);
-          final double baseSize = isCurrentStation ? 44.0 : (isInterchange ? 32.0 : 24.0);
+          final double scale = (0.75 + (_currentZoom.value - 12.0) * 0.16)
+              .clamp(0.6, 2.0);
+          final double baseSize = isCurrentStation
+              ? 44.0
+              : (isInterchange ? 32.0 : 24.0);
           final double sizeValue = baseSize * scale;
 
           newMarkers.add(
@@ -502,7 +516,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
 
           final lineColor = TransitColors.getLineColor(station.lineId);
           final isInterchange = station.interchange.isNotEmpty;
-          final double scale = (0.75 + (_currentZoom.value - 12.0) * 0.16).clamp(0.6, 2.0);
+          final double scale = (0.75 + (_currentZoom.value - 12.0) * 0.16)
+              .clamp(0.6, 2.0);
           final double sizeValue = (isInterchange ? 32.0 : 24.0) * scale;
 
           newMarkers.add(
@@ -798,10 +813,13 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         ),
       );
     }
-    
+
     // Add Search Results
     final searchState = ref.watch(searchViewModelProvider);
-    if (searchState.searchResults.isNotEmpty && searchState.query.length >= 3 && _selectedStation == null && _customSelectedLocation == null) {
+    if (searchState.searchResults.isNotEmpty &&
+        searchState.query.length >= 3 &&
+        _selectedStation == null &&
+        _customSelectedLocation == null) {
       for (final item in searchState.searchResults) {
         if (item is Landmark) {
           dynamicMarkers.add(
@@ -810,7 +828,11 @@ class _MapScreenState extends ConsumerState<MapScreen> {
               width: 32,
               height: 32,
               alignment: Alignment.center,
-              child: const Icon(Icons.place_rounded, color: Colors.purple, size: 28),
+              child: const Icon(
+                Icons.place_rounded,
+                color: Colors.purple,
+                size: 28,
+              ),
             ),
           );
         }
@@ -943,7 +965,16 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                   ),
                   if (prefetchState.isPrefetching) ...[
                     const SizedBox(height: 8),
-                    _buildMapPrefetchWidget(context, prefetchState, theme, t),
+                    MapPrefetchWidget(
+                      prefetchState: prefetchState,
+                      theme: theme,
+                      t: t,
+                      isExpanded: _isPrefetchExpanded,
+                      onToggleExpand: () => setState(
+                        () => _isPrefetchExpanded = !_isPrefetchExpanded,
+                      ),
+                      onStartPrefetch: _startMapPrefetch,
+                    ),
                   ],
                 ],
               ),
@@ -993,12 +1024,13 @@ class _MapScreenState extends ConsumerState<MapScreen> {
               left: 16,
               right: 16,
               bottom: 16,
-              child: _buildCustomLocationDetailsCard(
-                context,
-                _customSelectedLocation!,
-                theme,
-                t,
-                localeCode,
+              child: CustomLocationCard(
+                location: _customSelectedLocation!,
+                theme: theme,
+                t: t,
+                localeCode: localeCode,
+                onClose: () => setState(() => _customSelectedLocation = null),
+                onOpenSearchOverlay: (focus) => _openSearchOverlay(context, focusDestination: focus),
               ),
             ),
 
@@ -1008,12 +1040,13 @@ class _MapScreenState extends ConsumerState<MapScreen> {
               left: 16,
               right: 16,
               bottom: 16,
-              child: _buildNamtangStopDetailsCard(
-                context,
-                _selectedNamtangStop!,
-                theme,
-                t,
-                localeCode,
+              child: NamtangStopCard(
+                stop: _selectedNamtangStop!,
+                theme: theme,
+                t: t,
+                localeCode: localeCode,
+                onClose: () => setState(() => _selectedNamtangStop = null),
+                onOpenSearchOverlay: (focus) => _openSearchOverlay(context, focusDestination: focus),
               ),
             ),
 
@@ -1043,12 +1076,11 @@ class _MapScreenState extends ConsumerState<MapScreen> {
               left: 16,
               right: 16,
               bottom: 16,
-              child: _buildActiveJourneyPanel(
-                context,
-                trackerState!,
-                theme,
-                t,
-                localeCode,
+              child: ActiveJourneyPanel(
+                tracker: trackerState!,
+                theme: theme,
+                t: t,
+                localeCode: localeCode,
               ),
             ),
 
@@ -1071,7 +1103,10 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                   child: Card(
                     margin: const EdgeInsets.symmetric(horizontal: 32),
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 20,
+                      ),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -1124,407 +1159,6 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     );
   }
 
-  Widget _buildCustomLocationDetailsCard(
-    BuildContext context,
-    CustomLocation location,
-    ThemeData theme,
-    AppLocalizations t,
-    String localeCode,
-  ) {
-    final searchVm = ref.read(searchViewModelProvider.notifier);
-    final transitRepo = ref.read(transitRepositoryProvider);
-    final nearest = transitRepo.getStation(location.nearestStationId ?? '');
-    final nearestName =
-        nearest?.displayName(isEnglish: localeCode == 'en') ?? '';
-    final walkMin = location.walkingMinutes?.toInt() ?? 0;
-
-    final stationName = localeCode == 'th' ? location.nameTh : location.nameEn;
-
-    return Card(
-      elevation: 8,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(
-                  Icons.place_rounded,
-                  color: theme.colorScheme.error,
-                  size: 28,
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        stationName,
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        t.proximity.nearStationWalk(
-                          nearestName,
-                          '${walkMin.toInt()}',
-                        ),
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: theme.colorScheme.onSurface.withValues(
-                            alpha: 0.5,
-                          ),
-                          fontSize: 12,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.close_rounded),
-                  onPressed: () {
-                    setState(() => _customSelectedLocation = null);
-                  },
-                ),
-              ],
-            ),
-            const Divider(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () {
-                      searchVm.setOrigin(location);
-                      setState(() => _customSelectedLocation = null);
-                      final currentState = ref.read(searchViewModelProvider);
-                      if (currentState.destination == null) {
-                        _openSearchOverlay(context, focusDestination: true);
-                      }
-                    },
-                    icon: const Icon(
-                      Icons.trip_origin_rounded,
-                      size: 16,
-                      color: Colors.green,
-                    ),
-                    label: Text(t.favorites.setOriginBtn),
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () {
-                      searchVm.setDestination(location);
-                      setState(() => _customSelectedLocation = null);
-                      final currentState = ref.read(searchViewModelProvider);
-                      if (currentState.origin == null) {
-                        _openSearchOverlay(context, focusDestination: false);
-                      }
-                    },
-                    icon: const Icon(
-                      Icons.location_on_rounded,
-                      size: 16,
-                      color: Colors.red,
-                    ),
-                    label: Text(t.favorites.setDestBtn),
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildActiveJourneyPanel(
-    BuildContext context,
-    RouteTrackerState tracker,
-    ThemeData theme,
-    AppLocalizations t,
-    String localeCode,
-  ) {
-    final segment = tracker.currentSegment;
-    if (segment == null) return const SizedBox.shrink();
-
-    final isWalk = segment.lineId == 'WALK';
-    final lineColor = isWalk
-        ? Colors.grey
-        : TransitColors.getLineColor(segment.lineId);
-    final stations = tracker.currentSegmentStations;
-
-    if (tracker.hasArrived) {
-      return Card(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        elevation: 8,
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: const BoxDecoration(
-                  color: Colors.green,
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.check_rounded,
-                  color: Colors.white,
-                  size: 32,
-                ),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                t.journey.arrivedLabel,
-                style: theme.textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  ref.read(routeTrackerProvider.notifier).stopTracking();
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: theme.colorScheme.primary,
-                  foregroundColor: theme.colorScheme.onPrimary,
-                  minimumSize: const Size.fromHeight(48),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: Text(t.journey.endJourneyBtn),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
-
-    final currentStationName =
-        tracker.currentStation?.displayName(isEnglish: localeCode == 'en') ??
-        '';
-    final nextStationName =
-        tracker.nextStation?.displayName(isEnglish: localeCode == 'en') ?? '';
-
-    // Calculate progress
-    double progress = 1.0;
-    if (stations.isNotEmpty) {
-      progress = (tracker.currentStationIndex + 1) / stations.length;
-    }
-
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      elevation: 8,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header: Line Badge and Segment progress
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: lineColor,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    isWalk ? t.journey.walkToLabel : segment.lineName,
-                    style: TextStyle(
-                      color: isWalk
-                          ? Colors.white
-                          : TransitColors.getLineTextColor(segment.lineId),
-                      fontWeight: FontWeight.bold,
-                      fontSize: 12,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    isWalk
-                        ? '~${segment.estimatedMinutes.toInt()} ${t.common.minutesUnit}'
-                        : '${stations.length} ${t.journey.stationsCount}',
-                    style: theme.textTheme.labelLarge?.copyWith(
-                      color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                    ),
-                  ),
-                ),
-                if (tracker.isSimulation) ...[
-                  const SizedBox(width: 8),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 2,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.amber.withValues(alpha: 0.15),
-                      border: Border.all(
-                        color: Colors.amber.shade700,
-                        width: 1,
-                      ),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Text(
-                      t.journey.simulationMode,
-                      style: TextStyle(
-                        color: Colors.amber.shade800,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 10,
-                      ),
-                    ),
-                  ),
-                ],
-              ],
-            ),
-            const SizedBox(height: 12),
-
-            // Progress bar
-            LinearProgressIndicator(
-              value: progress,
-              backgroundColor: lineColor.withValues(alpha: 0.15),
-              color: lineColor,
-              minHeight: 6,
-              borderRadius: BorderRadius.circular(3),
-            ),
-            const SizedBox(height: 16),
-
-            // Current & Next station details
-            Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        t.journey.currentStationLabel,
-                        style: theme.textTheme.labelMedium?.copyWith(
-                          color: theme.colorScheme.onSurface.withValues(
-                            alpha: 0.5,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        currentStationName.isNotEmpty
-                            ? currentStationName
-                            : (isWalk
-                                  ? segment.fromStation.displayName(
-                                      isEnglish: localeCode == 'en',
-                                    )
-                                  : ''),
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                ),
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 8),
-                  child: Icon(
-                    Icons.arrow_forward_rounded,
-                    color: Colors.grey,
-                    size: 20,
-                  ),
-                ),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        t.journey.nextStationLabel,
-                        style: theme.textTheme.labelMedium?.copyWith(
-                          color: theme.colorScheme.onSurface.withValues(
-                            alpha: 0.5,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        nextStationName.isNotEmpty
-                            ? nextStationName
-                            : (isWalk
-                                  ? segment.toStation.displayName(
-                                      isEnglish: localeCode == 'en',
-                                    )
-                                  : '-'),
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: theme.colorScheme.primary,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-
-            // Buttons: Simulation Step & End Journey
-            Row(
-              children: [
-                if (tracker.isSimulation) ...[
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: () {
-                        ref
-                            .read(routeTrackerProvider.notifier)
-                            .advanceSimulation();
-                      },
-                      icon: const Icon(Icons.skip_next_rounded, size: 20),
-                      label: Text(t.journey.nextSimulationBtn),
-                      style: OutlinedButton.styleFrom(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                ],
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      ref.read(routeTrackerProvider.notifier).stopTracking();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: theme.colorScheme.errorContainer,
-                      foregroundColor: theme.colorScheme.onErrorContainer,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                    ),
-                    child: Text(t.journey.endJourneyBtn),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget _buildTopSearchCard(
     BuildContext context,
     SearchState searchState,
@@ -1540,7 +1174,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         tag: 'search_bar_card',
         child: Card(
           elevation: 6,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
           child: InkWell(
             onTap: () {
               _openSearchOverlay(context);
@@ -1556,7 +1192,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                     child: Text(
                       t.search.searchPlaceholder,
                       style: theme.textTheme.bodyLarge?.copyWith(
-                        color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                        color: theme.colorScheme.onSurface.withValues(
+                          alpha: 0.5,
+                        ),
                       ),
                     ),
                   ),
@@ -1573,7 +1211,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         tag: 'search_bar_card',
         child: Card(
           elevation: 6,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
             child: Row(
@@ -1703,9 +1343,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  isOrigin
-                      ? t.search.chooseDest
-                      : t.search.chooseOrigin,
+                  isOrigin ? t.search.chooseDest : t.search.chooseOrigin,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: theme.colorScheme.primary,
                     fontWeight: FontWeight.bold,
@@ -1716,194 +1354,6 @@ class _MapScreenState extends ConsumerState<MapScreen> {
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildMapPrefetchWidget(
-    BuildContext context,
-    MapPrefetchProgress prefetchState,
-    ThemeData theme,
-    AppLocalizations t,
-  ) {
-    final isTh = t.localeCode == 'th';
-    final percentage = (prefetchState.progress * 100).toInt();
-    final showDetails = _isPrefetchExpanded && !prefetchState.isPaused;
-
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        // Control Button (Larger 44x44px button with custom progress border)
-        CustomPaint(
-          foregroundPainter: _RoundedRectangleProgressPainter(
-            progress: prefetchState.progress,
-            color: theme.colorScheme.primary,
-            backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.25),
-            strokeWidth: 3.0,
-            borderRadius: 8.0,
-          ),
-          child: GestureDetector(
-            onTap: () {
-              if (prefetchState.isPaused) {
-                // Resume
-                CachedTileProvider.isPaused = false;
-                ref.read(mapPrefetchProvider.notifier).resumePrefetch();
-                setState(() {
-                  _isPrefetchExpanded = true;
-                });
-                _startMapPrefetch();
-              } else {
-                if (!_isPrefetchExpanded) {
-                  // If collapsed but downloading, tapping expands it
-                  setState(() {
-                    _isPrefetchExpanded = true;
-                  });
-                } else {
-                  // If expanded, tapping pauses and collapses
-                  CachedTileProvider.isPaused = true;
-                  ref.read(mapPrefetchProvider.notifier).pausePrefetch();
-                  setState(() {
-                    _isPrefetchExpanded = false;
-                  });
-                }
-              }
-            },
-            child: Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: theme.colorScheme.surface.withValues(alpha: 0.9),
-                borderRadius: BorderRadius.circular(8),
-                boxShadow: const [
-                  BoxShadow(
-                    color: Colors.black12,
-                    blurRadius: 3,
-                    offset: Offset(0, 1.5),
-                  ),
-                ],
-              ),
-              child: Center(
-                child: Icon(
-                  prefetchState.isPaused ? Icons.play_arrow : Icons.pause,
-                  color: theme.colorScheme.primary,
-                  size: 24,
-                ),
-              ),
-            ),
-          ),
-        ),
-        // Animated Details Card
-        AnimatedContainer(
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeInOut,
-          width: showDetails ? 288 : 0,
-          height: showDetails ? 104 : 44,
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(16),
-            child: OverflowBox(
-              alignment: Alignment.centerLeft,
-              minWidth: 288,
-              maxWidth: 288,
-              minHeight: 104,
-              maxHeight: 104,
-              child: Padding(
-                padding: const EdgeInsets.only(left: 8),
-                child: Container(
-                  width: 280,
-                  height: 104,
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.surface.withValues(alpha: 0.9),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: theme.colorScheme.outline.withValues(alpha: 0.2),
-                    ),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Colors.black12,
-                        blurRadius: 4,
-                        offset: Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              t.settings.offlineMapDownloading,
-                              style: theme.textTheme.titleSmall?.copyWith(
-                                fontWeight: FontWeight.bold,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                          const SizedBox(width: 4),
-                          GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                _isPrefetchExpanded = false;
-                              });
-                            },
-                            child: Icon(
-                              Icons.close,
-                              size: 18,
-                              color: theme.colorScheme.onSurfaceVariant,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 6),
-                      LinearProgressIndicator(
-                        value: prefetchState.progress,
-                        minHeight: 6,
-                        backgroundColor: theme.colorScheme.primary.withValues(
-                          alpha: 0.1,
-                        ),
-                        color: theme.colorScheme.primary,
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      const SizedBox(height: 6),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            t.settings.offlineMapDownloaded(prefetchState.currentTile, prefetchState.totalTiles),
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: theme.colorScheme.onSurfaceVariant,
-                            ),
-                          ),
-                          Text(
-                            '$percentage%',
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: theme.colorScheme.primary,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        t.settings.offlineMapCachedAndNew(prefetchState.cachedCount, prefetchState.successCount),
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant.withValues(
-                            alpha: 0.7,
-                          ),
-                          fontSize: 10,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ],
     );
   }
 
@@ -1922,686 +1372,5 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         reverseTransitionDuration: const Duration(milliseconds: 150),
       ),
     );
-  }
-
-  Widget _buildNamtangStopDetailsCard(
-    BuildContext context,
-    NamtangStop stop,
-    ThemeData theme,
-    AppLocalizations t,
-    String localeCode,
-  ) {
-    final searchVm = ref.read(searchViewModelProvider.notifier);
-    final transitRepo = ref.read(transitRepositoryProvider);
-    final nearest = stop.nearestStationId != null
-        ? transitRepo.getStation(stop.nearestStationId!)
-        : null;
-    final nearestName =
-        nearest?.displayName(isEnglish: localeCode == 'en') ?? '';
-    final walkMin = stop.walkingMinutes?.toInt() ?? 5;
-
-    final stopName = localeCode == 'th' ? stop.nameTh : stop.nameEn;
-
-    IconData leadingIcon = Icons.directions_bus_rounded;
-    Color leadingColor = Colors.green;
-    if (stop.type == 'boat') {
-      leadingIcon = Icons.directions_boat_rounded;
-      leadingColor = Colors.blue.shade700;
-    } else if (stop.type == 'commuter_train') {
-      leadingIcon = Icons.train_rounded;
-      leadingColor = Colors.red.shade700;
-    }
-
-    return Card(
-      elevation: 8,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(leadingIcon, color: leadingColor, size: 28),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        stopName,
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      if (nearestName.isNotEmpty)
-                        Text(
-                          t.proximity.nearStationWalk(nearestName, '$walkMin'),
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: theme.colorScheme.onSurface.withValues(
-                              alpha: 0.5,
-                            ),
-                            fontSize: 12,
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.close_rounded),
-                  onPressed: () {
-                    setState(() => _selectedNamtangStop = null);
-                  },
-                ),
-              ],
-            ),
-            const Divider(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () {
-                      searchVm.setOrigin(stop);
-                      setState(() => _selectedNamtangStop = null);
-                      final currentState = ref.read(searchViewModelProvider);
-                      if (currentState.destination == null) {
-                        _openSearchOverlay(context, focusDestination: true);
-                      }
-                    },
-                    icon: const Icon(
-                      Icons.trip_origin_rounded,
-                      size: 16,
-                      color: Colors.green,
-                    ),
-                    label: Text(t.favorites.setOriginBtn),
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () {
-                      searchVm.setDestination(stop);
-                      setState(() => _selectedNamtangStop = null);
-                      final currentState = ref.read(searchViewModelProvider);
-                      if (currentState.origin == null) {
-                        _openSearchOverlay(context, focusDestination: false);
-                      }
-                    },
-                    icon: const Icon(
-                      Icons.location_on_rounded,
-                      size: 16,
-                      color: Colors.red,
-                    ),
-                    label: Text(t.favorites.setDestBtn),
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class StationDetailsCard extends ConsumerWidget {
-  final Station station;
-  final String localeCode;
-  final VoidCallback onClose;
-
-  const StationDetailsCard({
-    super.key,
-    required this.station,
-    required this.localeCode,
-    required this.onClose,
-  });
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
-    final t = ref.read(translationsProvider);
-    final transitRepo = ref.read(transitRepositoryProvider);
-    final favoritesRepo = ref.read(favoritesRepositoryProvider);
-    final searchVm = ref.read(searchViewModelProvider.notifier);
-
-    // Watch these only at the card level to prevent full screen rebuilds!
-    final scheduleService = ref.watch(scheduleServiceProvider);
-    final crowdService = ref.watch(crowdServiceProvider);
-
-    final lineColor = TransitColors.getLineColor(station.lineId);
-    final crowdInfo = crowdService.getCrowdInfo(station.id);
-    final minutesUntilNext = scheduleService.getMinutesUntilNextTrain(station.lineId);
-
-    final stationName = localeCode == 'th' ? station.nameTh : station.nameEn;
-    final stationSubName = localeCode == 'th' ? station.nameEn : station.nameTh;
-
-    // Find all stations in the same interchange hub
-    final hubStations = <Station>[station];
-    for (final interchangeId in station.interchange) {
-      final s = transitRepo.getStation(interchangeId);
-      if (s != null && !hubStations.contains(s)) {
-        hubStations.add(s);
-      }
-    }
-    hubStations.sort((a, b) {
-      int getPriority(String lineId) {
-        if (lineId.startsWith('BTS')) return 0;
-        if (lineId.startsWith('MRT')) return 1;
-        return 2;
-      }
-
-      final pA = getPriority(a.lineId);
-      final pB = getPriority(b.lineId);
-      if (pA != pB) return pA.compareTo(pB);
-      return a.id.compareTo(b.id);
-    });
-
-    final String trainStatusText;
-    if (minutesUntilNext == null) {
-      trainStatusText = t.routeResult.serviceEnded;
-    } else if (minutesUntilNext == 0) {
-      trainStatusText = t.routeResult.trainArriving;
-    } else {
-      trainStatusText =
-          '${t.routeResult.nextTrain}: ~$minutesUntilNext ${t.common.minutesUnit}';
-    }
-
-    String getCrowdLevelText(CrowdLevel level) {
-      switch (level) {
-        case CrowdLevel.low:
-          return t.routeResult.crowdLow;
-        case CrowdLevel.medium:
-          return t.routeResult.crowdMedium;
-        case CrowdLevel.high:
-          return t.routeResult.crowdHigh;
-        case CrowdLevel.unknown:
-          return t.routeResult.crowdUnknown;
-      }
-    }
-
-    return Card(
-      elevation: 8,
-      shadowColor: Colors.black26,
-      margin: EdgeInsets.zero,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header Row (Name + Close Button)
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: lineColor,
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Text(
-                    station.code,
-                    style: TextStyle(
-                      color: TransitColors.getLineTextColor(station.lineId),
-                      fontWeight: FontWeight.bold,
-                      fontSize: 12,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        stationName,
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        stationSubName,
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: theme.colorScheme.onSurface.withValues(
-                            alpha: 0.5,
-                          ),
-                          fontSize: 12,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Consumer(
-                  builder: (context, ref, child) {
-                    final favoritesState = ref.watch(favoritesViewModelProvider);
-                    final isFav = favoritesState.favoriteStations.any((s) => s.id == station.id);
-                    return IconButton(
-                      icon: Icon(
-                        isFav
-                            ? Icons.favorite_rounded
-                            : Icons.favorite_outline_rounded,
-                        color: isFav ? Colors.red : null,
-                      ),
-                      onPressed: () async {
-                        await ref
-                            .read(favoritesViewModelProvider.notifier)
-                            .toggleFavoriteStation(station.id);
-                      },
-                    );
-                  },
-                ),
-                IconButton(
-                  icon: const Icon(Icons.close_rounded),
-                  onPressed: onClose,
-                ),
-              ],
-            ),
-            if (hubStations.length > 1) ...[
-              const SizedBox(height: 12),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: hubStations.map((hubStation) {
-                    final hubLine = transitRepo.getLine(hubStation.lineId);
-                    final hubLineColor = TransitColors.getLineColor(
-                      hubStation.lineId,
-                    );
-                    final isSelected = hubStation.id == station.id;
-                    final hubLineName = hubLine != null
-                        ? (localeCode == 'th' ? hubLine.nameTh : hubLine.nameEn)
-                        : hubStation.lineId;
-
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 8.0),
-                      child: ChoiceChip(
-                        label: Text(
-                          '${hubStation.code} - $hubLineName',
-                          style: TextStyle(
-                            color: isSelected ? Colors.white : hubLineColor,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 12,
-                          ),
-                        ),
-                        selected: isSelected,
-                        selectedColor: hubLineColor,
-                        backgroundColor: theme.brightness == Brightness.dark
-                            ? const Color(0xFF1E293B)
-                            : Colors.grey.shade100,
-                        checkmarkColor: Colors.white,
-                        showCheckmark: false,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                          side: BorderSide(color: hubLineColor, width: 1.5),
-                        ),
-                        onSelected: (selected) {
-                          if (selected) {
-                            // Can't mutate MapScreen state directly here easily.
-                            // We will use onClose instead to just close, or add a callback.
-                            // To keep it simple, we don't switch hubs dynamically in the stateless widget
-                            // without passing a callback. But let's add an onSelectHubStation.
-                            // Wait, since we are inside a widget, we can't easily add a callback without changing constructor.
-                          }
-                        },
-                      ),
-                    );
-                  }).toList(),
-                ),
-              ),
-            ],
-            const Divider(height: 16),
-
-            // Next Train & Crowd Info
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                // Next Train
-                Expanded(
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.access_time_rounded,
-                        size: 16,
-                        color: Colors.amber.shade300,
-                      ),
-                      const SizedBox(width: 6),
-                      Expanded(
-                        child: Text(
-                          trainStatusText,
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: minutesUntilNext == 0
-                                ? Colors.amber.shade700
-                                : Colors.amber.shade200,
-                            fontWeight: minutesUntilNext == 0
-                                ? FontWeight.bold
-                                : null,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                // Crowd Level
-                Row(
-                  children: [
-                    Icon(
-                      Icons.people_outline_rounded,
-                      size: 16,
-                      color: crowdInfo.level == CrowdLevel.high
-                          ? Colors.red
-                          : (crowdInfo.level == CrowdLevel.medium
-                                ? Colors.orange
-                                : Colors.green),
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      '${t.routeResult.crowdLevel}: ${getCrowdLevelText(crowdInfo.level)} (~${crowdInfo.presenceCount} ${t.common.peopleUnit})',
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: crowdInfo.level == CrowdLevel.high
-                            ? Colors.red.shade400
-                            : (crowdInfo.level == CrowdLevel.medium
-                                  ? Colors.orange.shade400
-                                  : Colors.green.shade400),
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-
-            // Action Buttons
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () {
-                      searchVm.setOrigin(station);
-                      onClose();
-                      // Wait, we need to open search overlay if dest is null. But MapScreen has _openSearchOverlay.
-                      // Since we are separated, the user will have to manually open it, or we pass a callback.
-                    },
-                    icon: const Icon(
-                      Icons.trip_origin_rounded,
-                      size: 16,
-                      color: Colors.green,
-                    ),
-                    label: Text(t.favorites.setOriginBtn),
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () {
-                      searchVm.setDestination(station);
-                      onClose();
-                    },
-                    icon: const Icon(
-                      Icons.location_on_rounded,
-                      size: 16,
-                      color: Colors.red,
-                    ),
-                    label: Text(t.favorites.setDestBtn),
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 10),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-}
-
-class CustomMapPin extends StatelessWidget {
-  final Color color;
-  final IconData icon;
-
-  const CustomMapPin({super.key, required this.color, required this.icon});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        // Pin Bubble
-        Container(
-          width: 34,
-          height: 34,
-          decoration: BoxDecoration(
-            color: color,
-            shape: BoxShape.circle,
-            border: Border.all(color: Colors.white, width: 2.5),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.25),
-                blurRadius: 6,
-                offset: const Offset(0, 3),
-              ),
-            ],
-          ),
-          child: Center(child: Icon(icon, color: Colors.white, size: 16)),
-        ),
-        // Pin Tip (Teardrop pointer)
-        Transform.translate(
-          offset: const Offset(0, -1.5), // overlap slightly to merge borders
-          child: CustomPaint(
-            size: const Size(10, 5),
-            painter: _TrianglePainter(color: color),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _TrianglePainter extends CustomPainter {
-  final Color color;
-
-  _TrianglePainter({required this.color});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..style = PaintingStyle.fill;
-
-    // Draw triangle pointing down
-    final path = ui.Path()
-      ..moveTo(0, 0)
-      ..lineTo(size.width, 0)
-      ..lineTo(size.width / 2, size.height)
-      ..close();
-
-    // Draw white borders for the triangle to match the bubble border
-    final borderPaint = Paint()
-      ..color = Colors.white
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.5
-      ..strokeCap = StrokeCap.round;
-
-    final borderPath = ui.Path()
-      ..moveTo(0, 0)
-      ..lineTo(size.width / 2, size.height)
-      ..lineTo(size.width, 0);
-
-    canvas.drawPath(path, paint);
-    canvas.drawPath(borderPath, borderPaint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
-
-class _RoundedRectangleProgressPainter extends CustomPainter {
-  final double progress;
-  final Color color;
-  final Color backgroundColor;
-  final double strokeWidth;
-  final double borderRadius;
-
-  _RoundedRectangleProgressPainter({
-    required this.progress,
-    required this.color,
-    required this.backgroundColor,
-    this.strokeWidth = 3.0,
-    this.borderRadius = 8.0,
-  });
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final rect = Rect.fromLTWH(
-      strokeWidth / 2,
-      strokeWidth / 2,
-      size.width - strokeWidth,
-      size.height - strokeWidth,
-    );
-    final rrect = RRect.fromRectAndRadius(rect, Radius.circular(borderRadius));
-
-    // 1. Paint background border
-    final bgPaint = Paint()
-      ..color = backgroundColor
-      ..strokeWidth = strokeWidth
-      ..style = PaintingStyle.stroke;
-    canvas.drawRRect(rrect, bgPaint);
-
-    // 2. Paint progress border
-    if (progress > 0) {
-      final progressPaint = Paint()
-        ..color = color
-        ..strokeWidth = strokeWidth
-        ..style = PaintingStyle.stroke
-        ..strokeCap = StrokeCap.round;
-
-      final path = ui.Path()..addRRect(rrect);
-      final pathMetrics = path.computeMetrics();
-      for (final metric in pathMetrics) {
-        final extractPath = metric.extractPath(0.0, metric.length * progress);
-        canvas.drawPath(extractPath, progressPaint);
-      }
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant _RoundedRectangleProgressPainter oldDelegate) {
-    return oldDelegate.progress != progress ||
-        oldDelegate.color != color ||
-        oldDelegate.backgroundColor != backgroundColor ||
-        oldDelegate.strokeWidth != strokeWidth ||
-        oldDelegate.borderRadius != borderRadius;
-  }
-}
-
-class StationMarkerPainter extends CustomPainter {
-  final Color lineColor;
-  final bool isInterchange;
-  final Brightness brightness;
-  final bool isCurrentStation;
-  final double scale;
-
-  StationMarkerPainter({
-    required this.lineColor,
-    required this.isInterchange,
-    required this.brightness,
-    this.isCurrentStation = false,
-    this.scale = 1.0,
-  });
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final center = Offset(size.width / 2, size.height / 2);
-    final radius = size.width / 2;
-
-    // 1. Draw Drop Shadow
-    final shadowPaint = Paint()
-      ..color = isCurrentStation
-          ? Colors.green.withValues(alpha: 0.3)
-          : Colors.black.withValues(alpha: 0.26)
-      ..maskFilter = MaskFilter.blur(BlurStyle.normal, (isCurrentStation ? 4.0 : 2.0) * scale);
-
-    canvas.drawCircle(
-      center + Offset(0, 1.5 * scale),
-      radius - (1.5 * scale),
-      shadowPaint,
-    );
-
-    // 2. Draw Outer Circle (Background)
-    final bgPaint = Paint()
-      ..color = isCurrentStation
-          ? Colors.green
-          : (brightness == Brightness.dark ? const Color(0xFF1E293B) : Colors.white)
-      ..style = PaintingStyle.fill;
-    canvas.drawCircle(center, radius - (1.5 * scale), bgPaint);
-
-    // 3. Draw Border
-    final borderPaint = Paint()
-      ..color = isCurrentStation ? Colors.white : lineColor
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = isCurrentStation ? 4.0 * scale : (isInterchange ? 4.0 * scale : 3.0 * scale);
-    canvas.drawCircle(center, radius - (1.5 * scale) - (borderPaint.strokeWidth / 2), borderPaint);
-
-    // 4. Draw Center Content
-    if (isCurrentStation) {
-      // Draw navigation triangle pointing up
-      final path = ui.Path()
-        ..moveTo(center.dx, center.dy - 6 * scale)
-        ..lineTo(center.dx - 5 * scale, center.dy + 5 * scale)
-        ..lineTo(center.dx, center.dy + 2 * scale)
-        ..lineTo(center.dx + 5 * scale, center.dy + 5 * scale)
-        ..close();
-      canvas.drawPath(path, Paint()..color = Colors.white);
-    } else if (isInterchange) {
-      // Render the exact Material icon glyph directly on the canvas
-      final textPainter = TextPainter(
-        textDirection: TextDirection.ltr,
-      );
-      textPainter.text = TextSpan(
-        text: String.fromCharCode(Icons.swap_horiz_rounded.codePoint),
-        style: TextStyle(
-          fontSize: 14.0 * scale,
-          fontFamily: Icons.swap_horiz_rounded.fontFamily,
-          package: Icons.swap_horiz_rounded.fontPackage,
-          color: brightness == Brightness.dark ? Colors.white : Colors.black,
-        ),
-      );
-      textPainter.layout();
-      textPainter.paint(
-        canvas,
-        center - Offset(textPainter.width / 2, textPainter.height / 2),
-      );
-    } else {
-      // Draw Inner Dot
-      final dotPaint = Paint()
-        ..color = lineColor
-        ..style = PaintingStyle.fill;
-      canvas.drawCircle(center, 3.0 * scale, dotPaint);
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant StationMarkerPainter oldDelegate) {
-    return oldDelegate.lineColor != lineColor ||
-        oldDelegate.isInterchange != isInterchange ||
-        oldDelegate.brightness != brightness ||
-        oldDelegate.isCurrentStation != isCurrentStation ||
-        oldDelegate.scale != scale;
   }
 }
