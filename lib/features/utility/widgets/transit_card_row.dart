@@ -219,9 +219,7 @@ class TransitCardRow extends ConsumerWidget {
           );
         },
         child: Container(
-          decoration: BoxDecoration(
-            gradient: gradient,
-          ),
+          decoration: BoxDecoration(gradient: gradient),
           padding: const EdgeInsets.all(12),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -243,7 +241,11 @@ class TransitCardRow extends ConsumerWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                  const Icon(Icons.credit_card_rounded, color: Colors.white70, size: 12),
+                  const Icon(
+                    Icons.credit_card_rounded,
+                    color: Colors.white70,
+                    size: 12,
+                  ),
                 ],
               ),
               Column(
@@ -435,7 +437,10 @@ class _CardDetailBottomSheetContentState
                     borderRadius: BorderRadius.circular(16),
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 150),
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 14,
+                      ),
                       decoration: BoxDecoration(
                         color: isSelected
                             ? networkColor.withValues(alpha: 0.08)
@@ -444,7 +449,9 @@ class _CardDetailBottomSheetContentState
                         border: Border.all(
                           color: isSelected
                               ? networkColor
-                              : theme.colorScheme.outline.withValues(alpha: 0.12),
+                              : theme.colorScheme.outline.withValues(
+                                  alpha: 0.12,
+                                ),
                           width: isSelected ? 2.0 : 1.0,
                         ),
                       ),
@@ -473,25 +480,30 @@ class _CardDetailBottomSheetContentState
                               ],
                             ),
                           ),
-                          Radio<String>(
-                            value: opt.value,
+                          RadioGroup(
                             groupValue: _activeType,
-                            activeColor: networkColor,
                             onChanged: (val) {
-                               if (val != null) {
-                                 setState(() {
-                                   _activeType = val;
-                                 });
-                                 ref
-                                     .read(userCardsProvider.notifier)
-                                     .setCardType(widget.networkId, val);
-                                 Future.delayed(const Duration(milliseconds: 150), () {
-                                   if (context.mounted) {
-                                     Navigator.pop(context);
-                                   }
-                                 });
-                               }
-                             },
+                              if (val != null) {
+                                setState(() {
+                                  _activeType = val;
+                                });
+                                ref
+                                    .read(userCardsProvider.notifier)
+                                    .setCardType(widget.networkId, val);
+                                Future.delayed(
+                                  const Duration(milliseconds: 150),
+                                  () {
+                                    if (context.mounted) {
+                                      Navigator.pop(context);
+                                    }
+                                  },
+                                );
+                              }
+                            },
+                            child: Radio<String>(
+                              value: opt.value,
+                              activeColor: networkColor,
+                            ),
                           ),
                         ],
                       ),
@@ -507,23 +519,23 @@ class _CardDetailBottomSheetContentState
   }
 }
 
-class RadioGroup<T> extends StatelessWidget {
-  final T groupValue;
-  final ValueChanged<T?> onChanged;
-  final Widget child;
+// class RadioGroup<T> extends StatelessWidget {
+//   final T groupValue;
+//   final ValueChanged<T?> onChanged;
+//   final Widget child;
 
-  const RadioGroup({
-    super.key,
-    required this.groupValue,
-    required this.onChanged,
-    required this.child,
-  });
+//   const RadioGroup({
+//     super.key,
+//     required this.groupValue,
+//     required this.onChanged,
+//     required this.child,
+//   });
 
-  @override
-  Widget build(BuildContext context) {
-    return child;
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return child;
+//   }
+// }
 
 class _CardOption {
   final String value;
