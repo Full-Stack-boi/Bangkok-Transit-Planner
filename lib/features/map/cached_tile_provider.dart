@@ -329,7 +329,7 @@ class CachedTileProvider extends TileProvider {
             index++;
             onProgress?.call(index, successCount, cachedCount, errorCount);
             if (index % 100 == 0 || index == tilesToFetch.length) {
-              AppLogger.error('Progress: $index/${tilesToFetch.length} (Cached: $cachedCount, Downloaded: $successCount, Fail: $errorCount)', tag: 'Prefetch', error: index);
+              AppLogger.info('Progress: $index/${tilesToFetch.length} (Cached: $cachedCount, Downloaded: $successCount, Fail: $errorCount)', tag: 'Prefetch');
             }
             workerSemaphore.release();
           }
@@ -338,7 +338,7 @@ class CachedTileProvider extends TileProvider {
 
       await Future.wait(tasks);
 
-      AppLogger.error('Finished. Total: ${tilesToFetch.length}, Cached/Verified: $cachedCount, New Downloaded: $successCount, Errors: $errorCount', tag: 'Prefetch', error: cachedCount);
+      AppLogger.success('Finished. Total: ${tilesToFetch.length}, Cached/Verified: $cachedCount, New Downloaded: $successCount, Errors: $errorCount', tag: 'Prefetch');
       if (!isPaused && index == tilesToFetch.length) {
         completed = true;
       }
@@ -644,7 +644,7 @@ class CachedTileImageProvider extends ImageProvider<CachedTileImageProvider> {
         headers: {
           'User-Agent': 'com.bkktransit.bkk_transit_planner',
         },
-      );
+      ).timeout(const Duration(seconds: 10));
       if (response.statusCode == 200) {
         final bytes = response.bodyBytes;
         
@@ -700,7 +700,7 @@ class CachedTileImageProvider extends ImageProvider<CachedTileImageProvider> {
         } catch (_) {}
       }
 
-      final response = await http.get(Uri.parse(key.url), headers: headers);
+      final response = await http.get(Uri.parse(key.url), headers: headers).timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 200) {
         final bytes = response.bodyBytes;

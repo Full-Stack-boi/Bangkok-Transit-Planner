@@ -248,30 +248,22 @@ class FareService {
     return false;
   }
 
-  List<int>? _getFareTable(String lineId) {
-    switch (lineId) {
-      case 'BTS_SUKHUMVIT':
-      case 'BTS_SILOM':
-      case 'BTS_GOLD':
-        return _btsFareTable;
-      case 'MRT_BLUE':
-        return _mrtBlueFareTable;
-      case 'MRT_PURPLE':
-        return _mrtPurpleFareTable;
-      case 'MRT_YELLOW':
-        return _mrtYellowFareTable;
-      case 'MRT_PINK':
-      case 'MRT_PINK_BRANCH':
-        return _mrtPinkFareTable;
-      case 'SRT_RED_NORTH':
-      case 'SRT_RED_WEST':
-        return _srtRedFareTable;
-      case 'ARL':
-        return _arlFareTable;
-      default:
-        return null;
-    }
-  }
+  /// Static lookup map for O(1) fare table access (replaces switch-case)
+  static final Map<String, List<int>> _fareTableMap = {
+    'BTS_SUKHUMVIT': _btsFareTable,
+    'BTS_SILOM': _btsFareTable,
+    'BTS_GOLD': _btsFareTable,
+    'MRT_BLUE': _mrtBlueFareTable,
+    'MRT_PURPLE': _mrtPurpleFareTable,
+    'MRT_YELLOW': _mrtYellowFareTable,
+    'MRT_PINK': _mrtPinkFareTable,
+    'MRT_PINK_BRANCH': _mrtPinkFareTable,
+    'SRT_RED_NORTH': _srtRedFareTable,
+    'SRT_RED_WEST': _srtRedFareTable,
+    'ARL': _arlFareTable,
+  };
+
+  List<int>? _getFareTable(String lineId) => _fareTableMap[lineId];
 
   /// Get fare range text for a line
   String getFareRangeText(String lineId) {

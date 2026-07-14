@@ -67,3 +67,4 @@ flutter:
     - assets/data/
     - assets/images/
     - assets/map_tiles.bundle
+    - assets/google_fonts/

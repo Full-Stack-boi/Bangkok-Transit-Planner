@@ -80,7 +80,7 @@ class RouteResultSheet extends ConsumerWidget {
               if (result.origin is CustomLocation && (result.origin as CustomLocation).hasAccuracyWarning ||
                   result.destination is CustomLocation && (result.destination as CustomLocation).hasAccuracyWarning) ...[
                 const SizedBox(height: 12),
-                _buildAccuracyWarningWidget(context, theme, localeCode),
+                _buildAccuracyWarningWidget(context, theme, localeCode, t),
               ],
 
               const SizedBox(height: 24),
@@ -300,11 +300,12 @@ class RouteResultSheet extends ConsumerWidget {
     final originName = localeCode == 'th' ? result.origin.nameTh : result.origin.nameEn;
     final destName = localeCode == 'th' ? result.destination.nameTh : result.destination.nameEn;
     
-    final controller = TextEditingController(text: '$originName - $destName');
+    TextEditingController? controller;
 
-    return showDialog(
+    return showDialog<void>(
       context: context,
       builder: (context) {
+        controller ??= TextEditingController(text: '$originName - $destName');
         return AlertDialog(
           title: Text(t.routeResult.saveRouteBtn),
           content: TextField(
@@ -321,7 +322,7 @@ class RouteResultSheet extends ConsumerWidget {
             ),
             ElevatedButton(
               onPressed: () async {
-                final name = controller.text.trim();
+                final name = controller!.text.trim();
                 if (name.isNotEmpty) {
                   await ref.read(favoritesViewModelProvider.notifier).saveRoute(
                     originId: result.origin.id,
@@ -347,7 +348,7 @@ class RouteResultSheet extends ConsumerWidget {
           ],
         );
       },
-    );
+    ).whenComplete(() => controller?.dispose());
   }
 
   Widget _buildRouteTypeSelector(
@@ -631,7 +632,7 @@ class RouteResultSheet extends ConsumerWidget {
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        '${t.routeResult.crowdLevel}: ${getCrowdLevelText(crowdInfo.level)} (~${crowdInfo.presenceCount} ${localeCode == 'th' ? 'คน' : 'pax'})',
+                        '${t.routeResult.crowdLevel}: ${getCrowdLevelText(crowdInfo.level)} (~${crowdInfo.presenceCount} ${t.common.peopleUnit})',
                         style: theme.textTheme.bodyMedium?.copyWith(
                           color: crowdInfo.level == CrowdLevel.high
                               ? Colors.red.shade400
@@ -1111,7 +1112,7 @@ class RouteResultSheet extends ConsumerWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    localeCode == 'th' ? 'ส่วนลดบัตรโดยสาร' : 'Card Discount',
+                    t.routeResult.cardDiscount,
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: Colors.green.shade600,
                       fontWeight: FontWeight.w500,
@@ -1151,6 +1152,7 @@ class RouteResultSheet extends ConsumerWidget {
     BuildContext context,
     ThemeData theme,
     String localeCode,
+    AppLocalizations t,
   ) {
     return Container(
       padding: const EdgeInsets.all(16),
@@ -1169,9 +1171,7 @@ class RouteResultSheet extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  localeCode == 'th'
-                      ? 'เส้นทางนี้อาจไม่แม่นยำ 100%'
-                      : 'Route may not be 100% accurate',
+                  t.routeResult.accuracyWarning,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: Colors.amber[800],
@@ -1179,18 +1179,16 @@ class RouteResultSheet extends ConsumerWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  localeCode == 'th'
-                      ? 'เนื่องจากไม่สามารถดึงข้อมูลทางออกสถานีจากดาวเทียมได้ในขณะนี้'
-                      : 'Because station entrance data could not be fetched from the network at this time.',
+                  t.routeResult.accuracyBody,
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.8),
                   ),
                 ),
                 const SizedBox(height: 8),
                 GestureDetector(
-                  onTap: () => _showReportDialog(context, localeCode, theme),
+                  onTap: () => _showReportDialog(context, localeCode, theme, t),
                   child: Text(
-                    localeCode == 'th' ? 'คลิกที่นี่เพื่อรายงานปัญหา' : 'Click here to report issue',
+                    t.routeResult.reportIssueLink,
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: theme.colorScheme.primary,
                       decoration: TextDecoration.underline,
@@ -1210,22 +1208,21 @@ class RouteResultSheet extends ConsumerWidget {
     BuildContext context,
     String localeCode,
     ThemeData theme,
+    AppLocalizations t,
   ) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: Text(
-          localeCode == 'th' ? 'รายงานปัญหาเส้นทาง' : 'Report Route Issue',
+          t.routeResult.reportDialogTitle,
         ),
         content: Text(
-          localeCode == 'th'
-              ? 'ระบบจะส่งพิกัดและข้อมูลของเส้นทางนี้ไปยังผู้พัฒนาเพื่อทำการปรับปรุงประสิทธิภาพในอนาคต ขอบคุณครับ!'
-              : 'The system will submit the coordinate details of this route to our developers for future optimization. Thank you!',
+          t.routeResult.reportDialogBody,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text(localeCode == 'th' ? 'ยกเลิก' : 'Cancel'),
+            child: Text(t.common.cancelBtn),
           ),
           ElevatedButton(
             onPressed: () {
@@ -1233,15 +1230,13 @@ class RouteResultSheet extends ConsumerWidget {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(
-                    localeCode == 'th'
-                        ? 'ส่งรายงานปัญหาเรียบร้อยแล้ว!'
-                        : 'Report submitted successfully!',
+                    t.routeResult.reportSuccess,
                   ),
                   backgroundColor: theme.colorScheme.primary,
                 ),
               );
             },
-            child: Text(localeCode == 'th' ? 'ส่งรายงาน' : 'Submit'),
+            child: Text(t.utility.submitReportBtn),
           ),
         ],
       ),

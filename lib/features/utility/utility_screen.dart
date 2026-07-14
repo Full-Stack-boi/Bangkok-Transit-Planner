@@ -471,55 +471,61 @@ class UtilityScreen extends ConsumerWidget {
             ),
           )
         else
-          ...articles.map((item) {
-          final lineColor = TransitColors.getLineColor(item.lineId);
-          return Card(
-            margin: const EdgeInsets.only(bottom: 12),
-            child: InkWell(
-              onTap: () => _showNewsDetailsBottomSheet(context, theme, t, item),
-              borderRadius: BorderRadius.circular(12),
-              child: Padding(
-                padding: const EdgeInsets.all(14),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      width: 4,
-                      height: 50,
-                      decoration: BoxDecoration(
-                        color: lineColor,
-                        borderRadius: BorderRadius.circular(2),
-                      ),
-                    ),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            t.isTh ? item.titleTh : (item.titleEn.isNotEmpty ? item.titleEn : item.titleTh),
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
+          ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: articles.length,
+            itemBuilder: (context, index) {
+              final item = articles[index];
+              final lineColor = TransitColors.getLineColor(item.lineId);
+              return Card(
+                margin: const EdgeInsets.only(bottom: 12),
+                child: InkWell(
+                  onTap: () => _showNewsDetailsBottomSheet(context, theme, t, item),
+                  borderRadius: BorderRadius.circular(12),
+                  child: Padding(
+                    padding: const EdgeInsets.all(14),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          width: 4,
+                          height: 50,
+                          decoration: BoxDecoration(
+                            color: lineColor,
+                            borderRadius: BorderRadius.circular(2),
                           ),
-                          const SizedBox(height: 4),
-                          Text(
-                            t.isTh ? item.bodyTh : (item.bodyEn.isNotEmpty ? item.bodyEn : item.bodyTh),
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: theme.colorScheme.onSurfaceVariant,
-                            ),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(width: 14),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                t.isTh ? item.titleTh : (item.titleEn.isNotEmpty ? item.titleEn : item.titleTh),
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                t.isTh ? item.bodyTh : (item.bodyEn.isNotEmpty ? item.bodyEn : item.bodyTh),
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: theme.colorScheme.onSurfaceVariant,
+                                ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
-              ),
-            ),
-          );
-        }),
+              );
+            },
+          ),
       ],
     );
   }
@@ -893,9 +899,9 @@ class UtilityScreen extends ConsumerWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     TextField(
-                      decoration: const InputDecoration(
-                        hintText: 'Search station...',
-                        prefixIcon: Icon(Icons.search),
+                      decoration: InputDecoration(
+                        hintText: t.search.searchPlaceholder,
+                        prefixIcon: const Icon(Icons.search),
                       ),
                       onChanged: (val) {
                         setState(() {
@@ -1012,9 +1018,7 @@ class UtilityScreen extends ConsumerWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      t.isTh 
-                          ? 'ร่วมแจ้งความหนาแน่นและสถานะชานชาลารถไฟเพื่อแชร์แก่เพื่อนผู้โดยสาร' 
-                          : 'Share delay and platform crowding info with other commuters.',
+                      t.utility.reportDelayDesc,
                       style: theme.textTheme.bodySmall?.copyWith(
                         fontSize: 11,
                         color: theme.colorScheme.onSurfaceVariant,

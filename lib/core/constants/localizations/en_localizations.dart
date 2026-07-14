@@ -52,6 +52,14 @@ class EnglishCommon implements BaseCommon {
   String get laterBtn => 'Later';
   @override
   String get errorOccurred => 'An error occurred';
+  @override
+  String get peopleUnit => 'pax';
+  @override
+  String get closeBtn => 'Close';
+  @override
+  String get download => 'Download';
+  @override
+  String get genericError => 'Error occurred';
 }
 
 class EnglishNavigation implements BaseNavigation {
@@ -116,6 +124,25 @@ class EnglishSearch implements BaseSearch {
   String showMore(int count) => 'Show more ($count)';
   @override
   String get noResultsFound => 'No results found';
+  @override
+  String get clearAll => 'Clear all';
+  @override
+  String get currentLocationNameTh => '—';
+  @override
+  String get currentLocationNameEn => 'Your Current Location';
+
+  @override
+  String get clearRoute => 'Clear Route';
+  @override
+  String get swapTooltip => 'Swap Origin/Destination';
+  @override
+  String get fromPrefix => 'From:';
+  @override
+  String get toPrefix => 'To:';
+  @override
+  String get chooseDest => 'Choose destination...';
+  @override
+  String get chooseOrigin => 'Choose origin...';
 }
 
 class EnglishFavorites implements BaseFavorites {
@@ -202,6 +229,20 @@ class EnglishRouteResult implements BaseRouteResult {
   String get walkToStation => 'Walk to station';
   @override
   String get walkToDestination => 'Walk to destination';
+  @override
+  String get cardDiscount => 'Card Discount';
+  @override
+  String get accuracyWarning => 'Route may not be 100% accurate';
+  @override
+  String get accuracyBody => 'Because station entrance data is unavailable, distance is calculated from the station center.';
+  @override
+  String get reportIssueLink => 'Click here to report issue';
+  @override
+  String get reportDialogTitle => 'Report Route Issue';
+  @override
+  String get reportDialogBody => 'The system will submit the coordinates and route data for improvement. Do you want to continue?';
+  @override
+  String get reportSuccess => 'Report submitted successfully!';
 }
 
 class EnglishErrors implements BaseErrors {
@@ -352,6 +393,10 @@ class EnglishProximity implements BaseProximity {
   String get yesDelayedLabel => 'Yes, Delayed';
   @override
   String get thankYouReportLabel => 'Thank you for your report!';
+  @override
+  String delayedAtStation(String name) => 'Are you delayed at $name?';
+  @override
+  String get detectedLonger => 'You have been at this station longer than usual...';
 }
 
 class EnglishSettings implements BaseSettings {
@@ -381,6 +426,36 @@ class EnglishSettings implements BaseSettings {
   String get locationPermissionDesc => 'BKK Transit requires location permission to detect and notify you about nearby transit stations. Please enable it in settings.';
   @override
   String get openSettingsBtn => 'Open Settings';
+  @override
+  String get offlineMapTitle => 'Offline Map Updates';
+  @override
+  String get offlineMapSubtitle => 'Check and download additional updates';
+  @override
+  String get downloadDialogTitle => 'Download Map Updates';
+  @override
+  String get downloadDialogBody => 'Please wait while we download and install offline map data...';
+  @override
+  String get downloadStarted => 'Map update download started...';
+  @override
+  String get versionLabel => 'Version';
+  @override
+  String get disclaimer => 'Information and routes in this application are estimates to aid your decision.';
+  @override
+  String get copyright => '© 2026 BKK Transit Planner';
+  @override
+  String get viewLicenses => 'View Licenses';
+  @override
+  String get offlineMapDownloading => 'Downloading Offline Map';
+  @override
+  String get offlineMapPreparing => 'Preparing offline map tiles...';
+  @override
+  String offlineMapDownloaded(int current, int total) => 'Downloaded $current / $total tiles';
+  @override
+  String offlineMapCachedAndNew(int cached, int newCount) => 'Cached: $cached | New: $newCount tiles';
+  @override
+  String prefetchProgress(String current, String total) => 'Downloaded $current / $total tiles';
+  @override
+  String prefetchStats(String cached) => 'Cached: $cached';
 }
 
 class EnglishJourney implements BaseJourney {
@@ -479,6 +554,10 @@ class EnglishAuth implements BaseAuth {
   String get registrationFailed => 'Registration failed. Email might already be in use.';
   @override
   String get syncSuccess => 'Data synced successfully!';
+  @override
+  String get defaultUsername => 'User';
+  @override
+  String get orDivider => 'Or';
 }
 
 class EnglishUtility implements BaseUtility {
@@ -591,4 +670,6 @@ class EnglishUtility implements BaseUtility {
   String get lineArl => 'Airport Rail Link';
   @override
   String get lineSrtRed => 'SRT Red Line';
+  @override
+  String get reportDelayDesc => 'Share delay and platform crowding info to help other passengers.';
 }

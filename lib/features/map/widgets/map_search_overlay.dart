@@ -161,7 +161,7 @@ class _MapSearchOverlayState extends ConsumerState<MapSearchOverlay> {
           if (state.origin != null || state.destination != null)
             IconButton(
               icon: const Icon(Icons.clear_all),
-              tooltip: t.localeCode == 'th' ? 'ล้างทั้งหมด' : 'Clear all',
+              tooltip: t.search.clearAll,
               onPressed: () {
                 vm.clear();
                 _originController.clear();
@@ -210,50 +210,42 @@ class _MapSearchOverlayState extends ConsumerState<MapSearchOverlay> {
                     child: Row(
                       children: [
                         // Left track indicator placeholder
-                        SizedBox(
-                          height: 76,
-                          child: SingleChildScrollView(
-                            physics: const NeverScrollableScrollPhysics(),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Container(width: 12, height: 12, decoration: BoxDecoration(color: shimmerColor, shape: BoxShape.circle)),
-                                Container(width: 2, height: 24, color: shimmerColor),
-                                Container(width: 12, height: 12, decoration: BoxDecoration(color: shimmerColor, shape: BoxShape.circle)),
-                              ],
-                            ),
-                          ),
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(width: 12, height: 12, decoration: BoxDecoration(color: shimmerColor, shape: BoxShape.circle)),
+                            Container(width: 2, height: 24, color: shimmerColor),
+                            Container(width: 12, height: 12, decoration: BoxDecoration(color: shimmerColor, shape: BoxShape.circle)),
+                          ],
                         ),
                         const SizedBox(width: 16),
                         // Input fields placeholders
                         Expanded(
-                          child: SingleChildScrollView(
-                            physics: const NeverScrollableScrollPhysics(),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Container(
-                                  width: double.infinity,
-                                  height: 18,
-                                  decoration: BoxDecoration(
-                                    color: shimmerColor,
-                                    borderRadius: BorderRadius.circular(4),
-                                  ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                width: double.infinity,
+                                height: 18,
+                                decoration: BoxDecoration(
+                                  color: shimmerColor,
+                                  borderRadius: BorderRadius.circular(4),
                                 ),
-                                const SizedBox(height: 12),
-                                Container(width: double.infinity, height: 1, color: theme.colorScheme.outline.withValues(alpha: 0.15)),
-                                const SizedBox(height: 12),
-                                Container(
-                                  width: 140,
-                                  height: 18,
-                                  decoration: BoxDecoration(
-                                    color: shimmerColor,
-                                    borderRadius: BorderRadius.circular(4),
-                                  ),
+                              ),
+                              const SizedBox(height: 12),
+                              Container(width: double.infinity, height: 1, color: theme.colorScheme.outline.withValues(alpha: 0.15)),
+                              const SizedBox(height: 12),
+                              Container(
+                                width: 140,
+                                height: 18,
+                                decoration: BoxDecoration(
+                                  color: shimmerColor,
+                                  borderRadius: BorderRadius.circular(4),
                                 ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
                         ),
                         const SizedBox(width: 16),
@@ -293,34 +285,29 @@ class _MapSearchOverlayState extends ConsumerState<MapSearchOverlay> {
                   child: Row(
                     children: [
                       // Left track connecting indicator
-                      SizedBox(
-                        height: 76,
-                        child: const SingleChildScrollView(
-                          physics: NeverScrollableScrollPhysics(),
-                          child: Column(
-                            children: [
-                              Icon(Icons.trip_origin_rounded, color: Colors.green, size: 20),
-                              SizedBox(
-                                width: 2,
-                                height: 36,
-                                child: DecoratedBox(
-                                  decoration: BoxDecoration(
-                                    color: Colors.white24,
-                                  ),
-                                ),
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.trip_origin_rounded, color: Colors.green, size: 20),
+                          SizedBox(
+                            width: 2,
+                            height: 36,
+                            child: DecoratedBox(
+                              decoration: BoxDecoration(
+                                color: Colors.white24,
                               ),
-                              Icon(Icons.location_on_rounded, color: Colors.red, size: 20),
-                            ],
+                            ),
                           ),
-                        ),
+                          Icon(Icons.location_on_rounded, color: Colors.red, size: 20),
+                        ],
                       ),
                       const SizedBox(width: 16),
                       // Input Fields
                       Expanded(
-                        child: SingleChildScrollView(
-                          physics: const NeverScrollableScrollPhysics(),
-                          child: Column(
-                            children: [
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
                               // Origin Field
                               TextField(
                                 controller: _originController,
@@ -372,7 +359,6 @@ class _MapSearchOverlayState extends ConsumerState<MapSearchOverlay> {
                               ),
                             ],
                           ),
-                        ),
                       ),
                       const SizedBox(width: 8),
                       // Swap Button
@@ -435,13 +421,11 @@ class _MapSearchOverlayState extends ConsumerState<MapSearchOverlay> {
             if (state.isSearching)
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24),
-                child: ClipRRect(
+                child: LinearProgressIndicator(
+                  minHeight: 3,
+                  backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.1),
+                  color: theme.colorScheme.primary,
                   borderRadius: BorderRadius.circular(2),
-                  child: LinearProgressIndicator(
-                    minHeight: 3,
-                    backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.1),
-                    valueColor: AlwaysStoppedAnimation<Color>(theme.colorScheme.primary),
-                  ),
                 ),
               ),
 
@@ -820,8 +804,8 @@ class _MapSearchOverlayState extends ConsumerState<MapSearchOverlay> {
         final walkMin = (minDist / 80.0).clamp(1.0, 30.0);
         final currentLoc = CustomLocation(
           id: 'GPS_CURRENT',
-          nameTh: 'ตำแหน่งปัจจุบันของคุณ',
-          nameEn: 'Your Current Location',
+          nameTh: t.search.currentLocationNameTh,
+          nameEn: t.search.currentLocationNameEn,
           nearestStationId: nearest.id,
           walkingMinutes: walkMin,
           lat: pos.latitude,
@@ -856,7 +840,7 @@ class _MapSearchOverlayState extends ConsumerState<MapSearchOverlay> {
       }
     } catch (e) {
       if (mounted) Navigator.pop(context); // Dismiss loading
-      scaffoldMessenger.showSnackBar(SnackBar(content: Text('Error: $e')));
+      scaffoldMessenger.showSnackBar(SnackBar(content: Text('${t.common.errorOccurred} $e')));
     }
   }
 }

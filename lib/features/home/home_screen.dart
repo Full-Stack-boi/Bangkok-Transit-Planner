@@ -284,9 +284,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  t.isTh
-                      ? 'คุณติดอยู่ที่สถานี ${station.nameTh} หรือไม่?'
-                      : 'Are you delayed at ${station.nameEn}?',
+                  t.proximity.delayedAtStation(
+                    t.isTh ? station.nameTh : station.nameEn,
+                  ),
                   style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -294,9 +294,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  t.isTh
-                      ? 'ระบบตรวจพบว่าคุณอยู่ที่สถานีนี้นานกว่าปกติ โปรดช่วยยืนยันสถานะการเดินรถเพื่อแจ้งเพื่อนผู้โดยสารท่านอื่น'
-                      : 'You have been at this station longer than usual. Please help confirm transit status for other passengers.',
+                  t.proximity.detectedLonger,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
@@ -624,10 +622,11 @@ class AppNavigationRail extends ConsumerWidget {
               child: AnimatedOpacity(
                 duration: const Duration(milliseconds: 300),
                 opacity: isFloating ? 0.0 : 1.0,
-                child: Container(
+                child: ColoredBox(
                   color: theme.colorScheme.outline.withValues(
                     alpha: isDark ? 0.15 : 0.08,
                   ),
+                  child: const SizedBox.expand(),
                 ),
               ),
             ),

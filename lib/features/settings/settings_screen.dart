@@ -141,21 +141,19 @@ class SettingsScreen extends ConsumerWidget {
           Card(
             child: ListTile(
               leading: const Icon(Icons.map_rounded),
-              title: Text(localeCode == 'th' ? 'อัปเดตแผนที่ออฟไลน์' : 'Offline Map Updates'),
-              subtitle: Text(localeCode == 'th' ? 'ตรวจสอบและดาวน์โหลดการอัปเดตเพิ่มเติม' : 'Check and download additional updates'),
+              title: Text(t.settings.offlineMapTitle),
+              subtitle: Text(t.settings.offlineMapSubtitle),
               trailing: const Icon(Icons.chevron_right),
               onTap: () {
                 showDialog(
                   context: context,
                   builder: (dialogContext) => AlertDialog(
-                    title: Text(localeCode == 'th' ? 'ดาวน์โหลดแผนที่อัปเดตใหม่' : 'Download Map Updates'),
-                    content: Text(localeCode == 'th'
-                      ? 'คุณต้องการเริ่มดาวน์โหลดข้อมูลแผนที่อัพเดทล่าสุดจากเน็ตเวิร์กหรือไม่? (ขนาดดาวน์โหลดขึ้นอยู่กับจำนวนรูปภาพที่มีการปรับปรุง)'
-                      : 'Do you want to start downloading the latest map updates from the network? (Download size depends on the number of updated tiles)'),
+                    title: Text(t.settings.downloadDialogTitle),
+                    content: Text(t.settings.downloadDialogBody),
                     actions: [
                       TextButton(
                         onPressed: () => Navigator.pop(dialogContext),
-                        child: Text(localeCode == 'th' ? 'ยกเลิก' : 'Cancel'),
+                        child: Text(t.common.cancelBtn),
                       ),
                       ElevatedButton(
                         onPressed: () async {
@@ -204,15 +202,13 @@ class SettingsScreen extends ConsumerWidget {
                           if (context.mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: Text(localeCode == 'th'
-                                  ? 'เริ่มดาวน์โหลดการอัปเดตแผนที่แล้ว คุณสามารถดูความคืบหน้าได้ที่หน้าจอแผนที่'
-                                  : 'Map update download started. You can monitor the progress on the Map screen.'),
+                                content: Text(t.settings.downloadStarted),
                                 behavior: SnackBarBehavior.floating,
                               ),
                             );
                           }
                         },
-                        child: Text(localeCode == 'th' ? 'ดาวน์โหลด' : 'Download'),
+                        child: Text(t.common.download),
                       ),
                     ],
                   ),
@@ -234,17 +230,17 @@ class SettingsScreen extends ConsumerWidget {
               ),
               child: ListTile(
                 leading: Icon(Icons.bug_report_rounded, color: theme.colorScheme.error),
-                title: const Text(
-                  'Location Simulation (DEBUG ONLY)',
+                title: Text(
+                  t.utility.debugSimGpsTitle,
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 subtitle: Text(
                   mockLocation != null
-                      ? 'Simulating at: ${mockLocation.latitude.toStringAsFixed(4)}, ${mockLocation.longitude.toStringAsFixed(4)}\n(Hidden in production/release)'
-                      : 'Disabled (Using Real GPS)\n(Hidden in production/release)',
+                      ? t.utility.debugSimGpsActive(mockLocation.latitude.toStringAsFixed(4), mockLocation.longitude.toStringAsFixed(4))
+                      : t.utility.debugSimGpsDisabled,
                 ),
                 trailing: const Icon(Icons.chevron_right),
-                onTap: () => _showLocationSimulationDialog(context, ref, mockLocation, theme, localeCode),
+                onTap: () => _showLocationSimulationDialog(context, ref, mockLocation, theme, localeCode, t),
               ),
             ),
             const SizedBox(height: 8),
@@ -291,7 +287,7 @@ class SettingsScreen extends ConsumerWidget {
                         const SizedBox(height: 4),
                         // Version
                         Text(
-                          localeCode == 'th' ? 'เวอร์ชัน 1.0.0' : 'Version 1.0.0',
+                          '${t.settings.versionLabel} 1.0.0',
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                           ),
@@ -320,9 +316,7 @@ class SettingsScreen extends ConsumerWidget {
                             ),
                           ),
                           child: Text(
-                            localeCode == 'th'
-                                ? 'ข้อเสนอแนะเส้นทาง ตารางเวลา และค่าโดยสารในแอปพลิเคชันนี้จัดทำขึ้นเพื่อใช้ประกอบการวางแผนเดินทางเบื้องต้นเท่านั้น ข้อมูลจริงอาจแตกต่างไปตามการปรับปรุงของหน่วยงานผู้ให้บริการเดินรถ'
-                                : 'Route options, schedules, and fare calculations are provided for informational and planning purposes only. Actual transit details may vary based on official operator updates.',
+                            t.settings.disclaimer,
                             textAlign: TextAlign.center,
                             style: theme.textTheme.bodySmall?.copyWith(
                               color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
@@ -333,9 +327,7 @@ class SettingsScreen extends ConsumerWidget {
                         const SizedBox(height: 16),
                         // Copyright Text
                         Text(
-                          localeCode == 'th'
-                              ? '© 2026 BKK Transit Planner. สงวนลิขสิทธิ์'
-                              : '© 2026 BKK Transit Planner Developers. All rights reserved.',
+                          t.settings.copyright,
                           style: theme.textTheme.bodySmall?.copyWith(
                             fontSize: 10,
                             color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
@@ -359,12 +351,10 @@ class SettingsScreen extends ConsumerWidget {
                                 fit: BoxFit.contain,
                               ),
                             ),
-                            applicationLegalese: localeCode == 'th'
-                                ? '© 2026 BKK Transit Planner. สงวนลิขสิทธิ์'
-                                : '© 2026 BKK Transit Planner Developers. All rights reserved.',
+                            applicationLegalese: t.settings.copyright,
                           );
                         },
-                        child: Text(localeCode == 'th' ? 'ดูลิขสิทธิ์ซอฟต์แวร์' : 'View Licenses'),
+                        child: Text(t.settings.viewLicenses),
                       ),
                       ElevatedButton(
                         onPressed: () => Navigator.pop(context),
@@ -374,7 +364,7 @@ class SettingsScreen extends ConsumerWidget {
                             borderRadius: BorderRadius.circular(10),
                           ),
                         ),
-                        child: Text(localeCode == 'th' ? 'ปิด' : 'Close'),
+                        child: Text(t.common.closeBtn),
                       ),
                     ],
                   ),
@@ -405,7 +395,7 @@ class SettingsScreen extends ConsumerWidget {
     ThemeData theme,
   ) {
     if (authState.isAuthenticated) {
-      final String displayName = authState.displayName ?? authState.user?.email?.split('@').first ?? 'User';
+      final String displayName = authState.displayName ?? authState.user?.email?.split('@').first ?? t.auth.defaultUsername;
       final String email = authState.user?.email ?? '';
 
       return Card(
@@ -535,6 +525,7 @@ class SettingsScreen extends ConsumerWidget {
     Position? mockPos,
     ThemeData theme,
     String localeCode,
+    AppLocalizations t,
   ) {
     final transitRepo = ref.read(transitRepositoryProvider);
     final stations = transitRepo.stations;
@@ -580,13 +571,13 @@ class SettingsScreen extends ConsumerWidget {
                     if (mockPos != null)
                       ListTile(
                         leading: const Icon(Icons.gps_off_rounded, color: Colors.red),
-                        title: const Text('Disable Simulation'),
-                        subtitle: const Text('Use real hardware/emulator GPS'),
+                        title: Text(t.utility.debugSimGpsDisableOption),
+                        subtitle: Text(t.utility.debugSimGpsDisableSubtitle),
                         onTap: () {
                           ref.read(mockLocationProvider.notifier).clearMockLocation();
                           Navigator.pop(context);
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Mock location disabled')),
+                            SnackBar(content: Text(t.utility.debugSimGpsDisabledSnack)),
                           );
                         },
                       ),
@@ -614,7 +605,7 @@ class SettingsScreen extends ConsumerWidget {
                               Navigator.pop(context);
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
-                                  content: Text('Simulating at ${localeCode == 'th' ? station.nameTh : station.nameEn}'),
+                                  content: Text(t.utility.debugSimGpsEnabledSnack(localeCode == 'th' ? station.nameTh : station.nameEn)),
                                 ),
                               );
                             },

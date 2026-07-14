@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=BKK Transit Planner
+Comment=Bangkok Transit Planner — วางแผนการเดินทาง BTS MRT ARL
+Exec=/home/nattawutb/Project/Bangkok-Transit-Planner/build/linux/x64/debug/bundle/bkk_transit_planner
+Icon=/home/nattawutb/Project/Bangkok-Transit-Planner/assets/images/logo.png
+Terminal=false
+Categories=Utility;Navigation;
+StartupWMClass=bkk_transit_planner
+SingleMainWindow=true

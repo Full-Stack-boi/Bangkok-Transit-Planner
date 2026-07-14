@@ -29,6 +29,8 @@ class _DijkstraNode implements Comparable<_DijkstraNode> {
 
 /// Transit graph for all Bangkok rail stations
 class TransitGraph {
+  static final _whitespaceRegex = RegExp(r'\s+');
+
   final Map<String, Station> _stations = {};
   final Map<String, List<GraphEdge>> _adjacency = {};
 
@@ -166,12 +168,12 @@ class TransitGraph {
   /// Search stations by name (Thai or English)
   List<Station> searchStations(String query) {
     if (query.isEmpty) return [];
-    final q = query.toLowerCase().replaceAll(RegExp(r'\s+'), '');
+    final q = query.toLowerCase().replaceAll(_whitespaceRegex, '');
     return _stations.values.where((s) {
-      final normalizedTh = s.nameTh.toLowerCase().replaceAll(RegExp(r'\s+'), '');
-      final normalizedEn = s.nameEn.toLowerCase().replaceAll(RegExp(r'\s+'), '');
-      final normalizedCode = s.code.toLowerCase().replaceAll(RegExp(r'\s+'), '');
-      final normalizedId = s.id.toLowerCase().replaceAll(RegExp(r'\s+'), '');
+      final normalizedTh = s.nameTh.toLowerCase().replaceAll(_whitespaceRegex, '');
+      final normalizedEn = s.nameEn.toLowerCase().replaceAll(_whitespaceRegex, '');
+      final normalizedCode = s.code.toLowerCase().replaceAll(_whitespaceRegex, '');
+      final normalizedId = s.id.toLowerCase().replaceAll(_whitespaceRegex, '');
 
       return normalizedTh.contains(q) ||
              normalizedEn.contains(q) ||

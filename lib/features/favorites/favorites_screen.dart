@@ -269,7 +269,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          '${t.routeResult.crowdLevel}: ${getCrowdLevelText(crowdInfo.level)} (~${crowdInfo.presenceCount} ${localeCode == 'th' ? 'คน' : 'pax'})',
+                          '${t.routeResult.crowdLevel}: ${getCrowdLevelText(crowdInfo.level)} (~${crowdInfo.presenceCount} ${t.common.peopleUnit})',
                           style: theme.textTheme.bodyMedium?.copyWith(
                             color: crowdInfo.level == CrowdLevel.high
                                 ? Colors.red.shade400
@@ -441,7 +441,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
         final originId = route['origin_id'] ?? '';
         final destinationId = route['destination_id'] ?? '';
         final String? routeName = route['name'];
-        final String routeDisplayName = (routeName == null || routeName.isEmpty || routeName == 'เส้นทางไม่มีชื่อ')
+        final String routeDisplayName = (routeName == null || routeName.isEmpty || routeName == t.favorites.unnamedRoute)
             ? t.favorites.unnamedRoute
             : routeName;
         String originName = route['origin_name'] ?? '';
@@ -522,19 +522,14 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
                 ),
               ),
             ),
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.delete_outline_rounded, color: Colors.redAccent),
-                  onPressed: () {
-                    vm.deleteRoute(originId, destinationId);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(t.routeResult.routeDeletedSuccess)),
-                    );
-                  },
-                ),
-              ],
+            trailing: IconButton(
+              icon: const Icon(Icons.delete_outline_rounded, color: Colors.redAccent),
+              onPressed: () {
+                vm.deleteRoute(originId, destinationId);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(t.routeResult.routeDeletedSuccess)),
+                );
+              },
             ),
             onTap: () async {
               if (originItem != null && destItem != null) {

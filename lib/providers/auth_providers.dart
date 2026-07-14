@@ -164,8 +164,15 @@ class AuthNotifier extends _$AuthNotifier {
 
   /// Logout of current session
   Future<void> signOut() async {
-    state = state.copyWith(isLoading: true);
-    final repository = ref.read(authRepositoryProvider);
-    await repository.signOut();
+    state = state.copyWith(isLoading: true, errorMessage: null);
+    try {
+      final repository = ref.read(authRepositoryProvider);
+      await repository.signOut();
+    } catch (e, st) {
+      AppLogger.error('signOut failed', error: e, stackTrace: st);
+      if (ref.mounted) {
+        state = state.copyWith(isLoading: false, errorMessage: e.toString());
+      }
+    }
   }
 }

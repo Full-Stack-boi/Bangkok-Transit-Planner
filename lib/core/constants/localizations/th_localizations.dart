@@ -52,6 +52,14 @@ class ThaiCommon implements BaseCommon {
   String get laterBtn => 'ไว้ทีหลัง';
   @override
   String get errorOccurred => 'เกิดข้อผิดพลาด';
+  @override
+  String get peopleUnit => 'คน';
+  @override
+  String get closeBtn => 'ปิด';
+  @override
+  String get download => 'ดาวน์โหลด';
+  @override
+  String get genericError => 'เกิดข้อผิดพลาด';
 }
 
 class ThaiNavigation implements BaseNavigation {
@@ -116,6 +124,25 @@ class ThaiSearch implements BaseSearch {
   String showMore(int count) => 'ดูเพิ่มเติม ($count)';
   @override
   String get noResultsFound => 'ไม่พบข้อมูลที่ค้นหา';
+  @override
+  String get clearAll => 'ล้างทั้งหมด';
+  @override
+  String get currentLocationNameTh => 'ตำแหน่งปัจจุบันของคุณ';
+  @override
+  String get currentLocationNameEn => '—';
+
+  @override
+  String get clearRoute => 'ล้างเส้นทาง';
+  @override
+  String get swapTooltip => 'สลับต้นทาง/ปลายทาง';
+  @override
+  String get fromPrefix => 'ต้นทาง:';
+  @override
+  String get toPrefix => 'ปลายทาง:';
+  @override
+  String get chooseDest => 'เลือกปลายทาง...';
+  @override
+  String get chooseOrigin => 'เลือกต้นทาง...';
 }
 
 class ThaiFavorites implements BaseFavorites {
@@ -202,6 +229,20 @@ class ThaiRouteResult implements BaseRouteResult {
   String get walkToStation => 'เดินไปสถานี';
   @override
   String get walkToDestination => 'เดินไปยังจุดหมาย';
+  @override
+  String get cardDiscount => 'ส่วนลดบัตรโดยสาร';
+  @override
+  String get accuracyWarning => 'เส้นทางนี้อาจไม่แม่นยำ 100%';
+  @override
+  String get accuracyBody => 'เนื่องจากไม่สามารถดึงข้อมูลทางออกของสถานีได้ ระบบจึงคำนวณระยะทางจากจุดกึ่งกลางสถานีแทน';
+  @override
+  String get reportIssueLink => 'คลิกที่นี่เพื่อรายงานปัญหา';
+  @override
+  String get reportDialogTitle => 'รายงานปัญหาเส้นทาง';
+  @override
+  String get reportDialogBody => 'ระบบจะส่งพิกัดและข้อมูลเส้นทางเพื่อให้ทีมงานนำไปปรับปรุง คุณต้องการดำเนินการต่อหรือไม่?';
+  @override
+  String get reportSuccess => 'ส่งรายงานปัญหาเรียบร้อยแล้ว!';
 }
 
 class ThaiErrors implements BaseErrors {
@@ -352,6 +393,10 @@ class ThaiProximity implements BaseProximity {
   String get yesDelayedLabel => 'ใช่ ล่าช้า/ขัดข้อง';
   @override
   String get thankYouReportLabel => 'ขอบคุณที่ร่วมรายงานข้อมูลสถานการณ์';
+  @override
+  String delayedAtStation(String name) => 'คุณติดอยู่ที่สถานี $name หรือไม่?';
+  @override
+  String get detectedLonger => 'ระบบตรวจพบว่าคุณอยู่ที่สถานีนี้นานกว่าปกติ...';
 }
 
 class ThaiSettings implements BaseSettings {
@@ -381,6 +426,36 @@ class ThaiSettings implements BaseSettings {
   String get locationPermissionDesc => 'แอป BKK Transit ต้องการสิทธิ์ระบุตำแหน่งของคุณ เพื่อตรวจหาและแจ้งเตือนสถานีที่อยู่ใกล้เคียงโดยรอบ กรุณากดเปิดสิทธิ์ในการตั้งค่า';
   @override
   String get openSettingsBtn => 'เปิดการตั้งค่า';
+  @override
+  String get offlineMapTitle => 'อัปเดตแผนที่ออฟไลน์';
+  @override
+  String get offlineMapSubtitle => 'ตรวจสอบและดาวน์โหลดการอัปเดตเพิ่มเติม';
+  @override
+  String get downloadDialogTitle => 'ดาวน์โหลดแผนที่อัปเดตใหม่';
+  @override
+  String get downloadDialogBody => 'กรุณารอสักครู่ขณะที่ระบบทำการดาวน์โหลดและติดตั้งข้อมูลแผนที่ออฟไลน์...';
+  @override
+  String get downloadStarted => 'เริ่มดาวน์โหลดการอัปเดตแผนที่แล้ว...';
+  @override
+  String get versionLabel => 'เวอร์ชัน';
+  @override
+  String get disclaimer => 'ข้อมูลและเส้นทางในแอปพลิเคชันเป็นเพียงการประมาณการเพื่อช่วยในการตัดสินใจ';
+  @override
+  String get copyright => '© 2026 BKK Transit Planner';
+  @override
+  String get viewLicenses => 'ดูลิขสิทธิ์ซอฟต์แวร์';
+  @override
+  String get offlineMapDownloading => 'ดาวน์โหลดแผนที่ออฟไลน์';
+  @override
+  String get offlineMapPreparing => 'กำลังจัดเตรียมแผนที่สำหรับใช้งานออฟไลน์...';
+  @override
+  String offlineMapDownloaded(int current, int total) => 'ดาวน์โหลดแล้ว $current / $total รูป';
+  @override
+  String offlineMapCachedAndNew(int cached, int newCount) => 'เก็บในเครื่องแล้ว: $cached รูป | โหลดใหม่: $newCount รูป';
+  @override
+  String prefetchProgress(String current, String total) => 'ดาวน์โหลดแล้ว $current / $total รูป';
+  @override
+  String prefetchStats(String cached) => 'เก็บในเครื่องแล้ว: $cached';
 }
 
 class ThaiJourney implements BaseJourney {
@@ -479,6 +554,10 @@ class ThaiAuth implements BaseAuth {
   String get registrationFailed => 'สมัครสมาชิกไม่สำเร็จ อีเมลนี้อาจถูกใช้งานไปแล้ว';
   @override
   String get syncSuccess => 'ซิงค์ข้อมูลสำเร็จ!';
+  @override
+  String get defaultUsername => 'ผู้ใช้';
+  @override
+  String get orDivider => 'หรือ';
 }
 
 class ThaiUtility implements BaseUtility {
@@ -591,4 +670,6 @@ class ThaiUtility implements BaseUtility {
   String get lineArl => 'แอร์พอร์ตลิงก์';
   @override
   String get lineSrtRed => 'สายสีแดง';
+  @override
+  String get reportDelayDesc => 'ร่วมแจ้งความหนาแน่นและความล่าช้าในระบบรถไฟฟ้าเพื่อเป็นประโยชน์ต่อผู้เดินทางท่านอื่น';
 }

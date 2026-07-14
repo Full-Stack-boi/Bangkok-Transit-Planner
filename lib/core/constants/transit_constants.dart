@@ -8,6 +8,42 @@ class TransitConstants {
   static const int eveningPeakStart = 17; // 17:00
   static const int eveningPeakEnd = 19;   // 19:00
 
+  // ─── Line IDs ───
+  static const String kBtsSukhumvit = 'BTS_SUKHUMVIT';
+  static const String kBtsSilom = 'BTS_SILOM';
+  static const String kBtsGold = 'BTS_GOLD';
+  static const String kMrtBlue = 'MRT_BLUE';
+  static const String kMrtPurple = 'MRT_PURPLE';
+  static const String kMrtYellow = 'MRT_YELLOW';
+  static const String kMrtPink = 'MRT_PINK';
+  static const String kMrtPinkBranch = 'MRT_PINK_BRANCH';
+  static const String kSrtRedNorth = 'SRT_RED_NORTH';
+  static const String kSrtRedWest = 'SRT_RED_WEST';
+  static const String kArl = 'ARL';
+  static const String kWalkLineId = 'WALK';
+  static const int kDefaultInterval = 5;
+  static const int kLineCount = 8;
+
+  // ─── Critical Station IDs ───
+  static const String kStationMrtThaphraBl01 = 'MRT_BL01';
+  static const String kStationMrtThaphraUpperBl33 = 'MRT_BL33';
+  static const String kStationBtsSiamCen = 'BTS_CEN';
+  static const String kStationBtsSiamSilom = 'BTS_CEN_SILOM';
+  static const String kStationMrtAsokBl22 = 'MRT_BL22';
+  static const String kStationBtsSukhumvitE4 = 'BTS_E4';
+
+  // ─── Status Strings ───
+  static const String kStatusPendingTh = 'รอยืนยัน';
+  static const String kStatusPendingEn = 'Pending';
+
+  // ─── Proximity & Walking ───
+  static const double kInsideStationMeters = 50.0;
+  static const int kDwellThresholdMinutes = 10;
+  static const int kDwellThresholdMinutesDebug = 1;
+  static const double kWalkingSpeedMpm = 80.0;
+  static const double kMinWalkMinutes = 1.0;
+  static const double kMaxWalkMinutes = 30.0;
+
   // ─── GPS Passive Crowd Detection ───
   static const double stationProximityMeters = 200.0;
   static const Duration crowdReportExpiry = Duration(minutes: 15);
@@ -48,27 +84,27 @@ class TransitConstants {
   static int getInterval(String lineId, DateTime time) {
     final isPeak = isPeakHour(time);
     switch (lineId) {
-      case 'BTS_SUKHUMVIT':
-      case 'BTS_SILOM':
+      case kBtsSukhumvit:
+      case kBtsSilom:
         return isPeak ? btsPeakInterval : btsOffPeakInterval;
-      case 'BTS_GOLD':
+      case kBtsGold:
         return isPeak ? btsGoldPeakInterval : btsGoldOffPeakInterval;
-      case 'MRT_BLUE':
+      case kMrtBlue:
         return isPeak ? mrtBluePeakInterval : mrtBlueOffPeakInterval;
-      case 'MRT_PURPLE':
+      case kMrtPurple:
         return isPeak ? mrtPurplePeakInterval : mrtPurpleOffPeakInterval;
-      case 'MRT_YELLOW':
+      case kMrtYellow:
         return isPeak ? mrtYellowPeakInterval : mrtYellowOffPeakInterval;
-      case 'MRT_PINK':
-      case 'MRT_PINK_BRANCH':
+      case kMrtPink:
+      case kMrtPinkBranch:
         return isPeak ? mrtPinkPeakInterval : mrtPinkOffPeakInterval;
-      case 'SRT_RED_NORTH':
-      case 'SRT_RED_WEST':
+      case kSrtRedNorth:
+      case kSrtRedWest:
         return isPeak ? srtRedPeakInterval : srtRedOffPeakInterval;
-      case 'ARL':
+      case kArl:
         return isPeak ? arlPeakInterval : arlOffPeakInterval;
       default:
-        return 5;
+        return kDefaultInterval;
     }
   }
 }

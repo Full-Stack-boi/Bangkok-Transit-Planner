@@ -65,12 +65,10 @@ class NearestStationsSheet extends ConsumerWidget {
 
           // List of Stations
           Flexible(
-            child: ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: nearestEntries.length,
-              itemBuilder: (context, index) {
-                final entry = nearestEntries[index];
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: nearestEntries.map((entry) {
                 final station = entry.key;
                 final distanceM = entry.value;
 
@@ -234,7 +232,8 @@ class NearestStationsSheet extends ConsumerWidget {
                     ),
                   ),
                 );
-              },
+                }).toList(),
+              ),
             ),
           ),
           const SizedBox(height: 8),

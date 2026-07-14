@@ -26,6 +26,10 @@ abstract class BaseCommon {
   String get total;
   String get laterBtn;
   String get errorOccurred;
+  String get peopleUnit;
+  String get closeBtn;
+  String get download;
+  String get genericError;
 }
 
 abstract class BaseNavigation {
@@ -61,6 +65,16 @@ abstract class BaseSearch {
   String get groupPlaces;
   String showMore(int count);
   String get noResultsFound;
+  String get clearAll;
+  String get currentLocationNameTh;
+  String get currentLocationNameEn;
+
+  String get clearRoute;
+  String get swapTooltip;
+  String get fromPrefix;
+  String get toPrefix;
+  String get chooseDest;
+  String get chooseOrigin;
 }
 
 abstract class BaseFavorites {
@@ -107,6 +121,13 @@ abstract class BaseRouteResult {
   String exitLabel(String exitCode);
   String get walkToStation;
   String get walkToDestination;
+  String get cardDiscount;
+  String get accuracyWarning;
+  String get accuracyBody;
+  String get reportIssueLink;
+  String get reportDialogTitle;
+  String get reportDialogBody;
+  String get reportSuccess;
 }
 
 abstract class BaseErrors {
@@ -174,6 +195,8 @@ abstract class BaseProximity {
   String get normalStatusLabel;
   String get yesDelayedLabel;
   String get thankYouReportLabel;
+  String delayedAtStation(String name);
+  String get detectedLonger;
 }
 
 abstract class BaseSettings {
@@ -190,6 +213,21 @@ abstract class BaseSettings {
   String get locationPermissionRequired;
   String get locationPermissionDesc;
   String get openSettingsBtn;
+  String get offlineMapTitle;
+  String get offlineMapSubtitle;
+  String get downloadDialogTitle;
+  String get downloadDialogBody;
+  String get downloadStarted;
+  String get versionLabel;
+  String get disclaimer;
+  String get copyright;
+  String get viewLicenses;
+  String get offlineMapDownloading;
+  String get offlineMapPreparing;
+  String offlineMapDownloaded(int current, int total);
+  String offlineMapCachedAndNew(int cached, int newCount);
+  String prefetchProgress(String current, String total);
+  String prefetchStats(String cached);
 }
 
 abstract class BaseJourney {
@@ -269,6 +307,7 @@ abstract class BaseUtility {
   String get lineMrtPink;
   String get lineArl;
   String get lineSrtRed;
+  String get reportDelayDesc;
 }
 
 abstract class BaseAuth {
@@ -298,4 +337,6 @@ abstract class BaseAuth {
   String get loginFailed;
   String get registrationFailed;
   String get syncSuccess;
+  String get defaultUsername;
+  String get orDivider;
 }

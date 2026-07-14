@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../constants/transit_constants.dart';
 
 /// Transit line colors — official colors for each transit line
 class TransitColors {
@@ -45,26 +46,26 @@ class TransitColors {
   /// Get color for a given line ID
   static Color getLineColor(String lineId) {
     switch (lineId) {
-      case 'BTS_SUKHUMVIT':
+      case TransitConstants.kBtsSukhumvit:
         return btsSukhumvit;
-      case 'BTS_SILOM':
+      case TransitConstants.kBtsSilom:
         return btsSilom;
-      case 'BTS_GOLD':
+      case TransitConstants.kBtsGold:
         return btsGold;
-      case 'MRT_BLUE':
+      case TransitConstants.kMrtBlue:
         return mrtBlue;
-      case 'MRT_PURPLE':
+      case TransitConstants.kMrtPurple:
         return mrtPurple;
-      case 'MRT_YELLOW':
+      case TransitConstants.kMrtYellow:
         return mrtYellow;
-      case 'ARL':
+      case TransitConstants.kArl:
         return arl;
-      case 'MRT_PINK':
-      case 'MRT_PINK_BRANCH':
+      case TransitConstants.kMrtPink:
+      case TransitConstants.kMrtPinkBranch:
         return mrtPink;
-      case 'SRT_RED_NORTH':
+      case TransitConstants.kSrtRedNorth:
         return srtRedNorth;
-      case 'SRT_RED_WEST':
+      case TransitConstants.kSrtRedWest:
         return srtRedWest;
       default:
         return Colors.grey;
@@ -74,26 +75,26 @@ class TransitColors {
   /// Get darker variant for a given line ID
   static Color getLineDarkColor(String lineId) {
     switch (lineId) {
-      case 'BTS_SUKHUMVIT':
+      case TransitConstants.kBtsSukhumvit:
         return btsSukhumvitDark;
-      case 'BTS_SILOM':
+      case TransitConstants.kBtsSilom:
         return btsSilomDark;
-      case 'BTS_GOLD':
+      case TransitConstants.kBtsGold:
         return btsGoldDark;
-      case 'MRT_BLUE':
+      case TransitConstants.kMrtBlue:
         return mrtBlueDark;
-      case 'MRT_PURPLE':
+      case TransitConstants.kMrtPurple:
         return mrtPurpleDark;
-      case 'MRT_YELLOW':
+      case TransitConstants.kMrtYellow:
         return mrtYellowDark;
-      case 'ARL':
+      case TransitConstants.kArl:
         return arlDark;
-      case 'MRT_PINK':
-      case 'MRT_PINK_BRANCH':
+      case TransitConstants.kMrtPink:
+      case TransitConstants.kMrtPinkBranch:
         return mrtPinkDark;
-      case 'SRT_RED_NORTH':
+      case TransitConstants.kSrtRedNorth:
         return srtRedNorthDark;
-      case 'SRT_RED_WEST':
+      case TransitConstants.kSrtRedWest:
         return srtRedWestDark;
       default:
         return Colors.grey.shade700;
@@ -102,7 +103,7 @@ class TransitColors {
 
   /// Get readable text color (white or dark slate) for a given line ID
   static Color getLineTextColor(String lineId) {
-    if (lineId == 'MRT_YELLOW' || lineId == 'BTS_GOLD') {
+    if (lineId == TransitConstants.kMrtYellow || lineId == TransitConstants.kBtsGold) {
       return const Color(0xFF1E293B); // Dark slate
     }
     return Colors.white;
