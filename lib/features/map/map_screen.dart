@@ -427,8 +427,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
               isTrackingActive &&
               trackerState?.currentStation?.id == station.id;
 
-          final double scale = (0.75 + (_currentZoom.value - 12.0) * 0.16)
-              .clamp(0.6, 2.0);
+          final double scale = (0.80 + (_currentZoom.value - 11.5) * 0.14)
+              .clamp(0.80, 1.2);
           final double baseSize = isCurrentStation
               ? 44.0
               : (isInterchange ? 32.0 : 24.0);
@@ -516,8 +516,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
 
           final lineColor = TransitColors.getLineColor(station.lineId);
           final isInterchange = station.interchange.isNotEmpty;
-          final double scale = (0.75 + (_currentZoom.value - 12.0) * 0.16)
-              .clamp(0.6, 2.0);
+          final double scale = (0.80 + (_currentZoom.value - 11.5) * 0.14)
+              .clamp(0.80, 1.2);
           final double sizeValue = (isInterchange ? 32.0 : 24.0) * scale;
 
           newMarkers.add(
@@ -873,8 +873,10 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                       ),
                     ),
                     onPositionChanged: (position, hasGesture) {
-                      if ((position.zoom - _currentZoom.value).abs() > 0.15) {
-                        _currentZoom.value = position.zoom;
+                      if ((position.zoom - _currentZoom.value).abs() > 0.05) {
+                        setState(() {
+                          _currentZoom.value = position.zoom;
+                        });
                       }
                     },
                     onTap: (position, point) {
@@ -1030,7 +1032,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                 t: t,
                 localeCode: localeCode,
                 onClose: () => setState(() => _customSelectedLocation = null),
-                onOpenSearchOverlay: (focus) => _openSearchOverlay(context, focusDestination: focus),
+                onOpenSearchOverlay: (focus) =>
+                    _openSearchOverlay(context, focusDestination: focus),
               ),
             ),
 
@@ -1046,7 +1049,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                 t: t,
                 localeCode: localeCode,
                 onClose: () => setState(() => _selectedNamtangStop = null),
-                onOpenSearchOverlay: (focus) => _openSearchOverlay(context, focusDestination: focus),
+                onOpenSearchOverlay: (focus) =>
+                    _openSearchOverlay(context, focusDestination: focus),
               ),
             ),
 
