@@ -6,7 +6,6 @@ import '../../../models/crowd_report.dart';
 import '../../../providers/providers.dart';
 import '../../favorites/favorites_view_model.dart';
 import '../../search/search_view_model.dart';
-import '../../../core/constants/translation_helper.dart';
 
 class StationDetailsCard extends ConsumerWidget {
   final Station station;
@@ -34,7 +33,9 @@ class StationDetailsCard extends ConsumerWidget {
 
     final lineColor = TransitColors.getLineColor(station.lineId);
     final crowdInfo = crowdService.getCrowdInfo(station.id);
-    final minutesUntilNext = scheduleService.getMinutesUntilNextTrain(station.lineId);
+    final minutesUntilNext = scheduleService.getMinutesUntilNextTrain(
+      station.lineId,
+    );
 
     final stationName = localeCode == 'th' ? station.nameTh : station.nameEn;
     final stationSubName = localeCode == 'th' ? station.nameEn : station.nameTh;
@@ -140,8 +141,12 @@ class StationDetailsCard extends ConsumerWidget {
                 ),
                 Consumer(
                   builder: (context, ref, child) {
-                    final favoritesState = ref.watch(favoritesViewModelProvider);
-                    final isFav = favoritesState.favoriteStations.any((s) => s.id == station.id);
+                    final favoritesState = ref.watch(
+                      favoritesViewModelProvider,
+                    );
+                    final isFav = favoritesState.favoriteStations.any(
+                      (s) => s.id == station.id,
+                    );
                     return IconButton(
                       icon: Icon(
                         isFav
@@ -326,5 +331,4 @@ class StationDetailsCard extends ConsumerWidget {
       ),
     );
   }
-
 }

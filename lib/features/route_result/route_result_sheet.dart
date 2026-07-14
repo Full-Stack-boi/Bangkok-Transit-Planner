@@ -1,19 +1,11 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../core/theme/transit_colors.dart';
-import '../../core/theme/app_theme.dart';
 import '../../models/route_result.dart';
-import '../../models/station.dart';
-import '../../models/searchable_item.dart';
 import '../../models/custom_location.dart';
 
-import '../../models/crowd_report.dart';
 import '../../providers/providers.dart';
 import '../search/search_view_model.dart';
-import '../favorites/favorites_view_model.dart';
 import '../../core/constants/translation_helper.dart';
-import '../../providers/route_tracker.dart';
 import 'widgets/route_header.dart';
 import 'widgets/route_type_selector.dart';
 import 'widgets/accuracy_warning_card.dart';

@@ -4,8 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 import '../../../providers/providers.dart';
 import '../../../models/namtang_stop.dart';
-import '../../../models/station.dart';
-import '../../../models/custom_location.dart';
 
 class NamtangStopsLayer extends ConsumerStatefulWidget {
   final MapController mapController;
@@ -115,8 +113,8 @@ class _NamtangStopsLayerState extends ConsumerState<NamtangStopsLayer> {
                       color: stop.type == 'boat'
                           ? Colors.blue.shade700
                           : (stop.type == 'commuter_train'
-                              ? Colors.red.shade700
-                              : Colors.green.shade700),
+                                ? Colors.red.shade700
+                                : Colors.green.shade700),
                       width: 2.0,
                     ),
                     boxShadow: const [
@@ -132,14 +130,14 @@ class _NamtangStopsLayerState extends ConsumerState<NamtangStopsLayer> {
                       stop.type == 'boat'
                           ? Icons.directions_boat_rounded
                           : (stop.type == 'commuter_train'
-                              ? Icons.train_rounded
-                              : Icons.directions_bus_rounded),
+                                ? Icons.train_rounded
+                                : Icons.directions_bus_rounded),
                       size: 12,
                       color: stop.type == 'boat'
                           ? Colors.blue.shade700
                           : (stop.type == 'commuter_train'
-                              ? Colors.red.shade700
-                              : Colors.green.shade700),
+                                ? Colors.red.shade700
+                                : Colors.green.shade700),
                     ),
                   ),
                 ),

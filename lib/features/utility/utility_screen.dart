@@ -3,15 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import '../../core/constants/translation_helper.dart';
-import '../../core/theme/transit_colors.dart';
 import '../../providers/providers.dart';
-import '../../services/transit_news_service.dart';
-import '../../models/station.dart';
 import 'route_calculating_overlay.dart';
 import 'widgets/status_dashboard.dart';
-import 'widgets/transit_line_status_card.dart';
 import 'widgets/news_section.dart';
-import 'widgets/news_card.dart';
 import 'widgets/transit_card_row.dart';
 import 'widgets/manual_report_card.dart';
 
@@ -30,15 +25,14 @@ class UtilityScreen extends ConsumerWidget {
     final newsAsync = ref.watch(drtNewsProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(t.common.appTitle),
-      ),
+      appBar: AppBar(title: Text(t.common.appTitle)),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
           // ─── PART 1: TRANSIT STATUS DASHBOARD (GRID) ───
           statusesAsync.when(
-            data: (statuses) => StatusDashboard(theme: theme, t: t, statuses: statuses),
+            data: (statuses) =>
+                StatusDashboard(theme: theme, t: t, statuses: statuses),
             loading: () => _buildStatusShimmer(theme, t),
             error: (err, stack) => _buildErrorCard(ref, t, theme),
           ),
@@ -54,7 +48,8 @@ class UtilityScreen extends ConsumerWidget {
 
           // ─── PART 3: NEWS & ANNOUNCEMENTS (NOW HIGHLY VISIBLE & ASYNC) ───
           newsAsync.when(
-            data: (articles) => NewsSection(theme: theme, t: t, articles: articles),
+            data: (articles) =>
+                NewsSection(theme: theme, t: t, articles: articles),
             loading: () => _buildNewsShimmer(theme, t),
             error: (err, stack) => _buildErrorCard(ref, t, theme),
           ),
@@ -127,16 +122,28 @@ class UtilityScreen extends ConsumerWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: const [
-                            ShimmerPlaceholder(width: 60, height: 10, borderRadius: 99),
+                            ShimmerPlaceholder(
+                              width: 60,
+                              height: 10,
+                              borderRadius: 99,
+                            ),
                             SizedBox(height: 4),
-                            ShimmerPlaceholder(width: 40, height: 8, borderRadius: 99),
+                            ShimmerPlaceholder(
+                              width: 40,
+                              height: 8,
+                              borderRadius: 99,
+                            ),
                           ],
                         ),
                       ),
                       // Status Circle Icon placeholder on the right
                       const Padding(
                         padding: EdgeInsets.only(right: 8.0),
-                        child: ShimmerPlaceholder(width: 14, height: 14, borderRadius: 7),
+                        child: ShimmerPlaceholder(
+                          width: 14,
+                          height: 14,
+                          borderRadius: 7,
+                        ),
                       ),
                     ],
                   ),
@@ -161,41 +168,56 @@ class UtilityScreen extends ConsumerWidget {
           ),
         ),
         const SizedBox(height: 12),
-        ...List.generate(2, (index) => Card(
-          margin: const EdgeInsets.only(bottom: 12),
-          child: Padding(
-            padding: const EdgeInsets.all(14),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Left indicator skeleton line
-                Container(
-                  width: 4,
-                  height: 50,
-                  decoration: BoxDecoration(
-                    color: isDark
-                        ? Colors.white.withValues(alpha: 0.1)
-                        : Colors.black.withValues(alpha: 0.05),
-                    borderRadius: BorderRadius.circular(2),
+        ...List.generate(
+          2,
+          (index) => Card(
+            margin: const EdgeInsets.only(bottom: 12),
+            child: Padding(
+              padding: const EdgeInsets.all(14),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Left indicator skeleton line
+                  Container(
+                    width: 4,
+                    height: 50,
+                    decoration: BoxDecoration(
+                      color: isDark
+                          ? Colors.white.withValues(alpha: 0.1)
+                          : Colors.black.withValues(alpha: 0.05),
+                      borderRadius: BorderRadius.circular(2),
+                    ),
                   ),
-                ),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
-                      ShimmerPlaceholder(width: 150, height: 12, borderRadius: 99),
-                      SizedBox(height: 6),
-                      ShimmerPlaceholder(width: 220, height: 8, borderRadius: 99),
-                      SizedBox(height: 4),
-                      ShimmerPlaceholder(width: 120, height: 8, borderRadius: 99),
-                    ],
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: const [
+                        ShimmerPlaceholder(
+                          width: 150,
+                          height: 12,
+                          borderRadius: 99,
+                        ),
+                        SizedBox(height: 6),
+                        ShimmerPlaceholder(
+                          width: 220,
+                          height: 8,
+                          borderRadius: 99,
+                        ),
+                        SizedBox(height: 4),
+                        ShimmerPlaceholder(
+                          width: 120,
+                          height: 8,
+                          borderRadius: 99,
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
-        )),
+        ),
       ],
     );
   }
@@ -211,9 +233,7 @@ class UtilityScreen extends ConsumerWidget {
       color: theme.colorScheme.errorContainer.withValues(alpha: 0.1),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(
-          color: theme.colorScheme.error.withValues(alpha: 0.4),
-        ),
+        side: BorderSide(color: theme.colorScheme.error.withValues(alpha: 0.4)),
       ),
       child: ListTile(
         leading: const Icon(Icons.bug_report_outlined, color: Colors.orange),
@@ -227,7 +247,8 @@ class UtilityScreen extends ConsumerWidget {
               : t.utility.debugSimGpsDisabled,
         ),
         trailing: const Icon(Icons.chevron_right),
-        onTap: () => _showLocationSimulationDialog(context, ref, mockPos, theme, t),
+        onTap: () =>
+            _showLocationSimulationDialog(context, ref, mockPos, theme, t),
       ),
     );
   }
@@ -282,14 +303,21 @@ class UtilityScreen extends ConsumerWidget {
                     const SizedBox(height: 8),
                     if (mockPos != null)
                       ListTile(
-                        leading: const Icon(Icons.gps_off_rounded, color: Colors.red),
+                        leading: const Icon(
+                          Icons.gps_off_rounded,
+                          color: Colors.red,
+                        ),
                         title: Text(t.utility.debugSimGpsDisableOption),
                         subtitle: Text(t.utility.debugSimGpsDisableSubtitle),
                         onTap: () {
-                          ref.read(mockLocationProvider.notifier).clearMockLocation();
+                          ref
+                              .read(mockLocationProvider.notifier)
+                              .clearMockLocation();
                           Navigator.pop(context);
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text(t.utility.debugSimGpsDisabledSnack)),
+                            SnackBar(
+                              content: Text(t.utility.debugSimGpsDisabledSnack),
+                            ),
                           );
                         },
                       ),
@@ -300,26 +328,42 @@ class UtilityScreen extends ConsumerWidget {
                         itemCount: filtered.length,
                         itemBuilder: (context, index) {
                           final station = filtered[index];
-                          final isCurrent = mockPos != null &&
+                          final isCurrent =
+                              mockPos != null &&
                               (mockPos.latitude - station.lat).abs() < 0.0001 &&
                               (mockPos.longitude - station.lng).abs() < 0.0001;
 
                           return ListTile(
                             leading: Icon(
                               Icons.directions_transit_rounded,
-                              color: isCurrent ? theme.colorScheme.primary : null,
+                              color: isCurrent
+                                  ? theme.colorScheme.primary
+                                  : null,
                             ),
-                            title: Text(t.isTh ? station.nameTh : station.nameEn),
-                            subtitle: Text('${station.id} \u2022 ${station.lat.toStringAsFixed(4)}, ${station.lng.toStringAsFixed(4)}'),
-                            trailing: isCurrent ? const Icon(Icons.check_circle_rounded, color: Colors.green) : null,
+                            title: Text(
+                              t.isTh ? station.nameTh : station.nameEn,
+                            ),
+                            subtitle: Text(
+                              '${station.id} \u2022 ${station.lat.toStringAsFixed(4)}, ${station.lng.toStringAsFixed(4)}',
+                            ),
+                            trailing: isCurrent
+                                ? const Icon(
+                                    Icons.check_circle_rounded,
+                                    color: Colors.green,
+                                  )
+                                : null,
                             onTap: () {
-                              ref.read(mockLocationProvider.notifier).setMockLocation(station.lat, station.lng);
+                              ref
+                                  .read(mockLocationProvider.notifier)
+                                  .setMockLocation(station.lat, station.lng);
                               Navigator.pop(context);
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
-                                  content: Text(t.utility.debugSimGpsEnabledSnack(
-                                    t.isTh ? station.nameTh : station.nameEn,
-                                  )),
+                                  content: Text(
+                                    t.utility.debugSimGpsEnabledSnack(
+                                      t.isTh ? station.nameTh : station.nameEn,
+                                    ),
+                                  ),
                                 ),
                               );
                             },

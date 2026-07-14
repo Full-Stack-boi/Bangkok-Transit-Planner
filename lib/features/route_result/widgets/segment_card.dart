@@ -52,7 +52,7 @@ class SegmentCard extends ConsumerWidget {
       trainStatusText = t.routeResult.trainArriving;
     } else {
       trainStatusText =
-          '${t.routeResult.nextTrain}: ~${minutesUntilNext} ${t.common.minutesUnit}';
+          '${t.routeResult.nextTrain}: ~$minutesUntilNext ${t.common.minutesUnit}';
     }
 
     return Card(

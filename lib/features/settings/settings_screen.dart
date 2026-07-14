@@ -105,9 +105,7 @@ class SettingsScreen extends ConsumerWidget {
     final authState = ref.watch(authProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(t.navigation.settingsTitle),
-      ),
+      appBar: AppBar(title: Text(t.navigation.settingsTitle)),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -138,84 +136,109 @@ class SettingsScreen extends ConsumerWidget {
           const SizedBox(height: 8),
 
           // Offline Map Option (Manual check/download updates)
-          Card(
-            child: ListTile(
-              leading: const Icon(Icons.map_rounded),
-              title: Text(t.settings.offlineMapTitle),
-              subtitle: Text(t.settings.offlineMapSubtitle),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () {
-                showDialog(
-                  context: context,
-                  builder: (dialogContext) => AlertDialog(
-                    title: Text(t.settings.downloadDialogTitle),
-                    content: Text(t.settings.downloadDialogBody),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(dialogContext),
-                        child: Text(t.common.cancelBtn),
-                      ),
-                      ElevatedButton(
-                        onPressed: () async {
-                          Navigator.pop(dialogContext);
+          !kIsWeb
+              ? Card(
+                  child: ListTile(
+                    leading: const Icon(Icons.map_rounded),
+                    title: Text(t.settings.offlineMapTitle),
+                    subtitle: Text(t.settings.offlineMapSubtitle),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (dialogContext) => AlertDialog(
+                          title: Text(t.settings.downloadDialogTitle),
+                          content: Text(t.settings.downloadDialogBody),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(dialogContext),
+                              child: Text(t.common.cancelBtn),
+                            ),
+                            ElevatedButton(
+                              onPressed: () async {
+                                Navigator.pop(dialogContext);
 
-                          // Mark prefetch as NOT completed in SharedPreferences so it will run
-                          final prefs = await SharedPreferences.getInstance();
-                          await prefs.setBool('map_prefetch_completed_v6_greater', false);
+                                // Mark prefetch as NOT completed in SharedPreferences so it will run
+                                final prefs =
+                                    await SharedPreferences.getInstance();
+                                await prefs.setBool(
+                                  'map_prefetch_completed_v6_greater',
+                                  false,
+                                );
 
-                          // Clear the pause flag
-                          CachedTileProvider.isPaused = false;
+                                // Clear the pause flag
+                                CachedTileProvider.isPaused = false;
 
-                          // Let's get the stations from the transit repository provider
-                          final stations = ref.read(transitRepositoryProvider).stations;
+                                // Let's get the stations from the transit repository provider
+                                final stations = ref
+                                    .read(transitRepositoryProvider)
+                                    .stations;
 
-                          // Set prefetch state in riverpod
-                          ref.read(mapPrefetchProvider.notifier).startPrefetch(6914);
+                                // Set prefetch state in riverpod
+                                ref
+                                    .read(mapPrefetchProvider.notifier)
+                                    .startPrefetch(6914);
 
-                          // Start downloading
-                          CachedTileProvider.prefetchBangkokTiles(
-                            stations,
-                            onStart: (total) {
-                              ref.read(mapPrefetchProvider.notifier).startPrefetch(total);
-                            },
-                            onProgress: (current, success, cached, error) {
-                              ref.read(mapPrefetchProvider.notifier).updateProgress(
-                                    current: current,
-                                    success: success,
-                                    cached: cached,
-                                    error: error,
+                                // Start downloading
+                                CachedTileProvider.prefetchBangkokTiles(
+                                  stations,
+                                  onStart: (total) {
+                                    ref
+                                        .read(mapPrefetchProvider.notifier)
+                                        .startPrefetch(total);
+                                  },
+                                  onProgress:
+                                      (current, success, cached, error) {
+                                        ref
+                                            .read(mapPrefetchProvider.notifier)
+                                            .updateProgress(
+                                              current: current,
+                                              success: success,
+                                              cached: cached,
+                                              error: error,
+                                            );
+                                      },
+                                  onFinish: (completed, lostConnection) async {
+                                    if (completed) {
+                                      ref
+                                          .read(mapPrefetchProvider.notifier)
+                                          .finishPrefetch();
+                                      PaintingBinding.instance.imageCache
+                                          .clear();
+                                      PaintingBinding.instance.imageCache
+                                          .clearLiveImages();
+                                      final p =
+                                          await SharedPreferences.getInstance();
+                                      await p.setBool(
+                                        'map_prefetch_completed_v6_greater',
+                                        true,
+                                      );
+                                    } else {
+                                      ref
+                                          .read(mapPrefetchProvider.notifier)
+                                          .pausePrefetch();
+                                    }
+                                  },
+                                );
+
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(t.settings.downloadStarted),
+                                      behavior: SnackBarBehavior.floating,
+                                    ),
                                   );
-                            },
-                            onFinish: (completed, lostConnection) async {
-                              if (completed) {
-                                ref.read(mapPrefetchProvider.notifier).finishPrefetch();
-                                PaintingBinding.instance.imageCache.clear();
-                                PaintingBinding.instance.imageCache.clearLiveImages();
-                                final p = await SharedPreferences.getInstance();
-                                await p.setBool('map_prefetch_completed_v6_greater', true);
-                              } else {
-                                ref.read(mapPrefetchProvider.notifier).pausePrefetch();
-                              }
-                            },
-                          );
-
-                          if (context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(t.settings.downloadStarted),
-                                behavior: SnackBarBehavior.floating,
-                              ),
-                            );
-                          }
-                        },
-                        child: Text(t.common.download),
-                      ),
-                    ],
+                                }
+                              },
+                              child: Text(t.common.download),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
                   ),
-                );
-              },
-            ),
-          ),
+                )
+              : const SizedBox.shrink(),
           const SizedBox(height: 8),
 
           // Location Simulation Option (DEBUG ONLY - Hidden in release build)
@@ -229,18 +252,31 @@ class SettingsScreen extends ConsumerWidget {
                 ),
               ),
               child: ListTile(
-                leading: Icon(Icons.bug_report_rounded, color: theme.colorScheme.error),
+                leading: Icon(
+                  Icons.bug_report_rounded,
+                  color: theme.colorScheme.error,
+                ),
                 title: Text(
                   t.utility.debugSimGpsTitle,
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 subtitle: Text(
                   mockLocation != null
-                      ? t.utility.debugSimGpsActive(mockLocation.latitude.toStringAsFixed(4), mockLocation.longitude.toStringAsFixed(4))
+                      ? t.utility.debugSimGpsActive(
+                          mockLocation.latitude.toStringAsFixed(4),
+                          mockLocation.longitude.toStringAsFixed(4),
+                        )
                       : t.utility.debugSimGpsDisabled,
                 ),
                 trailing: const Icon(Icons.chevron_right),
-                onTap: () => _showLocationSimulationDialog(context, ref, mockLocation, theme, localeCode, t),
+                onTap: () => _showLocationSimulationDialog(
+                  context,
+                  ref,
+                  mockLocation,
+                  theme,
+                  localeCode,
+                  t,
+                ),
               ),
             ),
             const SizedBox(height: 8),
@@ -289,7 +325,9 @@ class SettingsScreen extends ConsumerWidget {
                         Text(
                           '${t.settings.versionLabel} 1.0.0',
                           style: theme.textTheme.bodySmall?.copyWith(
-                            color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                            color: theme.colorScheme.onSurface.withValues(
+                              alpha: 0.5,
+                            ),
                           ),
                         ),
                         const SizedBox(height: 16),
@@ -309,17 +347,23 @@ class SettingsScreen extends ConsumerWidget {
                         Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: theme.colorScheme.surface.withValues(alpha: 0.5),
+                            color: theme.colorScheme.surface.withValues(
+                              alpha: 0.5,
+                            ),
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(
-                              color: theme.colorScheme.outline.withValues(alpha: 0.1),
+                              color: theme.colorScheme.outline.withValues(
+                                alpha: 0.1,
+                              ),
                             ),
                           ),
                           child: Text(
                             t.settings.disclaimer,
                             textAlign: TextAlign.center,
                             style: theme.textTheme.bodySmall?.copyWith(
-                              color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                              color: theme.colorScheme.onSurface.withValues(
+                                alpha: 0.7,
+                              ),
                               height: 1.5,
                             ),
                           ),
@@ -330,7 +374,9 @@ class SettingsScreen extends ConsumerWidget {
                           t.settings.copyright,
                           style: theme.textTheme.bodySmall?.copyWith(
                             fontSize: 10,
-                            color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
+                            color: theme.colorScheme.onSurface.withValues(
+                              alpha: 0.4,
+                            ),
                           ),
                         ),
                       ],
@@ -359,7 +405,10 @@ class SettingsScreen extends ConsumerWidget {
                       ElevatedButton(
                         onPressed: () => Navigator.pop(context),
                         style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 10,
+                          ),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
@@ -395,7 +444,10 @@ class SettingsScreen extends ConsumerWidget {
     ThemeData theme,
   ) {
     if (authState.isAuthenticated) {
-      final String displayName = authState.displayName ?? authState.user?.email?.split('@').first ?? t.auth.defaultUsername;
+      final String displayName =
+          authState.displayName ??
+          authState.user?.email?.split('@').first ??
+          t.auth.defaultUsername;
       final String email = authState.user?.email ?? '';
 
       return Card(
@@ -406,11 +458,17 @@ class SettingsScreen extends ConsumerWidget {
             children: [
               CircleAvatar(
                 radius: 30,
-                backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.1),
-                backgroundImage: authState.avatarUrl != null ? NetworkImage(authState.avatarUrl!) : null,
+                backgroundColor: theme.colorScheme.primary.withValues(
+                  alpha: 0.1,
+                ),
+                backgroundImage: authState.avatarUrl != null
+                    ? NetworkImage(authState.avatarUrl!)
+                    : null,
                 child: authState.avatarUrl == null
                     ? Text(
-                        displayName.isNotEmpty ? displayName[0].toUpperCase() : 'U',
+                        displayName.isNotEmpty
+                            ? displayName[0].toUpperCase()
+                            : 'U',
                         style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
@@ -570,14 +628,21 @@ class SettingsScreen extends ConsumerWidget {
                     const SizedBox(height: 8),
                     if (mockPos != null)
                       ListTile(
-                        leading: const Icon(Icons.gps_off_rounded, color: Colors.red),
+                        leading: const Icon(
+                          Icons.gps_off_rounded,
+                          color: Colors.red,
+                        ),
                         title: Text(t.utility.debugSimGpsDisableOption),
                         subtitle: Text(t.utility.debugSimGpsDisableSubtitle),
                         onTap: () {
-                          ref.read(mockLocationProvider.notifier).clearMockLocation();
+                          ref
+                              .read(mockLocationProvider.notifier)
+                              .clearMockLocation();
                           Navigator.pop(context);
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text(t.utility.debugSimGpsDisabledSnack)),
+                            SnackBar(
+                              content: Text(t.utility.debugSimGpsDisabledSnack),
+                            ),
                           );
                         },
                       ),
@@ -588,24 +653,46 @@ class SettingsScreen extends ConsumerWidget {
                         itemCount: filtered.length,
                         itemBuilder: (context, index) {
                           final station = filtered[index];
-                          final isCurrent = mockPos != null &&
+                          final isCurrent =
+                              mockPos != null &&
                               (mockPos.latitude - station.lat).abs() < 0.0001 &&
                               (mockPos.longitude - station.lng).abs() < 0.0001;
 
                           return ListTile(
                             leading: Icon(
                               Icons.directions_transit_rounded,
-                              color: isCurrent ? theme.colorScheme.primary : null,
+                              color: isCurrent
+                                  ? theme.colorScheme.primary
+                                  : null,
                             ),
-                            title: Text(localeCode == 'th' ? station.nameTh : station.nameEn),
-                            subtitle: Text('${station.id} • ${station.lat.toStringAsFixed(4)}, ${station.lng.toStringAsFixed(4)}'),
-                            trailing: isCurrent ? const Icon(Icons.check_circle_rounded, color: Colors.green) : null,
+                            title: Text(
+                              localeCode == 'th'
+                                  ? station.nameTh
+                                  : station.nameEn,
+                            ),
+                            subtitle: Text(
+                              '${station.id} • ${station.lat.toStringAsFixed(4)}, ${station.lng.toStringAsFixed(4)}',
+                            ),
+                            trailing: isCurrent
+                                ? const Icon(
+                                    Icons.check_circle_rounded,
+                                    color: Colors.green,
+                                  )
+                                : null,
                             onTap: () {
-                              ref.read(mockLocationProvider.notifier).setMockLocation(station.lat, station.lng);
+                              ref
+                                  .read(mockLocationProvider.notifier)
+                                  .setMockLocation(station.lat, station.lng);
                               Navigator.pop(context);
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
-                                  content: Text(t.utility.debugSimGpsEnabledSnack(localeCode == 'th' ? station.nameTh : station.nameEn)),
+                                  content: Text(
+                                    t.utility.debugSimGpsEnabledSnack(
+                                      localeCode == 'th'
+                                          ? station.nameTh
+                                          : station.nameEn,
+                                    ),
+                                  ),
                                 ),
                               );
                             },
