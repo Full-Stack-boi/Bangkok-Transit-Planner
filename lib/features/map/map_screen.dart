@@ -14,19 +14,12 @@ import '../../models/namtang_stop.dart';
 import '../../models/route_result.dart';
 import '../../providers/providers.dart';
 import '../search/search_view_model.dart';
-import '../utility/route_calculating_overlay.dart';
 
 import '../../core/constants/translation_helper.dart';
 import 'widgets/map_search_overlay.dart';
+import 'widgets/map_overlay_stack.dart';
 import 'painters/station_marker_painter.dart';
 import 'painters/custom_map_pin.dart';
-import 'widgets/station_details_card.dart';
-import 'widgets/custom_location_card.dart';
-import 'widgets/namtang_stop_card.dart';
-import 'widgets/active_journey_panel.dart';
-import 'widgets/map_prefetch_widget.dart';
-
-import 'widgets/route_result_banner.dart';
 import '../route_result/route_result_sheet.dart';
 import '../../providers/route_tracker.dart';
 import 'cached_tile_provider.dart';
@@ -310,6 +303,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         ? ref.watch(routeTrackerProvider)
         : null;
     final prefetchState = ref.watch(mapPrefetchProvider);
+    final isCalculating = ref.watch(
+      searchViewModelProvider.select((s) => s.isCalculating),
+    );
 
     // Build Polylines for transit lines
     final themeBrightness = theme.brightness;
@@ -937,195 +933,55 @@ class _MapScreenState extends ConsumerState<MapScreen> {
             ),
           ),
 
-          // ─── Floating Top Search Card & Prefetch Indicator ───
-          Positioned(
-            top: 16,
-            left: 16,
-            right: 16,
-            child: SafeArea(
-              bottom: false,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Consumer(
-                    builder: (context, ref, child) {
-                      final searchState = ref.watch(searchViewModelProvider);
-                      return _buildTopSearchCard(
-                        context,
-                        searchState,
-                        t,
-                        localeCode,
-                      );
-                    },
-                  ),
-                  if (prefetchState.isPrefetching) ...[
-                    const SizedBox(height: 8),
-                    MapPrefetchWidget(
-                      prefetchState: prefetchState,
-                      theme: theme,
-                      t: t,
-                      isExpanded: _isPrefetchExpanded,
-                      onToggleExpand: () => setState(
-                        () => _isPrefetchExpanded = !_isPrefetchExpanded,
-                      ),
-                      onStartPrefetch: _startMapPrefetch,
-                    ),
-                  ],
-                ],
+          Positioned.fill(
+            child: MapOverlayStack(
+              mapLayer: const SizedBox.expand(),
+              searchCard: Consumer(
+                builder: (context, ref, child) {
+                  final searchState = ref.watch(searchViewModelProvider);
+                  return _buildTopSearchCard(
+                    context,
+                    searchState,
+                    t,
+                    localeCode,
+                  );
+                },
               ),
+              prefetchState: prefetchState,
+              theme: theme,
+              t: t,
+              localeCode: localeCode,
+              isPrefetchExpanded: _isPrefetchExpanded,
+              isLocating: _isLocating,
+              isOfflineMapInitializing: _isOfflineMapInitializing,
+              isBottomCardVisible: isBottomCardVisible,
+              isCalculating: isCalculating,
+              isTrackingActive: isTrackingActive,
+              selectedStation: _selectedStation,
+              selectedLocation: _customSelectedLocation,
+              selectedNamtangStop: _selectedNamtangStop,
+              routeResult: routeResult,
+              trackerState: trackerState,
+              onTogglePrefetch: () =>
+                  setState(() => _isPrefetchExpanded = !_isPrefetchExpanded),
+              onStartPrefetch: _startMapPrefetch,
+              onCenterOnUser: _centerOnUser,
+              onCloseStation: () => setState(() => _selectedStation = null),
+              onSelectHubStation: (station) =>
+                  setState(() => _selectedStation = station),
+              onSetOrigin: _setStationAsOrigin,
+              onSetDestination: _setStationAsDestination,
+              onCloseCustomLocation: () =>
+                  setState(() => _customSelectedLocation = null),
+              onOpenSearchOverlay: (focusDestination) => _openSearchOverlay(
+                context,
+                focusDestination: focusDestination,
+              ),
+              onCloseNamtangStop: () =>
+                  setState(() => _selectedNamtangStop = null),
+              onShowRouteDetail: () => _showRouteDetail(context),
             ),
           ),
-
-          // ─── Floating GPS Button ───
-          Positioned(
-            right: 16,
-            bottom: isBottomCardVisible ? 180 : 24,
-            child: FloatingActionButton.small(
-              heroTag: 'map_gps_fab',
-              onPressed: _centerOnUser,
-              backgroundColor: theme.colorScheme.surface,
-              foregroundColor: theme.colorScheme.onSurface,
-              child: _isLocating
-                  ? const SizedBox(
-                      width: 18,
-                      height: 18,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : const Icon(Icons.my_location_rounded),
-            ),
-          ),
-
-          // ─── Station Details Popup Card ───
-          Positioned(
-            bottom: 24 + MediaQuery.paddingOf(context).bottom,
-            left: 16,
-            right: 16,
-            child: AnimatedOpacity(
-              duration: const Duration(milliseconds: 200),
-              opacity: _selectedStation != null ? 1.0 : 0.0,
-              child: _selectedStation != null
-                  ? StationDetailsCard(
-                      station: _selectedStation!,
-                      localeCode: localeCode,
-                      onClose: () => setState(() => _selectedStation = null),
-                      onSelectHubStation: (station) =>
-                          setState(() => _selectedStation = station),
-                    )
-                  : const SizedBox.shrink(),
-            ),
-          ),
-
-          // ─── Custom Selected Location Details Popup Card ───
-          if (_customSelectedLocation != null)
-            Positioned(
-              left: 16,
-              right: 16,
-              bottom: 16,
-              child: CustomLocationCard(
-                location: _customSelectedLocation!,
-                theme: theme,
-                t: t,
-                localeCode: localeCode,
-                onClose: () => setState(() => _customSelectedLocation = null),
-                onOpenSearchOverlay: (focus) =>
-                    _openSearchOverlay(context, focusDestination: focus),
-              ),
-            ),
-
-          // ─── Namtang Stop Details Popup Card ───
-          if (_selectedNamtangStop != null)
-            Positioned(
-              left: 16,
-              right: 16,
-              bottom: 16,
-              child: NamtangStopCard(
-                stop: _selectedNamtangStop!,
-                theme: theme,
-                t: t,
-                localeCode: localeCode,
-                onClose: () => setState(() => _selectedNamtangStop = null),
-                onOpenSearchOverlay: (focus) =>
-                    _openSearchOverlay(context, focusDestination: focus),
-              ),
-            ),
-
-          // ─── Route Result Banner ───
-          if (isRouteActive &&
-              !isTrackingActive &&
-              _selectedStation == null &&
-              _customSelectedLocation == null &&
-              _selectedNamtangStop == null)
-            Positioned(
-              left: 16,
-              right: 16,
-              bottom: 16,
-              child: RouteResultBanner(
-                result: routeResult,
-                t: t,
-                onTap: () => _showRouteDetail(context),
-              ),
-            ),
-
-          // ─── Active Journey Tracking Panel ───
-          if (isTrackingActive &&
-              _selectedStation == null &&
-              _customSelectedLocation == null &&
-              _selectedNamtangStop == null)
-            Positioned(
-              left: 16,
-              right: 16,
-              bottom: 16,
-              child: ActiveJourneyPanel(
-                tracker: trackerState!,
-                theme: theme,
-                t: t,
-                localeCode: localeCode,
-              ),
-            ),
-
-          // ─── Route Calculating Overlay ───
-          Consumer(
-            builder: (context, ref, child) {
-              final isCalculating = ref.watch(
-                searchViewModelProvider.select((s) => s.isCalculating),
-              );
-              if (!isCalculating) return const SizedBox.shrink();
-              return RouteCalculatingOverlay(theme: theme, t: t);
-            },
-          ),
-
-          if (_isOfflineMapInitializing)
-            Positioned.fill(
-              child: Container(
-                color: Colors.black.withValues(alpha: 0.65),
-                child: Center(
-                  child: Card(
-                    margin: const EdgeInsets.symmetric(horizontal: 32),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 20,
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const CircularProgressIndicator(),
-                          const SizedBox(height: 16),
-                          Text(
-                            t.settings.offlineMapPreparing,
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
         ],
       ),
     );
@@ -1148,6 +1004,25 @@ class _MapScreenState extends ConsumerState<MapScreen> {
       }
     }
     return closest;
+  }
+
+  Future<void> _setStationAsOrigin(Station station) async {
+    await ref.read(searchViewModelProvider.notifier).setOrigin(station);
+    if (!mounted) return;
+
+    setState(() => _selectedStation = null);
+    _openSearchOverlay(context, focusDestination: true);
+  }
+
+  Future<void> _setStationAsDestination(Station station) async {
+    final hasOrigin = ref.read(searchViewModelProvider).origin != null;
+    await ref.read(searchViewModelProvider.notifier).setDestination(station);
+    if (!mounted) return;
+
+    setState(() => _selectedStation = null);
+    if (!hasOrigin) {
+      _openSearchOverlay(context);
+    }
   }
 
   void _showRouteDetail(BuildContext context) {
