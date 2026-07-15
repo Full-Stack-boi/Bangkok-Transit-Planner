@@ -11,6 +11,19 @@ class FavoritesRepository {
 
   FavoritesRepository(this._supabaseService);
 
+  static const _favoritesKeyPrefix = 'favorite_station_ids_v2';
+  static const _routesKeyPrefix = 'saved_routes_v2';
+
+  /// Keeps local data separate for every signed-in account.
+  ///
+  /// The anonymous scope supports favorites used before a user signs in, while
+  /// preventing one user's cached data from being read or uploaded for another.
+  String get _storageScope =>
+      _supabaseService.client?.auth.currentUser?.id ?? 'anonymous';
+
+  String get _favoritesKey => '${_favoritesKeyPrefix}_$_storageScope';
+  String get _routesKey => '${_routesKeyPrefix}_$_storageScope';
+
   /// Initialize SharedPreferences
   Future<void> initialize() async {
     if (_initialized) return;
@@ -22,7 +35,7 @@ class FavoritesRepository {
 
   /// Get list of favorite station IDs
   List<String> getFavoriteStationIds() {
-    return _prefs?.getStringList('favorite_station_ids') ?? [];
+    return _prefs?.getStringList(_favoritesKey) ?? [];
   }
 
   /// Toggle favorite status of a station (returns true if now favorited, false if removed)
@@ -38,7 +51,7 @@ class FavoritesRepository {
       newList.add(stationId);
     }
 
-    await _prefs?.setStringList('favorite_station_ids', newList);
+    await _prefs?.setStringList(_favoritesKey, newList);
 
     // Sync with Supabase in background (try-catch, fail silently)
     if (_supabaseService.isInitialized) {
@@ -75,7 +88,7 @@ class FavoritesRepository {
 
   /// Get list of saved routes as maps
   List<Map<String, String>> getSavedRoutes() {
-    final list = _prefs?.getStringList('saved_routes') ?? [];
+    final list = _prefs?.getStringList(_routesKey) ?? [];
     return list.map((item) {
       final decoded = json.decode(item) as Map<String, dynamic>;
       return decoded.map((k, v) => MapEntry(k, v as String));
@@ -98,8 +111,13 @@ class FavoritesRepository {
     final list = getSavedRoutes();
 
     // Remove existing if same endpoints
-    final filtered = list.where((item) =>
-        !(item['origin_id'] == originId && item['destination_id'] == destinationId)).toList();
+    final filtered = list
+        .where(
+          (item) =>
+              !(item['origin_id'] == originId &&
+                  item['destination_id'] == destinationId),
+        )
+        .toList();
 
     filtered.add({
       'origin_id': originId,
@@ -115,7 +133,7 @@ class FavoritesRepository {
     });
 
     final serialized = filtered.map((item) => json.encode(item)).toList();
-    await _prefs?.setStringList('saved_routes', serialized);
+    await _prefs?.setStringList(_routesKey, serialized);
 
     // Sync with Supabase in background
     if (_supabaseService.isInitialized) {
@@ -140,11 +158,16 @@ class FavoritesRepository {
   Future<void> deleteRoute(String originId, String destinationId) async {
     await initialize();
     final list = getSavedRoutes();
-    final filtered = list.where((item) =>
-        !(item['origin_id'] == originId && item['destination_id'] == destinationId)).toList();
+    final filtered = list
+        .where(
+          (item) =>
+              !(item['origin_id'] == originId &&
+                  item['destination_id'] == destinationId),
+        )
+        .toList();
 
     final serialized = filtered.map((item) => json.encode(item)).toList();
-    await _prefs?.setStringList('saved_routes', serialized);
+    await _prefs?.setStringList(_routesKey, serialized);
 
     // Sync with Supabase in background
     if (_supabaseService.isInitialized) {
@@ -166,11 +189,18 @@ class FavoritesRepository {
 
   /// Check if a route is saved
   bool isRouteSaved(String originId, String destinationId) {
-    return getSavedRoutes().any((item) =>
-        item['origin_id'] == originId && item['destination_id'] == destinationId);
+    return getSavedRoutes().any(
+      (item) =>
+          item['origin_id'] == originId &&
+          item['destination_id'] == destinationId,
+    );
   }
 
-  /// Bidirectional sync: uploads local offline changes, and downloads remote changes
+  /// Refreshes the current user's local cache from Supabase.
+  ///
+  /// Mutations are synced immediately by save/delete/toggle methods. At login,
+  /// Supabase is the source of truth so a stale device cache cannot recreate a
+  /// route or favorite deleted from another device or account.
   Future<void> syncOfflineDataWithSupabase() async {
     await initialize();
     if (!_supabaseService.isInitialized) return;
@@ -180,95 +210,79 @@ class FavoritesRepository {
     if (user == null) return;
 
     try {
-      // 1. Get local data
-      final localFavs = getFavoriteStationIds();
+      // Keep matching route metadata that is not currently stored remotely,
+      // such as custom-location coordinates used for route restoration.
       final localRoutes = getSavedRoutes();
 
-      // 2. Upload local favorites to Supabase (upsert)
-      if (localFavs.isNotEmpty) {
-        final favsToInsert = localFavs.map((stationId) => {
-          'user_id': user.id,
-          'station_id': stationId,
-        }).toList();
-        
-        await client?.from('user_favorites').upsert(
-          favsToInsert,
-          onConflict: 'user_id,station_id',
-        );
-      }
-
-      // 3. Upload local saved routes to Supabase (upsert)
-      if (localRoutes.isNotEmpty) {
-        final routesToInsert = localRoutes.map((route) => {
-          'user_id': user.id,
-          'origin_id': route['origin_id'],
-          'destination_id': route['destination_id'],
-          'name': route['name'] ?? 'Route',
-        }).toList();
-
-        await client?.from('saved_routes').upsert(
-          routesToInsert,
-          onConflict: 'user_id,origin_id,destination_id',
-        );
-      }
-
-      // 4. Download remote favorites from Supabase
-      final remoteFavsResponse = await client?.from('user_favorites').select('station_id').eq('user_id', user.id);
+      // Download remote favorites and replace this user's local cache.
+      final remoteFavsResponse = await client
+          ?.from('user_favorites')
+          .select('station_id')
+          .eq('user_id', user.id);
       if (remoteFavsResponse != null) {
         final List<dynamic> remoteFavsData = remoteFavsResponse;
-        final remoteFavs = remoteFavsData.map((item) => item['station_id'] as String).toList();
-        
-        // Merge with local favorites
-        final mergedFavs = {...localFavs, ...remoteFavs}.toList();
-        await _prefs?.setStringList('favorite_station_ids', mergedFavs);
+        final remoteFavs = remoteFavsData
+            .map((item) => item['station_id'] as String)
+            .toList();
+        await _prefs?.setStringList(_favoritesKey, remoteFavs);
       }
 
-      // 5. Download remote saved routes from Supabase
-      final remoteRoutesResponse = await client?.from('saved_routes').select().eq('user_id', user.id);
+      // Download remote routes and replace this user's local cache.
+      final remoteRoutesResponse = await client
+          ?.from('saved_routes')
+          .select()
+          .eq('user_id', user.id);
       if (remoteRoutesResponse != null) {
         final List<dynamic> remoteRoutesData = remoteRoutesResponse;
-        
-        // Convert to local map structure
-        final remoteRoutes = remoteRoutesData.map((item) => {
-          'origin_id': item['origin_id'] as String,
-          'destination_id': item['destination_id'] as String,
-          'origin_name': item['origin_name'] as String? ?? '',
-          'destination_name': item['destination_name'] as String? ?? '',
-          'name': item['name'] as String? ?? '',
-          'created_at': item['created_at'] as String? ?? DateTime.now().toIso8601String(),
-        }).toList();
 
-        // Merge saved routes based on origin_id & destination_id
-        final Map<String, Map<String, String>> mergedRoutesMap = {};
-        
-        // Add all local routes first
+        // Convert to local map structure
+        final remoteRoutes = remoteRoutesData
+            .map(
+              (item) => {
+                'origin_id': item['origin_id'] as String,
+                'destination_id': item['destination_id'] as String,
+                'origin_name': item['origin_name'] as String? ?? '',
+                'destination_name': item['destination_name'] as String? ?? '',
+                'name': item['name'] as String? ?? '',
+                'created_at':
+                    item['created_at'] as String? ??
+                    DateTime.now().toIso8601String(),
+              },
+            )
+            .toList();
+
+        final localRoutesByKey = <String, Map<String, String>>{};
         for (final route in localRoutes) {
           final key = '${route['origin_id']}_${route['destination_id']}';
-          mergedRoutesMap[key] = route;
+          localRoutesByKey[key] = route;
         }
-        
-        // Overwrite/add with remote routes
+
+        final synchronizedRoutes = <Map<String, String>>[];
         for (final route in remoteRoutes) {
           final key = '${route['origin_id']}_${route['destination_id']}';
-          // Preserve local origin_name and destination_name if they are already present locally
-          final existing = mergedRoutesMap[key];
-          mergedRoutesMap[key] = {
+          final existing = localRoutesByKey[key];
+          synchronizedRoutes.add({
             'origin_id': route['origin_id']!,
             'destination_id': route['destination_id']!,
-            'origin_name': existing?['origin_name'] ?? route['origin_name'] ?? '',
-            'destination_name': existing?['destination_name'] ?? route['destination_name'] ?? '',
+            'origin_name':
+                existing?['origin_name'] ?? route['origin_name'] ?? '',
+            'destination_name':
+                existing?['destination_name'] ??
+                route['destination_name'] ??
+                '',
             'origin_lat': existing?['origin_lat'] ?? '',
             'origin_lng': existing?['origin_lng'] ?? '',
             'destination_lat': existing?['destination_lat'] ?? '',
             'destination_lng': existing?['destination_lng'] ?? '',
             'name': route['name']!,
             'created_at': route['created_at']!,
-          };
+          });
         }
 
-        final mergedRoutes = mergedRoutesMap.values.toList();
-        final serialized = mergedRoutes.map((item) => json.encode(item)).toList();
-        await _prefs?.setStringList('saved_routes', serialized);
+        final serialized = synchronizedRoutes
+            .map((item) => json.encode(item))
+            .toList();
+        await _prefs?.setStringList(_routesKey, serialized);
       }
     } catch (e) {
       AppLogger.error('Bidirectional Supabase sync failed: $e', error: e);
