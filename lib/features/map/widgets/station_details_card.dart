@@ -5,13 +5,14 @@ import '../../../models/station.dart';
 import '../../../models/crowd_report.dart';
 import '../../../providers/providers.dart';
 import '../../favorites/favorites_view_model.dart';
-import '../../search/search_view_model.dart';
 
 class StationDetailsCard extends ConsumerWidget {
   final Station station;
   final String localeCode;
   final VoidCallback onClose;
   final ValueChanged<Station> onSelectHubStation;
+  final ValueChanged<Station> onSetOrigin;
+  final ValueChanged<Station> onSetDestination;
 
   const StationDetailsCard({
     super.key,
@@ -19,6 +20,8 @@ class StationDetailsCard extends ConsumerWidget {
     required this.localeCode,
     required this.onClose,
     required this.onSelectHubStation,
+    required this.onSetOrigin,
+    required this.onSetDestination,
   });
 
   @override
@@ -26,7 +29,6 @@ class StationDetailsCard extends ConsumerWidget {
     final theme = Theme.of(context);
     final t = ref.read(translationsProvider);
     final transitRepo = ref.read(transitRepositoryProvider);
-    final searchVm = ref.read(searchViewModelProvider.notifier);
 
     // Watch these only at the card level to prevent full screen rebuilds!
     final scheduleService = ref.watch(scheduleServiceProvider);
@@ -287,10 +289,7 @@ class StationDetailsCard extends ConsumerWidget {
                 Expanded(
                   child: OutlinedButton.icon(
                     onPressed: () {
-                      searchVm.setOrigin(station);
-                      onClose();
-                      // Wait, we need to open search overlay if dest is null. But MapScreen has _openSearchOverlay.
-                      // Since we are separated, the user will have to manually open it, or we pass a callback.
+                      onSetOrigin(station);
                     },
                     icon: const Icon(
                       Icons.trip_origin_rounded,
@@ -307,8 +306,7 @@ class StationDetailsCard extends ConsumerWidget {
                 Expanded(
                   child: OutlinedButton.icon(
                     onPressed: () {
-                      searchVm.setDestination(station);
-                      onClose();
+                      onSetDestination(station);
                     },
                     icon: const Icon(
                       Icons.location_on_rounded,
