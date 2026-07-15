@@ -298,7 +298,6 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     final theme = Theme.of(context);
     final t = ref.watch(translationsProvider);
     final transitRepo = ref.watch(transitRepositoryProvider);
-    final favoritesRepo = ref.watch(favoritesRepositoryProvider);
     final routeResult = ref.watch(
       searchViewModelProvider.select((s) => s.routeResult),
     );
@@ -1010,6 +1009,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                       station: _selectedStation!,
                       localeCode: localeCode,
                       onClose: () => setState(() => _selectedStation = null),
+                      onSelectHubStation: (station) =>
+                          setState(() => _selectedStation = station),
                     )
                   : const SizedBox.shrink(),
             ),

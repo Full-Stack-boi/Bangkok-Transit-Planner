@@ -11,12 +11,14 @@ class StationDetailsCard extends ConsumerWidget {
   final Station station;
   final String localeCode;
   final VoidCallback onClose;
+  final ValueChanged<Station> onSelectHubStation;
 
   const StationDetailsCard({
     super.key,
     required this.station,
     required this.localeCode,
     required this.onClose,
+    required this.onSelectHubStation,
   });
 
   @override
@@ -24,7 +26,6 @@ class StationDetailsCard extends ConsumerWidget {
     final theme = Theme.of(context);
     final t = ref.read(translationsProvider);
     final transitRepo = ref.read(transitRepositoryProvider);
-    final favoritesRepo = ref.read(favoritesRepositoryProvider);
     final searchVm = ref.read(searchViewModelProvider.notifier);
 
     // Watch these only at the card level to prevent full screen rebuilds!
@@ -207,11 +208,7 @@ class StationDetailsCard extends ConsumerWidget {
                         ),
                         onSelected: (selected) {
                           if (selected) {
-                            // Can't mutate MapScreen state directly here easily.
-                            // We will use onClose instead to just close, or add a callback.
-                            // To keep it simple, we don't switch hubs dynamically in the stateless widget
-                            // without passing a callback. But let's add an onSelectHubStation.
-                            // Wait, since we are inside a widget, we can't easily add a callback without changing constructor.
+                            onSelectHubStation(hubStation);
                           }
                         },
                       ),

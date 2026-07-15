@@ -66,56 +66,94 @@ class BookmarkButton extends ConsumerWidget {
         ? result.destination.nameTh
         : result.destination.nameEn;
 
-    TextEditingController? controller;
-
     return showDialog<void>(
       context: context,
-      builder: (context) {
-        controller ??= TextEditingController(text: '$originName - $destName');
-        return AlertDialog(
-          title: Text(t.routeResult.saveRouteBtn),
-          content: TextField(
-            controller: controller,
-            decoration: InputDecoration(
-              labelText: t.routeResult.routeNameLabel,
-              hintText: t.routeResult.routeNameHint,
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(t.common.cancelBtn),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                final name = controller!.text.trim();
-                if (name.isNotEmpty) {
-                  await ref
-                      .read(favoritesViewModelProvider.notifier)
-                      .saveRoute(
-                        originId: result.origin.id,
-                        destinationId: result.destination.id,
-                        originName: result.origin.nameTh,
-                        destinationName: result.destination.nameTh,
-                        routeName: name,
-                        originLat: result.origin.lat,
-                        originLng: result.origin.lng,
-                        destinationLat: result.destination.lat,
-                        destinationLng: result.destination.lng,
-                      );
-                  if (context.mounted) {
-                    Navigator.pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(t.routeResult.routeSavedSuccess)),
-                    );
-                  }
-                }
-              },
-              child: Text(t.common.saveBtn),
-            ),
-          ],
-        );
-      },
-    ).whenComplete(() => controller?.dispose());
+      builder: (_) => _SaveRouteDialog(
+        result: result,
+        t: t,
+        initialRouteName: '$originName - $destName',
+      ),
+    );
+  }
+}
+
+class _SaveRouteDialog extends ConsumerStatefulWidget {
+  final RouteResult result;
+  final AppLocalizations t;
+  final String initialRouteName;
+
+  const _SaveRouteDialog({
+    required this.result,
+    required this.t,
+    required this.initialRouteName,
+  });
+
+  @override
+  ConsumerState<_SaveRouteDialog> createState() => _SaveRouteDialogState();
+}
+
+class _SaveRouteDialogState extends ConsumerState<_SaveRouteDialog> {
+  late final TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: widget.initialRouteName);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final t = widget.t;
+    final result = widget.result;
+
+    return AlertDialog(
+      title: Text(t.routeResult.saveRouteBtn),
+      content: TextField(
+        controller: _controller,
+        decoration: InputDecoration(
+          labelText: t.routeResult.routeNameLabel,
+          hintText: t.routeResult.routeNameHint,
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text(t.common.cancelBtn),
+        ),
+        ElevatedButton(
+          onPressed: () async {
+            final name = _controller.text.trim();
+            if (name.isEmpty) return;
+
+            await ref
+                .read(favoritesViewModelProvider.notifier)
+                .saveRoute(
+                  originId: result.origin.id,
+                  destinationId: result.destination.id,
+                  originName: result.origin.nameTh,
+                  destinationName: result.destination.nameTh,
+                  routeName: name,
+                  originLat: result.origin.lat,
+                  originLng: result.origin.lng,
+                  destinationLat: result.destination.lat,
+                  destinationLng: result.destination.lng,
+                );
+            if (!context.mounted) return;
+
+            Navigator.pop(context);
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(t.routeResult.routeSavedSuccess)),
+            );
+          },
+          child: Text(t.common.saveBtn),
+        ),
+      ],
+    );
   }
 }
