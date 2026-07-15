@@ -21,12 +21,13 @@ dependencies:
 
   # Backend + Auth
   supabase_flutter: ^2.9.0
+  flutter_secure_storage: ^10.3.1
 
 
 
   # Map
   flutter_map: ^8.3.0
-  latlong2: ^0.9.1
+  latlong2: ^0.10.1
 
   # Location (GPS passive crowd)
   geolocator: ^14.0.3

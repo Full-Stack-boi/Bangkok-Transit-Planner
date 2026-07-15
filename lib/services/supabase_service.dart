@@ -1,5 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:bkk_transit_planner/core/utils/logger.dart';
+import 'secure_local_storage.dart';
 
 /// Service for managing Supabase integration and offline fallback
 class SupabaseService {
@@ -24,12 +26,15 @@ class SupabaseService {
           : 'REDACTED_SUPABASE_ANON_KEY';
 
       // Simple validation to ensure non-empty strings before initializing
-      if (supabaseUrl.isNotEmpty && supabaseAnonKey.isNotEmpty && !supabaseUrl.contains('PLACEHOLDER')) {
+      if (supabaseUrl.isNotEmpty &&
+          supabaseAnonKey.isNotEmpty &&
+          !supabaseUrl.contains('PLACEHOLDER')) {
         await Supabase.initialize(
           url: supabaseUrl,
           publishableKey: supabaseAnonKey,
-          authOptions: const FlutterAuthClientOptions(
+          authOptions: FlutterAuthClientOptions(
             authFlowType: AuthFlowType.pkce,
+            localStorage: kIsWeb ? null : SecureLocalStorage(),
           ),
         );
         _isInitialized = true;
@@ -37,7 +42,10 @@ class SupabaseService {
       }
     } catch (e) {
       _isInitialized = false;
-      AppLogger.error('Supabase initialization failed: $e. Running in offline/fallback mode.', error: e);
+      AppLogger.error(
+        'Supabase initialization failed: $e. Running in offline/fallback mode.',
+        error: e,
+      );
     }
   }
 

@@ -37,9 +37,7 @@ class AuthRepository {
       final response = await client.auth.signUp(
         email: email,
         password: password,
-        data: {
-          'display_name': displayName,
-        },
+        data: {'display_name': displayName},
       );
       return response;
     } catch (e) {
@@ -80,15 +78,19 @@ class AuthRepository {
     try {
       // Ensure Google Sign-In is initialized with the Web client ID as serverClientId
       await GoogleSignIn.instance.initialize(
-        serverClientId: '1010460816238-0q8gpanpmepu2g457mh1kb7124e1jn0b.apps.googleusercontent.com',
+        serverClientId:
+            '1010460816238-0q8gpanpmepu2g457mh1kb7124e1jn0b.apps.googleusercontent.com',
       );
 
       final googleUser = await GoogleSignIn.instance.authenticate();
       final googleAuth = googleUser.authentication;
       final String? idToken = googleAuth.idToken;
-      
+
       // Explicitly request access token by authorizing scopes
-      final clientAuth = await googleUser.authorizationClient.authorizeScopes(['email', 'profile']);
+      final clientAuth = await googleUser.authorizationClient.authorizeScopes([
+        'email',
+        'profile',
+      ]);
       final accessToken = clientAuth.accessToken;
 
       if (idToken == null) {
@@ -103,7 +105,10 @@ class AuthRepository {
 
       return response;
     } catch (e) {
-      AppLogger.error('Native Google Sign-In error in AuthRepository: $e', error: e);
+      AppLogger.error(
+        'Native Google Sign-In error in AuthRepository: $e',
+        error: e,
+      );
       rethrow;
     }
   }
@@ -112,11 +117,28 @@ class AuthRepository {
   Future<void> signOut() async {
     final client = _client;
     if (client == null) return;
+
+    final isGoogleSession =
+        client.auth.currentUser?.appMetadata['provider'] == 'google';
+
     try {
       await client.auth.signOut();
-      await GoogleSignIn.instance.signOut();
     } catch (e) {
       AppLogger.error('Sign out error in AuthRepository: $e', error: e);
+      return;
+    }
+
+    // Google account cleanup is only relevant to users who signed in with
+    // Google. A failure here must not turn a successful Supabase logout into
+    // an application error (for example, on platforms without Google Sign-In).
+    if (isGoogleSession) {
+      try {
+        await GoogleSignIn.instance.signOut();
+      } on UnimplementedError {
+        AppLogger.warning('Google Sign-In is not supported on this platform.');
+      } catch (e) {
+        AppLogger.warning('Google Sign-In cleanup failed: $e');
+      }
     }
   }
 

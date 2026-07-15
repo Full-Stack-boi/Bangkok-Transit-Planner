@@ -24,6 +24,7 @@ extensions.configure<ApplicationExtension> {
         applicationId = "com.bkktransit.bkk_transit_planner"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
+        // flutter_secure_storage 10 requires Android 6.0 (API 23) or newer.
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
