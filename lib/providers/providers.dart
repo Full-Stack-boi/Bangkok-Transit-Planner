@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 import '../core/constants/translation_helper.dart';
+import '../core/network/http_client_factory.dart';
 import '../repositories/transit_repository.dart';
 import '../repositories/favorites_repository.dart';
 import '../repositories/crowd_repository.dart';
@@ -12,6 +14,7 @@ import '../services/supabase_service.dart';
 import '../services/location_service.dart';
 import '../services/notification_service.dart';
 import '../services/transit_news_service.dart';
+import '../services/photon_search_service.dart';
 import 'auth_providers.dart';
 import 'package:bkk_transit_planner/core/utils/logger.dart';
 
@@ -21,11 +24,28 @@ export 'user_cards_provider.dart';
 
 part 'providers.g.dart';
 
+// ─── Network Providers ───
+
+@Riverpod(keepAlive: true)
+http.Client httpClient(Ref ref) {
+  final client = createHttpClient();
+  ref.onDispose(() => client.close());
+  return client;
+}
+
 // ─── Repository Providers ───
 
 @Riverpod(keepAlive: true)
 TransitRepository transitRepository(Ref ref) {
-  return TransitRepository();
+  final client = ref.watch(httpClientProvider);
+  return TransitRepository(client);
+}
+
+@Riverpod(keepAlive: true)
+PhotonSearchService photonSearchService(Ref ref) {
+  final client = ref.watch(httpClientProvider);
+  final repo = ref.watch(transitRepositoryProvider);
+  return PhotonSearchService(repo, client);
 }
 
 @Riverpod(keepAlive: true)

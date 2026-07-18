@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
+import 'package:bkk_transit_planner/core/network/http_client_factory.dart';
 import 'package:bkk_transit_planner/core/utils/logger.dart';
 
 class OsrmRouteResult {
@@ -16,6 +17,10 @@ class OsrmRouteResult {
 }
 
 class OsrmService {
+  final http.Client _client;
+
+  OsrmService([http.Client? client]) : _client = client ?? http.Client();
+
   // Use HTTPS to prevent Mixed Content errors on Vercel/Production web
   static const String _baseUrl = String.fromEnvironment(
     'OSRM_BASE_URL',
@@ -36,9 +41,9 @@ class OsrmService {
         '$_baseUrl/$lon1,$lat1;$lon2,$lat2?overview=full&geometries=geojson&steps=false',
       );
 
-      final response = await http.get(
+      final response = await _client.get(
         url,
-        headers: {'User-Agent': 'BkkTransitPlanner/1.0'},
+        headers: kDefaultHeaders,
       ).timeout(const Duration(seconds: 5));
 
       if (response.statusCode == 200) {

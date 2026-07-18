@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:bkk_transit_planner/repositories/transit_repository.dart';
+import 'package:bkk_transit_planner/services/photon_search_service.dart';
 import 'package:bkk_transit_planner/models/custom_location.dart';
 import 'package:flutter/widgets.dart';
 
@@ -9,8 +10,10 @@ void main() {
     final repo = TransitRepository();
     await repo.initialize(); // Requires init for loading landmarks
 
+    final photonService = PhotonSearchService(repo);
+
     print('Searching for MBK Center...');
-    final results = await repo.searchOnlinePlaces('MBK Center');
+    final results = await photonService.searchOnlinePlaces('MBK Center');
     if (results.isEmpty) {
       print('No results found.');
       return;

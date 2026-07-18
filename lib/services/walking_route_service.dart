@@ -2,12 +2,17 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:bkk_transit_planner/core/network/http_client_factory.dart';
 import 'package:bkk_transit_planner/core/utils/logger.dart';
 
 /// Service for generating realistic walking routes (online via OSRM, offline via Manhattan grid fallback)
 class WalkingRouteService {
+  final http.Client _client;
+
+  WalkingRouteService([http.Client? client]) : _client = client ?? http.Client();
+
   /// Fetches a walking path from start coordinates to end coordinates
-  static Future<List<LatLng>> getWalkingPath(
+  Future<List<LatLng>> getWalkingPath(
     double fromLat,
     double fromLng,
     double toLat,
@@ -18,9 +23,9 @@ class WalkingRouteService {
         'https://router.project-osrm.org/route/v1/foot/$fromLng,$fromLat;$toLng,$toLat?overview=full&geometries=geojson'
       );
 
-      final response = await http.get(
+      final response = await _client.get(
         uri,
-        headers: {'User-Agent': 'com.bkktransit.bkk_transit_planner'},
+        headers: kDefaultHeaders,
       ).timeout(const Duration(seconds: 4));
 
       if (response.statusCode == 200) {

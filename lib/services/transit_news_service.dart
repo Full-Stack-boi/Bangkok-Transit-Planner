@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
+import 'package:bkk_transit_planner/core/network/http_client_factory.dart';
 import 'package:bkk_transit_planner/core/utils/logger.dart';
 
 class TransitLineStatus {
@@ -350,4 +351,4 @@ class TransitNewsService {
   }
 }
 
-final transitNewsServiceProvider = Provider((ref) => TransitNewsService());
+final transitNewsServiceProvider = Provider((ref) => TransitNewsService(createHttpClient()));

@@ -2,9 +2,14 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
+import 'package:bkk_transit_planner/core/network/http_client_factory.dart';
 import 'package:bkk_transit_planner/core/utils/logger.dart';
 
 class OverpassService {
+  final http.Client _client;
+
+  OverpassService([http.Client? client]) : _client = client ?? http.Client();
+
   // Use Vercel Serverless Function proxy on Web to bypass CORS and avoid 404s.
   // For other platforms (Android/iOS), use the direct LZ4 mirror URL.
   final String _baseUrl = () {
@@ -75,11 +80,11 @@ class OverpassService {
 
     for (int i = 0; i < attempts; i++) {
       try {
-        final response = await http.post(
+        final response = await _client.post(
           Uri.parse(_baseUrl),
           body: {'data': query},
           headers: {
-            'User-Agent': 'BkkTransitPlanner/1.0',
+            ...kDefaultHeaders,
             'Accept': 'application/json',
             'Content-Type': 'application/x-www-form-urlencoded',
           },

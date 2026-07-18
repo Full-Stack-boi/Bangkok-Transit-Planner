@@ -113,7 +113,8 @@ class SearchViewModel extends _$SearchViewModel {
       // 2. Fetch online places in background
       state = state.copyWith(isSearching: true);
       try {
-        final onlineResults = await repo.searchOnlinePlaces(query);
+        final photonService = ref.read(photonSearchServiceProvider);
+        final onlineResults = await photonService.searchOnlinePlaces(query);
 
         // Merge without duplicates (O(n) using Sets for fast lookup)
         if (state.query == query) {
@@ -1414,7 +1415,8 @@ class SearchViewModel extends _$SearchViewModel {
           tLng = toRouteLng;
         }
 
-        List<LatLng> path = await WalkingRouteService.getWalkingPath(
+        final walkingService = WalkingRouteService(ref.read(httpClientProvider));
+        List<LatLng> path = await walkingService.getWalkingPath(
           fLat,
           fLng,
           tLat,
