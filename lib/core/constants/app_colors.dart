@@ -1,5 +1,4 @@
-/// Semantic and brand color constants used across the app.
-/// Centralizes previously scattered `Colors.xxx` and `Color(0xFF...)` literals.
+/// Core app colors
 library;
 
 import 'package:flutter/material.dart';

@@ -1,5 +1,4 @@
-/// Application-wide constants to eliminate magic numbers and hardcoded strings.
-/// Centralizes values that were previously scattered across multiple files.
+/// App constants
 library;
 
 /// General app-level constants
@@ -67,7 +66,7 @@ class AppConstants {
   static const double kSheetCornerRadius = 20.0;
 }
 
-/// Map-specific constants
+/// Map constants
 class MapConstants {
   MapConstants._();
 
