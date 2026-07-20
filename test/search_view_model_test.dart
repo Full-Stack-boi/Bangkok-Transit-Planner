@@ -117,7 +117,7 @@ class MockSearchTransitRepository extends TransitRepository {
   }
 
   @override
-  DijkstraResult? findRoute(String fromId, String toId) {
+  DijkstraResult? findRoute(String fromId, String toId, {DateTime? time}) {
     return graph.findShortestPath(fromId, toId);
   }
 }

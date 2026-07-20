@@ -105,7 +105,8 @@ void main() {
       'Should calculate correct route and transfer details between different lines',
       () {
         // 1. ลงมือทำ (Act): เรียกคำนวณเส้นทางจาก A ไป D (ข้ามสายผ่านจุดเปลี่ยนเส้นทาง)
-        final result = graph.findShortestPath('BTS_A', 'MRT_D');
+        final offPeakTime = DateTime(2026, 1, 1, 12, 0);
+        final result = graph.findShortestPath('BTS_A', 'MRT_D', time: offPeakTime);
 
         // 2. ตรวจสอบผลลัพธ์ (Assert)
         expect(result, isNotNull);
@@ -118,8 +119,8 @@ void main() {
           equals(1),
         ); // ต้องมีการเปลี่ยนสาย 1 ครั้ง (จาก BTS ไป MRT)
 
-        // เวลาเดินทางรวม: A->B (2.0) + เดินเปลี่ยนสาย B->C (5.0) + C->D (3.0) = 10.0 นาที
-        expect(result.totalWeight, equals(10.0));
+        // เวลาเดินทางรวม: A->B (2.0) + เดินเปลี่ยนสาย B->C (5.0) + รอรถ (5.0) + C->D (3.0) = 15.0 นาที
+        expect(result.totalWeight, equals(15.0));
 
         // ตรวจสอบโครงสร้างลำดับสถานีจริง
         expect(result.path[0].stationId, equals('BTS_A'));

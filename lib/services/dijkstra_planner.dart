@@ -1,5 +1,6 @@
 import 'dart:collection';
 import '../models/station.dart';
+import '../core/constants/transit_constants.dart';
 
 /// Edge in the transit graph
 class GraphEdge {
@@ -100,7 +101,7 @@ class TransitGraph {
 
   /// Find shortest path using Dijkstra's algorithm
   /// Returns list of (stationId, lineId) pairs representing the path
-  DijkstraResult? findShortestPath(String fromId, String toId) {
+  DijkstraResult? findShortestPath(String fromId, String toId, {DateTime? time}) {
     if (!_stations.containsKey(fromId) || !_stations.containsKey(toId)) {
       return null;
     }
@@ -121,6 +122,9 @@ class TransitGraph {
       return a.stationId.compareTo(b.stationId);
     });
 
+    final isPeak = TransitConstants.isPeakHour(time ?? DateTime.now());
+    final transferWaitTime = isPeak ? 3.0 : 5.0;
+
     pq.add(_DijkstraNode(fromId, 0));
 
     while (pq.isNotEmpty) {
@@ -135,7 +139,13 @@ class TransitGraph {
         if (visited.contains(edge.toId)) continue;
 
         final currentDist = dist[current.stationId] ?? double.infinity;
-        final newDist = currentDist + edge.weight;
+        
+        double dynamicWeight = edge.weight;
+        if (edge.lineId == 'TRANSFER') {
+          dynamicWeight += transferWaitTime;
+        }
+        
+        final newDist = currentDist + dynamicWeight;
         final edgeToDist = dist[edge.toId] ?? double.infinity;
 
         if (newDist < edgeToDist) {

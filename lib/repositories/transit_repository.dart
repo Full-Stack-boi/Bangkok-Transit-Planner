@@ -389,8 +389,8 @@ class TransitRepository {
   }
 
   /// Find shortest path between two stations
-  DijkstraResult? findRoute(String fromId, String toId) {
-    return _graph?.findShortestPath(fromId, toId);
+  DijkstraResult? findRoute(String fromId, String toId, {DateTime? time}) {
+    return _graph?.findShortestPath(fromId, toId, time: time);
   }
 
   /// Search stations and local landmarks by query
