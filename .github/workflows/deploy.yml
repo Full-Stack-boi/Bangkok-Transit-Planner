@@ -30,18 +30,18 @@ jobs:
       - name: Run build_runner
         run: flutter pub run build_runner build --delete-conflicting-outputs
 
-      - name: Verify Code Quality (Analyze)
-        run: flutter analyze || { echo '::error::Code analysis failed. Please fix the linting errors before deploying.'; exit 1; }
-
-      - name: Verify Logic (Test)
-        run: flutter test --exclude-tags live_api || { echo '::error::Unit/Widget tests failed. Please fix the failing tests before deploying.'; exit 1; }
-
       - name: Optimize Pubspec and Assets for Web
         run: |
           # Remove the map_tiles.bundle line from pubspec.yaml to avoid inclusion in build
           sed -i '/- assets\/map_tiles.bundle/d' pubspec.yaml
           # Delete the file itself to be safe and save space in runner
           rm -f assets/map_tiles.bundle
+
+      - name: Verify Code Quality (Analyze)
+        run: flutter analyze || { echo '::error::Code analysis failed. Please fix the linting errors before deploying.'; exit 1; }
+
+      - name: Verify Logic (Test)
+        run: flutter test --exclude-tags live_api || { echo '::error::Unit/Widget tests failed. Please fix the failing tests before deploying.'; exit 1; }
 
       - name: Build Web
         run: |
