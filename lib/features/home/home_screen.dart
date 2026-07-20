@@ -1,10 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../providers/providers.dart';
 import '../utility/utility_screen.dart';
-import '../../core/theme/app_theme.dart';
 import '../map/map_screen.dart' deferred as map_screen;
 import '../favorites/favorites_screen.dart';
 import '../settings/settings_screen.dart';
@@ -15,14 +13,8 @@ import '../../models/location_permission_status.dart';
 import 'widgets/nearest_stations_sheet.dart';
 import 'widgets/in_app_notification_banner.dart';
 import 'widgets/animated_indexed_stack.dart';
-
-const double _kRailWidth = 100.0;
-const double _kRailHeight = 350.0;
-const double _kRailRadius = 28.0;
-const double _kRailOpacity = 0.75;
-const double _kRailIconSize = 28.0;
-const double _kRailFontSize = 13.0;
-const double _kRailPadding = 16.0;
+import 'widgets/home_navigation_rail.dart';
+import 'widgets/home_bottom_nav_bar.dart';
 
 /// Main home screen with bottom navigation
 class HomeScreen extends ConsumerStatefulWidget {
@@ -426,7 +418,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
 
     if (isWide && initState.hasValue) {
-      final double leftContentPadding = currentIndex == 1 ? 0.0 : _kRailWidth;
+      final double leftContentPadding = currentIndex == 1 ? 0.0 : 100.0;
       return Scaffold(
         body: Stack(
           children: [
@@ -454,266 +446,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 }
 
-class AppNavigationRail extends ConsumerWidget {
-  const AppNavigationRail({super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final currentIndex = ref.watch(homeTabIndexProvider);
-    final locale = ref.watch(localeProvider);
-    final t = AppLocalizations(locale);
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final screenHeight = MediaQuery.sizeOf(context).height;
-    final double verticalMargin = (screenHeight - _kRailHeight) / 2;
-
-    final activeColors = [
-      theme.colorScheme.primary, // Seafoam Sage for Transit Lines
-      theme.appColors.routeColor ??
-          const Color(0xFF818CF8), // Soft Lavender for Map
-      theme.appColors.favoriteColor ??
-          const Color(0xFFF472B6), // Coral Pink for Favorites (Heart)
-      theme.appColors.timeColor ??
-          const Color(0xFFF59E0B), // Warm Amber for Settings
-    ];
-    final activeColor = activeColors[currentIndex];
-    final isFloating = currentIndex == 1; // Float only on Map Screen (tab 1)
-
-    final BorderRadius borderRadius = isFloating
-        ? BorderRadius.circular(_kRailRadius)
-        : BorderRadius.zero;
-
-    // Use uniform Border.all in both states to prevent Flutter paint assertions,
-    // fading the color to transparent when solid.
-    final BoxBorder border = Border.all(
-      color: isFloating
-          ? theme.colorScheme.outline.withValues(alpha: isDark ? 0.15 : 0.08)
-          : Colors.transparent,
-    );
-
-    final List<BoxShadow>? boxShadow = isFloating
-        ? [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.06),
-              blurRadius: 16,
-              offset: const Offset(4, 4),
-            ),
-          ]
-        : null;
-
-    final EdgeInsets margin = isFloating
-        ? EdgeInsets.fromLTRB(
-            _kRailPadding,
-            verticalMargin > 0 ? verticalMargin : 0.0,
-            0,
-            verticalMargin > 0 ? verticalMargin : 0.0,
-          )
-        : EdgeInsets.zero;
-
-    return Theme(
-      data: theme.copyWith(
-        navigationRailTheme: theme.navigationRailTheme.copyWith(
-          backgroundColor: Colors.transparent,
-          indicatorColor: activeColor.withValues(alpha: 0.15),
-          selectedIconTheme: IconThemeData(
-            color: activeColor,
-            size: _kRailIconSize,
-          ),
-          selectedLabelTextStyle: GoogleFonts.outfit(
-            color: activeColor,
-            fontSize: _kRailFontSize,
-            fontWeight: FontWeight.w600,
-          ),
-          unselectedIconTheme: const IconThemeData(
-            color: Color(0xFF64748B),
-            size: _kRailIconSize,
-          ),
-          unselectedLabelTextStyle: GoogleFonts.outfit(
-            color: Color(0xFF64748B),
-            fontSize: _kRailFontSize,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-      ),
-      child: SizedBox(
-        width:
-            _kRailWidth + _kRailPadding + 8.0, // Dynamic parent container width
-        height: screenHeight,
-        child: Stack(
-          children: [
-            // 1. Animated background decoration
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.easeInOutCubic,
-              width: _kRailWidth,
-              height: isFloating ? _kRailHeight : screenHeight,
-              margin: margin,
-              decoration: BoxDecoration(
-                color: isFloating
-                    ? theme.colorScheme.surface.withValues(alpha: _kRailOpacity)
-                    : theme.colorScheme.surface,
-                borderRadius: borderRadius,
-                border: border,
-                boxShadow: boxShadow,
-              ),
-            ),
-
-            // 2. Animated position, but static layout size for NavigationRail
-            AnimatedPositioned(
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.easeInOutCubic,
-              left: isFloating ? _kRailPadding : 0.0,
-              top: isFloating ? verticalMargin : 0.0,
-              width: _kRailWidth,
-              height: isFloating ? _kRailHeight : screenHeight,
-              child: NavigationRail(
-                groupAlignment:
-                    0.0, // Keep vertical position identical to prevent item shifting
-                backgroundColor: Colors.transparent,
-                selectedIndex: currentIndex,
-                onDestinationSelected: (index) {
-                  ref.read(homeTabIndexProvider.notifier).setTab(index);
-                },
-                labelType: NavigationRailLabelType.all,
-                destinations: [
-                  NavigationRailDestination(
-                    icon: const Icon(Icons.dashboard_customize_outlined),
-                    selectedIcon: Icon(
-                      Icons.dashboard_customize,
-                      color: activeColors[0],
-                    ),
-                    label: Text(t.navigation.utilityTitle),
-                  ),
-                  NavigationRailDestination(
-                    icon: const Icon(Icons.map_outlined),
-                    selectedIcon: Icon(
-                      Icons.map_rounded,
-                      color: activeColors[1],
-                    ),
-                    label: Text(t.navigation.mapTitle),
-                  ),
-                  NavigationRailDestination(
-                    icon: const Icon(Icons.favorite_outline_rounded),
-                    selectedIcon: Icon(
-                      Icons.favorite_rounded,
-                      color: activeColors[2],
-                    ),
-                    label: Text(t.navigation.favoritesTitle),
-                  ),
-                  NavigationRailDestination(
-                    icon: const Icon(Icons.settings_outlined),
-                    selectedIcon: Icon(
-                      Icons.settings_rounded,
-                      color: activeColors[3],
-                    ),
-                    label: Text(t.navigation.settingsTitle),
-                  ),
-                ],
-              ),
-            ),
-
-            // 3. Right edge border line for solid sidebar state
-            Positioned(
-              left:
-                  _kRailWidth - 1.0, // Dynamic right edge align for solid state
-              top: 0,
-              bottom: 0,
-              width: 1.0,
-              child: AnimatedOpacity(
-                duration: const Duration(milliseconds: 300),
-                opacity: isFloating ? 0.0 : 1.0,
-                child: ColoredBox(
-                  color: theme.colorScheme.outline.withValues(
-                    alpha: isDark ? 0.15 : 0.08,
-                  ),
-                  child: const SizedBox.expand(),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class AppBottomNavigationBar extends ConsumerWidget {
-  const AppBottomNavigationBar({super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final currentIndex = ref.watch(homeTabIndexProvider);
-    final locale = ref.watch(localeProvider);
-    final t = AppLocalizations(locale);
-    final theme = Theme.of(context);
-
-    final activeColors = [
-      theme.colorScheme.primary, // Seafoam Sage for Transit Lines
-      theme.appColors.routeColor ??
-          const Color(0xFF818CF8), // Soft Lavender for Map
-      theme.appColors.favoriteColor ??
-          const Color(0xFFF472B6), // Coral Pink for Favorites (Heart)
-      theme.appColors.timeColor ??
-          const Color(0xFFF59E0B), // Warm Amber for Settings
-    ];
-    final activeColor = activeColors[currentIndex];
-
-    return Theme(
-      data: theme.copyWith(
-        navigationBarTheme: theme.navigationBarTheme.copyWith(
-          indicatorColor: activeColor.withValues(alpha: 0.15),
-          labelTextStyle: WidgetStateProperty.resolveWith((states) {
-            if (states.contains(WidgetState.selected)) {
-              return GoogleFonts.outfit(
-                color: activeColor,
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-              );
-            }
-            return GoogleFonts.outfit(
-              color: const Color(0xFF64748B),
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-            );
-          }),
-        ),
-      ),
-      child: NavigationBar(
-        height: 66.0,
-        key: ValueKey('nav_bar_$locale'),
-        selectedIndex: currentIndex,
-        onDestinationSelected: (index) {
-          ref.read(homeTabIndexProvider.notifier).setTab(index);
-        },
-        destinations: [
-          NavigationDestination(
-            icon: const Icon(Icons.dashboard_customize_outlined),
-            selectedIcon: Icon(
-              Icons.dashboard_customize,
-              color: activeColors[0],
-            ),
-            label: t.navigation.utilityTitle,
-          ),
-          NavigationDestination(
-            icon: const Icon(Icons.map_outlined),
-            selectedIcon: Icon(Icons.map_rounded, color: activeColors[1]),
-            label: t.navigation.mapTitle,
-          ),
-          NavigationDestination(
-            icon: const Icon(Icons.favorite_outline_rounded),
-            selectedIcon: Icon(Icons.favorite_rounded, color: activeColors[2]),
-            label: t.navigation.favoritesTitle,
-          ),
-          NavigationDestination(
-            icon: const Icon(Icons.settings_outlined),
-            selectedIcon: Icon(Icons.settings_rounded, color: activeColors[3]),
-            label: t.navigation.settingsTitle,
-          ),
-        ],
-      ),
-    );
-  }
-}
 
 class _LoadingView extends StatelessWidget {
   final AppLocalizations t;
