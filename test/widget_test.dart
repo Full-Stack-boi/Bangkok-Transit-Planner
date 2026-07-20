@@ -11,6 +11,7 @@ import 'package:bkk_transit_planner/repositories/transit_repository.dart';
 import 'package:bkk_transit_planner/services/location_service.dart';
 import 'package:bkk_transit_planner/services/notification_service.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:bkk_transit_planner/services/transit_news_service.dart';
 import 'package:bkk_transit_planner/features/map/widgets/route_result_banner.dart';
 import 'package:bkk_transit_planner/features/route_result/route_result_sheet.dart';
 import 'package:bkk_transit_planner/features/search/search_view_model.dart';
@@ -23,6 +24,7 @@ import 'package:bkk_transit_planner/models/location_permission_status.dart';
 // และยืนยันได้ว่าหน้าจอ UI แสดงผลได้ถูกต้องตามที่ควรจะเป็น โดยไม่จำเป็นต้องเปิด Emulator/เครื่องจริง
 
 class MockTransitRepository extends TransitRepository {
+
   final List<Station> _mockStations = [
     const Station(
       id: 'BTS_A',
@@ -146,6 +148,14 @@ class MockNotificationService extends NotificationService {
   }) async {}
 }
 
+class MockTransitNewsService extends TransitNewsService {
+  @override
+  Future<List<TransitNewsArticle>> fetchDrtNews() async {
+    return [];
+  }
+}
+
+
 void main() {
   setUp(() async {
     // จำลอง SharedPreferences สำหรับรันเทสต์ เพื่อไม่ให้พึ่งพาระบบไฟล์ของแพลตฟอร์มจริง
@@ -162,6 +172,7 @@ void main() {
           transitRepositoryProvider.overrideWithValue(MockTransitRepository()),
           locationServiceProvider.overrideWithValue(MockLocationService()),
           notificationServiceProvider.overrideWithValue(MockNotificationService()),
+          transitNewsServiceProvider.overrideWithValue(MockTransitNewsService()),
         ],
         child: const BkkTransitApp(),
       );
@@ -208,6 +219,7 @@ void main() {
           transitRepositoryProvider.overrideWithValue(repo),
           locationServiceProvider.overrideWithValue(MockLocationService()),
           notificationServiceProvider.overrideWithValue(MockNotificationService()),
+          transitNewsServiceProvider.overrideWithValue(MockTransitNewsService()),
         ],
         child: const BkkTransitApp(),
       );
@@ -254,6 +266,7 @@ void main() {
           transitRepositoryProvider.overrideWithValue(repo),
           locationServiceProvider.overrideWithValue(MockLocationService()),
           notificationServiceProvider.overrideWithValue(MockNotificationService()),
+          transitNewsServiceProvider.overrideWithValue(MockTransitNewsService()),
         ],
         child: const BkkTransitApp(),
       );

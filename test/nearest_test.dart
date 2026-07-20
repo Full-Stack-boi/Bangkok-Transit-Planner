@@ -1,3 +1,5 @@
+@Tags(["live_api"])
+library;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:bkk_transit_planner/repositories/transit_repository.dart';
 

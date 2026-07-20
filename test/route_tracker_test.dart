@@ -8,7 +8,18 @@ import 'package:bkk_transit_planner/providers/route_tracker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:bkk_transit_planner/providers/providers.dart';
 
+import 'package:flutter/services.dart';
+
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+  const MethodChannel channel = MethodChannel('live_activities');
+  TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+      .setMockMethodCallHandler(channel, (MethodCall methodCall) async {
+    return null;
+  });
+
+  late SharedPreferences testSharedPreferencesInstance;
+
   setUp(() async {
     SharedPreferences.setMockInitialValues({});
     testSharedPreferencesInstance = await SharedPreferences.getInstance();
@@ -64,7 +75,11 @@ void main() {
     );
 
     test('Should start and stop tracking correctly', () {
-      final container = ProviderContainer();
+      final container = ProviderContainer(
+        overrides: [
+          sharedPreferencesProvider.overrideWithValue(testSharedPreferencesInstance),
+        ],
+      );
       final tracker = container.read(routeTrackerProvider.notifier);
 
       expect(container.read(routeTrackerProvider).isActive, isFalse);
@@ -88,7 +103,11 @@ void main() {
     });
 
     test('Should advance simulation step by step until arrival', () {
-      final container = ProviderContainer();
+      final container = ProviderContainer(
+        overrides: [
+          sharedPreferencesProvider.overrideWithValue(testSharedPreferencesInstance),
+        ],
+      );
       final tracker = container.read(routeTrackerProvider.notifier);
 
       tracker.startTracking(mockRoute, simulation: true);
@@ -107,7 +126,11 @@ void main() {
     });
 
     test('Should advance automatically on location proximity updates', () {
-      final container = ProviderContainer();
+      final container = ProviderContainer(
+        overrides: [
+          sharedPreferencesProvider.overrideWithValue(testSharedPreferencesInstance),
+        ],
+      );
       final tracker = container.read(routeTrackerProvider.notifier);
 
       tracker.startTracking(mockRoute, simulation: true);
