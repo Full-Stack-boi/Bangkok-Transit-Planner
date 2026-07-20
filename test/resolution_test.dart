@@ -61,7 +61,7 @@ Future<void> debugCustomLocationResolution(
   List<String>? expectedNearestStations,
 }) async {
   print('\n======================================================');
-  print('RESOLVING CUSTOM LOCATION: ${location.nameEn ?? location.nameTh}');
+  print('RESOLVING CUSTOM LOCATION: ${location.nameEn}');
   print('======================================================');
   
   final resolved = await repo.resolveOnlinePlaceAsync(location);
