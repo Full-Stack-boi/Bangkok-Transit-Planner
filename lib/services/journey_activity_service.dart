@@ -19,11 +19,17 @@ class JourneyActivityService {
       await _plugin.init(appGroupId: 'group.com.bkktransit');
       _initialized = true;
     } catch (e) {
-      AppLogger.error('Failed to initialize LiveActivities plugin: $e', error: e);
+      AppLogger.error(
+        'Failed to initialize LiveActivities plugin: $e',
+        error: e,
+      );
     }
   }
 
-  static Future<void> start(RouteTrackerState state, {required AppLocalizations t}) async {
+  static Future<void> start(
+    RouteTrackerState state, {
+    required AppLocalizations t,
+  }) async {
     _t = t;
     if (kIsWeb) return;
     await init();
@@ -31,7 +37,9 @@ class JourneyActivityService {
     // Check if device supports Live Activities before attempting to create one
     final enabled = await _plugin.areActivitiesEnabled();
     if (enabled != true) {
-      AppLogger.warning('Live Activities not supported or disabled on this device');
+      AppLogger.warning(
+        'Live Activities not supported or disabled on this device',
+      );
       return;
     }
     try {
@@ -42,7 +50,12 @@ class JourneyActivityService {
     }
   }
 
-  static Future<void> update(RouteTrackerState state, {double speedKmh = 0, int walkMeters = 0, AppLocalizations? t}) async {
+  static Future<void> update(
+    RouteTrackerState state, {
+    double speedKmh = 0,
+    int walkMeters = 0,
+    AppLocalizations? t,
+  }) async {
     if (t != null) {
       _t = t;
     }
@@ -51,14 +64,14 @@ class JourneyActivityService {
     try {
       final data = _buildPayload(state, speedKmh: speedKmh);
       data['walkMeters'] = walkMeters;
-      
+
       // Update walkText and contentText with the dynamic walking distance
       if (state.currentSegment?.lineId == 'WALK') {
         final walkMetersStr = walkMeters.toString();
         data['walkText'] = _t.journey.walkRemaining(walkMetersStr);
         data['contentText'] = _t.journey.walkRemaining(walkMetersStr);
       }
-      
+
       await _plugin.updateActivity(_activityId, data);
     } catch (e) {
       AppLogger.error('Failed to update live activity: $e', error: e);
@@ -91,28 +104,36 @@ class JourneyActivityService {
     return '#$r$g$b'.toUpperCase();
   }
 
-  static Map<String, dynamic> _buildPayload(RouteTrackerState state, {required double speedKmh}) {
+  static Map<String, dynamic> _buildPayload(
+    RouteTrackerState state, {
+    required double speedKmh,
+  }) {
     final seg = state.currentSegment;
-    
+
     // Calculate remaining stations
     int remaining = 0;
     final currentStations = state.currentSegmentStations;
     if (currentStations.isNotEmpty) {
-      final remainingInCurrent = currentStations.length - 1 - state.currentStationIndex;
+      final remainingInCurrent =
+          currentStations.length - 1 - state.currentStationIndex;
       if (remainingInCurrent > 0) {
         remaining += remainingInCurrent;
       }
     }
     final route = state.activeRoute;
     if (route != null) {
-      for (int i = state.currentSegmentIndex + 1; i < route.segments.length; i++) {
+      for (
+        int i = state.currentSegmentIndex + 1;
+        i < route.segments.length;
+        i++
+      ) {
         final s = route.segments[i];
         if (s.lineId != 'WALK') {
           remaining += s.stationCount;
         }
       }
     }
-    
+
     final total = route?.totalStations ?? 1;
     final done = (total - remaining).clamp(0, total);
 
@@ -121,16 +142,21 @@ class JourneyActivityService {
     if (seg != null) {
       etaMinutes = seg.estimatedMinutes;
       if (currentStations.isNotEmpty) {
-        final progressRatio = state.currentStationIndex / currentStations.length;
+        final progressRatio =
+            state.currentStationIndex / currentStations.length;
         etaMinutes = etaMinutes * (1.0 - progressRatio);
       }
       if (route != null) {
-        for (int i = state.currentSegmentIndex + 1; i < route.segments.length; i++) {
+        for (
+          int i = state.currentSegmentIndex + 1;
+          i < route.segments.length;
+          i++
+        ) {
           etaMinutes += route.segments[i].estimatedMinutes;
         }
       }
     }
-    
+
     final isTh = _t.isTh;
     final isWalk = seg?.lineId == 'WALK';
     final lineId = isWalk ? 'WALK' : (seg?.lineId ?? '');
@@ -145,26 +171,30 @@ class JourneyActivityService {
         : (state.currentStation?.nameEn ?? (seg?.fromStation.nameEn ?? ''));
 
     final nextStn = state.nextStation;
-    final nextStnName = nextStn != null 
-        ? (isTh ? nextStn.nameTh : nextStn.nameEn) 
-        : (seg?.toStation != null 
-            ? (isTh ? seg!.toStation.nameTh : seg!.toStation.nameEn) 
-            : _t.journey.arrivedText);
+    final nextStnName = nextStn != null
+        ? (isTh ? nextStn.nameTh : nextStn.nameEn)
+        : (seg?.toStation != null
+              ? (isTh ? seg!.toStation.nameTh : seg!.toStation.nameEn)
+              : _t.journey.arrivedText);
 
-    final destStnName = isTh 
-        ? (route?.destination.nameTh ?? '') 
+    final destStnName = isTh
+        ? (route?.destination.nameTh ?? '')
         : (route?.destination.nameEn ?? '');
 
     final directionText = _t.journey.headingTo(destStnName);
     final walkText = _t.journey.walkRemaining('0');
     final etaText = _t.journey.etaRemaining(etaMinutes.round());
     final speedText = _t.journey.speedMeasure(speedKmh.toStringAsFixed(1));
-    final travelModeText = isWalk ? _t.journey.walkingAction : _t.journey.transitRideAction;
-    final contentText = isWalk ? _t.journey.walkRemaining('0') : _t.journey.headingTo(destStnName);
+    final travelModeText = isWalk
+        ? _t.journey.walkingAction
+        : _t.journey.transitRideAction;
+    final contentText = isWalk
+        ? _t.journey.walkRemaining('0')
+        : _t.journey.headingTo(destStnName);
 
     return {
       'lineId': lineId,
-      'lineName': isWalk 
+      'lineName': isWalk
           ? _t.journey.walkingConnection
           : (seg?.lineName ?? _t.journey.travelingStatus),
       'lineColorHex': colorHex,
@@ -179,7 +209,7 @@ class JourneyActivityService {
       'speedKmh': speedKmh,
       'isWalking': isWalk,
       'isSimulation': state.isSimulation,
-      
+
       // Localized notification strings
       'directionText': directionText,
       'walkText': walkText,

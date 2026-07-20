@@ -9,10 +9,7 @@ import 'search_results_list.dart';
 class MapSearchOverlay extends ConsumerStatefulWidget {
   final bool focusDestination;
 
-  const MapSearchOverlay({
-    super.key,
-    this.focusDestination = false,
-  });
+  const MapSearchOverlay({super.key, this.focusDestination = false});
 
   @override
   ConsumerState<MapSearchOverlay> createState() => _MapSearchOverlayState();
@@ -78,6 +75,7 @@ class _MapSearchOverlayState extends ConsumerState<MapSearchOverlay> {
               requestInitialFocus();
             }
           }
+
           route.animation!.addStatusListener(listener);
         }
       } else {
@@ -91,9 +89,7 @@ class _MapSearchOverlayState extends ConsumerState<MapSearchOverlay> {
       _isSelectingOrigin = true;
     });
     _originController.text = state.origin != null
-        ? state.origin!.displayName(
-            isEnglish: ref.read(localeProvider) == 'en',
-          )
+        ? state.origin!.displayName(isEnglish: ref.read(localeProvider) == 'en')
         : '';
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_originFocusNode.canRequestFocus && mounted) {
@@ -190,10 +186,14 @@ class _MapSearchOverlayState extends ConsumerState<MapSearchOverlay> {
                       vm.swapStations();
                       final nextState = ref.read(searchViewModelProvider);
                       _originController.text = nextState.origin != null
-                          ? nextState.origin!.displayName(isEnglish: localeCode == 'en')
+                          ? nextState.origin!.displayName(
+                              isEnglish: localeCode == 'en',
+                            )
                           : '';
                       _destController.text = nextState.destination != null
-                          ? nextState.destination!.displayName(isEnglish: localeCode == 'en')
+                          ? nextState.destination!.displayName(
+                              isEnglish: localeCode == 'en',
+                            )
                           : '';
                       if (_isSelectingOrigin) {
                         _startEditingOrigin(nextState);
@@ -206,16 +206,27 @@ class _MapSearchOverlayState extends ConsumerState<MapSearchOverlay> {
 
             if (state.error != null)
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
                 child: Card(
                   color: theme.colorScheme.error.withValues(alpha: 0.1),
                   child: Padding(
                     padding: const EdgeInsets.all(12),
                     child: Row(
                       children: [
-                        Icon(Icons.error_outline, color: theme.colorScheme.error),
+                        Icon(
+                          Icons.error_outline,
+                          color: theme.colorScheme.error,
+                        ),
                         const SizedBox(width: 8),
-                        Expanded(child: Text(state.error!, style: TextStyle(color: theme.colorScheme.error))),
+                        Expanded(
+                          child: Text(
+                            state.error!,
+                            style: TextStyle(color: theme.colorScheme.error),
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -228,7 +239,9 @@ class _MapSearchOverlayState extends ConsumerState<MapSearchOverlay> {
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 child: LinearProgressIndicator(
                   minHeight: 3,
-                  backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.1),
+                  backgroundColor: theme.colorScheme.primary.withValues(
+                    alpha: 0.1,
+                  ),
                   color: theme.colorScheme.primary,
                   borderRadius: BorderRadius.circular(2),
                 ),
@@ -244,7 +257,9 @@ class _MapSearchOverlayState extends ConsumerState<MapSearchOverlay> {
                 onOriginSelected: (item) {
                   vm.setOrigin(item);
                   final nextState = ref.read(searchViewModelProvider);
-                  _originController.text = item.displayName(isEnglish: localeCode == 'en');
+                  _originController.text = item.displayName(
+                    isEnglish: localeCode == 'en',
+                  );
                   if (nextState.destination == null) {
                     _startEditingDest(nextState);
                   } else {
@@ -256,7 +271,9 @@ class _MapSearchOverlayState extends ConsumerState<MapSearchOverlay> {
                 onDestSelected: (item) {
                   vm.setDestination(item);
                   final nextState = ref.read(searchViewModelProvider);
-                  _destController.text = item.displayName(isEnglish: localeCode == 'en');
+                  _destController.text = item.displayName(
+                    isEnglish: localeCode == 'en',
+                  );
                   if (nextState.origin == null) {
                     _startEditingOrigin(nextState);
                   } else {

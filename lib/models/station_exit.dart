@@ -16,5 +16,6 @@ abstract class StationExit with _$StationExit {
     required double lng,
   }) = _StationExit;
 
-  factory StationExit.fromJson(Map<String, dynamic> json) => _$StationExitFromJson(json);
+  factory StationExit.fromJson(Map<String, dynamic> json) =>
+      _$StationExitFromJson(json);
 }

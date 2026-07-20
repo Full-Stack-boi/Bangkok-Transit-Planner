@@ -29,7 +29,7 @@ class UtilityScreen extends ConsumerWidget {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          // ─── PART 1: TRANSIT STATUS DASHBOARD (GRID) ───
+          // Transit Status Dashboard
           statusesAsync.when(
             data: (statuses) =>
                 StatusDashboard(theme: theme, t: t, statuses: statuses),
@@ -38,15 +38,15 @@ class UtilityScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 24),
 
-          // ─── PART 2: COMPACT TRANSIT CARDS & PASSES (GRID) ───
+          // Transit Cards & Passes
           TransitCardRow(theme: theme, t: t, cardState: cardState),
           const SizedBox(height: 24),
 
-          // ─── PART 2.5: MANUAL REPORT ACTION ───
+          // Manual Report Action
           ManualReportCard(theme: theme, t: t),
           const SizedBox(height: 28),
 
-          // ─── PART 3: NEWS & ANNOUNCEMENTS (NOW HIGHLY VISIBLE & ASYNC) ───
+          // News & Announcements
           newsAsync.when(
             data: (articles) =>
                 NewsSection(theme: theme, t: t, articles: articles),
@@ -55,7 +55,7 @@ class UtilityScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 24),
 
-          // ─── PART 4: MOCK LOCATION SETUP (DEBUG MODE ONLY) ───
+          // Mock Location Setup (Debug)
           if (kDebugMode) ...[
             _buildDebugMockLocationCard(context, ref, mockLocation, theme, t),
             const SizedBox(height: 24),

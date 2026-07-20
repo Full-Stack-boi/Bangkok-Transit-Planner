@@ -103,7 +103,8 @@ class TransitColors {
 
   /// Get readable text color (white or dark slate) for a given line ID
   static Color getLineTextColor(String lineId) {
-    if (lineId == TransitConstants.kMrtYellow || lineId == TransitConstants.kBtsGold) {
+    if (lineId == TransitConstants.kMrtYellow ||
+        lineId == TransitConstants.kBtsGold) {
       return const Color(0xFF1E293B); // Dark slate
     }
     return Colors.white;

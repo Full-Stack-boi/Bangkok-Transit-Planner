@@ -63,7 +63,7 @@ class AuthNotifier extends _$AuthNotifier {
         if (!ref.mounted) return;
         state = state.copyWith(user: user, isLoading: true);
         final profile = await repository.getUserProfile(user.id);
-        
+
         if (!ref.mounted) return;
         state = state.copyWith(
           displayName: profile?['display_name'] as String?,
@@ -77,18 +77,20 @@ class AuthNotifier extends _$AuthNotifier {
         final mrt = userMetadata['mrt_card_type'] as String? ?? 'standard';
         final arl = userMetadata['arl_card_type'] as String? ?? 'standard';
         final srt = userMetadata['srt_card_type'] as String? ?? 'standard';
-        ref.read(userCardsProvider.notifier).updateFromSync(
-          btsCardType: bts,
-          mrtCardType: mrt,
-          arlCardType: arl,
-          srtCardType: srt,
-        );
+        ref
+            .read(userCardsProvider.notifier)
+            .updateFromSync(
+              btsCardType: bts,
+              mrtCardType: mrt,
+              arlCardType: arl,
+              srtCardType: srt,
+            );
 
         // Perform offline sync to upload locally saved routes and favorites
         try {
           final favoritesRepo = ref.read(favoritesRepositoryProvider);
           await favoritesRepo.syncOfflineDataWithSupabase();
-          
+
           if (!ref.mounted) return;
           // Refresh favorites screen view model to load updated synced listings
           ref.read(favoritesViewModelProvider.notifier).refresh();

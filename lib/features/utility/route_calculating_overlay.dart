@@ -80,7 +80,11 @@ class RouteCalculatingOverlay extends StatelessWidget {
                     // Origin Station Skeleton
                     Row(
                       children: [
-                        const ShimmerPlaceholder(width: 16, height: 16, borderRadius: 8),
+                        const ShimmerPlaceholder(
+                          width: 16,
+                          height: 16,
+                          borderRadius: 8,
+                        ),
                         const SizedBox(width: 12),
                         Expanded(
                           child: Column(
@@ -97,12 +101,20 @@ class RouteCalculatingOverlay extends StatelessWidget {
                     // Path connection line
                     const Padding(
                       padding: EdgeInsets.only(left: 7.0, top: 4, bottom: 4),
-                      child: ShimmerPlaceholder(width: 2, height: 32, borderRadius: 1),
+                      child: ShimmerPlaceholder(
+                        width: 2,
+                        height: 32,
+                        borderRadius: 1,
+                      ),
                     ),
                     // Destination Station Skeleton
                     Row(
                       children: [
-                        const ShimmerPlaceholder(width: 16, height: 16, borderRadius: 8),
+                        const ShimmerPlaceholder(
+                          width: 16,
+                          height: 16,
+                          borderRadius: 8,
+                        ),
                         const SizedBox(width: 12),
                         Expanded(
                           child: Column(
@@ -185,8 +197,12 @@ class _ShimmerPlaceholderState extends State<ShimmerPlaceholder>
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    final baseColor = isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0);
-    final highlightColor = isDark ? const Color(0xFF475569) : const Color(0xFFF1F5F9);
+    final baseColor = isDark
+        ? const Color(0xFF334155)
+        : const Color(0xFFE2E8F0);
+    final highlightColor = isDark
+        ? const Color(0xFF475569)
+        : const Color(0xFFF1F5F9);
 
     return AnimatedBuilder(
       animation: _controller,
@@ -197,11 +213,7 @@ class _ShimmerPlaceholderState extends State<ShimmerPlaceholder>
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(widget.borderRadius),
             gradient: LinearGradient(
-              colors: [
-                baseColor,
-                highlightColor,
-                baseColor,
-              ],
+              colors: [baseColor, highlightColor, baseColor],
               stops: const [0.0, 0.5, 1.0],
               begin: Alignment(-2.0 + _controller.value * 4.0, -0.5),
               end: Alignment(-1.0 + _controller.value * 4.0, 0.5),

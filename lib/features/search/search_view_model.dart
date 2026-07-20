@@ -89,9 +89,7 @@ class SearchViewModel extends _$SearchViewModel {
     return const SearchState();
   }
 
-  // ──────────────────────────────────────────────────────────────
   //  Search
-  // ──────────────────────────────────────────────────────────────
 
   /// Search stations and landmarks by query, querying online places if needed
   Future<void> search(String query) async {
@@ -116,13 +114,17 @@ class SearchViewModel extends _$SearchViewModel {
         // Merge without duplicates (O(n) using Sets for fast lookup)
         if (state.query == query) {
           final merged = [...localResults];
-          final seenNames = {for (final item in localResults) item.nameTh.toLowerCase()};
-          final seenCoords = {for (final item in localResults) '${item.lat},${item.lng}'};
-          
+          final seenNames = {
+            for (final item in localResults) item.nameTh.toLowerCase(),
+          };
+          final seenCoords = {
+            for (final item in localResults) '${item.lat},${item.lng}',
+          };
+
           for (final online in onlineResults) {
             final name = online.nameTh.toLowerCase();
             final coords = '${online.lat},${online.lng}';
-            
+
             if (!seenNames.contains(name) && !seenCoords.contains(coords)) {
               merged.add(online);
               seenNames.add(name);
@@ -142,9 +144,7 @@ class SearchViewModel extends _$SearchViewModel {
     }
   }
 
-  // ──────────────────────────────────────────────────────────────
   //  Origin / Destination
-  // ──────────────────────────────────────────────────────────────
 
   /// Set origin station or place
   Future<void> setOrigin(SearchableItem station) async {
@@ -200,10 +200,7 @@ class SearchViewModel extends _$SearchViewModel {
     } catch (e, stack) {
       AppLogger.error('Error in setRoute: $e\n$stack', error: e);
       if (_mounted) {
-        state = state.copyWith(
-          isCalculating: false,
-          error: e.toString(),
-        );
+        state = state.copyWith(isCalculating: false, error: e.toString());
       }
     }
   }
@@ -225,9 +222,7 @@ class SearchViewModel extends _$SearchViewModel {
     state = const SearchState();
   }
 
-  // ──────────────────────────────────────────────────────────────
   //  Route Calculation (delegated to RouteCalculator)
-  // ──────────────────────────────────────────────────────────────
 
   /// Calculate route if both origin and destination are set
   void _tryCalculateRoute() {
@@ -265,7 +260,10 @@ class SearchViewModel extends _$SearchViewModel {
       );
 
       final result = calculator.calculate(
-        origin, destination, cardSnapshot, translations,
+        origin,
+        destination,
+        cardSnapshot,
+        translations,
       );
 
       if (result == null) {
@@ -309,9 +307,7 @@ class SearchViewModel extends _$SearchViewModel {
     }
   }
 
-  // ──────────────────────────────────────────────────────────────
   //  Background Hydration
-  // ──────────────────────────────────────────────────────────────
 
   Future<void> _hydrateAllRoutes(
     RouteCalculator calculator,
@@ -319,8 +315,8 @@ class SearchViewModel extends _$SearchViewModel {
     RouteResult? saver,
   ) async {
     try {
-      final (hydratedRecommended, hydratedSaver) =
-          await calculator.hydrateRoutes(recommended, saver);
+      final (hydratedRecommended, hydratedSaver) = await calculator
+          .hydrateRoutes(recommended, saver);
 
       if (_mounted &&
           state.origin != null &&

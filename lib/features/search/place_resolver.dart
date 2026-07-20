@@ -31,7 +31,12 @@ class PlaceResolver {
 
       // Second, snap to a local landmark if the coordinates are extremely close (within 250m)
       for (final l in _repo.landmarks) {
-        final dist = Geolocator.distanceBetween(item.lat, item.lng, l.lat, l.lng);
+        final dist = Geolocator.distanceBetween(
+          item.lat,
+          item.lng,
+          l.lat,
+          l.lng,
+        );
         if (dist <= 250.0) {
           return l; // Snap to perfectly curated local landmark
         }
@@ -41,7 +46,10 @@ class PlaceResolver {
       final resolved = await _repo.resolveOnlinePlaceAsync(item);
       return resolved ?? item;
     } catch (e, stack) {
-      AppLogger.error('Error resolving item in PlaceResolver: $e\n$stack', error: e);
+      AppLogger.error(
+        'Error resolving item in PlaceResolver: $e\n$stack',
+        error: e,
+      );
       return item; // Safe fallback
     }
   }

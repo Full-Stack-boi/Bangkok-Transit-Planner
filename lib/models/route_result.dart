@@ -14,8 +14,8 @@ abstract class RouteSegment with _$RouteSegment {
   const factory RouteSegment({
     required String lineId,
     required String lineName,
-    required String direction,    // e.g. "ไปสุวรรณภูมิ"
-    required int boundIndex,      // 0 or 1
+    required String direction, // e.g. "ไปสุวรรณภูมิ"
+    required int boundIndex, // 0 or 1
     required SearchableItem fromStation,
     required SearchableItem toStation,
     @Default([]) List<Station> intermediateStations,
@@ -66,8 +66,7 @@ abstract class RouteResult with _$RouteResult {
   int get transferCount => transfers.length;
 
   /// All unique line IDs used in this route
-  List<String> get lineIds =>
-      segments.map((s) => s.lineId).toSet().toList();
+  List<String> get lineIds => segments.map((s) => s.lineId).toSet().toList();
 
   /// Is this a direct route (no transfers)?
   bool get isDirect => transfers.isEmpty;

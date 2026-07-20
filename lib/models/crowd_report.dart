@@ -10,12 +10,13 @@ abstract class CrowdReport with _$CrowdReport {
     required String id,
     @JsonKey(name: 'station_id') required String stationId,
     @JsonKey(name: 'user_id') required String userId,
-    required int level,         // 1-5
+    required int level, // 1-5
     @JsonKey(name: 'reported_at') required DateTime reportedAt,
     String? direction,
   }) = _CrowdReport;
 
-  factory CrowdReport.fromJson(Map<String, dynamic> json) => _$CrowdReportFromJson(json);
+  factory CrowdReport.fromJson(Map<String, dynamic> json) =>
+      _$CrowdReportFromJson(json);
 }
 
 /// Passive GPS presence detection
@@ -29,22 +30,23 @@ abstract class CrowdPresence with _$CrowdPresence {
     @JsonKey(name: 'accuracy_meters') double? accuracyMeters,
   }) = _CrowdPresence;
 
-  factory CrowdPresence.fromJson(Map<String, dynamic> json) => _$CrowdPresenceFromJson(json);
+  factory CrowdPresence.fromJson(Map<String, dynamic> json) =>
+      _$CrowdPresenceFromJson(json);
 }
 
 /// Aggregated crowd level for a station
 enum CrowdLevel {
-  low,      // 🟢 โล่ง
-  medium,   // 🟡 ปานกลาง
-  high,     // 🔴 แน่นมาก
-  unknown,  // ไม่มีข้อมูล
+  low, // 🟢 โล่ง
+  medium, // 🟡 ปานกลาง
+  high, // 🔴 แน่นมาก
+  unknown, // ไม่มีข้อมูล
 }
 
 class StationCrowdInfo {
   final String stationId;
   final CrowdLevel level;
-  final int presenceCount;      // number of users detected nearby
-  final int activeReportCount;  // number of manual reports
+  final int presenceCount; // number of users detected nearby
+  final int activeReportCount; // number of manual reports
   final double? averageReportLevel;
   final DateTime updatedAt;
 

@@ -7,14 +7,16 @@ void main() {
     final supabaseUrl = const String.fromEnvironment('SUPABASE_URL').isNotEmpty
         ? const String.fromEnvironment('SUPABASE_URL')
         : 'https://REDACTED_SUPABASE_PROJECT_ID.supabase.co';
-    final supabaseAnonKey = const String.fromEnvironment('SUPABASE_ANON_KEY').isNotEmpty
+    final supabaseAnonKey =
+        const String.fromEnvironment('SUPABASE_ANON_KEY').isNotEmpty
         ? const String.fromEnvironment('SUPABASE_ANON_KEY')
         : 'REDACTED_SUPABASE_ANON_KEY';
 
     setUpAll(() async {
       // Mock shared_preferences since Supabase initialization uses it for storing session info
       SharedPreferences.setMockInitialValues({});
-      if (supabaseUrl.contains('REDACTED') || supabaseAnonKey.contains('REDACTED')) {
+      if (supabaseUrl.contains('REDACTED') ||
+          supabaseAnonKey.contains('REDACTED')) {
         return;
       }
       try {
@@ -28,12 +30,16 @@ void main() {
     });
 
     test('Verify cleanup_old_presence trigger purges records older than 1 minute', () async {
-      if (supabaseUrl.contains('REDACTED') || supabaseAnonKey.contains('REDACTED')) {
-        print('Skipping database integration test: Supabase credentials are not configured.');
+      if (supabaseUrl.contains('REDACTED') ||
+          supabaseAnonKey.contains('REDACTED')) {
+        print(
+          'Skipping database integration test: Supabase credentials are not configured.',
+        );
         return;
       }
       final client = Supabase.instance.client;
-      final testUserId = 'integration_test_user_${DateTime.now().millisecondsSinceEpoch}';
+      final testUserId =
+          'integration_test_user_${DateTime.now().millisecondsSinceEpoch}';
 
       print('\n--- E2E Database Integration Test Start ---');
 
@@ -43,7 +49,10 @@ void main() {
 
       // 2. Insert an outdated presence ping (1 hour ago to ensure it is older than 1 minute despite clock drift)
       print('[E2E] Step 2: Inserting an OUTDATED record (1 hour old)...');
-      final oneHourAgo = DateTime.now().toUtc().subtract(const Duration(hours: 1)).toIso8601String();
+      final oneHourAgo = DateTime.now()
+          .toUtc()
+          .subtract(const Duration(hours: 1))
+          .toIso8601String();
       await client.from('crowd_presence').insert({
         'station_id': 'ARL_A4',
         'user_id': testUserId,
@@ -52,13 +61,20 @@ void main() {
       });
 
       // 3. Query database - the trigger should have INSTANTLY deleted it since it's > 1 minute old
-      print('[E2E] Step 3: Querying database - should be 0 because trigger instantly purged it...');
-      var rows = await client.from('crowd_presence').select().eq('user_id', testUserId);
+      print(
+        '[E2E] Step 3: Querying database - should be 0 because trigger instantly purged it...',
+      );
+      var rows = await client
+          .from('crowd_presence')
+          .select()
+          .eq('user_id', testUserId);
       print('[E2E] Current rows count: ${rows.length}');
       if (rows.isNotEmpty) {
         print('[E2E] Leftover row details:');
         for (final r in rows) {
-          print('  - ID: ${r['id']}, detected_at: ${r['detected_at']}, user_id: ${r['user_id']}');
+          print(
+            '  - ID: ${r['id']}, detected_at: ${r['detected_at']}, user_id: ${r['user_id']}',
+          );
         }
       }
       expect(rows.length, equals(0)); // Instantly deleted by TTL trigger!
@@ -74,11 +90,20 @@ void main() {
       });
 
       // 5. Query database again - the fresh record should persist because it's < 1 minute old
-      print('[E2E] Step 5: Querying database again. Fresh record should still exist.');
-      rows = await client.from('crowd_presence').select().eq('user_id', testUserId);
-      print('[E2E] Current rows count after inserting fresh record: ${rows.length}');
+      print(
+        '[E2E] Step 5: Querying database again. Fresh record should still exist.',
+      );
+      rows = await client
+          .from('crowd_presence')
+          .select()
+          .eq('user_id', testUserId);
+      print(
+        '[E2E] Current rows count after inserting fresh record: ${rows.length}',
+      );
       expect(rows.length, equals(1));
-      print('[E2E] Remaining row in DB: ID: ${rows.first['id']}, Detected At: ${rows.first['detected_at']}');
+      print(
+        '[E2E] Remaining row in DB: ID: ${rows.first['id']}, Detected At: ${rows.first['detected_at']}',
+      );
 
       // 6. Clean up test records
       print('[E2E] Step 6: Cleaning up test records from DB...');

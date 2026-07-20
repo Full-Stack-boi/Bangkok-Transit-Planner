@@ -46,7 +46,9 @@ class NewsCard extends StatelessWidget {
                     Text(
                       t.isTh
                           ? item.titleTh
-                          : (item.titleEn.isNotEmpty ? item.titleEn : item.titleTh),
+                          : (item.titleEn.isNotEmpty
+                                ? item.titleEn
+                                : item.titleTh),
                       style: theme.textTheme.bodyMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
@@ -55,7 +57,9 @@ class NewsCard extends StatelessWidget {
                     Text(
                       t.isTh
                           ? item.bodyTh
-                          : (item.bodyEn.isNotEmpty ? item.bodyEn : item.bodyTh),
+                          : (item.bodyEn.isNotEmpty
+                                ? item.bodyEn
+                                : item.bodyTh),
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,
                       ),

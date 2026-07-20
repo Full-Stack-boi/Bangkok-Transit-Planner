@@ -51,7 +51,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       final authState = ref.read(authProvider);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(authState.errorMessage ?? ref.read(translationsProvider).auth.registrationFailed),
+          content: Text(
+            authState.errorMessage ??
+                ref.read(translationsProvider).auth.registrationFailed,
+          ),
           backgroundColor: Theme.of(context).colorScheme.error,
         ),
       );
@@ -69,7 +72,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new_rounded, color: theme.colorScheme.onSurface),
+          icon: Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: theme.colorScheme.onSurface,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -81,7 +87,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             end: Alignment.bottomCenter,
             colors: theme.brightness == Brightness.dark
                 ? [theme.colorScheme.surface, theme.colorScheme.surfaceDim]
-                : [theme.colorScheme.surface, theme.colorScheme.primaryContainer.withValues(alpha: 0.15)],
+                : [
+                    theme.colorScheme.surface,
+                    theme.colorScheme.primaryContainer.withValues(alpha: 0.15),
+                  ],
           ),
         ),
         child: SafeArea(
@@ -153,7 +162,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         if (value == null || value.isEmpty) {
                           return t.auth.invalidEmail;
                         }
-                        final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+                        final emailRegex = RegExp(
+                          r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                        );
                         if (!emailRegex.hasMatch(value)) {
                           return t.auth.invalidEmail;
                         }
@@ -188,7 +199,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         ),
                       ),
                       validator: (value) {
-                        if (value == null || value.isEmpty || value.length < 6) {
+                        if (value == null ||
+                            value.isEmpty ||
+                            value.length < 6) {
                           return t.auth.passwordTooShort;
                         }
                         return null;
@@ -214,7 +227,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                           ),
                           onPressed: () {
                             setState(() {
-                              _obscureConfirmPassword = !_obscureConfirmPassword;
+                              _obscureConfirmPassword =
+                                  !_obscureConfirmPassword;
                             });
                           },
                         ),
@@ -233,7 +247,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
                     // Submit Button
                     ElevatedButton(
-                      onPressed: authState.isLoading ? null : () => _submitRegister(),
+                      onPressed: authState.isLoading
+                          ? null
+                          : () => _submitRegister(),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: theme.colorScheme.primary,
                         foregroundColor: theme.colorScheme.onPrimary,
@@ -266,7 +282,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       onPressed: () {
                         Navigator.pushReplacement(
                           context,
-                          MaterialPageRoute(builder: (context) => const LoginScreen()),
+                          MaterialPageRoute(
+                            builder: (context) => const LoginScreen(),
+                          ),
                         );
                       },
                       child: Text(

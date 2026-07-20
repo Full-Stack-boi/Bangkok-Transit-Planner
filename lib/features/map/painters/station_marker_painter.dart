@@ -26,7 +26,10 @@ class StationMarkerPainter extends CustomPainter {
       ..color = isCurrentStation
           ? Colors.green.withValues(alpha: 0.3)
           : Colors.black.withValues(alpha: 0.26)
-      ..maskFilter = MaskFilter.blur(BlurStyle.normal, (isCurrentStation ? 4.0 : 2.0) * scale);
+      ..maskFilter = MaskFilter.blur(
+        BlurStyle.normal,
+        (isCurrentStation ? 4.0 : 2.0) * scale,
+      );
 
     canvas.drawCircle(
       center + Offset(0, 1.5 * scale),
@@ -38,7 +41,9 @@ class StationMarkerPainter extends CustomPainter {
     final bgPaint = Paint()
       ..color = isCurrentStation
           ? Colors.green
-          : (brightness == Brightness.dark ? const Color(0xFF1E293B) : Colors.white)
+          : (brightness == Brightness.dark
+                ? const Color(0xFF1E293B)
+                : Colors.white)
       ..style = PaintingStyle.fill;
     canvas.drawCircle(center, radius - (1.5 * scale), bgPaint);
 
@@ -46,8 +51,14 @@ class StationMarkerPainter extends CustomPainter {
     final borderPaint = Paint()
       ..color = isCurrentStation ? Colors.white : lineColor
       ..style = PaintingStyle.stroke
-      ..strokeWidth = isCurrentStation ? 4.0 * scale : (isInterchange ? 4.0 * scale : 3.0 * scale);
-    canvas.drawCircle(center, radius - (1.5 * scale) - (borderPaint.strokeWidth / 2), borderPaint);
+      ..strokeWidth = isCurrentStation
+          ? 4.0 * scale
+          : (isInterchange ? 4.0 * scale : 3.0 * scale);
+    canvas.drawCircle(
+      center,
+      radius - (1.5 * scale) - (borderPaint.strokeWidth / 2),
+      borderPaint,
+    );
 
     // 4. Draw Center Content
     if (isCurrentStation) {
@@ -61,9 +72,7 @@ class StationMarkerPainter extends CustomPainter {
       canvas.drawPath(path, Paint()..color = Colors.white);
     } else if (isInterchange) {
       // Render the exact Material icon glyph directly on the canvas
-      final textPainter = TextPainter(
-        textDirection: TextDirection.ltr,
-      );
+      final textPainter = TextPainter(textDirection: TextDirection.ltr);
       textPainter.text = TextSpan(
         text: String.fromCharCode(Icons.swap_horiz_rounded.codePoint),
         style: TextStyle(

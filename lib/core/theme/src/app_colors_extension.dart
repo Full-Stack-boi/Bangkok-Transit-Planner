@@ -20,22 +20,22 @@ class AppColorsExtension extends ThemeExtension<AppColorsExtension> {
 
   /// Dark theme palette constant
   static const AppColorsExtension dark = AppColorsExtension(
-    timeColor: Color(0xFFFCD34D),      // Colors.amber.shade300
-    moneyColor: Color(0xFF2DD4BF),     // Soft Green/Teal
-    routeColor: Color(0xFF818CF8),     // Soft Lavender
-    favoriteColor: Color(0xFFF472B6),  // Coral Pink
-    landmarkColor: Color(0xFFF97316),  // Warm Coral Orange
-    gpsPinColor: Color(0xFF2DD4BF),    // Soft Teal
+    timeColor: Color(0xFFFCD34D), // Colors.amber.shade300
+    moneyColor: Color(0xFF2DD4BF), // Soft Green/Teal
+    routeColor: Color(0xFF818CF8), // Soft Lavender
+    favoriteColor: Color(0xFFF472B6), // Coral Pink
+    landmarkColor: Color(0xFFF97316), // Warm Coral Orange
+    gpsPinColor: Color(0xFF2DD4BF), // Soft Teal
   );
 
   /// Light theme palette constant
   static const AppColorsExtension light = AppColorsExtension(
-    timeColor: Color(0xFFD97706),      // Warm Dark Amber/Gold
-    moneyColor: Color(0xFF0D9488),     // Teal Green
-    routeColor: Color(0xFF4F46E5),     // Indigo
-    favoriteColor: Color(0xFFDB2777),  // Deep Pink
-    landmarkColor: Color(0xFFEA580C),  // Dark Orange
-    gpsPinColor: Color(0xFF0D9488),    // Teal
+    timeColor: Color(0xFFD97706), // Warm Dark Amber/Gold
+    moneyColor: Color(0xFF0D9488), // Teal Green
+    routeColor: Color(0xFF4F46E5), // Indigo
+    favoriteColor: Color(0xFFDB2777), // Deep Pink
+    landmarkColor: Color(0xFFEA580C), // Dark Orange
+    gpsPinColor: Color(0xFF0D9488), // Teal
   );
 
   @override

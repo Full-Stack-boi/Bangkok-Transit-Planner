@@ -446,7 +446,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 }
 
-
 class _LoadingView extends StatelessWidget {
   final AppLocalizations t;
   const _LoadingView({required this.t});

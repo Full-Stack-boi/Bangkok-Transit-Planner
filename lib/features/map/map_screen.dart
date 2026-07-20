@@ -839,7 +839,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     return Scaffold(
       body: Stack(
         children: [
-          // ─── Map Layer ───
+          // Map Layer
           RepaintBoundary(
             child: ColoredBox(
               color: themeBrightness == Brightness.dark

@@ -15,8 +15,8 @@ void main() {
   const MethodChannel channel = MethodChannel('live_activities');
   TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
       .setMockMethodCallHandler(channel, (MethodCall methodCall) async {
-    return null;
-  });
+        return null;
+      });
 
   late SharedPreferences testSharedPreferencesInstance;
 
@@ -77,7 +77,9 @@ void main() {
     test('Should start and stop tracking correctly', () {
       final container = ProviderContainer(
         overrides: [
-          sharedPreferencesProvider.overrideWithValue(testSharedPreferencesInstance),
+          sharedPreferencesProvider.overrideWithValue(
+            testSharedPreferencesInstance,
+          ),
         ],
       );
       final tracker = container.read(routeTrackerProvider.notifier);
@@ -105,7 +107,9 @@ void main() {
     test('Should advance simulation step by step until arrival', () {
       final container = ProviderContainer(
         overrides: [
-          sharedPreferencesProvider.overrideWithValue(testSharedPreferencesInstance),
+          sharedPreferencesProvider.overrideWithValue(
+            testSharedPreferencesInstance,
+          ),
         ],
       );
       final tracker = container.read(routeTrackerProvider.notifier);
@@ -113,11 +117,17 @@ void main() {
       tracker.startTracking(mockRoute, simulation: true);
 
       // Current station is A (index 0)
-      expect(container.read(routeTrackerProvider).currentStation?.id, equals('BTS_A'));
+      expect(
+        container.read(routeTrackerProvider).currentStation?.id,
+        equals('BTS_A'),
+      );
 
       // Advance simulation -> should move to station B (index 1)
       tracker.advanceSimulation();
-      expect(container.read(routeTrackerProvider).currentStation?.id, equals('BTS_B'));
+      expect(
+        container.read(routeTrackerProvider).currentStation?.id,
+        equals('BTS_B'),
+      );
       expect(container.read(routeTrackerProvider).hasArrived, isFalse);
 
       // Advance simulation again -> should reach the end (since B is the last station of the last segment)
@@ -128,7 +138,9 @@ void main() {
     test('Should advance automatically on location proximity updates', () {
       final container = ProviderContainer(
         overrides: [
-          sharedPreferencesProvider.overrideWithValue(testSharedPreferencesInstance),
+          sharedPreferencesProvider.overrideWithValue(
+            testSharedPreferencesInstance,
+          ),
         ],
       );
       final tracker = container.read(routeTrackerProvider.notifier);
@@ -136,7 +148,10 @@ void main() {
       tracker.startTracking(mockRoute, simulation: true);
 
       // Initial position at station A
-      expect(container.read(routeTrackerProvider).currentStation?.id, equals('BTS_A'));
+      expect(
+        container.read(routeTrackerProvider).currentStation?.id,
+        equals('BTS_A'),
+      );
 
       // Mock user position close to station B (lat: 13.76, lng: 100.53)
       final posNearB = Position(

@@ -18,7 +18,10 @@ AppBarTheme buildSharedAppBarTheme(ColorScheme scheme) {
   );
 }
 
-NavigationBarThemeData buildSharedNavigationBarTheme(ColorScheme scheme, Color cardColor) {
+NavigationBarThemeData buildSharedNavigationBarTheme(
+  ColorScheme scheme,
+  Color cardColor,
+) {
   return NavigationBarThemeData(
     backgroundColor: cardColor,
     elevation: 0,
@@ -50,30 +53,48 @@ NavigationBarThemeData buildSharedNavigationBarTheme(ColorScheme scheme, Color c
   );
 }
 
-CardThemeData buildSharedCardTheme(ColorScheme scheme, {Color? color, ShapeBorder? shape}) {
+CardThemeData buildSharedCardTheme(
+  ColorScheme scheme, {
+  Color? color,
+  ShapeBorder? shape,
+}) {
   return CardThemeData(
     color: color ?? scheme.surfaceContainerLow,
     elevation: 0,
     margin: EdgeInsets.zero,
-    shape: shape ?? RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(16),
-      side: BorderSide(color: scheme.outline.withValues(alpha: 0.2), width: 1),
-    ),
+    shape:
+        shape ??
+        RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(
+            color: scheme.outline.withValues(alpha: 0.2),
+            width: 1,
+          ),
+        ),
   );
 }
 
-InputDecorationTheme buildSharedInputDecorationTheme(ColorScheme scheme, {Color? fillColor, InputBorder? border, InputBorder? enabledBorder}) {
+InputDecorationTheme buildSharedInputDecorationTheme(
+  ColorScheme scheme, {
+  Color? fillColor,
+  InputBorder? border,
+  InputBorder? enabledBorder,
+}) {
   return InputDecorationTheme(
     filled: true,
     fillColor: fillColor ?? scheme.surfaceContainerLowest,
-    border: border ?? OutlineInputBorder(
-      borderRadius: BorderRadius.circular(12),
-      borderSide: BorderSide(color: scheme.outline.withValues(alpha: 0.2)),
-    ),
-    enabledBorder: enabledBorder ?? OutlineInputBorder(
-      borderRadius: BorderRadius.circular(12),
-      borderSide: BorderSide(color: scheme.outline.withValues(alpha: 0.2)),
-    ),
+    border:
+        border ??
+        OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: scheme.outline.withValues(alpha: 0.2)),
+        ),
+    enabledBorder:
+        enabledBorder ??
+        OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: scheme.outline.withValues(alpha: 0.2)),
+        ),
     focusedBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(12),
       borderSide: BorderSide(color: scheme.primary, width: 2),
@@ -84,38 +105,44 @@ InputDecorationTheme buildSharedInputDecorationTheme(ColorScheme scheme, {Color?
   );
 }
 
-ElevatedButtonThemeData buildSharedElevatedButtonTheme(ColorScheme scheme, {required bool isDark}) {
+ElevatedButtonThemeData buildSharedElevatedButtonTheme(
+  ColorScheme scheme, {
+  required bool isDark,
+}) {
   return ElevatedButtonThemeData(
     style: ElevatedButton.styleFrom(
       backgroundColor: scheme.primary,
       foregroundColor: isDark ? Colors.black : Colors.white,
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      textStyle: GoogleFonts.outfit(
-        fontSize: 16,
-        fontWeight: FontWeight.w600,
-      ),
+      textStyle: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.w600),
       elevation: 0,
     ),
   );
 }
 
-OutlinedButtonThemeData buildSharedOutlinedButtonTheme(ColorScheme scheme, {BorderSide? borderSide, Color? textColor}) {
+OutlinedButtonThemeData buildSharedOutlinedButtonTheme(
+  ColorScheme scheme, {
+  BorderSide? borderSide,
+  Color? textColor,
+}) {
   return OutlinedButtonThemeData(
     style: OutlinedButton.styleFrom(
       foregroundColor: textColor ?? scheme.onSurface,
-      side: borderSide ?? BorderSide(color: scheme.outline.withValues(alpha: 0.2)),
+      side:
+          borderSide ??
+          BorderSide(color: scheme.outline.withValues(alpha: 0.2)),
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      textStyle: GoogleFonts.outfit(
-        fontSize: 16,
-        fontWeight: FontWeight.w600,
-      ),
+      textStyle: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.w600),
     ),
   );
 }
 
-BottomSheetThemeData buildSharedBottomSheetTheme(ColorScheme scheme, Color cardColor) {
+BottomSheetThemeData buildSharedBottomSheetTheme(
+  ColorScheme scheme,
+  Color cardColor,
+) {
   return BottomSheetThemeData(
     backgroundColor: cardColor,
     elevation: 0,

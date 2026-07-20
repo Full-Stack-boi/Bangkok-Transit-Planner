@@ -9,20 +9,27 @@ abstract class TransitLine with _$TransitLine {
   const TransitLine._(); // Allows custom methods/getters
 
   const factory TransitLine({
-    required String id,           // e.g. "BTS_SUKHUMVIT"
-    @JsonKey(name: 'name_th') required String nameTh,       // e.g. "สายสุขุมวิท"
-    @JsonKey(name: 'name_en') required String nameEn,       // e.g. "Sukhumvit Line"
-    required String operator,     // e.g. "BTS", "MRT", "ARL"
-    @JsonKey(name: 'color_hex') required String colorHex,     // e.g. "#7DC242"
-    @JsonKey(name: 'station_ids') required List<String> stationIds,  // Ordered station IDs along the line
-    @JsonKey(name: 'bound_0_label') required String bound0Label,  // Direction label for bound 0 (e.g. "ไปหมอชิต")
-    @JsonKey(name: 'bound_1_label') required String bound1Label,  // Direction label for bound 1 (e.g. "ไปเคหะฯ")
-    @Default(false) @JsonKey(name: 'is_loop') bool isLoop,         // True for MRT Blue Line (circular)
+    required String id, // e.g. "BTS_SUKHUMVIT"
+    @JsonKey(name: 'name_th') required String nameTh, // e.g. "สายสุขุมวิท"
+    @JsonKey(name: 'name_en') required String nameEn, // e.g. "Sukhumvit Line"
+    required String operator, // e.g. "BTS", "MRT", "ARL"
+    @JsonKey(name: 'color_hex') required String colorHex, // e.g. "#7DC242"
+    @JsonKey(name: 'station_ids')
+    required List<String> stationIds, // Ordered station IDs along the line
+    @JsonKey(name: 'bound_0_label')
+    required String
+    bound0Label, // Direction label for bound 0 (e.g. "ไปหมอชิต")
+    @JsonKey(name: 'bound_1_label')
+    required String bound1Label, // Direction label for bound 1 (e.g. "ไปเคหะฯ")
+    @Default(false)
+    @JsonKey(name: 'is_loop')
+    bool isLoop, // True for MRT Blue Line (circular)
     @JsonKey(name: 'peak_interval_min') required int peakIntervalMin,
     @JsonKey(name: 'off_peak_interval_min') required int offPeakIntervalMin,
   }) = _TransitLine;
 
-  factory TransitLine.fromJson(Map<String, dynamic> json) => _$TransitLineFromJson(json);
+  factory TransitLine.fromJson(Map<String, dynamic> json) =>
+      _$TransitLineFromJson(json);
 
   /// Get the direction label for a given bound index
   String getDirectionLabel(int bound) {

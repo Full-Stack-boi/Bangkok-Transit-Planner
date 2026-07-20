@@ -37,86 +37,118 @@ class SearchInputBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Hero(
       tag: 'search_bar_card',
-      flightShuttleBuilder: (
-        BuildContext flightContext,
-        Animation<double> animation,
-        HeroFlightDirection flightDirection,
-        BuildContext fromHeroContext,
-        BuildContext toHeroContext,
-      ) {
-        final theme = Theme.of(flightContext);
-        final isDark = theme.brightness == Brightness.dark;
-        final shimmerColor = isDark ? Colors.white12 : Colors.black.withValues(alpha: 0.06);
-        
-        return Material(
-          type: MaterialType.transparency,
-          child: Container(
-            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: theme.cardColor,
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
+      flightShuttleBuilder:
+          (
+            BuildContext flightContext,
+            Animation<double> animation,
+            HeroFlightDirection flightDirection,
+            BuildContext fromHeroContext,
+            BuildContext toHeroContext,
+          ) {
+            final theme = Theme.of(flightContext);
+            final isDark = theme.brightness == Brightness.dark;
+            final shimmerColor = isDark
+                ? Colors.white12
+                : Colors.black.withValues(alpha: 0.06);
+
+            return Material(
+              type: MaterialType.transparency,
+              child: Container(
+                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: theme.cardColor,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                  border: Border.all(
+                    color: theme.colorScheme.outline.withValues(alpha: 0.1),
+                  ),
                 ),
-              ],
-              border: Border.all(
-                color: theme.colorScheme.outline.withValues(alpha: 0.1),
-              ),
-            ),
-            child: SingleChildScrollView(
-              physics: const NeverScrollableScrollPhysics(),
-              child: Row(
-                children: [
-                  Column(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.center,
+                child: SingleChildScrollView(
+                  physics: const NeverScrollableScrollPhysics(),
+                  child: Row(
                     children: [
-                      Container(width: 12, height: 12, decoration: BoxDecoration(color: shimmerColor, shape: BoxShape.circle)),
-                      Container(width: 2, height: 24, color: shimmerColor),
-                      Container(width: 12, height: 12, decoration: BoxDecoration(color: shimmerColor, shape: BoxShape.circle)),
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            width: 12,
+                            height: 12,
+                            decoration: BoxDecoration(
+                              color: shimmerColor,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                          Container(width: 2, height: 24, color: shimmerColor),
+                          Container(
+                            width: 12,
+                            height: 12,
+                            decoration: BoxDecoration(
+                              color: shimmerColor,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: double.infinity,
+                              height: 18,
+                              decoration: BoxDecoration(
+                                color: shimmerColor,
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            Container(
+                              width: double.infinity,
+                              height: 1,
+                              color: theme.colorScheme.outline.withValues(
+                                alpha: 0.15,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            Container(
+                              width: 140,
+                              height: 18,
+                              decoration: BoxDecoration(
+                                color: shimmerColor,
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Container(
+                        width: 36,
+                        height: 36,
+                        decoration: BoxDecoration(
+                          color: shimmerColor,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
                     ],
                   ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          width: double.infinity,
-                          height: 18,
-                          decoration: BoxDecoration(color: shimmerColor, borderRadius: BorderRadius.circular(4)),
-                        ),
-                        const SizedBox(height: 12),
-                        Container(width: double.infinity, height: 1, color: theme.colorScheme.outline.withValues(alpha: 0.15)),
-                        const SizedBox(height: 12),
-                        Container(
-                          width: 140,
-                          height: 18,
-                          decoration: BoxDecoration(color: shimmerColor, borderRadius: BorderRadius.circular(4)),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Container(
-                    width: 36,
-                    height: 36,
-                    decoration: BoxDecoration(color: shimmerColor, shape: BoxShape.circle),
-                  ),
-                ],
+                ),
               ),
-            ),
-          ),
-        );
-      },
+            );
+          },
       child: Material(
         type: MaterialType.transparency,
         child: Container(
@@ -144,7 +176,11 @@ class SearchInputBar extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.trip_origin_rounded, color: Colors.green, size: 20),
+                    const Icon(
+                      Icons.trip_origin_rounded,
+                      color: Colors.green,
+                      size: 20,
+                    ),
                     const SizedBox(
                       width: 2,
                       height: 36,
@@ -152,7 +188,11 @@ class SearchInputBar extends StatelessWidget {
                         decoration: BoxDecoration(color: Colors.white24),
                       ),
                     ),
-                    const Icon(Icons.location_on_rounded, color: Colors.red, size: 20),
+                    const Icon(
+                      Icons.location_on_rounded,
+                      color: Colors.red,
+                      size: 20,
+                    ),
                   ],
                 ),
                 const SizedBox(width: 16),
@@ -170,9 +210,13 @@ class SearchInputBar extends StatelessWidget {
                           hintText: originHint,
                           border: InputBorder.none,
                           hintStyle: theme.textTheme.titleMedium?.copyWith(
-                            color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
+                            color: theme.colorScheme.onSurface.withValues(
+                              alpha: 0.4,
+                            ),
                           ),
-                          suffixIcon: isSelectingOrigin && originController.text.isNotEmpty
+                          suffixIcon:
+                              isSelectingOrigin &&
+                                  originController.text.isNotEmpty
                               ? IconButton(
                                   icon: const Icon(Icons.clear, size: 18),
                                   onPressed: onOriginClear,
@@ -180,7 +224,12 @@ class SearchInputBar extends StatelessWidget {
                               : null,
                         ),
                       ),
-                      Divider(color: theme.colorScheme.outline.withValues(alpha: 0.15), height: 1),
+                      Divider(
+                        color: theme.colorScheme.outline.withValues(
+                          alpha: 0.15,
+                        ),
+                        height: 1,
+                      ),
                       TextField(
                         controller: destController,
                         focusNode: destFocusNode,
@@ -191,9 +240,13 @@ class SearchInputBar extends StatelessWidget {
                           hintText: destHint,
                           border: InputBorder.none,
                           hintStyle: theme.textTheme.titleMedium?.copyWith(
-                            color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
+                            color: theme.colorScheme.onSurface.withValues(
+                              alpha: 0.4,
+                            ),
                           ),
-                          suffixIcon: !isSelectingOrigin && destController.text.isNotEmpty
+                          suffixIcon:
+                              !isSelectingOrigin &&
+                                  destController.text.isNotEmpty
                               ? IconButton(
                                   icon: const Icon(Icons.clear, size: 18),
                                   onPressed: onDestClear,
@@ -213,7 +266,9 @@ class SearchInputBar extends StatelessWidget {
                     color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                   ),
                   style: IconButton.styleFrom(
-                    backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.08),
+                    backgroundColor: theme.colorScheme.primary.withValues(
+                      alpha: 0.08,
+                    ),
                     foregroundColor: theme.colorScheme.primary,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),

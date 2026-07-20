@@ -5,7 +5,8 @@ import 'searchable_item.dart';
 part 'landmark.freezed.dart';
 part 'landmark.g.dart';
 
-class NullableLatLngListConverter implements JsonConverter<List<LatLng>?, List<dynamic>?> {
+class NullableLatLngListConverter
+    implements JsonConverter<List<LatLng>?, List<dynamic>?> {
   const NullableLatLngListConverter();
 
   @override
@@ -23,7 +24,8 @@ class NullableLatLngListConverter implements JsonConverter<List<LatLng>?, List<d
   }
 }
 
-class LatLngListConverter implements JsonConverter<List<LatLng>, List<dynamic>> {
+class LatLngListConverter
+    implements JsonConverter<List<LatLng>, List<dynamic>> {
   const LatLngListConverter();
 
   @override
@@ -39,7 +41,8 @@ class LatLngListConverter implements JsonConverter<List<LatLng>, List<dynamic>> 
   }
 }
 
-class AlternativeWalksConverter implements JsonConverter<Map<String, StationWalk>?, Map<String, dynamic>?> {
+class AlternativeWalksConverter
+    implements JsonConverter<Map<String, StationWalk>?, Map<String, dynamic>?> {
   const AlternativeWalksConverter();
 
   @override
@@ -47,7 +50,8 @@ class AlternativeWalksConverter implements JsonConverter<Map<String, StationWalk
     if (json == null) return null;
     return json.map((k, v) {
       final valMap = Map<String, dynamic>.from(v as Map);
-      valMap['instructions_th'] = valMap['instructions_th'] ?? valMap['instructions'];
+      valMap['instructions_th'] =
+          valMap['instructions_th'] ?? valMap['instructions'];
       return MapEntry(k, StationWalk.fromJson(valMap));
     });
   }
@@ -72,9 +76,13 @@ abstract class Landmark extends SearchableItem with _$Landmark {
     @JsonKey(name: 'walking_minutes') double? walkingMinutes,
     required double lat,
     required double lng,
-    @NullableLatLngListConverter() @JsonKey(name: 'walking_path') List<LatLng>? walkingPath,
+    @NullableLatLngListConverter()
+    @JsonKey(name: 'walking_path')
+    List<LatLng>? walkingPath,
     @JsonKey(name: 'exit_code') String? exitCode,
-    @AlternativeWalksConverter() @JsonKey(name: 'alternative_walks') Map<String, StationWalk>? alternativeWalks,
+    @AlternativeWalksConverter()
+    @JsonKey(name: 'alternative_walks')
+    Map<String, StationWalk>? alternativeWalks,
     @JsonKey(name: 'entrance_lat') double? entranceLat,
     @JsonKey(name: 'entrance_lng') double? entranceLng,
   }) = _Landmark;
@@ -84,19 +92,23 @@ abstract class Landmark extends SearchableItem with _$Landmark {
   @override
   double get routeLng => entranceLng ?? lng;
 
-  factory Landmark.fromJson(Map<String, dynamic> json) => _$LandmarkFromJson(json);
+  factory Landmark.fromJson(Map<String, dynamic> json) =>
+      _$LandmarkFromJson(json);
 }
 
 /// Model representing a walking route from a specific station to a landmark
 @freezed
 abstract class StationWalk with _$StationWalk {
   const factory StationWalk({
-    @LatLngListConverter() @JsonKey(name: 'walking_path') required List<LatLng> walkingPath,
+    @LatLngListConverter()
+    @JsonKey(name: 'walking_path')
+    required List<LatLng> walkingPath,
     @JsonKey(name: 'exit_code') required String exitCode,
     @JsonKey(name: 'walking_minutes') required double walkingMinutes,
     @JsonKey(name: 'instructions_th') String? instructionsTh,
     @JsonKey(name: 'instructions_en') String? instructionsEn,
   }) = _StationWalk;
 
-  factory StationWalk.fromJson(Map<String, dynamic> json) => _$StationWalkFromJson(json);
+  factory StationWalk.fromJson(Map<String, dynamic> json) =>
+      _$StationWalkFromJson(json);
 }

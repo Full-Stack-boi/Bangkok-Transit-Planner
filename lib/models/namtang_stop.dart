@@ -13,7 +13,7 @@ class NamtangStop extends SearchableItem {
   final double lat;
   @override
   final double lng;
-  
+
   /// Stop classification: 'bus', 'boat', 'brt', 'commuter_train'
   final String type;
 
@@ -22,7 +22,7 @@ class NamtangStop extends SearchableItem {
   final String? nearestStationId;
   @override
   final double? walkingMinutes;
-  
+
   final List<LatLng>? walkingPath;
 
   const NamtangStop({
@@ -46,24 +46,31 @@ class NamtangStop extends SearchableItem {
       lng: (json['lng'] as num).toDouble(),
       type: json['type'] as String? ?? 'bus',
       nearestStationId: json['nearest_station_id'] as String?,
-      walkingMinutes: json['walking_minutes'] != null ? (json['walking_minutes'] as num).toDouble() : null,
+      walkingMinutes: json['walking_minutes'] != null
+          ? (json['walking_minutes'] as num).toDouble()
+          : null,
       walkingPath: (json['walking_path'] as List<dynamic>?)
-          ?.map((c) => LatLng((c[0] as num).toDouble(), (c[1] as num).toDouble()))
+          ?.map(
+            (c) => LatLng((c[0] as num).toDouble(), (c[1] as num).toDouble()),
+          )
           .toList(),
     );
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'name_th': nameTh,
-        'name_en': nameEn,
-        'lat': lat,
-        'lng': lng,
-        'type': type,
-        if (nearestStationId != null) 'nearest_station_id': nearestStationId,
-        if (walkingMinutes != null) 'walking_minutes': walkingMinutes,
-        if (walkingPath != null) 'walking_path': walkingPath!.map((p) => [p.latitude, p.longitude]).toList(),
-      };
+    'id': id,
+    'name_th': nameTh,
+    'name_en': nameEn,
+    'lat': lat,
+    'lng': lng,
+    'type': type,
+    if (nearestStationId != null) 'nearest_station_id': nearestStationId,
+    if (walkingMinutes != null) 'walking_minutes': walkingMinutes,
+    if (walkingPath != null)
+      'walking_path': walkingPath!
+          .map((p) => [p.latitude, p.longitude])
+          .toList(),
+  };
 
   NamtangStop copyWith({
     String? id,

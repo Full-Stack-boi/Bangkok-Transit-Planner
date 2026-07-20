@@ -41,14 +41,15 @@ class OsrmService {
         '$_baseUrl/$lon1,$lat1;$lon2,$lat2?overview=full&geometries=geojson&steps=false',
       );
 
-      final response = await _client.get(
-        url,
-        headers: kDefaultHeaders,
-      ).timeout(const Duration(seconds: 5));
+      final response = await _client
+          .get(url, headers: kDefaultHeaders)
+          .timeout(const Duration(seconds: 5));
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        if (data['code'] == 'Ok' && data['routes'] != null && data['routes'].isNotEmpty) {
+        if (data['code'] == 'Ok' &&
+            data['routes'] != null &&
+            data['routes'].isNotEmpty) {
           final route = data['routes'][0];
           final distance = (route['distance'] as num).toDouble();
           final duration = (route['duration'] as num).toDouble();

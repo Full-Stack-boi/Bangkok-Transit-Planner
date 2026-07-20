@@ -12,7 +12,7 @@ class PhotonSearchService {
   final TransitRepository _repository;
 
   PhotonSearchService(this._repository, [http.Client? client])
-      : _client = client ?? http.Client();
+    : _client = client ?? http.Client();
 
   Future<List<CustomLocation>> searchOnlinePlaces(String query) async {
     if (query.trim().length < 3) return [];
@@ -20,13 +20,12 @@ class PhotonSearchService {
     try {
       // Query Photon API with Bangkok location bias (lat=13.7563, lon=100.5018)
       final uri = Uri.parse(
-        'https://photon.komoot.io/api/?q=${Uri.encodeComponent(query)}&limit=5&lat=13.7563&lon=100.5018&lang=en'
+        'https://photon.komoot.io/api/?q=${Uri.encodeComponent(query)}&limit=5&lat=13.7563&lon=100.5018&lang=en',
       );
 
-      final response = await _client.get(
-        uri,
-        headers: kDefaultHeaders,
-      ).timeout(const Duration(seconds: 5));
+      final response = await _client
+          .get(uri, headers: kDefaultHeaders)
+          .timeout(const Duration(seconds: 5));
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = json.decode(response.body);
@@ -68,23 +67,31 @@ class PhotonSearchService {
           // Find nearest station
           final nearest = _repository.findNearestStation(lat, lon);
           if (nearest != null) {
-            final dist = Geolocator.distanceBetween(lat, lon, nearest.lat, nearest.lng);
+            final dist = Geolocator.distanceBetween(
+              lat,
+              lon,
+              nearest.lat,
+              nearest.lng,
+            );
             // Limit results to locations within 12 km of a transit station to filter out far-away provinces
             if (dist <= 12000.0) {
               // Walking minutes based on 80 meters/minute, capped between 1 and 30 mins
               final walkMin = (dist / 80.0).clamp(1.0, 30.0);
 
               final osmType = properties['osm_type'] as String? ?? 'N';
-              final osmId = properties['osm_id'] ?? DateTime.now().millisecondsSinceEpoch;
-              results.add(CustomLocation(
-                id: 'OSM_${osmType}_${osmId}_${lat.toStringAsFixed(6)}_${lon.toStringAsFixed(6)}',
-                nameTh: name,
-                nameEn: name,
-                nearestStationId: nearest.id,
-                walkingMinutes: walkMin,
-                lat: lat,
-                lng: lon,
-              ));
+              final osmId =
+                  properties['osm_id'] ?? DateTime.now().millisecondsSinceEpoch;
+              results.add(
+                CustomLocation(
+                  id: 'OSM_${osmType}_${osmId}_${lat.toStringAsFixed(6)}_${lon.toStringAsFixed(6)}',
+                  nameTh: name,
+                  nameEn: name,
+                  nearestStationId: nearest.id,
+                  walkingMinutes: walkMin,
+                  lat: lat,
+                  lng: lon,
+                ),
+              );
             }
           }
         }

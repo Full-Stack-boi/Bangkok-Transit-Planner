@@ -12,7 +12,8 @@ class RouteTrackerState {
   final RouteResult? activeRoute;
   final bool isActive;
   final int currentSegmentIndex;
-  final int currentStationIndex; // Index within the current segment's stations list
+  final int
+  currentStationIndex; // Index within the current segment's stations list
   final bool isSimulation;
   final bool hasArrived;
 
@@ -27,7 +28,10 @@ class RouteTrackerState {
 
   RouteSegment? get currentSegment {
     if (activeRoute == null || !isActive) return null;
-    if (currentSegmentIndex < 0 || currentSegmentIndex >= activeRoute!.segments.length) return null;
+    if (currentSegmentIndex < 0 ||
+        currentSegmentIndex >= activeRoute!.segments.length) {
+      return null;
+    }
     return activeRoute!.segments[currentSegmentIndex];
   }
 
@@ -49,7 +53,11 @@ class RouteTrackerState {
 
   Station? get currentStation {
     final stations = currentSegmentStations;
-    if (stations.isEmpty || currentStationIndex < 0 || currentStationIndex >= stations.length) return null;
+    if (stations.isEmpty ||
+        currentStationIndex < 0 ||
+        currentStationIndex >= stations.length) {
+      return null;
+    }
     return stations[currentStationIndex];
   }
 
@@ -96,7 +104,9 @@ class RouteTracker extends Notifier<RouteTrackerState> {
     ref.onDispose(() {
       _positionSubscription?.cancel();
       try {
-        const MethodChannel('bkktransit/journey_actions').setMethodCallHandler(null);
+        const MethodChannel(
+          'bkktransit/journey_actions',
+        ).setMethodCallHandler(null);
       } catch (_) {}
     });
     return RouteTrackerState();
@@ -126,7 +136,10 @@ class RouteTracker extends Notifier<RouteTrackerState> {
 
     LocationSettings settings;
     if (kIsWeb) {
-      settings = const LocationSettings(accuracy: LocationAccuracy.high, distanceFilter: 10);
+      settings = const LocationSettings(
+        accuracy: LocationAccuracy.high,
+        distanceFilter: 10,
+      );
     } else if (defaultTargetPlatform == TargetPlatform.android) {
       settings = AndroidSettings(
         accuracy: LocationAccuracy.high,
@@ -137,23 +150,26 @@ class RouteTracker extends Notifier<RouteTrackerState> {
       settings = AppleSettings(
         accuracy: LocationAccuracy.high,
         distanceFilter: isWalk ? 15 : 30,
-        activityType: isWalk ? ActivityType.fitness : ActivityType.otherNavigation,
+        activityType: isWalk
+            ? ActivityType.fitness
+            : ActivityType.otherNavigation,
         pauseLocationUpdatesAutomatically: true,
         showBackgroundLocationIndicator: true,
       );
     }
 
-    _positionSubscription = Geolocator.getPositionStream(
-      locationSettings: settings,
-    ).listen(
-      (Position position) {
-        updateLocation(position);
-      },
-      onError: (error) {
-        debugPrint("Location stream error (likely location service disabled): $error");
-      },
-      cancelOnError: false,
-    );
+    _positionSubscription =
+        Geolocator.getPositionStream(locationSettings: settings).listen(
+          (Position position) {
+            updateLocation(position);
+          },
+          onError: (error) {
+            debugPrint(
+              "Location stream error (likely location service disabled): $error",
+            );
+          },
+          cancelOnError: false,
+        );
   }
 
   void startTracking(RouteResult route, {bool simulation = false}) {
@@ -178,14 +194,14 @@ class RouteTracker extends Notifier<RouteTrackerState> {
   void stopTracking() {
     _positionSubscription?.cancel();
     _positionSubscription = null;
-    
+
     try {
       const channel = MethodChannel('bkktransit/journey_actions');
       channel.setMethodCallHandler(null);
     } catch (e) {
       // Ignore missing binary messenger in unit tests
     }
-    
+
     JourneyActivityService.stop();
     state = RouteTrackerState();
   }
@@ -195,11 +211,16 @@ class RouteTracker extends Notifier<RouteTrackerState> {
   }
 
   void advanceSimulation() {
-    if (state.activeRoute == null || !state.isActive || state.hasArrived) return;
+    if (state.activeRoute == null || !state.isActive || state.hasArrived) {
+      return;
+    }
 
     final stations = state.currentSegmentStations;
-    if (stations.isNotEmpty && state.currentStationIndex < stations.length - 1) {
-      state = state.copyWith(currentStationIndex: state.currentStationIndex + 1);
+    if (stations.isNotEmpty &&
+        state.currentStationIndex < stations.length - 1) {
+      state = state.copyWith(
+        currentStationIndex: state.currentStationIndex + 1,
+      );
       final t = ref.read(translationsProvider);
       JourneyActivityService.update(state, t: t);
     } else {
@@ -216,7 +237,7 @@ class RouteTracker extends Notifier<RouteTrackerState> {
         currentSegmentIndex: state.currentSegmentIndex + 1,
         currentStationIndex: 0,
       );
-      
+
       if (!state.isSimulation) {
         _subscribeToPositionStream();
       }
@@ -229,7 +250,9 @@ class RouteTracker extends Notifier<RouteTrackerState> {
   }
 
   void updateLocation(Position position) {
-    if (state.activeRoute == null || !state.isActive || state.hasArrived) return;
+    if (state.activeRoute == null || !state.isActive || state.hasArrived) {
+      return;
+    }
 
     final segment = state.currentSegment;
     if (segment == null) return;
@@ -265,7 +288,7 @@ class RouteTracker extends Notifier<RouteTrackerState> {
           segment.toStation.lat,
           segment.toStation.lng,
         );
-        
+
         final t = ref.read(translationsProvider);
         JourneyActivityService.update(
           state,
@@ -288,7 +311,7 @@ class RouteTracker extends Notifier<RouteTrackerState> {
           lastStation.lat,
           lastStation.lng,
         );
-        
+
         final t = ref.read(translationsProvider);
         JourneyActivityService.update(
           state,
@@ -323,13 +346,19 @@ class RouteTracker extends Notifier<RouteTrackerState> {
         } else {
           state = state.copyWith(currentStationIndex: nextIdx);
           final t = ref.read(translationsProvider);
-          JourneyActivityService.update(state, speedKmh: position.speed * 3.6, t: t);
+          JourneyActivityService.update(
+            state,
+            speedKmh: position.speed * 3.6,
+            t: t,
+          );
         }
       }
     }
   }
 }
 
-final routeTrackerProvider = NotifierProvider<RouteTracker, RouteTrackerState>(() {
-  return RouteTracker();
-});
+final routeTrackerProvider = NotifierProvider<RouteTracker, RouteTrackerState>(
+  () {
+    return RouteTracker();
+  },
+);

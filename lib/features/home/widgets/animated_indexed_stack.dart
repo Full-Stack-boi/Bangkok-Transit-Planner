@@ -16,7 +16,8 @@ class AnimatedIndexedStack extends StatefulWidget {
   State<AnimatedIndexedStack> createState() => _AnimatedIndexedStackState();
 }
 
-class _AnimatedIndexedStackState extends State<AnimatedIndexedStack> with TickerProviderStateMixin {
+class _AnimatedIndexedStackState extends State<AnimatedIndexedStack>
+    with TickerProviderStateMixin {
   late List<AnimationController> _controllers;
   late List<Animation<double>> _animations;
 
@@ -31,10 +32,9 @@ class _AnimatedIndexedStackState extends State<AnimatedIndexedStack> with Ticker
         value: i == widget.index ? 1.0 : 0.0,
       ),
     );
-    _animations = _controllers.map((c) => CurvedAnimation(
-      parent: c,
-      curve: Curves.easeInOutCubic,
-    )).toList();
+    _animations = _controllers
+        .map((c) => CurvedAnimation(parent: c, curve: Curves.easeInOutCubic))
+        .toList();
   }
 
   @override
@@ -59,15 +59,15 @@ class _AnimatedIndexedStackState extends State<AnimatedIndexedStack> with Ticker
     return Stack(
       children: List.generate(widget.children.length, (i) {
         final isSelected = i == widget.index;
-        
+
         final Animation<double> opacityAnimation = _animations[i];
-        final Animation<double> scaleAnimation = Tween<double>(
-          begin: 0.96,
-          end: 1.0,
-        ).animate(CurvedAnimation(
-          parent: _controllers[i],
-          curve: Curves.easeOutCubic,
-        ));
+        final Animation<double> scaleAnimation =
+            Tween<double>(begin: 0.96, end: 1.0).animate(
+              CurvedAnimation(
+                parent: _controllers[i],
+                curve: Curves.easeOutCubic,
+              ),
+            );
 
         return FadeTransition(
           opacity: opacityAnimation,
@@ -75,10 +75,7 @@ class _AnimatedIndexedStackState extends State<AnimatedIndexedStack> with Ticker
             scale: scaleAnimation,
             child: IgnorePointer(
               ignoring: !isSelected,
-              child: TickerMode(
-                enabled: isSelected,
-                child: widget.children[i],
-              ),
+              child: TickerMode(enabled: isSelected, child: widget.children[i]),
             ),
           ),
         );

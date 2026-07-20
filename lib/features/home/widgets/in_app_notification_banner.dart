@@ -1,8 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 
-/// A custom-themed in-app notification banner that slides down from the top of the screen.
-/// Features animations, a dismiss timer, close action, and premium styled UI matching the brand.
+/// In-app notification banner component.
 class InAppNotificationBanner extends StatefulWidget {
   final String title;
   final String body;
@@ -20,7 +19,8 @@ class InAppNotificationBanner extends StatefulWidget {
   });
 
   @override
-  State<InAppNotificationBanner> createState() => _InAppNotificationBannerState();
+  State<InAppNotificationBanner> createState() =>
+      _InAppNotificationBannerState();
 }
 
 class _InAppNotificationBannerState extends State<InAppNotificationBanner>
@@ -40,10 +40,7 @@ class _InAppNotificationBannerState extends State<InAppNotificationBanner>
     _offsetAnimation = Tween<Offset>(
       begin: const Offset(0.0, -1.5),
       end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeOutBack,
-    ));
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutBack));
 
     // Start entrance animation
     _controller.forward();
@@ -84,20 +81,27 @@ class _InAppNotificationBannerState extends State<InAppNotificationBanner>
             color: Colors.transparent,
             child: Container(
               decoration: BoxDecoration(
-                color: isDark 
-                    ? const Color(0xFF1E293B).withValues(alpha: 0.9) // slate-800
+                color: isDark
+                    ? const Color(0xFF1E293B).withValues(
+                        alpha: 0.9,
+                      ) // slate-800
                     : Colors.white.withValues(alpha: 0.95),
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
                   color: isDark
-                      ? const Color(0xFF6366F1).withValues(alpha: 0.4) // Indigo glow
+                      ? const Color(0xFF6366F1).withValues(
+                          alpha: 0.4,
+                        ) // Indigo glow
                       : const Color(0xFF4F46E5).withValues(alpha: 0.2),
                   width: 1.5,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: (isDark ? const Color(0xFF6366F1) : const Color(0xFF4F46E5))
-                        .withValues(alpha: 0.15),
+                    color:
+                        (isDark
+                                ? const Color(0xFF6366F1)
+                                : const Color(0xFF4F46E5))
+                            .withValues(alpha: 0.15),
                     blurRadius: 12,
                     spreadRadius: 2,
                     offset: const Offset(0, 4),
@@ -112,7 +116,10 @@ class _InAppNotificationBannerState extends State<InAppNotificationBanner>
                     widget.onTap();
                   },
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 14,
+                    ),
                     child: Row(
                       children: [
                         // Left brand indicator bar
@@ -120,7 +127,9 @@ class _InAppNotificationBannerState extends State<InAppNotificationBanner>
                           width: 4,
                           height: 40,
                           decoration: BoxDecoration(
-                            color: isDark ? const Color(0xFF6366F1) : const Color(0xFF4F46E5),
+                            color: isDark
+                                ? const Color(0xFF6366F1)
+                                : const Color(0xFF4F46E5),
                             borderRadius: BorderRadius.circular(2),
                           ),
                         ),
@@ -130,13 +139,18 @@ class _InAppNotificationBannerState extends State<InAppNotificationBanner>
                         Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: (isDark ? const Color(0xFF6366F1) : const Color(0xFF4F46E5))
-                                .withValues(alpha: 0.1),
+                            color:
+                                (isDark
+                                        ? const Color(0xFF6366F1)
+                                        : const Color(0xFF4F46E5))
+                                    .withValues(alpha: 0.1),
                             shape: BoxShape.circle,
                           ),
                           child: Icon(
                             Icons.train_rounded,
-                            color: isDark ? const Color(0xFF6366F1) : const Color(0xFF4F46E5),
+                            color: isDark
+                                ? const Color(0xFF6366F1)
+                                : const Color(0xFF4F46E5),
                             size: 24,
                           ),
                         ),
@@ -152,7 +166,9 @@ class _InAppNotificationBannerState extends State<InAppNotificationBanner>
                                 widget.title,
                                 style: theme.textTheme.titleMedium?.copyWith(
                                   fontWeight: FontWeight.bold,
-                                  color: isDark ? Colors.white : const Color(0xFF1E293B),
+                                  color: isDark
+                                      ? Colors.white
+                                      : const Color(0xFF1E293B),
                                   fontSize: 15,
                                 ),
                               ),
@@ -160,7 +176,9 @@ class _InAppNotificationBannerState extends State<InAppNotificationBanner>
                               Text(
                                 widget.body,
                                 style: theme.textTheme.bodyMedium?.copyWith(
-                                  color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF475569),
+                                  color: isDark
+                                      ? const Color(0xFFCBD5E1)
+                                      : const Color(0xFF475569),
                                   fontSize: 13,
                                 ),
                               ),
@@ -172,7 +190,9 @@ class _InAppNotificationBannerState extends State<InAppNotificationBanner>
                         IconButton(
                           icon: Icon(
                             Icons.close_rounded,
-                            color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                            color: theme.colorScheme.onSurface.withValues(
+                              alpha: 0.5,
+                            ),
                             size: 20,
                           ),
                           onPressed: () {

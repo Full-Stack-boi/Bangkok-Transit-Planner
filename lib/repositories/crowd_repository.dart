@@ -14,12 +14,15 @@ class CrowdRepository {
     String? userId,
   }) async {
     final now = DateTime.now().toIso8601String();
-    AppLogger.info('Passive GPS check-in reported locally: Station: $stationId, Accuracy: $accuracy meters, Time: $now');
+    AppLogger.info(
+      'Passive GPS check-in reported locally: Station: $stationId, Accuracy: $accuracy meters, Time: $now',
+    );
 
     if (_supabaseService.isInitialized) {
       try {
         final client = _supabaseService.client;
-        final actualUserId = userId ?? client?.auth.currentUser?.id ?? 'anonymous_user';
+        final actualUserId =
+            userId ?? client?.auth.currentUser?.id ?? 'anonymous_user';
 
         await client?.from('crowd_presence').insert({
           'station_id': stationId,
@@ -41,12 +44,15 @@ class CrowdRepository {
     String? userId,
   }) async {
     final now = DateTime.now().toIso8601String();
-    AppLogger.info('Active crowd report submitted locally: Station: $stationId, Level: $level, Direction: $direction, Time: $now');
+    AppLogger.info(
+      'Active crowd report submitted locally: Station: $stationId, Level: $level, Direction: $direction, Time: $now',
+    );
 
     if (_supabaseService.isInitialized) {
       try {
         final client = _supabaseService.client;
-        final actualUserId = userId ?? client?.auth.currentUser?.id ?? 'anonymous_user';
+        final actualUserId =
+            userId ?? client?.auth.currentUser?.id ?? 'anonymous_user';
 
         await client?.from('crowd_reports').insert({
           'station_id': stationId,
@@ -56,7 +62,10 @@ class CrowdRepository {
           'direction': direction,
         });
       } catch (e) {
-        AppLogger.error('Supabase active crowd report sync failed: $e', error: e);
+        AppLogger.error(
+          'Supabase active crowd report sync failed: $e',
+          error: e,
+        );
       }
     }
   }

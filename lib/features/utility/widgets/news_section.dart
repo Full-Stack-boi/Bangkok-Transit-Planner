@@ -43,7 +43,9 @@ class NewsSection extends StatelessWidget {
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.3),
+                    color: theme.colorScheme.onSurfaceVariant.withValues(
+                      alpha: 0.3,
+                    ),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -72,7 +74,11 @@ class NewsSection extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               Text(
-                t.isTh ? article.titleTh : (article.titleEn.isNotEmpty ? article.titleEn : article.titleTh),
+                t.isTh
+                    ? article.titleTh
+                    : (article.titleEn.isNotEmpty
+                          ? article.titleEn
+                          : article.titleTh),
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
@@ -86,10 +92,12 @@ class NewsSection extends StatelessWidget {
               ),
               const Divider(height: 24),
               Text(
-                t.isTh ? article.bodyTh : (article.bodyEn.isNotEmpty ? article.bodyEn : article.bodyTh),
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  height: 1.5,
-                ),
+                t.isTh
+                    ? article.bodyTh
+                    : (article.bodyEn.isNotEmpty
+                          ? article.bodyEn
+                          : article.bodyTh),
+                style: theme.textTheme.bodyMedium?.copyWith(height: 1.5),
               ),
             ],
           ),
@@ -122,7 +130,9 @@ class NewsSection extends StatelessWidget {
                     Icon(
                       Icons.notifications_off_outlined,
                       size: 40,
-                      color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+                      color: theme.colorScheme.onSurfaceVariant.withValues(
+                        alpha: 0.5,
+                      ),
                     ),
                     const SizedBox(height: 12),
                     Text(
@@ -148,7 +158,8 @@ class NewsSection extends StatelessWidget {
                 theme: theme,
                 t: t,
                 item: item,
-                onTap: () => _showNewsDetailsBottomSheet(context, theme, t, item),
+                onTap: () =>
+                    _showNewsDetailsBottomSheet(context, theme, t, item),
               );
             },
           ),

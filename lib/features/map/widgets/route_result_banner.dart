@@ -18,13 +18,18 @@ class RouteResultBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final hasWarning = (result.origin is CustomLocation && (result.origin as CustomLocation).hasAccuracyWarning) ||
-                       (result.destination is CustomLocation && (result.destination as CustomLocation).hasAccuracyWarning);
+    final hasWarning =
+        (result.origin is CustomLocation &&
+            (result.origin as CustomLocation).hasAccuracyWarning) ||
+        (result.destination is CustomLocation &&
+            (result.destination as CustomLocation).hasAccuracyWarning);
 
     return Card(
       color: hasWarning
           ? Colors.amber.withValues(alpha: 0.1)
-          : (theme.appColors.routeColor ?? const Color(0xFF818CF8)).withValues(alpha: 0.1),
+          : (theme.appColors.routeColor ?? const Color(0xFF818CF8)).withValues(
+              alpha: 0.1,
+            ),
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(16),
@@ -34,7 +39,9 @@ class RouteResultBanner extends StatelessWidget {
             children: [
               Icon(
                 hasWarning ? Icons.warning_amber_rounded : Icons.route_rounded,
-                color: hasWarning ? Colors.amber[800] : (theme.appColors.routeColor ?? const Color(0xFF818CF8)),
+                color: hasWarning
+                    ? Colors.amber[800]
+                    : (theme.appColors.routeColor ?? const Color(0xFF818CF8)),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -57,7 +64,10 @@ class RouteResultBanner extends StatelessWidget {
                   ],
                 ),
               ),
-              Icon(Icons.chevron_right, color: theme.colorScheme.onSurface.withValues(alpha: 0.4)),
+              Icon(
+                Icons.chevron_right,
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
+              ),
             ],
           ),
         ),

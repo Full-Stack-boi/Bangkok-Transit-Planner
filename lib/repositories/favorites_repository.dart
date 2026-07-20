@@ -31,7 +31,7 @@ class FavoritesRepository {
     _initialized = true;
   }
 
-  // ─── Favorite Stations ───
+  // Favorite Stations
 
   /// Get list of favorite station IDs
   List<String> getFavoriteStationIds() {
@@ -84,7 +84,7 @@ class FavoritesRepository {
     return getFavoriteStationIds().contains(stationId);
   }
 
-  // ─── Saved Routes ───
+  // Saved Routes
 
   /// Get list of saved routes as maps
   List<Map<String, String>> getSavedRoutes() {

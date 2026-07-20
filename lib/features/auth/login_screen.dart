@@ -38,7 +38,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       final authState = ref.read(authProvider);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(authState.errorMessage ?? ref.read(translationsProvider).auth.loginFailed),
+          content: Text(
+            authState.errorMessage ??
+                ref.read(translationsProvider).auth.loginFailed,
+          ),
           backgroundColor: Theme.of(context).colorScheme.error,
         ),
       );
@@ -88,7 +91,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new_rounded, color: theme.colorScheme.onSurface),
+          icon: Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: theme.colorScheme.onSurface,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -100,7 +106,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             end: Alignment.bottomCenter,
             colors: theme.brightness == Brightness.dark
                 ? [theme.colorScheme.surface, theme.colorScheme.surfaceDim]
-                : [theme.colorScheme.surface, theme.colorScheme.primaryContainer.withValues(alpha: 0.15)],
+                : [
+                    theme.colorScheme.surface,
+                    theme.colorScheme.primaryContainer.withValues(alpha: 0.15),
+                  ],
           ),
         ),
         child: SafeArea(
@@ -158,7 +167,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         if (value == null || value.isEmpty) {
                           return t.auth.invalidEmail;
                         }
-                        final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+                        final emailRegex = RegExp(
+                          r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                        );
                         if (!emailRegex.hasMatch(value)) {
                           return t.auth.invalidEmail;
                         }
@@ -194,7 +205,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         ),
                       ),
                       validator: (value) {
-                        if (value == null || value.isEmpty || value.length < 6) {
+                        if (value == null ||
+                            value.isEmpty ||
+                            value.length < 6) {
                           return t.auth.passwordTooShort;
                         }
                         return null;
@@ -204,7 +217,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
                     // Submit Button
                     ElevatedButton(
-                      onPressed: authState.isLoading ? null : () => _submitLogin(),
+                      onPressed: authState.isLoading
+                          ? null
+                          : () => _submitLogin(),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: theme.colorScheme.primary,
                         foregroundColor: theme.colorScheme.onPrimary,
@@ -235,7 +250,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     // Divider
                     Row(
                       children: [
-                        Expanded(child: Divider(color: theme.colorScheme.outlineVariant)),
+                        Expanded(
+                          child: Divider(
+                            color: theme.colorScheme.outlineVariant,
+                          ),
+                        ),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 16),
                           child: Text(
@@ -245,24 +264,36 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             ),
                           ),
                         ),
-                        Expanded(child: Divider(color: theme.colorScheme.outlineVariant)),
+                        Expanded(
+                          child: Divider(
+                            color: theme.colorScheme.outlineVariant,
+                          ),
+                        ),
                       ],
                     ),
                     const SizedBox(height: 20),
 
                     // Google Sign-In Button
                     ElevatedButton(
-                      onPressed: authState.isLoading ? null : () => _submitGoogleLogin(),
+                      onPressed: authState.isLoading
+                          ? null
+                          : () => _submitGoogleLogin(),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: theme.brightness == Brightness.dark ? const Color(0xFF131314) : Colors.white,
-                        foregroundColor: theme.brightness == Brightness.dark ? const Color(0xFFE3E3E3) : const Color(0xFF1F1F1F),
-                        elevation: theme.brightness == Brightness.dark ? 0 : 1.5,
+                        backgroundColor: theme.brightness == Brightness.dark
+                            ? const Color(0xFF131314)
+                            : Colors.white,
+                        foregroundColor: theme.brightness == Brightness.dark
+                            ? const Color(0xFFE3E3E3)
+                            : const Color(0xFF1F1F1F),
+                        elevation: theme.brightness == Brightness.dark
+                            ? 0
+                            : 1.5,
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                           side: BorderSide(
-                            color: theme.brightness == Brightness.dark 
-                                ? const Color(0xFF333537) 
+                            color: theme.brightness == Brightness.dark
+                                ? const Color(0xFF333537)
                                 : const Color(0xFF747775),
                             width: 1,
                           ),
@@ -282,7 +313,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
-                              color: theme.brightness == Brightness.dark ? const Color(0xFFE3E3E3) : const Color(0xFF1F1F1F),
+                              color: theme.brightness == Brightness.dark
+                                  ? const Color(0xFFE3E3E3)
+                                  : const Color(0xFF1F1F1F),
                             ),
                           ),
                         ],
@@ -295,7 +328,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       onPressed: () {
                         Navigator.pushReplacement(
                           context,
-                          MaterialPageRoute(builder: (context) => const RegisterScreen()),
+                          MaterialPageRoute(
+                            builder: (context) => const RegisterScreen(),
+                          ),
                         );
                       },
                       child: Text(

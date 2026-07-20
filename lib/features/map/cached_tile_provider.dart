@@ -30,10 +30,10 @@ class CachedTileProvider extends TileProvider {
     if (_resolvedCachePath != null) return _resolvedCachePath!;
     final supportDir = await getApplicationSupportDirectory();
     _resolvedCachePath = '${supportDir.path}/map_tiles';
-    
+
     final bundleFile = File('$_resolvedCachePath/map_tiles.bundle');
     final versionFile = File('$_resolvedCachePath/map_tiles.bundle.ver');
-    
+
     bool needsCopy = false;
     if (!await bundleFile.exists()) {
       needsCopy = true;
@@ -47,21 +47,28 @@ class CachedTileProvider extends TileProvider {
         }
       }
     }
-    
+
     if (needsCopy) {
-      AppLogger.info('Bundle needs copy or update. Copying from assets...', tag: 'MapCache');
+      AppLogger.info(
+        'Bundle needs copy or update. Copying from assets...',
+        tag: 'MapCache',
+      );
       try {
         await copyBundleAsset('assets/map_tiles.bundle', bundleFile.path);
         await versionFile.parent.create(recursive: true);
         await versionFile.writeAsString(_bundleVersion, flush: true);
       } catch (e) {
-        AppLogger.error('Failed to copy/update bundle: $e', tag: 'MapCache', error: e);
+        AppLogger.error(
+          'Failed to copy/update bundle: $e',
+          tag: 'MapCache',
+          error: e,
+        );
       }
     }
-    
+
     // Auto initialize MapBundleManager once target directory path is resolved
     await MapBundleManager.instance.init(bundleFile.path);
-    
+
     // Scan updates folder to populate in-memory loose file path tracker
     try {
       _looseTilePaths.clear();
@@ -75,9 +82,12 @@ class CachedTileProvider extends TileProvider {
         }
       }
     } catch (e) {
-      AppLogger.error('Failed to populate loose tile paths: $e', tag: 'MapCache');
+      AppLogger.error(
+        'Failed to populate loose tile paths: $e',
+        tag: 'MapCache',
+      );
     }
-    
+
     return _resolvedCachePath!;
   }
 
@@ -87,7 +97,8 @@ class CachedTileProvider extends TileProvider {
   static String getFolderHash(String urlTemplate) {
     if (urlTemplate.contains('dark_all')) {
       return 'dark_all';
-    } else if (urlTemplate.contains('voyager') || urlTemplate.contains('rastertiles')) {
+    } else if (urlTemplate.contains('voyager') ||
+        urlTemplate.contains('rastertiles')) {
       return 'voyager';
     } else {
       // Fallback: sanitize URL template to make it a safe directory name
@@ -102,19 +113,35 @@ class CachedTileProvider extends TileProvider {
   }
 
   /// Copies the map tiles bundle binary asset directly to the local disk cache
-  static Future<void> copyBundleAsset(String assetPath, String targetPath) async {
+  static Future<void> copyBundleAsset(
+    String assetPath,
+    String targetPath,
+  ) async {
     try {
-      AppLogger.info('Copying map tiles bundle from $assetPath to $targetPath...', tag: 'MapCache');
+      AppLogger.info(
+        'Copying map tiles bundle from $assetPath to $targetPath...',
+        tag: 'MapCache',
+      );
       final file = File(targetPath);
       await file.parent.create(recursive: true);
 
       final data = await rootBundle.load(assetPath);
-      final bytes = data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
+      final bytes = data.buffer.asUint8List(
+        data.offsetInBytes,
+        data.lengthInBytes,
+      );
 
       await file.writeAsBytes(bytes, flush: true);
-      AppLogger.success('Bundle asset copied successfully (${bytes.length} bytes).', tag: 'MapCache');
+      AppLogger.success(
+        'Bundle asset copied successfully (${bytes.length} bytes).',
+        tag: 'MapCache',
+      );
     } catch (e) {
-      AppLogger.error('Failed to copy bundle asset: $e', tag: 'MapCache', error: e);
+      AppLogger.error(
+        'Failed to copy bundle asset: $e',
+        tag: 'MapCache',
+        error: e,
+      );
       rethrow;
     }
   }
@@ -122,16 +149,79 @@ class CachedTileProvider extends TileProvider {
   @override
   ImageProvider getImage(TileCoordinates coordinates, TileLayer options) {
     if (Platform.environment.containsKey('FLUTTER_TEST')) {
-      return MemoryImage(Uint8List.fromList(<int>[
-        0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0x00, 0x00, 0x00, 0x0D, 0x49,
-        0x48, 0x44, 0x52, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x08, 0x06,
-        0x00, 0x00, 0x00, 0x1F, 0x15, 0xC4, 0x89, 0x00, 0x00, 0x00, 0x0A, 0x49, 0x44,
-        0x41, 0x54, 0x78, 0x9C, 0x63, 0x00, 0x01, 0x00, 0x00, 0x05, 0x00, 0x01, 0x0D,
-        0x0A, 0x2D, 0xB4, 0x00, 0x00, 0x00, 0x00, 0x49, 0x45, 0x4E, 0x44, 0xAE, 0x42,
-        0x60, 0x82,
-      ]));
+      return MemoryImage(
+        Uint8List.fromList(<int>[
+          0x89,
+          0x50,
+          0x4E,
+          0x47,
+          0x0D,
+          0x0A,
+          0x1A,
+          0x0A,
+          0x00,
+          0x00,
+          0x00,
+          0x0D,
+          0x49,
+          0x48,
+          0x44,
+          0x52,
+          0x00,
+          0x00,
+          0x00,
+          0x01,
+          0x00,
+          0x00,
+          0x00,
+          0x01,
+          0x08,
+          0x06,
+          0x00,
+          0x00,
+          0x00,
+          0x1F,
+          0x15,
+          0xC4,
+          0x89,
+          0x00,
+          0x00,
+          0x00,
+          0x0A,
+          0x49,
+          0x44,
+          0x41,
+          0x54,
+          0x78,
+          0x9C,
+          0x63,
+          0x00,
+          0x01,
+          0x00,
+          0x00,
+          0x05,
+          0x00,
+          0x01,
+          0x0D,
+          0x0A,
+          0x2D,
+          0xB4,
+          0x00,
+          0x00,
+          0x00,
+          0x00,
+          0x49,
+          0x45,
+          0x4E,
+          0x44,
+          0xAE,
+          0x42,
+          0x60,
+          0x82,
+        ]),
+      );
     }
-    
+
     final url = getTileUrl(coordinates, options);
     if (kIsWeb) {
       return NetworkImage(url);
@@ -142,13 +232,20 @@ class CachedTileProvider extends TileProvider {
       // Safe fallback if not initialized
       return NetworkImage(url);
     }
-    
+
     // Writable updates go to updates/ folder. The bundle provides base tiles.
-    final tileFile = File('$cacheDir/updates/$folderHash/${coordinates.z}/${coordinates.x}/${coordinates.y}.png');
-    final metaFile = File('$cacheDir/updates/$folderHash/${coordinates.z}/${coordinates.x}/${coordinates.y}.meta');
+    final tileFile = File(
+      '$cacheDir/updates/$folderHash/${coordinates.z}/${coordinates.x}/${coordinates.y}.png',
+    );
+    final metaFile = File(
+      '$cacheDir/updates/$folderHash/${coordinates.z}/${coordinates.x}/${coordinates.y}.meta',
+    );
 
     if (kDebugMode) {
-      AppLogger.info('getImage URL: $url, Path: ${tileFile.path}', tag: 'MapTile');
+      AppLogger.info(
+        'getImage URL: $url, Path: ${tileFile.path}',
+        tag: 'MapTile',
+      );
     }
 
     return CachedTileImageProvider(
@@ -171,7 +268,10 @@ class CachedTileProvider extends TileProvider {
   /// Converts Latitude to Slippy Map Tile Y coordinate
   static int latToTileY(double lat, int zoom) {
     final latRad = lat * pi / 180.0;
-    return ((1.0 - (log(tan(latRad) + 1.0 / cos(latRad)) / pi)) / 2.0 * pow(2, zoom)).floor();
+    return ((1.0 - (log(tan(latRad) + 1.0 / cos(latRad)) / pi)) /
+            2.0 *
+            pow(2, zoom))
+        .floor();
   }
 
   /// Prefetch map tiles for the Bangkok transit network in the background.
@@ -202,33 +302,43 @@ class CachedTileProvider extends TileProvider {
 
     try {
       final cacheDir = await getCachePath();
-      AppLogger.info('Starting background map prefetch for ${stations.length} stations in Bangkok...', tag: 'Prefetch');
+      AppLogger.info(
+        'Starting background map prefetch for ${stations.length} stations in Bangkok...',
+        tag: 'Prefetch',
+      );
 
       // Three-tier bounding box definitions
       const bMinLat = 13.10;
       const bMaxLat = 14.70;
       const bMinLng = 99.50;
       const bMaxLng = 101.50;
-      
+
       const tMinLat = 13.51;
       const tMaxLat = 13.99;
       const tMinLng = 100.35;
       const tMaxLng = 100.81;
 
-      final double devicePixelRatio = ui.PlatformDispatcher.instance.views.isNotEmpty
+      final double devicePixelRatio =
+          ui.PlatformDispatcher.instance.views.isNotEmpty
           ? ui.PlatformDispatcher.instance.views.first.devicePixelRatio
           : 1.0;
       final String rValue = devicePixelRatio > 1.0 ? '@2x' : '';
 
       final targets = [
         {
-          'template': 'https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}$rValue.png',
-          'hash': getFolderHash('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'),
+          'template':
+              'https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}$rValue.png',
+          'hash': getFolderHash(
+            'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+          ),
         },
         {
-          'template': 'https://a.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}$rValue.png',
-          'hash': getFolderHash('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png'),
-        }
+          'template':
+              'https://a.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}$rValue.png',
+          'hash': getFolderHash(
+            'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
+          ),
+        },
       ];
 
       final tilesToFetch = <String>{};
@@ -242,7 +352,9 @@ class CachedTileProvider extends TileProvider {
         for (int tx = xMin; tx <= xMax; tx++) {
           for (int ty = yMin; ty <= yMax; ty++) {
             for (final target in targets) {
-              tilesToFetch.add('${target['hash']}:$z:$tx:$ty:${target['template']}');
+              tilesToFetch.add(
+                '${target['hash']}:$z:$tx:$ty:${target['template']}',
+              );
             }
           }
         }
@@ -257,7 +369,9 @@ class CachedTileProvider extends TileProvider {
         for (int tx = xMin; tx <= xMax; tx++) {
           for (int ty = yMin; ty <= yMax; ty++) {
             for (final target in targets) {
-              tilesToFetch.add('${target['hash']}:$z:$tx:$ty:${target['template']}');
+              tilesToFetch.add(
+                '${target['hash']}:$z:$tx:$ty:${target['template']}',
+              );
             }
           }
         }
@@ -265,7 +379,10 @@ class CachedTileProvider extends TileProvider {
 
       // 3. Station Centers Zoom (16-17)
       for (final station in stations) {
-        if (station.lat < bMinLat || station.lat > bMaxLat || station.lng < bMinLng || station.lng > bMaxLng) {
+        if (station.lat < bMinLat ||
+            station.lat > bMaxLat ||
+            station.lng < bMinLng ||
+            station.lng > bMaxLng) {
           continue;
         }
 
@@ -273,12 +390,17 @@ class CachedTileProvider extends TileProvider {
           final tx = lonToTileX(station.lng, z);
           final ty = latToTileY(station.lat, z);
           for (final target in targets) {
-            tilesToFetch.add('${target['hash']}:$z:$tx:$ty:${target['template']}');
+            tilesToFetch.add(
+              '${target['hash']}:$z:$tx:$ty:${target['template']}',
+            );
           }
         }
       }
 
-      AppLogger.info('Deduplicated total tiles to fetch: ${tilesToFetch.length}', tag: 'Prefetch');
+      AppLogger.info(
+        'Deduplicated total tiles to fetch: ${tilesToFetch.length}',
+        tag: 'Prefetch',
+      );
       onStart?.call(tilesToFetch.length);
 
       int successCount = 0;
@@ -295,66 +417,86 @@ class CachedTileProvider extends TileProvider {
           break;
         }
         await workerSemaphore.acquire();
-        tasks.add(Future(() async {
-          try {
-            if (isPaused) return;
+        tasks.add(
+          Future(() async {
+            try {
+              if (isPaused) return;
 
-            final parts = tileInfo.split(':');
-            final folderHash = parts[0];
-            final z = int.parse(parts[1]);
-            final x = int.parse(parts[2]);
-            final y = int.parse(parts[3]);
-            final urlTemplate = parts.sublist(4).join(':');
+              final parts = tileInfo.split(':');
+              final folderHash = parts[0];
+              final z = int.parse(parts[1]);
+              final x = int.parse(parts[2]);
+              final y = int.parse(parts[3]);
+              final urlTemplate = parts.sublist(4).join(':');
 
-            final url = urlTemplate
-                .replaceAll('{z}', z.toString())
-                .replaceAll('{x}', x.toString())
-                .replaceAll('{y}', y.toString());
+              final url = urlTemplate
+                  .replaceAll('{z}', z.toString())
+                  .replaceAll('{x}', x.toString())
+                  .replaceAll('{y}', y.toString());
 
-            final tileFile = File('$cacheDir/$folderHash/$z/$x/$y.png');
-            final metaFile = File('$cacheDir/$folderHash/$z/$x/$y.meta');
+              final tileFile = File('$cacheDir/$folderHash/$z/$x/$y.png');
+              final metaFile = File('$cacheDir/$folderHash/$z/$x/$y.meta');
 
-            if (await tileFile.exists() || MapBundleManager.instance.hasTile(folderHash, z, x, y)) {
-              cachedCount++;
-            } else {
-              final status = await _downloadTileStatus(url, tileFile, metaFile);
-              if (status == _tileSuccess || status == _tileUnmodified) {
-                successCount++;
-                consecutiveNetworkErrors = 0;
-              } else if (status == _tileErrorHttp) {
-                errorCount++;
-                consecutiveNetworkErrors = 0;
-              } else if (status == _tileErrorNetwork) {
-                errorCount++;
-                consecutiveNetworkErrors++;
-                if (consecutiveNetworkErrors >= 3) {
-                  AppLogger.error('Lost internet connection (3 consecutive network errors). Pausing prefetch.', tag: 'Prefetch');
-                  isPaused = true;
-                  lostConnection = true;
+              if (await tileFile.exists() ||
+                  MapBundleManager.instance.hasTile(folderHash, z, x, y)) {
+                cachedCount++;
+              } else {
+                final status = await _downloadTileStatus(
+                  url,
+                  tileFile,
+                  metaFile,
+                );
+                if (status == _tileSuccess || status == _tileUnmodified) {
+                  successCount++;
+                  consecutiveNetworkErrors = 0;
+                } else if (status == _tileErrorHttp) {
+                  errorCount++;
+                  consecutiveNetworkErrors = 0;
+                } else if (status == _tileErrorNetwork) {
+                  errorCount++;
+                  consecutiveNetworkErrors++;
+                  if (consecutiveNetworkErrors >= 3) {
+                    AppLogger.error(
+                      'Lost internet connection (3 consecutive network errors). Pausing prefetch.',
+                      tag: 'Prefetch',
+                    );
+                    isPaused = true;
+                    lostConnection = true;
+                  }
                 }
               }
+            } catch (e) {
+              errorCount++;
+            } finally {
+              index++;
+              onProgress?.call(index, successCount, cachedCount, errorCount);
+              if (index % 100 == 0 || index == tilesToFetch.length) {
+                AppLogger.info(
+                  'Progress: $index/${tilesToFetch.length} (Cached: $cachedCount, Downloaded: $successCount, Fail: $errorCount)',
+                  tag: 'Prefetch',
+                );
+              }
+              workerSemaphore.release();
             }
-          } catch (e) {
-            errorCount++;
-          } finally {
-            index++;
-            onProgress?.call(index, successCount, cachedCount, errorCount);
-            if (index % 100 == 0 || index == tilesToFetch.length) {
-              AppLogger.info('Progress: $index/${tilesToFetch.length} (Cached: $cachedCount, Downloaded: $successCount, Fail: $errorCount)', tag: 'Prefetch');
-            }
-            workerSemaphore.release();
-          }
-        }));
+          }),
+        );
       }
 
       await Future.wait(tasks);
 
-      AppLogger.success('Finished. Total: ${tilesToFetch.length}, Cached/Verified: $cachedCount, New Downloaded: $successCount, Errors: $errorCount', tag: 'Prefetch');
+      AppLogger.success(
+        'Finished. Total: ${tilesToFetch.length}, Cached/Verified: $cachedCount, New Downloaded: $successCount, Errors: $errorCount',
+        tag: 'Prefetch',
+      );
       if (!isPaused && index == tilesToFetch.length) {
         completed = true;
       }
     } catch (e) {
-      AppLogger.error('Fatal error in prefetcher: $e', tag: 'Prefetch', error: e);
+      AppLogger.error(
+        'Fatal error in prefetcher: $e',
+        tag: 'Prefetch',
+        error: e,
+      );
     } finally {
       _isPrefetching = false;
       onFinish?.call(completed, lostConnection);
@@ -381,7 +523,9 @@ class CachedTileProvider extends TileProvider {
         } catch (_) {}
       }
 
-      final response = await http.get(Uri.parse(url), headers: headers).timeout(const Duration(seconds: 10));
+      final response = await http
+          .get(Uri.parse(url), headers: headers)
+          .timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 200) {
         final bytes = response.bodyBytes;
@@ -391,12 +535,11 @@ class CachedTileProvider extends TileProvider {
 
         final etag = response.headers['etag'];
         final lastModified = response.headers['last-modified'];
-        
+
         await metaFile.parent.create(recursive: true);
-        await metaFile.writeAsString(jsonEncode({
-          'etag': etag,
-          'lastModified': lastModified,
-        }));
+        await metaFile.writeAsString(
+          jsonEncode({'etag': etag, 'lastModified': lastModified}),
+        );
         return _tileSuccess;
       } else if (response.statusCode == 304) {
         return _tileUnmodified;
@@ -411,7 +554,9 @@ class CachedTileProvider extends TileProvider {
       return _tileErrorNetwork;
     } catch (e) {
       final errStr = e.toString();
-      if (errStr.contains('ClientException') || errStr.contains('SocketException') || errStr.contains('Failed host lookup')) {
+      if (errStr.contains('ClientException') ||
+          errStr.contains('SocketException') ||
+          errStr.contains('Failed host lookup')) {
         return _tileErrorNetwork;
       }
       return _tileErrorHttp;
@@ -476,7 +621,10 @@ class CachedTileImageProvider extends ImageProvider<CachedTileImageProvider> {
   }
 
   @override
-  ImageStreamCompleter loadImage(CachedTileImageProvider key, ImageDecoderCallback decode) {
+  ImageStreamCompleter loadImage(
+    CachedTileImageProvider key,
+    ImageDecoderCallback decode,
+  ) {
     final completer = Completer<ImageInfo>();
     _loadAsync(key, decode, completer);
     return OneFrameImageStreamCompleter(completer.future);
@@ -489,9 +637,14 @@ class CachedTileImageProvider extends ImageProvider<CachedTileImageProvider> {
   ) async {
     try {
       // 1. Check updates folder (loose downloaded tiles) first
-      final fileExists = CachedTileProvider._looseTilePaths.contains(key.tileFile.path);
+      final fileExists = CachedTileProvider._looseTilePaths.contains(
+        key.tileFile.path,
+      );
       if (kDebugMode) {
-        AppLogger.info('Loading tile (${key.z}, ${key.x}, ${key.y}). Loose file exists: $fileExists, Path: ${key.tileFile.path}', tag: 'MapTile');
+        AppLogger.info(
+          'Loading tile (${key.z}, ${key.x}, ${key.y}). Loose file exists: $fileExists, Path: ${key.tileFile.path}',
+          tag: 'MapTile',
+        );
       }
 
       if (fileExists) {
@@ -504,17 +657,26 @@ class CachedTileImageProvider extends ImageProvider<CachedTileImageProvider> {
         } else {
           final Uint8List bytes = await key.tileFile.readAsBytes();
           _validateCacheInBackground(key);
-          
+
           try {
-            final codec = await decode(await ui.ImmutableBuffer.fromUint8List(bytes));
+            final codec = await decode(
+              await ui.ImmutableBuffer.fromUint8List(bytes),
+            );
             final frame = await codec.getNextFrame();
             completer.complete(ImageInfo(image: frame.image, scale: 1.0));
             if (kDebugMode) {
-              AppLogger.success('Successfully decoded tile (${key.z}, ${key.x}, ${key.y}) from updates folder.', tag: 'MapTile');
+              AppLogger.success(
+                'Successfully decoded tile (${key.z}, ${key.x}, ${key.y}) from updates folder.',
+                tag: 'MapTile',
+              );
             }
             return;
           } catch (e, stackTrace) {
-            AppLogger.error('Error decoding tile (${key.z}, ${key.x}, ${key.y}) from updates: $e\n$stackTrace', tag: 'MapTile', error: e);
+            AppLogger.error(
+              'Error decoding tile (${key.z}, ${key.x}, ${key.y}) from updates: $e\n$stackTrace',
+              tag: 'MapTile',
+              error: e,
+            );
             try {
               await key.tileFile.delete();
               CachedTileProvider._looseTilePaths.remove(key.tileFile.path);
@@ -524,43 +686,72 @@ class CachedTileImageProvider extends ImageProvider<CachedTileImageProvider> {
       }
 
       // 2. Check binary bundle second
-      final bundleBytes = await MapBundleManager.instance.readTile(key.folderHash, key.z, key.x, key.y);
+      final bundleBytes = await MapBundleManager.instance.readTile(
+        key.folderHash,
+        key.z,
+        key.x,
+        key.y,
+      );
       if (bundleBytes != null && bundleBytes.isNotEmpty) {
         try {
-          final codec = await decode(await ui.ImmutableBuffer.fromUint8List(bundleBytes));
+          final codec = await decode(
+            await ui.ImmutableBuffer.fromUint8List(bundleBytes),
+          );
           final frame = await codec.getNextFrame();
           completer.complete(ImageInfo(image: frame.image, scale: 1.0));
           if (kDebugMode) {
-            AppLogger.success('Successfully decoded tile (${key.z}, ${key.x}, ${key.y}) from bundle.', tag: 'MapTile');
+            AppLogger.success(
+              'Successfully decoded tile (${key.z}, ${key.x}, ${key.y}) from bundle.',
+              tag: 'MapTile',
+            );
           }
           return;
         } catch (e, stackTrace) {
-          AppLogger.error('Error decoding tile (${key.z}, ${key.x}, ${key.y}) from bundle: $e\n$stackTrace', tag: 'MapTile', error: e);
+          AppLogger.error(
+            'Error decoding tile (${key.z}, ${key.x}, ${key.y}) from bundle: $e\n$stackTrace',
+            tag: 'MapTile',
+            error: e,
+          );
         }
       }
 
       // 3. Cache miss: Perform network request
       if (kDebugMode) {
-        AppLogger.info('Cache miss for tile (${key.z}, ${key.x}, ${key.y}). Fetching from network: ${key.url}', tag: 'MapTile');
+        AppLogger.info(
+          'Cache miss for tile (${key.z}, ${key.x}, ${key.y}). Fetching from network: ${key.url}',
+          tag: 'MapTile',
+        );
       }
       final bytes = await _downloadTile(key);
       if (bytes != null && bytes.isNotEmpty) {
         try {
-          final codec = await decode(await ui.ImmutableBuffer.fromUint8List(bytes));
+          final codec = await decode(
+            await ui.ImmutableBuffer.fromUint8List(bytes),
+          );
           final frame = await codec.getNextFrame();
           completer.complete(ImageInfo(image: frame.image, scale: 1.0));
           if (kDebugMode) {
-            AppLogger.success('Successfully decoded tile (${key.z}, ${key.x}, ${key.y}) from network.', tag: 'MapTile');
+            AppLogger.success(
+              'Successfully decoded tile (${key.z}, ${key.x}, ${key.y}) from network.',
+              tag: 'MapTile',
+            );
           }
           return;
         } catch (e, stackTrace) {
-          AppLogger.error('Error decoding tile (${key.z}, ${key.x}, ${key.y}) from network: $e\n$stackTrace', tag: 'MapTile', error: e);
+          AppLogger.error(
+            'Error decoding tile (${key.z}, ${key.x}, ${key.y}) from network: $e\n$stackTrace',
+            tag: 'MapTile',
+            error: e,
+          );
         }
       }
 
       // 4. Fallback: try to crop/scale from an ancestor tile in the updates folder
       if (kDebugMode) {
-        AppLogger.info('Attempting ancestor fallback for tile (${key.z}, ${key.x}, ${key.y})...', tag: 'MapTile');
+        AppLogger.info(
+          'Attempting ancestor fallback for tile (${key.z}, ${key.x}, ${key.y})...',
+          tag: 'MapTile',
+        );
       }
       final fallbackImage = await _fallbackFromAncestor(key);
       if (fallbackImage != null) {
@@ -568,7 +759,11 @@ class CachedTileImageProvider extends ImageProvider<CachedTileImageProvider> {
         return;
       }
     } catch (e, stackTrace) {
-      AppLogger.error('Error in _loadAsync for tile (${key.z}, ${key.x}, ${key.y}): $e\n$stackTrace', tag: 'MapTile', error: e);
+      AppLogger.error(
+        'Error in _loadAsync for tile (${key.z}, ${key.x}, ${key.y}): $e\n$stackTrace',
+        tag: 'MapTile',
+        error: e,
+      );
     }
 
     // 5. Hard fallback: transparent 1x1 png
@@ -590,12 +785,25 @@ class CachedTileImageProvider extends ImageProvider<CachedTileImageProvider> {
     while (currentZ >= 10) {
       currentX = currentX >> 1;
       currentY = currentY >> 1;
-      final file = File('${key.cacheDir}/${key.folderHash}/$currentZ/$currentX/$currentY.png');
+      final file = File(
+        '${key.cacheDir}/${key.folderHash}/$currentZ/$currentX/$currentY.png',
+      );
       if (await file.exists()) {
         try {
-          return await _cropAndScaleAncestor(file, currentZ, currentX, currentY, key.z, key.x, key.y);
+          return await _cropAndScaleAncestor(
+            file,
+            currentZ,
+            currentX,
+            currentY,
+            key.z,
+            key.x,
+            key.y,
+          );
         } catch (e) {
-          AppLogger.error('Failed to crop ancestor tile ($currentZ, $currentX, $currentY) for child (${key.z}, ${key.x}, ${key.y}): $e', error: currentZ);
+          AppLogger.error(
+            'Failed to crop ancestor tile ($currentZ, $currentX, $currentY) for child (${key.z}, ${key.x}, ${key.y}): $e',
+            error: currentZ,
+          );
         }
       }
       currentZ--;
@@ -650,15 +858,15 @@ class CachedTileImageProvider extends ImageProvider<CachedTileImageProvider> {
   /// Downloads the tile, saves it to disk with metadata, and returns the raw bytes
   Future<Uint8List?> _downloadTile(CachedTileImageProvider key) async {
     try {
-      final response = await http.get(
-        Uri.parse(key.url),
-        headers: {
-          'User-Agent': 'com.bkktransit.bkk_transit_planner',
-        },
-      ).timeout(const Duration(seconds: 10));
+      final response = await http
+          .get(
+            Uri.parse(key.url),
+            headers: {'User-Agent': 'com.bkktransit.bkk_transit_planner'},
+          )
+          .timeout(const Duration(seconds: 10));
       if (response.statusCode == 200) {
         final bytes = response.bodyBytes;
-        
+
         // Write to disk
         await key.tileFile.parent.create(recursive: true);
         await key.tileFile.writeAsBytes(bytes);
@@ -667,17 +875,19 @@ class CachedTileImageProvider extends ImageProvider<CachedTileImageProvider> {
         // Store ETag/Last-Modified metadata
         final etag = response.headers['etag'];
         final lastModified = response.headers['last-modified'];
-        
+
         await key.metaFile.parent.create(recursive: true);
-        await key.metaFile.writeAsString(jsonEncode({
-          'etag': etag,
-          'lastModified': lastModified,
-        }));
+        await key.metaFile.writeAsString(
+          jsonEncode({'etag': etag, 'lastModified': lastModified}),
+        );
 
         return bytes;
       }
     } catch (e) {
-      AppLogger.error('Network download failed for tile: ${key.url} ($e)', error: e);
+      AppLogger.error(
+        'Network download failed for tile: ${key.url} ($e)',
+        error: e,
+      );
     }
     return null;
   }
@@ -711,7 +921,9 @@ class CachedTileImageProvider extends ImageProvider<CachedTileImageProvider> {
         } catch (_) {}
       }
 
-      final response = await http.get(Uri.parse(key.url), headers: headers).timeout(const Duration(seconds: 10));
+      final response = await http
+          .get(Uri.parse(key.url), headers: headers)
+          .timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 200) {
         final bytes = response.bodyBytes;
@@ -721,10 +933,9 @@ class CachedTileImageProvider extends ImageProvider<CachedTileImageProvider> {
 
         final etag = response.headers['etag'];
         final lastModified = response.headers['last-modified'];
-        await key.metaFile.writeAsString(jsonEncode({
-          'etag': etag,
-          'lastModified': lastModified,
-        }));
+        await key.metaFile.writeAsString(
+          jsonEncode({'etag': etag, 'lastModified': lastModified}),
+        );
       } else if (response.statusCode == 304) {
         // Tile is still unmodified. Reset the 7-day validation window
         // by updating the metadata file's modification time.
@@ -755,12 +966,73 @@ class CachedTileImageProvider extends ImageProvider<CachedTileImageProvider> {
 
 // 1x1 transparent PNG fallback bytes
 final Uint8List _kTransparentImageBytes = Uint8List.fromList([
-  0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0x00, 0x00, 0x00, 0x0D,
-  0x49, 0x48, 0x44, 0x52, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01,
-  0x08, 0x06, 0x00, 0x00, 0x00, 0x1F, 0x15, 0xC4, 0x89, 0x00, 0x00, 0x00,
-  0x0A, 0x49, 0x44, 0x41, 0x54, 0x78, 0x9C, 0x63, 0x00, 0x01, 0x00, 0x00,
-  0x05, 0x00, 0x01, 0x0D, 0x0A, 0x2D, 0xB4, 0x00, 0x00, 0x00, 0x00, 0x49,
-  0x45, 0x4E, 0x44, 0xAE, 0x42, 0x60, 0x82
+  0x89,
+  0x50,
+  0x4E,
+  0x47,
+  0x0D,
+  0x0A,
+  0x1A,
+  0x0A,
+  0x00,
+  0x00,
+  0x00,
+  0x0D,
+  0x49,
+  0x48,
+  0x44,
+  0x52,
+  0x00,
+  0x00,
+  0x00,
+  0x01,
+  0x00,
+  0x00,
+  0x00,
+  0x01,
+  0x08,
+  0x06,
+  0x00,
+  0x00,
+  0x00,
+  0x1F,
+  0x15,
+  0xC4,
+  0x89,
+  0x00,
+  0x00,
+  0x00,
+  0x0A,
+  0x49,
+  0x44,
+  0x41,
+  0x54,
+  0x78,
+  0x9C,
+  0x63,
+  0x00,
+  0x01,
+  0x00,
+  0x00,
+  0x05,
+  0x00,
+  0x01,
+  0x0D,
+  0x0A,
+  0x2D,
+  0xB4,
+  0x00,
+  0x00,
+  0x00,
+  0x00,
+  0x49,
+  0x45,
+  0x4E,
+  0x44,
+  0xAE,
+  0x42,
+  0x60,
+  0x82,
 ]);
 
 /// Manages random access reads from the compressed binary bundle `map_tiles.bundle`
@@ -791,55 +1063,76 @@ class MapBundleManager {
     try {
       final file = File(bundlePath);
       if (!await file.exists()) {
-        AppLogger.info('Bundle file not found at $bundlePath. App will fall back to network.', tag: 'MapBundle');
+        AppLogger.info(
+          'Bundle file not found at $bundlePath. App will fall back to network.',
+          tag: 'MapBundle',
+        );
         return;
       }
       _bundleFile = await file.open(mode: FileMode.read);
-      
+
       final int fileLength = await file.length();
       if (fileLength < 4) {
         AppLogger.info('Corrupt bundle: file too short.', tag: 'MapBundle');
         return;
       }
-      
+
       // Read last 4 bytes to get the index offset pointer
       await _bundleFile!.setPosition(fileLength - 4);
       final offsetBytes = await _bundleFile!.read(4);
       if (offsetBytes.length != 4) {
-        AppLogger.error('Corrupt bundle: failed to read index offset pointer.', tag: 'MapBundle');
+        AppLogger.error(
+          'Corrupt bundle: failed to read index offset pointer.',
+          tag: 'MapBundle',
+        );
         return;
       }
-      final int indexOffset = ByteData.sublistView(Uint8List.fromList(offsetBytes)).getUint32(0, Endian.big);
-      
+      final int indexOffset = ByteData.sublistView(
+        Uint8List.fromList(offsetBytes),
+      ).getUint32(0, Endian.big);
+
       // Seek to indexOffset and read the compressed index
       final int indexLength = fileLength - 4 - indexOffset;
       if (indexLength <= 0 || indexOffset < 0 || indexOffset >= fileLength) {
-        AppLogger.info('Corrupt bundle: invalid index offset ($indexOffset) or length ($indexLength).', tag: 'MapBundle');
+        AppLogger.info(
+          'Corrupt bundle: invalid index offset ($indexOffset) or length ($indexLength).',
+          tag: 'MapBundle',
+        );
         return;
       }
-      
+
       await _bundleFile!.setPosition(indexOffset);
       final compressedBytes = await _bundleFile!.read(indexLength);
       if (compressedBytes.length != indexLength) {
-        AppLogger.error('Corrupt bundle: failed to read compressed index data.', tag: 'MapBundle');
+        AppLogger.error(
+          'Corrupt bundle: failed to read compressed index data.',
+          tag: 'MapBundle',
+        );
         return;
       }
-      
+
       // Decompress index
       final decompressedBytes = gzip.decode(compressedBytes);
       final jsonStr = utf8.decode(decompressedBytes);
       final Map<String, dynamic> rawMap = jsonDecode(jsonStr);
-      
+
       rawMap.forEach((key, value) {
         if (value is List) {
           _index[key] = List<int>.from(value);
         }
       });
-      
+
       _initialized = true;
-      AppLogger.success('Initialized successfully. Loaded ${_index.length} tile references.', tag: 'MapBundle');
+      AppLogger.success(
+        'Initialized successfully. Loaded ${_index.length} tile references.',
+        tag: 'MapBundle',
+      );
     } catch (e, stackTrace) {
-      AppLogger.error('Initialization failed: $e\n$stackTrace', tag: 'MapBundle', error: e);
+      AppLogger.error(
+        'Initialization failed: $e\n$stackTrace',
+        tag: 'MapBundle',
+        error: e,
+      );
       await close();
     }
   }
@@ -865,10 +1158,10 @@ class MapBundleManager {
 
     final range = _index[key];
     if (range == null) return null;
-    
+
     final int offset = range[0];
     final int length = range[1];
-    
+
     try {
       // Synchronize sets and reads to prevent race conditions on RandomAccessFile position
       final bytes = await _lock.synchronized(() async {
@@ -886,7 +1179,11 @@ class MapBundleManager {
       }
       return bytes;
     } catch (e, stackTrace) {
-      AppLogger.error('Error reading tile $key from bundle: $e\n$stackTrace', tag: 'MapBundle', error: key);
+      AppLogger.error(
+        'Error reading tile $key from bundle: $e\n$stackTrace',
+        tag: 'MapBundle',
+        error: key,
+      );
       return null;
     }
   }
@@ -904,7 +1201,7 @@ class MapBundleManager {
 
 class _FutureChain {
   Future<void> _chain = Future.value();
-  
+
   Future<T> synchronized<T>(Future<T> Function() action) {
     final completer = Completer<T>();
     _chain = _chain.then((_) async {

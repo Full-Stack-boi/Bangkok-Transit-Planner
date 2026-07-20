@@ -9,6 +9,7 @@ abstract class SearchableItem {
 
   /// The latitude to use when routing to/from this item. Defaults to [lat].
   double get routeLat => lat;
+
   /// The longitude to use when routing to/from this item. Defaults to [lng].
   double get routeLng => lng;
 

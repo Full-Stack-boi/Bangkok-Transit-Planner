@@ -52,11 +52,7 @@ class CalculationResult {
   final RouteResult? saver;
   final String? error;
 
-  const CalculationResult({
-    required this.recommended,
-    this.saver,
-    this.error,
-  });
+  const CalculationResult({required this.recommended, this.saver, this.error});
 }
 
 /// Encapsulates all route calculation logic extracted from SearchViewModel:
@@ -72,9 +68,7 @@ class RouteCalculator {
 
   RouteCalculator(this._repo, this._fareService, this._httpClient);
 
-  // ──────────────────────────────────────────────────────────────
   //  Public API
-  // ──────────────────────────────────────────────────────────────
 
   /// Calculate routes between origin and destination.
   /// Returns [CalculationResult] with recommended + optional saver route,
@@ -102,7 +96,8 @@ class RouteCalculator {
       );
     }
     if (origin is CustomLocation) {
-      final destStationId = resolvedDestination.nearestStationId ?? resolvedDestination.id;
+      final destStationId =
+          resolvedDestination.nearestStationId ?? resolvedDestination.id;
       resolvedOrigin = _resolveLocationEntrance(
         resolvedOrigin as CustomLocation,
         destStationId,
@@ -110,13 +105,16 @@ class RouteCalculator {
       );
     }
 
-    final originStationId = resolvedOrigin.nearestStationId ?? resolvedOrigin.id;
-    final destinationStationId = resolvedDestination.nearestStationId ?? resolvedDestination.id;
+    final originStationId =
+        resolvedOrigin.nearestStationId ?? resolvedOrigin.id;
+    final destinationStationId =
+        resolvedDestination.nearestStationId ?? resolvedDestination.id;
 
     // Exit-to-entrance optimization when both resolve to the same station
     if (originStationId == destinationStationId) {
       final optimized = _optimizeSameStationEntrances(
-        resolvedOrigin, resolvedDestination,
+        resolvedOrigin,
+        resolvedDestination,
       );
       resolvedOrigin = optimized.$1;
       resolvedDestination = optimized.$2;
@@ -127,8 +125,11 @@ class RouteCalculator {
     if (originStationId == destinationStationId) {
       // Direct walk scenario
       routeResult = _buildDirectWalkRoute(
-        resolvedOrigin, resolvedDestination,
-        originStationId, destinationStationId, t,
+        resolvedOrigin,
+        resolvedDestination,
+        originStationId,
+        destinationStationId,
+        t,
       );
     } else {
       final dijkstra = _repo.findRoute(originStationId, destinationStationId);
@@ -136,20 +137,24 @@ class RouteCalculator {
         return null; // No route error — handled by caller
       }
       routeResult = buildRouteResult(
-        dijkstra, resolvedOrigin, resolvedDestination, cardState, t,
+        dijkstra,
+        resolvedOrigin,
+        resolvedDestination,
+        cardState,
+        t,
       );
     }
 
     // Calculate saver route
     final saverRoute = _findSaverRoute(
-      resolvedOrigin, resolvedDestination,
-      routeResult, cardState, t,
+      resolvedOrigin,
+      resolvedDestination,
+      routeResult,
+      cardState,
+      t,
     );
 
-    return CalculationResult(
-      recommended: routeResult,
-      saver: saverRoute,
-    );
+    return CalculationResult(recommended: routeResult, saver: saverRoute);
   }
 
   /// Hydrate walking paths for recommended and saver routes via OSRM.
@@ -165,15 +170,16 @@ class RouteCalculator {
     return (hydratedRecommended, hydratedSaver);
   }
 
-  // ──────────────────────────────────────────────────────────────
   //  Entrance Resolution
-  // ──────────────────────────────────────────────────────────────
 
   List<Station> _getCandidateStations(CustomLocation loc) {
     final list = <Station>[];
     for (final station in _repo.stations) {
       final dist = Geolocator.distanceBetween(
-        loc.routeLat, loc.routeLng, station.lat, station.lng,
+        loc.routeLat,
+        loc.routeLng,
+        station.lat,
+        station.lng,
       );
       if (dist <= 700.0) {
         list.add(station);
@@ -199,14 +205,19 @@ class RouteCalculator {
     for (final station in candidates) {
       LatLng targetEntrance = LatLng(loc.lat, loc.lng);
       double minDist = Geolocator.distanceBetween(
-        targetEntrance.latitude, targetEntrance.longitude,
-        station.lat, station.lng,
+        targetEntrance.latitude,
+        targetEntrance.longitude,
+        station.lat,
+        station.lng,
       );
 
       if (loc.entrances != null && loc.entrances!.isNotEmpty) {
         for (final ent in loc.entrances!) {
           final d = Geolocator.distanceBetween(
-            ent.latitude, ent.longitude, station.lat, station.lng,
+            ent.latitude,
+            ent.longitude,
+            station.lat,
+            station.lng,
           );
           if (d < minDist) {
             minDist = d;
@@ -239,8 +250,10 @@ class RouteCalculator {
     final bestStation = _repo.getStation(bestStationId);
     final newWalkDist = bestStation != null
         ? Geolocator.distanceBetween(
-            bestRoutePoint.latitude, bestRoutePoint.longitude,
-            bestStation.lat, bestStation.lng,
+            bestRoutePoint.latitude,
+            bestRoutePoint.longitude,
+            bestStation.lat,
+            bestStation.lng,
           )
         : 0.0;
     final newWalkMinutes = (newWalkDist / 80.0).clamp(1.0, 30.0);
@@ -268,8 +281,10 @@ class RouteCalculator {
       LatLng? bestEntrance;
       for (final entrance in resolvedDestination.entrances!) {
         final dist = Geolocator.distanceBetween(
-          entrance.latitude, entrance.longitude,
-          resolvedOrigin.routeLat, resolvedOrigin.routeLng,
+          entrance.latitude,
+          entrance.longitude,
+          resolvedOrigin.routeLat,
+          resolvedOrigin.routeLng,
         );
         if (dist < minDist) {
           minDist = dist;
@@ -290,8 +305,10 @@ class RouteCalculator {
       LatLng? bestEntrance;
       for (final entrance in resolvedOrigin.entrances!) {
         final dist = Geolocator.distanceBetween(
-          entrance.latitude, entrance.longitude,
-          resolvedDestination.routeLat, resolvedDestination.routeLng,
+          entrance.latitude,
+          entrance.longitude,
+          resolvedDestination.routeLat,
+          resolvedDestination.routeLng,
         );
         if (dist < minDist) {
           minDist = dist;
@@ -309,9 +326,7 @@ class RouteCalculator {
     return (resolvedOrigin, resolvedDestination);
   }
 
-  // ──────────────────────────────────────────────────────────────
   //  Direct Walk Route (same station)
-  // ──────────────────────────────────────────────────────────────
 
   RouteResult _buildDirectWalkRoute(
     SearchableItem origin,
@@ -350,7 +365,11 @@ class RouteCalculator {
     }
 
     if (lm != null && st != null) {
-      _resolveWalkDetails(lm, st, (resolvedExit, resolvedPath, resolvedMinutes) {
+      _resolveWalkDetails(lm, st, (
+        resolvedExit,
+        resolvedPath,
+        resolvedMinutes,
+      ) {
         exit = resolvedExit;
         walkingPath = resolvedPath;
         if (resolvedMinutes != null) walkMinutes = resolvedMinutes;
@@ -359,7 +378,8 @@ class RouteCalculator {
 
     exit ??= st?.findClosestExit(
       _repo.exits,
-      destination.routeLat, destination.routeLng,
+      destination.routeLat,
+      destination.routeLng,
       targetNameTh: destination.nameTh,
       targetNameEn: destination.nameEn,
     );
@@ -371,7 +391,8 @@ class RouteCalculator {
     String direction = t.walkToDestination;
     String? instructionsTh;
     String? instructionsEn;
-    if (lm != null && st != null &&
+    if (lm != null &&
+        st != null &&
         lm.alternativeWalks != null &&
         lm.alternativeWalks!.containsKey(st.id)) {
       final sw = lm.alternativeWalks![st.id]!;
@@ -425,8 +446,11 @@ class RouteCalculator {
         exit = exits.firstWhere(
           (e) => e.exitCode == lm.exitCode,
           orElse: () => st.findClosestExit(
-            _repo.exits, lm.routeLat, lm.routeLng,
-            targetNameTh: lm.nameTh, targetNameEn: lm.nameEn,
+            _repo.exits,
+            lm.routeLat,
+            lm.routeLng,
+            targetNameTh: lm.nameTh,
+            targetNameEn: lm.nameEn,
           ),
         );
       }
@@ -438,17 +462,18 @@ class RouteCalculator {
       final exit = exits.firstWhere(
         (e) => e.exitCode == walk.exitCode,
         orElse: () => st.findClosestExit(
-          _repo.exits, lm.routeLat, lm.routeLng,
-          targetNameTh: lm.nameTh, targetNameEn: lm.nameEn,
+          _repo.exits,
+          lm.routeLat,
+          lm.routeLng,
+          targetNameTh: lm.nameTh,
+          targetNameEn: lm.nameEn,
         ),
       );
       callback(exit, walk.walkingPath, walk.walkingMinutes);
     }
   }
 
-  // ──────────────────────────────────────────────────────────────
   //  Build RouteResult from Dijkstra
-  // ──────────────────────────────────────────────────────────────
 
   RouteResult buildRouteResult(
     DijkstraResult dijkstraResult,
@@ -460,21 +485,26 @@ class RouteCalculator {
     final segments = <RouteSegment>[];
     final transfers = <TransferStep>[];
 
-    // ─── 1. If Origin requires walking, add initial Walk Segment ───
+    // 1. If Origin requires walking, add initial Walk Segment
     _addOriginWalkSegment(segments, origin, t);
 
-    // ─── 2. Group path steps by line ───
+    // 2. Group path steps by line
     _buildTransitSegments(dijkstraResult, segments, transfers, cardState);
 
-    // ─── 3. If Destination requires walking, add final Walk Segment ───
+    // 3. If Destination requires walking, add final Walk Segment
     _addDestinationWalkSegment(segments, destination, t);
 
     final totalFare = segments.fold<int>(0, (sum, s) => sum + s.fareThb);
-    final totalStandardFare = segments.fold<int>(0, (sum, s) => sum + s.standardFareThb);
+    final totalStandardFare = segments.fold<int>(
+      0,
+      (sum, s) => sum + s.standardFareThb,
+    );
 
     double totalMinutes = dijkstraResult.totalWeight;
     if (origin.walkingMinutes != null) totalMinutes += origin.walkingMinutes!;
-    if (destination.walkingMinutes != null) totalMinutes += destination.walkingMinutes!;
+    if (destination.walkingMinutes != null) {
+      totalMinutes += destination.walkingMinutes!;
+    }
 
     return RouteResult(
       origin: origin,
@@ -494,7 +524,9 @@ class RouteCalculator {
     SearchableItem origin,
     RouteTranslations t,
   ) {
-    if (origin.nearestStationId == null || origin.id == origin.nearestStationId) return;
+    if (origin.nearestStationId == null || origin.id == origin.nearestStationId) {
+      return;
+    }
 
     final nearestStation = _repo.getStation(origin.nearestStationId!);
     if (nearestStation == null) return;
@@ -508,7 +540,10 @@ class RouteCalculator {
       originLandmark = origin;
     } else {
       for (final l in _repo.landmarks) {
-        if (l.id == origin.id) { originLandmark = l; break; }
+        if (l.id == origin.id) {
+          originLandmark = l;
+          break;
+        }
       }
     }
 
@@ -525,8 +560,11 @@ class RouteCalculator {
     }
 
     exit ??= nearestStation.findClosestExit(
-      _repo.exits, origin.routeLat, origin.routeLng,
-      targetNameTh: origin.nameTh, targetNameEn: origin.nameEn,
+      _repo.exits,
+      origin.routeLat,
+      origin.routeLng,
+      targetNameTh: origin.nameTh,
+      targetNameEn: origin.nameEn,
     );
     walkingPath ??= [
       LatLng(origin.routeLat, origin.routeLng),
@@ -545,14 +583,24 @@ class RouteCalculator {
       if (instructionsTh != null) direction = instructionsTh;
     }
 
-    segments.add(RouteSegment(
-      lineId: 'WALK', lineName: 'Walk', direction: direction,
-      boundIndex: 0, fromStation: origin, toStation: nearestStation,
-      stationCount: 0, estimatedMinutes: walkingMinutes,
-      fareThb: 0, standardFareThb: 0,
-      walkingPath: walkingPath, exit: exit,
-      instructionsTh: instructionsTh, instructionsEn: instructionsEn,
-    ));
+    segments.add(
+      RouteSegment(
+        lineId: 'WALK',
+        lineName: 'Walk',
+        direction: direction,
+        boundIndex: 0,
+        fromStation: origin,
+        toStation: nearestStation,
+        stationCount: 0,
+        estimatedMinutes: walkingMinutes,
+        fareThb: 0,
+        standardFareThb: 0,
+        walkingPath: walkingPath,
+        exit: exit,
+        instructionsTh: instructionsTh,
+        instructionsEn: instructionsEn,
+      ),
+    );
   }
 
   void _addDestinationWalkSegment(
@@ -560,7 +608,10 @@ class RouteCalculator {
     SearchableItem destination,
     RouteTranslations t,
   ) {
-    if (destination.nearestStationId == null || destination.id == destination.nearestStationId) return;
+    if (destination.nearestStationId == null ||
+        destination.id == destination.nearestStationId) {
+      return;
+    }
 
     final nearestStation = _repo.getStation(destination.nearestStationId!);
     if (nearestStation == null) return;
@@ -574,7 +625,10 @@ class RouteCalculator {
       destLandmark = destination;
     } else {
       for (final l in _repo.landmarks) {
-        if (l.id == destination.id) { destLandmark = l; break; }
+        if (l.id == destination.id) {
+          destLandmark = l;
+          break;
+        }
       }
     }
 
@@ -591,8 +645,11 @@ class RouteCalculator {
     }
 
     exit ??= nearestStation.findClosestExit(
-      _repo.exits, destination.routeLat, destination.routeLng,
-      targetNameTh: destination.nameTh, targetNameEn: destination.nameEn,
+      _repo.exits,
+      destination.routeLat,
+      destination.routeLng,
+      targetNameTh: destination.nameTh,
+      targetNameEn: destination.nameEn,
     );
     walkingPath ??= [
       LatLng(exit!.lat, exit!.lng),
@@ -611,14 +668,24 @@ class RouteCalculator {
       if (instructionsTh != null) direction = instructionsTh;
     }
 
-    segments.add(RouteSegment(
-      lineId: 'WALK', lineName: 'Walk', direction: direction,
-      boundIndex: 0, fromStation: nearestStation, toStation: destination,
-      stationCount: 0, estimatedMinutes: walkingMinutes,
-      fareThb: 0, standardFareThb: 0,
-      walkingPath: walkingPath, exit: exit,
-      instructionsTh: instructionsTh, instructionsEn: instructionsEn,
-    ));
+    segments.add(
+      RouteSegment(
+        lineId: 'WALK',
+        lineName: 'Walk',
+        direction: direction,
+        boundIndex: 0,
+        fromStation: nearestStation,
+        toStation: destination,
+        stationCount: 0,
+        estimatedMinutes: walkingMinutes,
+        fareThb: 0,
+        standardFareThb: 0,
+        walkingPath: walkingPath,
+        exit: exit,
+        instructionsTh: instructionsTh,
+        instructionsEn: instructionsEn,
+      ),
+    );
   }
 
   void _buildTransitSegments(
@@ -637,18 +704,26 @@ class RouteCalculator {
       if (station == null) continue;
 
       if (step.lineId == 'TRANSFER') {
-        _flushSegment(segments, currentLineId, segmentStart, segmentStations, cardState);
+        _flushSegment(
+          segments,
+          currentLineId,
+          segmentStart,
+          segmentStations,
+          cardState,
+        );
 
         if (segmentStations.isNotEmpty) {
           final nextLineId = i + 1 < dijkstraResult.path.length
               ? dijkstraResult.path[i + 1].lineId
               : '';
-          transfers.add(TransferStep(
-            fromStation: segmentStations.last,
-            toStation: station,
-            fromLineId: currentLineId,
-            toLineId: nextLineId,
-          ));
+          transfers.add(
+            TransferStep(
+              fromStation: segmentStations.last,
+              toStation: station,
+              fromLineId: currentLineId,
+              toLineId: nextLineId,
+            ),
+          );
         }
 
         segmentStart = station;
@@ -664,7 +739,13 @@ class RouteCalculator {
         if (currentLineId.isEmpty) {
           currentLineId = step.lineId;
         } else {
-          _flushSegment(segments, currentLineId, segmentStart, segmentStations, cardState);
+          _flushSegment(
+            segments,
+            currentLineId,
+            segmentStart,
+            segmentStations,
+            cardState,
+          );
           currentLineId = step.lineId;
           segmentStart = station;
           segmentStations.clear();
@@ -679,7 +760,13 @@ class RouteCalculator {
     }
 
     // Flush last segment
-    _flushSegment(segments, currentLineId, segmentStart, segmentStations, cardState);
+    _flushSegment(
+      segments,
+      currentLineId,
+      segmentStart,
+      segmentStations,
+      cardState,
+    );
   }
 
   void _flushSegment(
@@ -697,33 +784,35 @@ class RouteCalculator {
 
     final standardFare = _fareService.calculateFare(lineId, stationCount);
     final discountedFare = _fareService.calculateFare(
-      lineId, stationCount,
+      lineId,
+      stationCount,
       btsCardType: cardState.btsCardType,
       mrtCardType: cardState.mrtCardType,
       arlCardType: cardState.arlCardType,
       srtCardType: cardState.srtCardType,
     );
 
-    segments.add(RouteSegment(
-      lineId: lineId,
-      lineName: line?.nameEn ?? lineId,
-      direction: line?.getDirectionLabel(bound) ?? '',
-      boundIndex: bound,
-      fromStation: segmentStart,
-      toStation: segmentStations.last,
-      intermediateStations: segmentStations.length > 2
-          ? segmentStations.sublist(1, segmentStations.length - 1)
-          : [],
-      stationCount: stationCount,
-      estimatedMinutes: stationCount * TransitConstants.avgTimeBetweenStations,
-      fareThb: discountedFare,
-      standardFareThb: standardFare,
-    ));
+    segments.add(
+      RouteSegment(
+        lineId: lineId,
+        lineName: line?.nameEn ?? lineId,
+        direction: line?.getDirectionLabel(bound) ?? '',
+        boundIndex: bound,
+        fromStation: segmentStart,
+        toStation: segmentStations.last,
+        intermediateStations: segmentStations.length > 2
+            ? segmentStations.sublist(1, segmentStations.length - 1)
+            : [],
+        stationCount: stationCount,
+        estimatedMinutes:
+            stationCount * TransitConstants.avgTimeBetweenStations,
+        fareThb: discountedFare,
+        standardFareThb: standardFare,
+      ),
+    );
   }
 
-  // ──────────────────────────────────────────────────────────────
   //  Saver Route
-  // ──────────────────────────────────────────────────────────────
 
   RouteResult? _findSaverRoute(
     SearchableItem origin,
@@ -746,46 +835,73 @@ class RouteCalculator {
     final originLng = origin.routeLng;
 
     final candidateDestStations = _findCandidateStations(
-      destLat, destLng, destinationStationId,
+      destLat,
+      destLng,
+      destinationStationId,
       destination is CustomLocation ? destination.entrances : null,
     );
     final candidateOriginStations = _findCandidateStations(
-      originLat, originLng, originStationId,
+      originLat,
+      originLng,
+      originStationId,
       origin is CustomLocation ? origin.entrances : null,
     );
 
     RouteResult? bestSaverRoute;
 
     void evaluateCandidate({
-      required String startId, required String endId,
-      required double startWalkMin, required double endWalkMin,
-      required double altOriginRouteLat, required double altOriginRouteLng,
-      required double altDestRouteLat, required double altDestRouteLng,
+      required String startId,
+      required String endId,
+      required double startWalkMin,
+      required double endWalkMin,
+      required double altOriginRouteLat,
+      required double altOriginRouteLng,
+      required double altDestRouteLat,
+      required double altDestRouteLng,
     }) {
       final dijkstraResult = _repo.findRoute(startId, endId);
       if (dijkstraResult == null) return;
 
       final tempOrigin = CustomLocation(
-        id: origin.id, nameTh: origin.nameTh, nameEn: origin.nameEn,
-        nearestStationId: startId, walkingMinutes: startWalkMin,
-        lat: originLat, lng: originLng,
-        customRouteLat: altOriginRouteLat, customRouteLng: altOriginRouteLng,
+        id: origin.id,
+        nameTh: origin.nameTh,
+        nameEn: origin.nameEn,
+        nearestStationId: startId,
+        walkingMinutes: startWalkMin,
+        lat: originLat,
+        lng: originLng,
+        customRouteLat: altOriginRouteLat,
+        customRouteLng: altOriginRouteLng,
         entrances: origin is CustomLocation ? origin.entrances : null,
         walkingPath: origin is CustomLocation ? origin.walkingPath : null,
       );
       final tempDest = CustomLocation(
-        id: destination.id, nameTh: destination.nameTh, nameEn: destination.nameEn,
-        nearestStationId: endId, walkingMinutes: endWalkMin,
-        lat: destLat, lng: destLng,
-        customRouteLat: altDestRouteLat, customRouteLng: altDestRouteLng,
+        id: destination.id,
+        nameTh: destination.nameTh,
+        nameEn: destination.nameEn,
+        nearestStationId: endId,
+        walkingMinutes: endWalkMin,
+        lat: destLat,
+        lng: destLng,
+        customRouteLat: altDestRouteLat,
+        customRouteLng: altDestRouteLng,
         entrances: destination is CustomLocation ? destination.entrances : null,
-        walkingPath: destination is CustomLocation ? destination.walkingPath : null,
+        walkingPath: destination is CustomLocation
+            ? destination.walkingPath
+            : null,
       );
 
-      final altRoute = buildRouteResult(dijkstraResult, tempOrigin, tempDest, cardState, t);
+      final altRoute = buildRouteResult(
+        dijkstraResult,
+        tempOrigin,
+        tempDest,
+        cardState,
+        t,
+      );
 
       final isCheaper = altRoute.totalFareThb < regularRoute.totalFareThb;
-      final isNotTooSlow = altRoute.totalMinutes <= regularRoute.totalMinutes + 15.0;
+      final isNotTooSlow =
+          altRoute.totalMinutes <= regularRoute.totalMinutes + 15.0;
 
       if (isCheaper && isNotTooSlow) {
         final currentBest = bestSaverRoute;
@@ -800,27 +916,39 @@ class RouteCalculator {
 
     for (final altDest in candidateDestStations) {
       evaluateCandidate(
-        startId: originStationId, endId: altDest.station.id,
-        startWalkMin: origin.walkingMinutes ?? 0.0, endWalkMin: altDest.walkMinutes,
-        altOriginRouteLat: originLat, altOriginRouteLng: originLng,
-        altDestRouteLat: altDest.entrance.latitude, altDestRouteLng: altDest.entrance.longitude,
+        startId: originStationId,
+        endId: altDest.station.id,
+        startWalkMin: origin.walkingMinutes ?? 0.0,
+        endWalkMin: altDest.walkMinutes,
+        altOriginRouteLat: originLat,
+        altOriginRouteLng: originLng,
+        altDestRouteLat: altDest.entrance.latitude,
+        altDestRouteLng: altDest.entrance.longitude,
       );
     }
     for (final altOrigin in candidateOriginStations) {
       evaluateCandidate(
-        startId: altOrigin.station.id, endId: destinationStationId,
-        startWalkMin: altOrigin.walkMinutes, endWalkMin: destination.walkingMinutes ?? 0.0,
-        altOriginRouteLat: altOrigin.entrance.latitude, altOriginRouteLng: altOrigin.entrance.longitude,
-        altDestRouteLat: destLat, altDestRouteLng: destLng,
+        startId: altOrigin.station.id,
+        endId: destinationStationId,
+        startWalkMin: altOrigin.walkMinutes,
+        endWalkMin: destination.walkingMinutes ?? 0.0,
+        altOriginRouteLat: altOrigin.entrance.latitude,
+        altOriginRouteLng: altOrigin.entrance.longitude,
+        altDestRouteLat: destLat,
+        altDestRouteLng: destLng,
       );
     }
     for (final altOrigin in candidateOriginStations) {
       for (final altDest in candidateDestStations) {
         evaluateCandidate(
-          startId: altOrigin.station.id, endId: altDest.station.id,
-          startWalkMin: altOrigin.walkMinutes, endWalkMin: altDest.walkMinutes,
-          altOriginRouteLat: altOrigin.entrance.latitude, altOriginRouteLng: altOrigin.entrance.longitude,
-          altDestRouteLat: altDest.entrance.latitude, altDestRouteLng: altDest.entrance.longitude,
+          startId: altOrigin.station.id,
+          endId: altDest.station.id,
+          startWalkMin: altOrigin.walkMinutes,
+          endWalkMin: altDest.walkMinutes,
+          altOriginRouteLat: altOrigin.entrance.latitude,
+          altOriginRouteLng: altOrigin.entrance.longitude,
+          altDestRouteLat: altDest.entrance.latitude,
+          altDestRouteLng: altDest.entrance.longitude,
         );
       }
     }
@@ -828,23 +956,38 @@ class RouteCalculator {
     return bestSaverRoute;
   }
 
-  List<({Station station, LatLng entrance, double walkMinutes})> _findCandidateStations(
-    double lat, double lng, String excludeId, List<LatLng>? entrances,
+  List<({Station station, LatLng entrance, double walkMinutes})>
+  _findCandidateStations(
+    double lat,
+    double lng,
+    String excludeId,
+    List<LatLng>? entrances,
   ) {
     final result = <({Station station, LatLng entrance, double walkMinutes})>[];
     for (final station in _repo.stations) {
       if (station.id == excludeId) continue;
 
       LatLng targetEntrance = LatLng(lat, lng);
-      double minDist = Geolocator.distanceBetween(lat, lng, station.lat, station.lng);
+      double minDist = Geolocator.distanceBetween(
+        lat,
+        lng,
+        station.lat,
+        station.lng,
+      );
 
       if (entrances != null && entrances.isNotEmpty) {
         double dMin = double.infinity;
         for (final ent in entrances) {
           final d = Geolocator.distanceBetween(
-            ent.latitude, ent.longitude, station.lat, station.lng,
+            ent.latitude,
+            ent.longitude,
+            station.lat,
+            station.lng,
           );
-          if (d < dMin) { dMin = d; targetEntrance = ent; }
+          if (d < dMin) {
+            dMin = d;
+            targetEntrance = ent;
+          }
         }
         minDist = dMin;
       }
@@ -860,9 +1003,7 @@ class RouteCalculator {
     return result;
   }
 
-  // ──────────────────────────────────────────────────────────────
   //  Walking Path Hydration
-  // ──────────────────────────────────────────────────────────────
 
   Future<RouteResult> _hydrateRouteWalkingPaths(RouteResult route) async {
     final hydratedSegments = <RouteSegment>[];
@@ -882,19 +1023,30 @@ class RouteCalculator {
         double fLat, fLng, tLat, tLng;
         if (segment.exit != null) {
           if (from is Station) {
-            fLat = segment.exit!.lat; fLng = segment.exit!.lng;
-            tLat = to.routeLat; tLng = to.routeLng;
+            fLat = segment.exit!.lat;
+            fLng = segment.exit!.lng;
+            tLat = to.routeLat;
+            tLng = to.routeLng;
           } else {
-            fLat = from.routeLat; fLng = from.routeLng;
-            tLat = segment.exit!.lat; tLng = segment.exit!.lng;
+            fLat = from.routeLat;
+            fLng = from.routeLng;
+            tLat = segment.exit!.lat;
+            tLng = segment.exit!.lng;
           }
         } else {
-          fLat = from.routeLat; fLng = from.routeLng;
-          tLat = to.routeLat; tLng = to.routeLng;
+          fLat = from.routeLat;
+          fLng = from.routeLng;
+          tLat = to.routeLat;
+          tLng = to.routeLng;
         }
 
         final walkingService = WalkingRouteService(_httpClient);
-        List<LatLng> path = await walkingService.getWalkingPath(fLat, fLng, tLat, tLng);
+        List<LatLng> path = await walkingService.getWalkingPath(
+          fLat,
+          fLng,
+          tLat,
+          tLng,
+        );
 
         final straightDist = Geolocator.distanceBetween(fLat, fLng, tLat, tLng);
         if (straightDist < 150.0) {
@@ -903,31 +1055,49 @@ class RouteCalculator {
           double pathDist = 0.0;
           for (int idx = 0; idx < path.length - 1; idx++) {
             pathDist += Geolocator.distanceBetween(
-              path[idx].latitude, path[idx].longitude,
-              path[idx + 1].latitude, path[idx + 1].longitude,
+              path[idx].latitude,
+              path[idx].longitude,
+              path[idx + 1].latitude,
+              path[idx + 1].longitude,
             );
           }
           if (pathDist > 4.0 * straightDist) {
-            AppLogger.info("OSRM extreme detour detected (OSRM: ${pathDist.toStringAsFixed(1)}m, Straight: ${straightDist.toStringAsFixed(1)}m). Falling back to direct straight-line path.");
+            AppLogger.info(
+              "OSRM extreme detour detected (OSRM: ${pathDist.toStringAsFixed(1)}m, Straight: ${straightDist.toStringAsFixed(1)}m). Falling back to direct straight-line path.",
+            );
             path = [LatLng(fLat, fLng), LatLng(tLat, tLng)];
           } else if (pathDist > 2.8 * straightDist) {
-            AppLogger.info("OSRM significant detour detected (OSRM: ${pathDist.toStringAsFixed(1)}m, Straight: ${straightDist.toStringAsFixed(1)}m). Falling back to smart L-shape path.");
-            path = WalkingRouteService.generateManhattanPath(fLat, fLng, tLat, tLng);
+            AppLogger.info(
+              "OSRM significant detour detected (OSRM: ${pathDist.toStringAsFixed(1)}m, Straight: ${straightDist.toStringAsFixed(1)}m). Falling back to smart L-shape path.",
+            );
+            path = WalkingRouteService.generateManhattanPath(
+              fLat,
+              fLng,
+              tLat,
+              tLng,
+            );
           }
         }
 
-        hydratedSegments.add(RouteSegment(
-          lineId: segment.lineId, lineName: segment.lineName,
-          direction: segment.direction, boundIndex: segment.boundIndex,
-          fromStation: segment.fromStation, toStation: segment.toStation,
-          intermediateStations: segment.intermediateStations,
-          stationCount: segment.stationCount,
-          estimatedMinutes: segment.estimatedMinutes,
-          fareThb: segment.fareThb, standardFareThb: segment.standardFareThb,
-          walkingPath: path, exit: segment.exit,
-          instructionsTh: segment.instructionsTh,
-          instructionsEn: segment.instructionsEn,
-        ));
+        hydratedSegments.add(
+          RouteSegment(
+            lineId: segment.lineId,
+            lineName: segment.lineName,
+            direction: segment.direction,
+            boundIndex: segment.boundIndex,
+            fromStation: segment.fromStation,
+            toStation: segment.toStation,
+            intermediateStations: segment.intermediateStations,
+            stationCount: segment.stationCount,
+            estimatedMinutes: segment.estimatedMinutes,
+            fareThb: segment.fareThb,
+            standardFareThb: segment.standardFareThb,
+            walkingPath: path,
+            exit: segment.exit,
+            instructionsTh: segment.instructionsTh,
+            instructionsEn: segment.instructionsEn,
+          ),
+        );
         modified = true;
       } else {
         hydratedSegments.add(segment);
@@ -936,11 +1106,15 @@ class RouteCalculator {
 
     if (modified) {
       return RouteResult(
-        origin: route.origin, destination: route.destination,
-        segments: hydratedSegments, transfers: route.transfers,
-        totalMinutes: route.totalMinutes, totalFareThb: route.totalFareThb,
+        origin: route.origin,
+        destination: route.destination,
+        segments: hydratedSegments,
+        transfers: route.transfers,
+        totalMinutes: route.totalMinutes,
+        totalFareThb: route.totalFareThb,
         totalStandardFareThb: route.totalStandardFareThb,
-        totalStations: route.totalStations, calculatedAt: route.calculatedAt,
+        totalStations: route.totalStations,
+        calculatedAt: route.calculatedAt,
       );
     }
     return route;
@@ -949,19 +1123,34 @@ class RouteCalculator {
   bool _isPrecalculatedPath(SearchableItem from, SearchableItem to) {
     Landmark? lm;
     Station? st;
-    if (from is Landmark) { lm = from; if (to is Station) st = to; }
-    else if (to is Landmark) { lm = to; if (from is Station) st = from; }
+    if (from is Landmark) {
+      lm = from;
+      if (to is Station) st = to;
+    } else if (to is Landmark) {
+      lm = to;
+      if (from is Station) st = from;
+    }
 
     if (lm == null) {
       for (final l in _repo.landmarks) {
-        if (l.id == from.id) { lm = l; if (to is Station) st = to; break; }
-        else if (l.id == to.id) { lm = l; if (from is Station) st = from; break; }
+        if (l.id == from.id) {
+          lm = l;
+          if (to is Station) st = to;
+          break;
+        } else if (l.id == to.id) {
+          lm = l;
+          if (from is Station) st = from;
+          break;
+        }
       }
     }
 
     if (lm != null && st != null) {
       if (st.id == lm.nearestStationId && lm.walkingPath != null) return true;
-      if (lm.alternativeWalks != null && lm.alternativeWalks!.containsKey(st.id)) return true;
+      if (lm.alternativeWalks != null &&
+          lm.alternativeWalks!.containsKey(st.id)) {
+        return true;
+      }
     }
     return false;
   }

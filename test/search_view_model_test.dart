@@ -85,7 +85,7 @@ class MockSearchTransitRepository extends TransitRepository {
       isLoop: false,
       peakIntervalMin: 4,
       offPeakIntervalMin: 8,
-    )
+    ),
   ];
 
   @override
@@ -132,9 +132,7 @@ void main() {
     test('Should calculate transfer route and segments successfully', () async {
       final repo = MockSearchTransitRepository();
       final container = ProviderContainer(
-        overrides: [
-          transitRepositoryProvider.overrideWithValue(repo),
-        ],
+        overrides: [transitRepositoryProvider.overrideWithValue(repo)],
       );
 
       final searchVm = container.read(searchViewModelProvider.notifier);
@@ -149,71 +147,73 @@ void main() {
       final state = container.read(searchViewModelProvider);
       expect(state.error, isNull);
       expect(state.routeResult, isNotNull);
-      
+
       final result = state.routeResult!;
       expect(result.segments.length, equals(2)); // BTS Segment and MRT Segment
-      expect(result.transfers.length, equals(1)); // 1 Transfer between BTS_B and MRT_C
-      
+      expect(
+        result.transfers.length,
+        equals(1),
+      ); // 1 Transfer between BTS_B and MRT_C
+
       // First segment: BTS_A -> BTS_B
       expect(result.segments[0].lineId, equals('BTS_SUKHUMVIT'));
       expect(result.segments[0].fromStation.id, equals('BTS_A'));
       expect(result.segments[0].toStation.id, equals('BTS_B'));
-      
+
       // Second segment: MRT_C -> MRT_D
       expect(result.segments[1].lineId, equals('MRT_BLUE'));
       expect(result.segments[1].fromStation.id, equals('MRT_C'));
       expect(result.segments[1].toStation.id, equals('MRT_D'));
     });
 
-    test('Should handle swap and calculate routes without throwing errors', () async {
-      final repo = MockSearchTransitRepository();
-      final container = ProviderContainer(
-        overrides: [
-          transitRepositoryProvider.overrideWithValue(repo),
-        ],
-      );
+    test(
+      'Should handle swap and calculate routes without throwing errors',
+      () async {
+        final repo = MockSearchTransitRepository();
+        final container = ProviderContainer(
+          overrides: [transitRepositoryProvider.overrideWithValue(repo)],
+        );
 
-      final searchVm = container.read(searchViewModelProvider.notifier);
-      final stationA = repo.getStation('BTS_A')!;
-      final stationD = repo.getStation('MRT_D')!;
+        final searchVm = container.read(searchViewModelProvider.notifier);
+        final stationA = repo.getStation('BTS_A')!;
+        final stationD = repo.getStation('MRT_D')!;
 
-      // Act
-      await searchVm.setOrigin(stationA);
-      await searchVm.setDestination(stationD);
-      
-      // Swap Origin and Destination
-      searchVm.swapStations();
+        // Act
+        await searchVm.setOrigin(stationA);
+        await searchVm.setDestination(stationD);
 
-      // Assert
-      final state = container.read(searchViewModelProvider);
-      expect(state.error, isNull);
-      expect(state.routeResult, isNotNull);
-      
-      final result = state.routeResult!;
-      // Origin is now MRT_D, Destination is BTS_A
-      expect(result.origin.id, equals('MRT_D'));
-      expect(result.destination.id, equals('BTS_A'));
-      
-      expect(result.segments.length, equals(2));
-      expect(result.transfers.length, equals(1));
-      
-      // First segment: MRT_D -> MRT_C
-      expect(result.segments[0].lineId, equals('MRT_BLUE'));
-      expect(result.segments[0].fromStation.id, equals('MRT_D'));
-      expect(result.segments[0].toStation.id, equals('MRT_C'));
-      
-      // Second segment: BTS_B -> BTS_A
-      expect(result.segments[1].lineId, equals('BTS_SUKHUMVIT'));
-      expect(result.segments[1].fromStation.id, equals('BTS_B'));
-      expect(result.segments[1].toStation.id, equals('BTS_A'));
-    });
+        // Swap Origin and Destination
+        searchVm.swapStations();
+
+        // Assert
+        final state = container.read(searchViewModelProvider);
+        expect(state.error, isNull);
+        expect(state.routeResult, isNotNull);
+
+        final result = state.routeResult!;
+        // Origin is now MRT_D, Destination is BTS_A
+        expect(result.origin.id, equals('MRT_D'));
+        expect(result.destination.id, equals('BTS_A'));
+
+        expect(result.segments.length, equals(2));
+        expect(result.transfers.length, equals(1));
+
+        // First segment: MRT_D -> MRT_C
+        expect(result.segments[0].lineId, equals('MRT_BLUE'));
+        expect(result.segments[0].fromStation.id, equals('MRT_D'));
+        expect(result.segments[0].toStation.id, equals('MRT_C'));
+
+        // Second segment: BTS_B -> BTS_A
+        expect(result.segments[1].lineId, equals('BTS_SUKHUMVIT'));
+        expect(result.segments[1].fromStation.id, equals('BTS_B'));
+        expect(result.segments[1].toStation.id, equals('BTS_A'));
+      },
+    );
 
     test('Should support selecting recommended and saver route types', () async {
       final repo = MockSearchTransitRepository();
       final container = ProviderContainer(
-        overrides: [
-          transitRepositoryProvider.overrideWithValue(repo),
-        ],
+        overrides: [transitRepositoryProvider.overrideWithValue(repo)],
       );
 
       final searchVm = container.read(searchViewModelProvider.notifier);

@@ -1,5 +1,6 @@
 @Tags(["live_api"])
 library;
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:bkk_transit_planner/repositories/transit_repository.dart';
 import 'package:bkk_transit_planner/services/photon_search_service.dart';
@@ -29,9 +30,13 @@ void main() {
     if (resolved != null) {
       // After BUG 2 fix: lat/lng stays at centroid, routeLat/routeLng moves to entrance
       print('Display pin (lat/lng): ${resolved.lat}, ${resolved.lng}');
-      print('Routing coord (routeLat/routeLng): ${resolved.routeLat}, ${resolved.routeLng}');
+      print(
+        'Routing coord (routeLat/routeLng): ${resolved.routeLat}, ${resolved.routeLng}',
+      );
       if (mbk.lat == resolved.routeLat && mbk.lng == resolved.routeLng) {
-        print('Warning: Routing coord UNCHANGED (still pointing to centroid/back alley)');
+        print(
+          'Warning: Routing coord UNCHANGED (still pointing to centroid/back alley)',
+        );
       } else {
         print('Success: Routing coord UPDATED to an entrance!');
       }
@@ -59,7 +64,9 @@ void main() {
       lng: 100.5414,
     );
 
-    print('Resolving Lumphini Park entrances from centroid (13.7313, 100.5414)...');
+    print(
+      'Resolving Lumphini Park entrances from centroid (13.7313, 100.5414)...',
+    );
     final resolved = await repo.resolveOnlinePlaceAsync(lumpini);
 
     expect(resolved, isNotNull);
@@ -67,27 +74,43 @@ void main() {
       print('Original Centroid (lat/lng): ${lumpini.lat}, ${lumpini.lng}');
       // After BUG 2 fix: lat/lng = centroid (display pin), routeLat/routeLng = entrance (routing)
       print('Display pin (lat/lng): ${resolved.lat}, ${resolved.lng}');
-      print('Routing coord (routeLat/routeLng): ${resolved.routeLat}, ${resolved.routeLng}');
+      print(
+        'Routing coord (routeLat/routeLng): ${resolved.routeLat}, ${resolved.routeLng}',
+      );
       print('Nearest Station ID: ${resolved.nearestStationId}');
       print('Walking Minutes: ${resolved.walkingMinutes}');
       print('Walking Path Length: ${resolved.walkingPath?.length}');
 
       // BUG 2 fix: display pin (lat/lng) must remain at centroid — must NOT be updated
-      expect(resolved.lat, equals(lumpini.lat),
-          reason: 'lat (display pin) must stay at centroid after resolution');
-      expect(resolved.lng, equals(lumpini.lng),
-          reason: 'lng (display pin) must stay at centroid after resolution');
+      expect(
+        resolved.lat,
+        equals(lumpini.lat),
+        reason: 'lat (display pin) must stay at centroid after resolution',
+      );
+      expect(
+        resolved.lng,
+        equals(lumpini.lng),
+        reason: 'lng (display pin) must stay at centroid after resolution',
+      );
 
       // The routing coordinate (routeLat/routeLng) should move to a gate entrance.
       // If no entrance was found (e.g. Overpass timeout), fallback to centroid is acceptable.
-      if (resolved.routeLat != lumpini.lat || resolved.routeLng != lumpini.lng) {
-        print('Success: Routing coord UPDATED to entrance at (${resolved.routeLat}, ${resolved.routeLng})');
+      if (resolved.routeLat != lumpini.lat ||
+          resolved.routeLng != lumpini.lng) {
+        print(
+          'Success: Routing coord UPDATED to entrance at (${resolved.routeLat}, ${resolved.routeLng})',
+        );
       } else {
-        print('Info: No entrance found (possible Overpass timeout) — using centroid as routing point');
+        print(
+          'Info: No entrance found (possible Overpass timeout) — using centroid as routing point',
+        );
       }
 
       // Nearest station should be MRT Si Lom (MRT_BL26) or BTS Sala Daeng (BTS_S2)
-      expect(resolved.nearestStationId, anyOf(equals('MRT_BL26'), equals('BTS_S2')));
+      expect(
+        resolved.nearestStationId,
+        anyOf(equals('MRT_BL26'), equals('BTS_S2')),
+      );
     }
   });
 }

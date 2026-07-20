@@ -17,7 +17,9 @@ class OverpassService {
     if (kIsWeb) {
       // Direct Overpass API calls will always fail on Web due to CORS.
       // Force the local Vercel serverless proxy if the URL is empty or direct.
-      if (envUrl.isEmpty || envUrl.contains('overpass-api.de') || envUrl.contains('openstreetmap.org')) {
+      if (envUrl.isEmpty ||
+          envUrl.contains('overpass-api.de') ||
+          envUrl.contains('openstreetmap.org')) {
         return '/api/overpass';
       }
       return envUrl;
@@ -80,15 +82,17 @@ class OverpassService {
 
     for (int i = 0; i < attempts; i++) {
       try {
-        final response = await _client.post(
-          Uri.parse(_baseUrl),
-          body: {'data': query},
-          headers: {
-            ...kDefaultHeaders,
-            'Accept': 'application/json',
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-        ).timeout(Duration(seconds: timeoutSeconds));
+        final response = await _client
+            .post(
+              Uri.parse(_baseUrl),
+              body: {'data': query},
+              headers: {
+                ...kDefaultHeaders,
+                'Accept': 'application/json',
+                'Content-Type': 'application/x-www-form-urlencoded',
+              },
+            )
+            .timeout(Duration(seconds: timeoutSeconds));
 
         if (response.statusCode == 200) {
           final data = json.decode(response.body);
@@ -102,10 +106,15 @@ class OverpassService {
             return entrances;
           }
         } else {
-          AppLogger.error('Overpass API error on attempt ${i + 1}: ${response.statusCode}');
+          AppLogger.error(
+            'Overpass API error on attempt ${i + 1}: ${response.statusCode}',
+          );
         }
       } catch (e) {
-        AppLogger.error('Exception calling Overpass API on attempt ${i + 1}: $e', error: e);
+        AppLogger.error(
+          'Exception calling Overpass API on attempt ${i + 1}: $e',
+          error: e,
+        );
         if (i == attempts - 1) {
           rethrow; // Rethrow on last attempt so caller knows it failed
         }

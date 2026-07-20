@@ -6,7 +6,8 @@ import 'package:bkk_transit_planner/core/utils/logger.dart';
 
 /// Service to handle local push notifications (e.g. proximity geofence alerts)
 class NotificationService {
-  final FlutterLocalNotificationsPlugin _notificationsPlugin = FlutterLocalNotificationsPlugin();
+  final FlutterLocalNotificationsPlugin _notificationsPlugin =
+      FlutterLocalNotificationsPlugin();
   bool _isInitialized = false;
   Ref? _ref;
 
@@ -20,16 +21,17 @@ class NotificationService {
 
     const DarwinInitializationSettings initializationSettingsDarwin =
         DarwinInitializationSettings(
-      requestAlertPermission: true,
-      requestBadgePermission: true,
-      requestSoundPermission: true,
-    );
+          requestAlertPermission: true,
+          requestBadgePermission: true,
+          requestSoundPermission: true,
+        );
 
-    const InitializationSettings initializationSettings = InitializationSettings(
-      android: initializationSettingsAndroid,
-      iOS: initializationSettingsDarwin,
-      macOS: initializationSettingsDarwin,
-    );
+    const InitializationSettings initializationSettings =
+        InitializationSettings(
+          android: initializationSettingsAndroid,
+          iOS: initializationSettingsDarwin,
+          macOS: initializationSettingsDarwin,
+        );
 
     try {
       await _notificationsPlugin.initialize(
@@ -38,7 +40,9 @@ class NotificationService {
           final payload = response.payload;
           if (payload != null && _ref != null) {
             // Set the state so the UI listener triggers the bottom sheet popup
-            _ref!.read(activeNotificationPayloadProvider.notifier).setPayload(payload);
+            _ref!
+                .read(activeNotificationPayloadProvider.notifier)
+                .setPayload(payload);
           }
         },
       );
@@ -55,24 +59,27 @@ class NotificationService {
     required String body,
     String? payload,
   }) async {
-    const AndroidNotificationDetails androidPlatformChannelSpecifics =
-        AndroidNotificationDetails(
+    const AndroidNotificationDetails
+    androidPlatformChannelSpecifics = AndroidNotificationDetails(
       'bkk_transit_proximity_channel',
       'Proximity Presence Alerts',
       channelDescription: 'Alerts when near transit stations',
       importance: Importance.max,
       priority: Priority.high,
       showWhen: true,
-      color: Color(0xFF4F46E5), // Brand indigo color to style accent and headers
-      colorized: true,          // Allow system tinting of the notification card when supported
+      color: Color(
+        0xFF4F46E5,
+      ), // Brand indigo color to style accent and headers
+      colorized:
+          true, // Allow system tinting of the notification card when supported
     );
 
     const DarwinNotificationDetails darwinNotificationDetails =
         DarwinNotificationDetails(
-      presentAlert: true,
-      presentBadge: true,
-      presentSound: true,
-    );
+          presentAlert: true,
+          presentBadge: true,
+          presentSound: true,
+        );
 
     const NotificationDetails platformChannelSpecifics = NotificationDetails(
       android: androidPlatformChannelSpecifics,

@@ -5,22 +5,22 @@ library;
 class AppConstants {
   AppConstants._(); // Prevent instantiation
 
-  // ─── App Info ───
+  // App Info
   static const String kAppName = 'BKK Transit Planner';
   static const String kAppVersion = '1.0.0';
 
-  // ─── SharedPreferences Keys ───
+  // SharedPreferences Keys
   /// Key used to track if offline map prefetch has been completed
   static const String kMapPrefetchKey = 'map_prefetch_completed_v6_greater';
 
-  // ─── Map / Prefetch ───
+  // Map / Prefetch
   /// Total number of tiles for Bangkok offline map package
   static const int kMapTileCount = 6914;
 
   /// Maximum content width for utility/settings layout on wide screens
   static const double kMaxGridWidth = 800.0;
 
-  // ─── Navigation ───
+  // Navigation
   /// Tab index for the Map screen in the bottom navigation bar
   static const int kMapTabIndex = 1;
 
@@ -33,7 +33,7 @@ class AppConstants {
   /// Animation duration used consistently across nav rail / nav bar transitions
   static const Duration kNavAnimationDuration = Duration(milliseconds: 300);
 
-  // ─── GPS / Proximity ───
+  // GPS / Proximity
   /// Synthetic station ID used for the user's current GPS location
   static const String kGpsCurrentId = 'GPS_CURRENT';
 
@@ -52,12 +52,12 @@ class AppConstants {
   /// Short delay after card selection before navigation (for visual feedback)
   static const Duration kCardSelectionDelay = Duration(milliseconds: 150);
 
-  // ─── Favorites / Routes ───
+  // Favorites / Routes
   /// Default route name used when saving a route without a custom name
   static const String kDefaultRouteName =
       '\u0e40\u0e2a\u0e49\u0e19\u0e17\u0e32\u0e07\u0e44\u0e21\u0e48\u0e21\u0e35\u0e0a\u0e37\u0e48\u0e2d'; // 'เส้นทางไม่มีชื่อ'
 
-  // ─── Bottom Sheet ───
+  // Bottom Sheet
   static const double kSheetInitialSize = 0.7;
   static const double kSheetMinSize = 0.4;
   static const double kSheetMaxSize = 0.95;

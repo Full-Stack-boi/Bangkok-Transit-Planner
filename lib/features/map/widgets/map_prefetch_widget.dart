@@ -145,7 +145,9 @@ class MapPrefetchWidget extends ConsumerWidget {
                       LinearProgressIndicator(
                         value: prefetchState.progress,
                         minHeight: 6,
-                        backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.1),
+                        backgroundColor: theme.colorScheme.primary.withValues(
+                          alpha: 0.1,
+                        ),
                         color: theme.colorScheme.primary,
                         borderRadius: BorderRadius.circular(4),
                       ),
@@ -154,7 +156,10 @@ class MapPrefetchWidget extends ConsumerWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            t.settings.offlineMapDownloaded(prefetchState.currentTile, prefetchState.totalTiles),
+                            t.settings.offlineMapDownloaded(
+                              prefetchState.currentTile,
+                              prefetchState.totalTiles,
+                            ),
                             style: theme.textTheme.bodySmall?.copyWith(
                               color: theme.colorScheme.onSurfaceVariant,
                             ),
@@ -170,9 +175,14 @@ class MapPrefetchWidget extends ConsumerWidget {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        t.settings.offlineMapCachedAndNew(prefetchState.cachedCount, prefetchState.successCount),
+                        t.settings.offlineMapCachedAndNew(
+                          prefetchState.cachedCount,
+                          prefetchState.successCount,
+                        ),
                         style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+                          color: theme.colorScheme.onSurfaceVariant.withValues(
+                            alpha: 0.7,
+                          ),
                           fontSize: 10,
                         ),
                       ),

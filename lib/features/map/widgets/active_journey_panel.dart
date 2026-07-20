@@ -182,7 +182,9 @@ class ActiveJourneyPanel extends ConsumerWidget {
                       Text(
                         t.journey.currentStationLabel,
                         style: theme.textTheme.labelMedium?.copyWith(
-                          color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                          color: theme.colorScheme.onSurface.withValues(
+                            alpha: 0.5,
+                          ),
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -218,7 +220,9 @@ class ActiveJourneyPanel extends ConsumerWidget {
                       Text(
                         t.journey.nextStationLabel,
                         style: theme.textTheme.labelMedium?.copyWith(
-                          color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                          color: theme.colorScheme.onSurface.withValues(
+                            alpha: 0.5,
+                          ),
                         ),
                       ),
                       const SizedBox(height: 4),

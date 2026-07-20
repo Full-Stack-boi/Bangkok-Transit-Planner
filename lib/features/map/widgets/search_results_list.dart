@@ -43,18 +43,24 @@ class _SearchResultsListState extends ConsumerState<SearchResultsList> {
   @override
   Widget build(BuildContext context) {
     final results = widget.state.searchResults;
-    
-    if (results.isEmpty && !widget.state.isSearching && widget.state.query.isEmpty) {
+
+    if (results.isEmpty &&
+        !widget.state.isSearching &&
+        widget.state.query.isEmpty) {
       return _buildQuickActions(context);
     }
-    
+
     if (results.isEmpty && !widget.state.isSearching) {
       final theme = Theme.of(context);
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.search_off_rounded, size: 64, color: theme.colorScheme.outline),
+            Icon(
+              Icons.search_off_rounded,
+              size: 64,
+              color: theme.colorScheme.outline,
+            ),
             const SizedBox(height: 16),
             Text(
               widget.t.search.noResultsFound,
@@ -70,7 +76,9 @@ class _SearchResultsListState extends ConsumerState<SearchResultsList> {
     final stations = results.whereType<Station>().toList();
     final landmarks = results.whereType<Landmark>().toList();
     final transitStops = results.whereType<NamtangStop>().toList();
-    final onlinePlaces = results.where((item) => item is CustomLocation && item.id != 'GPS_CURRENT').toList();
+    final onlinePlaces = results
+        .where((item) => item is CustomLocation && item.id != 'GPS_CURRENT')
+        .toList();
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
@@ -124,7 +132,7 @@ class _SearchResultsListState extends ConsumerState<SearchResultsList> {
     } else if (icon == Icons.place_rounded) {
       categoryColor = theme.appColors.landmarkColor ?? const Color(0xFFF97316);
     }
-    
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
@@ -159,7 +167,10 @@ class _SearchResultsListState extends ConsumerState<SearchResultsList> {
                 color: theme.colorScheme.onSurface,
               ),
             ),
-            childrenPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            childrenPadding: const EdgeInsets.symmetric(
+              horizontal: 8,
+              vertical: 4,
+            ),
             children: [
               ...displayItems.map((item) {
                 return StationListTile(
@@ -214,7 +225,9 @@ class _SearchResultsListState extends ConsumerState<SearchResultsList> {
       children: [
         Card(
           elevation: 0,
-          color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+          color: theme.colorScheme.surfaceContainerHighest.withValues(
+            alpha: 0.3,
+          ),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
             side: BorderSide(
@@ -256,7 +269,9 @@ class _SearchResultsListState extends ConsumerState<SearchResultsList> {
                         Text(
                           widget.t.search.useCurrentLocationDesc,
                           style: theme.textTheme.bodyMedium?.copyWith(
-                            color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                            color: theme.colorScheme.onSurface.withValues(
+                              alpha: 0.6,
+                            ),
                           ),
                         ),
                       ],
@@ -343,7 +358,10 @@ class _SearchResultsListState extends ConsumerState<SearchResultsList> {
       double minDist = double.infinity;
       for (final s in transitRepo.stations) {
         final dist = locationService.calculateDistance(
-          pos.latitude, pos.longitude, s.lat, s.lng,
+          pos.latitude,
+          pos.longitude,
+          s.lat,
+          s.lng,
         );
         if (dist < minDist) {
           minDist = dist;
@@ -371,7 +389,9 @@ class _SearchResultsListState extends ConsumerState<SearchResultsList> {
       }
     } catch (e) {
       if (mounted) Navigator.pop(context);
-      scaffoldMessenger.showSnackBar(SnackBar(content: Text('${widget.t.common.errorOccurred} $e')));
+      scaffoldMessenger.showSnackBar(
+        SnackBar(content: Text('${widget.t.common.errorOccurred} $e')),
+      );
     }
   }
 }
@@ -427,7 +447,8 @@ class StationListTile extends ConsumerWidget {
       final nearestStation = station.nearestStationId != null
           ? repo.getStation(station.nearestStationId!)
           : null;
-      final nearestName = nearestStation?.displayName(isEnglish: localeCode == 'en') ?? '';
+      final nearestName =
+          nearestStation?.displayName(isEnglish: localeCode == 'en') ?? '';
       final walkTime = station.walkingMinutes?.toInt() ?? 5;
 
       itemColor = theme.colorScheme.onSurface.withValues(alpha: 0.6);
@@ -470,9 +491,7 @@ class StationListTile extends ConsumerWidget {
           color: itemColor.withValues(alpha: 0.12),
           borderRadius: BorderRadius.circular(12),
         ),
-        child: Center(
-          child: Icon(leadingIcon, color: itemColor, size: 22),
-        ),
+        child: Center(child: Icon(leadingIcon, color: itemColor, size: 22)),
       );
     }
 
@@ -503,7 +522,10 @@ class StationListTile extends ConsumerWidget {
             fontSize: 12,
           ),
         ),
-        trailing: Icon(Icons.chevron_right, color: theme.colorScheme.onSurface.withValues(alpha: 0.3)),
+        trailing: Icon(
+          Icons.chevron_right,
+          color: theme.colorScheme.onSurface.withValues(alpha: 0.3),
+        ),
       ),
     );
   }

@@ -63,7 +63,9 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
                           Icons.favorite_rounded,
                           color: isSelected
                               ? theme.appColors.favoriteColor
-                              : theme.appColors.favoriteColor?.withValues(alpha: 0.5),
+                              : theme.appColors.favoriteColor?.withValues(
+                                  alpha: 0.5,
+                                ),
                         );
                       },
                     ),
@@ -78,7 +80,9 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
                           Icons.route_rounded,
                           color: isSelected
                               ? theme.appColors.routeColor
-                              : theme.appColors.routeColor?.withValues(alpha: 0.5),
+                              : theme.appColors.routeColor?.withValues(
+                                  alpha: 0.5,
+                                ),
                         );
                       },
                     ),
@@ -87,7 +91,9 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
                 ],
                 indicatorColor: theme.colorScheme.onSurface,
                 labelColor: theme.colorScheme.onSurface,
-                unselectedLabelColor: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                unselectedLabelColor: theme.colorScheme.onSurface.withValues(
+                  alpha: 0.6,
+                ),
               ),
             ),
             body: TabBarView(
@@ -99,7 +105,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
           ),
         ),
 
-        // ─── Route Calculating Overlay ───
+        // Route Calculating Overlay
         Consumer(
           builder: (context, ref, child) {
             final isCalculating = ref.watch(
@@ -142,9 +148,13 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
         final station = state.favoriteStations[index];
         final lineColor = TransitColors.getLineColor(station.lineId);
         final crowdInfo = crowdService.getCrowdInfo(station.id);
-        final minutesUntilNext = scheduleService.getMinutesUntilNextTrain(station.lineId);
+        final minutesUntilNext = scheduleService.getMinutesUntilNextTrain(
+          station.lineId,
+        );
 
-        final String stationName = localeCode == 'th' ? station.nameTh : station.nameEn;
+        final String stationName = localeCode == 'th'
+            ? station.nameTh
+            : station.nameEn;
 
         final String trainStatusText;
         if (minutesUntilNext == null) {
@@ -152,7 +162,8 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
         } else if (minutesUntilNext == 0) {
           trainStatusText = t.routeResult.trainArriving;
         } else {
-          trainStatusText = '${t.routeResult.nextTrain}: ~$minutesUntilNext ${t.common.minutesUnit}';
+          trainStatusText =
+              '${t.routeResult.nextTrain}: ~$minutesUntilNext ${t.common.minutesUnit}';
         }
 
         String getCrowdLevelText(CrowdLevel level) {
@@ -179,7 +190,10 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
                 Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: lineColor,
                         borderRadius: BorderRadius.circular(6),
@@ -205,9 +219,13 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
                             ),
                           ),
                           Text(
-                            localeCode == 'th' ? station.nameEn : station.nameTh,
+                            localeCode == 'th'
+                                ? station.nameEn
+                                : station.nameTh,
                             style: theme.textTheme.bodyMedium?.copyWith(
-                              color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                              color: theme.colorScheme.onSurface.withValues(
+                                alpha: 0.5,
+                              ),
                               fontSize: 12,
                             ),
                           ),
@@ -215,11 +233,16 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
                       ),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.delete_outline_rounded, color: Colors.redAccent),
+                      icon: const Icon(
+                        Icons.delete_outline_rounded,
+                        color: Colors.redAccent,
+                      ),
                       onPressed: () {
                         vm.toggleFavoriteStation(station.id);
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text(t.favorites.stationRemovedFav)),
+                          SnackBar(
+                            content: Text(t.favorites.stationRemovedFav),
+                          ),
                         );
                       },
                     ),
@@ -248,7 +271,9 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
                                 color: minutesUntilNext == 0
                                     ? Colors.amber.shade700
                                     : theme.appColors.timeColor,
-                                fontWeight: minutesUntilNext == 0 ? FontWeight.bold : null,
+                                fontWeight: minutesUntilNext == 0
+                                    ? FontWeight.bold
+                                    : null,
                               ),
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -265,7 +290,9 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
                           size: 14,
                           color: crowdInfo.level == CrowdLevel.high
                               ? Colors.red
-                              : (crowdInfo.level == CrowdLevel.medium ? Colors.orange : Colors.green),
+                              : (crowdInfo.level == CrowdLevel.medium
+                                    ? Colors.orange
+                                    : Colors.green),
                         ),
                         const SizedBox(width: 4),
                         Text(
@@ -274,8 +301,8 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
                             color: crowdInfo.level == CrowdLevel.high
                                 ? Colors.red.shade400
                                 : (crowdInfo.level == CrowdLevel.medium
-                                    ? Colors.orange.shade400
-                                    : Colors.green.shade400),
+                                      ? Colors.orange.shade400
+                                      : Colors.green.shade400),
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -292,9 +319,17 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
                       child: OutlinedButton.icon(
                         onPressed: () {
                           searchVm.setOrigin(station);
-                          ref.read(homeTabIndexProvider.notifier).setTab(1); // Switch to Map Screen (search is on Map)
+                          ref
+                              .read(homeTabIndexProvider.notifier)
+                              .setTab(
+                                1,
+                              ); // Switch to Map Screen (search is on Map)
                         },
-                        icon: const Icon(Icons.trip_origin_rounded, size: 16, color: Colors.green),
+                        icon: const Icon(
+                          Icons.trip_origin_rounded,
+                          size: 16,
+                          color: Colors.green,
+                        ),
                         label: Text(t.favorites.setOriginBtn),
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 8),
@@ -306,9 +341,17 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
                       child: OutlinedButton.icon(
                         onPressed: () {
                           searchVm.setDestination(station);
-                          ref.read(homeTabIndexProvider.notifier).setTab(1); // Switch to Map Screen (search is on Map)
+                          ref
+                              .read(homeTabIndexProvider.notifier)
+                              .setTab(
+                                1,
+                              ); // Switch to Map Screen (search is on Map)
                         },
-                        icon: const Icon(Icons.location_on_rounded, size: 16, color: Colors.red),
+                        icon: const Icon(
+                          Icons.location_on_rounded,
+                          size: 16,
+                          color: Colors.red,
+                        ),
                         label: Text(t.favorites.setDestBtn),
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 8),
@@ -357,7 +400,10 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
     // 3. Check if we have stored coordinates
     double? lat;
     double? lng;
-    if (latStr != null && latStr.isNotEmpty && lngStr != null && lngStr.isNotEmpty) {
+    if (latStr != null &&
+        latStr.isNotEmpty &&
+        lngStr != null &&
+        lngStr.isNotEmpty) {
       lat = double.tryParse(latStr);
       lng = double.tryParse(lngStr);
     }
@@ -391,9 +437,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
           nearest = s;
         }
       }
-      final walkMin = nearest != null
-          ? (minDist / 80.0).clamp(1.0, 30.0)
-          : 5.0;
+      final walkMin = nearest != null ? (minDist / 80.0).clamp(1.0, 30.0) : 5.0;
 
       final loc = CustomLocation(
         id: id,
@@ -441,7 +485,10 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
         final originId = route['origin_id'] ?? '';
         final destinationId = route['destination_id'] ?? '';
         final String? routeName = route['name'];
-        final String routeDisplayName = (routeName == null || routeName.isEmpty || routeName == t.favorites.unnamedRoute)
+        final String routeDisplayName =
+            (routeName == null ||
+                routeName.isEmpty ||
+                routeName == t.favorites.unnamedRoute)
             ? t.favorites.unnamedRoute
             : routeName;
         String originName = route['origin_name'] ?? '';
@@ -486,10 +533,18 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
         return Card(
           margin: const EdgeInsets.only(bottom: 12),
           child: ListTile(
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 8,
+            ),
             leading: CircleAvatar(
-              backgroundColor: theme.appColors.routeColor?.withValues(alpha: 0.1),
-              child: Icon(Icons.route_rounded, color: theme.appColors.routeColor),
+              backgroundColor: theme.appColors.routeColor?.withValues(
+                alpha: 0.1,
+              ),
+              child: Icon(
+                Icons.route_rounded,
+                color: theme.appColors.routeColor,
+              ),
             ),
             title: Text(
               routeDisplayName,
@@ -523,7 +578,10 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
               ),
             ),
             trailing: IconButton(
-              icon: const Icon(Icons.delete_outline_rounded, color: Colors.redAccent),
+              icon: const Icon(
+                Icons.delete_outline_rounded,
+                color: Colors.redAccent,
+              ),
               onPressed: () {
                 vm.deleteRoute(originId, destinationId);
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -534,7 +592,9 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
             onTap: () async {
               if (originItem != null && destItem != null) {
                 await searchVm.setRoute(originItem, destItem);
-                ref.read(homeTabIndexProvider.notifier).setTab(1); // Switch to Map Screen
+                ref
+                    .read(homeTabIndexProvider.notifier)
+                    .setTab(1); // Switch to Map Screen
               }
             },
           ),

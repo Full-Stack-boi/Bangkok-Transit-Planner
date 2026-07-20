@@ -18,13 +18,12 @@ import 'package:bkk_transit_planner/features/search/search_view_model.dart';
 import 'package:bkk_transit_planner/features/map/map_screen.dart';
 import 'package:bkk_transit_planner/models/location_permission_status.dart';
 
-// ─── หัวข้อการเรียนรู้: Widget Test คืออะไร? ───
+// หัวข้อการเรียนรู้: Widget Test คืออะไร?
 // Widget Test คือการทดสอบองค์ประกอบส่วนติดต่อผู้ใช้ (UI Components/Widgets) ในสภาพแวดล้อมจำลอง
 // ช่วยให้นักพัฒนาสามารถจำลองพฤติกรรมผู้ใช้ เช่น การคลิกปุ่ม, การพิมพ์ข้อความ, การปัดหน้าจอ
 // และยืนยันได้ว่าหน้าจอ UI แสดงผลได้ถูกต้องตามที่ควรจะเป็น โดยไม่จำเป็นต้องเปิด Emulator/เครื่องจริง
 
 class MockTransitRepository extends TransitRepository {
-
   final List<Station> _mockStations = [
     const Station(
       id: 'BTS_A',
@@ -68,7 +67,7 @@ class MockTransitRepository extends TransitRepository {
       isLoop: false,
       peakIntervalMin: 3,
       offPeakIntervalMin: 6,
-    )
+    ),
   ];
 
   @override
@@ -89,12 +88,21 @@ class MockTransitRepository extends TransitRepository {
     if (query.isEmpty) return _mockStations;
     final q = query.toLowerCase().replaceAll(RegExp(r'\s+'), '');
     return _mockStations.where((s) {
-      final normalizedTh = s.nameTh.toLowerCase().replaceAll(RegExp(r'\s+'), '');
-      final normalizedEn = s.nameEn.toLowerCase().replaceAll(RegExp(r'\s+'), '');
-      final normalizedCode = s.code.toLowerCase().replaceAll(RegExp(r'\s+'), '');
+      final normalizedTh = s.nameTh.toLowerCase().replaceAll(
+        RegExp(r'\s+'),
+        '',
+      );
+      final normalizedEn = s.nameEn.toLowerCase().replaceAll(
+        RegExp(r'\s+'),
+        '',
+      );
+      final normalizedCode = s.code.toLowerCase().replaceAll(
+        RegExp(r'\s+'),
+        '',
+      );
       return normalizedTh.contains(q) ||
-             normalizedEn.contains(q) ||
-             normalizedCode.contains(q);
+          normalizedEn.contains(q) ||
+          normalizedCode.contains(q);
     }).toList();
   }
 
@@ -155,7 +163,6 @@ class MockTransitNewsService extends TransitNewsService {
   }
 }
 
-
 void main() {
   setUp(() async {
     // จำลอง SharedPreferences สำหรับรันเทสต์ เพื่อไม่ให้พึ่งพาระบบไฟล์ของแพลตฟอร์มจริง
@@ -164,22 +171,28 @@ void main() {
   });
 
   group('BkkTransitApp Widget Tests', () {
-    testWidgets('Should render home screen with bottom navigation and switch tabs', (WidgetTester tester) async {
+    testWidgets('Should render home screen with bottom navigation and switch tabs', (
+      WidgetTester tester,
+    ) async {
       // 1. เตรียมสภาพแวดล้อม (Arrange): กำหนด ProviderScope และ Override mock providers
       final container = ProviderScope(
         overrides: [
           transitInitProvider.overrideWith((ref) => Future.value(null)),
           transitRepositoryProvider.overrideWithValue(MockTransitRepository()),
           locationServiceProvider.overrideWithValue(MockLocationService()),
-          notificationServiceProvider.overrideWithValue(MockNotificationService()),
-          transitNewsServiceProvider.overrideWithValue(MockTransitNewsService()),
+          notificationServiceProvider.overrideWithValue(
+            MockNotificationService(),
+          ),
+          transitNewsServiceProvider.overrideWithValue(
+            MockTransitNewsService(),
+          ),
         ],
         child: const BkkTransitApp(),
       );
 
       // 2. โหลดหน้าจอเสมือนจริง (Act): เรียก pumpWidget() เพื่อสร้าง widget tree ขึ้นมาทดสอบ
       await tester.pumpWidget(container);
-      
+
       // รอให้การโหลด asynchronous ต่างๆ หรืออนิเมชั่นเริ่มต้นเสร็จสิ้น
       await tester.pumpAndSettle();
 
@@ -190,18 +203,33 @@ void main() {
       // ค้นหาและตรวจสอบว่ามีแท็บนำทางครบทั้ง 4 แท็บใน NavigationBar
       // อิงตามคำแปลภาษาไทยเริ่มต้น
       final navBar = find.byType(NavigationBar);
-      expect(find.descendant(of: navBar, matching: find.text('บริการ')), findsOneWidget);
-      expect(find.descendant(of: navBar, matching: find.text('แผนที่รถไฟฟ้า')), findsOneWidget);
-      expect(find.descendant(of: navBar, matching: find.text('รายการโปรด')), findsOneWidget);
-      expect(find.descendant(of: navBar, matching: find.text('ตั้งค่า')), findsOneWidget);
+      expect(
+        find.descendant(of: navBar, matching: find.text('บริการ')),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(of: navBar, matching: find.text('แผนที่รถไฟฟ้า')),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(of: navBar, matching: find.text('รายการโปรด')),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(of: navBar, matching: find.text('ตั้งค่า')),
+        findsOneWidget,
+      );
 
       // ตรวจสอบว่า app เปิดที่หน้า Map (MapScreen widget ควรมีอยู่บนหน้าจอ)
       expect(find.byType(MapScreen), findsOneWidget);
 
       // 4. จำลองการคลิกเปลี่ยนแท็บไปยังแท็บ "ตั้งค่า" (Act)
-      final settingsTab = find.descendant(of: navBar, matching: find.text('ตั้งค่า'));
+      final settingsTab = find.descendant(
+        of: navBar,
+        matching: find.text('ตั้งค่า'),
+      );
       await tester.tap(settingsTab);
-      
+
       // อัปเดต UI หลังจากมีการคลิกเพื่อแสดงหน้าต่างใหม่
       await tester.pumpAndSettle();
 
@@ -211,15 +239,78 @@ void main() {
       expect(find.text('ภาษา'), findsOneWidget);
     });
 
-    testWidgets('Should show route result banner on map screen and open detail sheet on tap', (WidgetTester tester) async {
+    testWidgets(
+      'Should show route result banner on map screen and open detail sheet on tap',
+      (WidgetTester tester) async {
+        final repo = MockTransitRepository();
+        final container = ProviderScope(
+          overrides: [
+            transitInitProvider.overrideWith((ref) => Future.value(null)),
+            transitRepositoryProvider.overrideWithValue(repo),
+            locationServiceProvider.overrideWithValue(MockLocationService()),
+            notificationServiceProvider.overrideWithValue(
+              MockNotificationService(),
+            ),
+            transitNewsServiceProvider.overrideWithValue(
+              MockTransitNewsService(),
+            ),
+          ],
+          child: const BkkTransitApp(),
+        );
+
+        await tester.pumpWidget(container);
+        await tester.pumpAndSettle();
+
+        // Find the search view model and set origin & destination to calculate a route
+        final element = tester.element(find.byType(BkkTransitApp));
+        final ref = ProviderScope.containerOf(element);
+        final searchVm = ref.read(searchViewModelProvider.notifier);
+        final stationA = repo.getStation('BTS_A')!;
+        final stationB = repo.getStation('BTS_B')!;
+
+        searchVm.setOrigin(stationA);
+        searchVm.setDestination(stationB);
+        await tester.pumpAndSettle();
+
+        // Switch to the map tab
+        final navBar = find.byType(NavigationBar);
+        final mapTab = find.descendant(
+          of: navBar,
+          matching: find.text('แผนที่รถไฟฟ้า'),
+        );
+        await tester.tap(mapTab);
+        await tester.pumpAndSettle();
+
+        // Verify RouteResultBanner is displayed on MapScreen
+        expect(find.byType(RouteResultBanner), findsOneWidget);
+
+        // Verify that details chip info is shown (e.g. fare or minutes)
+        expect(find.textContaining('นาที'), findsOneWidget);
+
+        // Tap on RouteResultBanner
+        await tester.tap(find.byType(RouteResultBanner));
+        await tester.pumpAndSettle();
+
+        // Verify RouteResultSheet bottom sheet is open
+        expect(find.byType(RouteResultSheet), findsOneWidget);
+      },
+    );
+
+    testWidgets('Should save route and restore it correctly on tap', (
+      WidgetTester tester,
+    ) async {
       final repo = MockTransitRepository();
       final container = ProviderScope(
         overrides: [
           transitInitProvider.overrideWith((ref) => Future.value(null)),
           transitRepositoryProvider.overrideWithValue(repo),
           locationServiceProvider.overrideWithValue(MockLocationService()),
-          notificationServiceProvider.overrideWithValue(MockNotificationService()),
-          transitNewsServiceProvider.overrideWithValue(MockTransitNewsService()),
+          notificationServiceProvider.overrideWithValue(
+            MockNotificationService(),
+          ),
+          transitNewsServiceProvider.overrideWithValue(
+            MockTransitNewsService(),
+          ),
         ],
         child: const BkkTransitApp(),
       );
@@ -240,54 +331,10 @@ void main() {
 
       // Switch to the map tab
       final navBar = find.byType(NavigationBar);
-      final mapTab = find.descendant(of: navBar, matching: find.text('แผนที่รถไฟฟ้า'));
-      await tester.tap(mapTab);
-      await tester.pumpAndSettle();
-
-      // Verify RouteResultBanner is displayed on MapScreen
-      expect(find.byType(RouteResultBanner), findsOneWidget);
-
-      // Verify that details chip info is shown (e.g. fare or minutes)
-      expect(find.textContaining('นาที'), findsOneWidget);
-
-      // Tap on RouteResultBanner
-      await tester.tap(find.byType(RouteResultBanner));
-      await tester.pumpAndSettle();
-
-      // Verify RouteResultSheet bottom sheet is open
-      expect(find.byType(RouteResultSheet), findsOneWidget);
-    });
-
-    testWidgets('Should save route and restore it correctly on tap', (WidgetTester tester) async {
-      final repo = MockTransitRepository();
-      final container = ProviderScope(
-        overrides: [
-          transitInitProvider.overrideWith((ref) => Future.value(null)),
-          transitRepositoryProvider.overrideWithValue(repo),
-          locationServiceProvider.overrideWithValue(MockLocationService()),
-          notificationServiceProvider.overrideWithValue(MockNotificationService()),
-          transitNewsServiceProvider.overrideWithValue(MockTransitNewsService()),
-        ],
-        child: const BkkTransitApp(),
+      final mapTab = find.descendant(
+        of: navBar,
+        matching: find.text('แผนที่รถไฟฟ้า'),
       );
-
-      await tester.pumpWidget(container);
-      await tester.pumpAndSettle();
-
-      // Find the search view model and set origin & destination to calculate a route
-      final element = tester.element(find.byType(BkkTransitApp));
-      final ref = ProviderScope.containerOf(element);
-      final searchVm = ref.read(searchViewModelProvider.notifier);
-      final stationA = repo.getStation('BTS_A')!;
-      final stationB = repo.getStation('BTS_B')!;
-
-      searchVm.setOrigin(stationA);
-      searchVm.setDestination(stationB);
-      await tester.pumpAndSettle();
-
-      // Switch to the map tab
-      final navBar = find.byType(NavigationBar);
-      final mapTab = find.descendant(of: navBar, matching: find.text('แผนที่รถไฟฟ้า'));
       await tester.tap(mapTab);
       await tester.pumpAndSettle();
 
@@ -319,7 +366,10 @@ void main() {
       await tester.pumpAndSettle();
 
       // Tap on Saved Routes tab inside Favorites screen
-      final routesTab = find.descendant(of: find.byType(TabBar), matching: find.byIcon(Icons.route_rounded));
+      final routesTab = find.descendant(
+        of: find.byType(TabBar),
+        matching: find.byIcon(Icons.route_rounded),
+      );
       await tester.tap(routesTab);
       await tester.pumpAndSettle();
 

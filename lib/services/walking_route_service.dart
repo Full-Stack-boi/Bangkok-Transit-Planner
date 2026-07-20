@@ -9,7 +9,8 @@ import 'package:bkk_transit_planner/core/utils/logger.dart';
 class WalkingRouteService {
   final http.Client _client;
 
-  WalkingRouteService([http.Client? client]) : _client = client ?? http.Client();
+  WalkingRouteService([http.Client? client])
+    : _client = client ?? http.Client();
 
   /// Fetches a walking path from start coordinates to end coordinates
   Future<List<LatLng>> getWalkingPath(
@@ -20,13 +21,12 @@ class WalkingRouteService {
   ) async {
     try {
       final uri = Uri.parse(
-        'https://router.project-osrm.org/route/v1/foot/$fromLng,$fromLat;$toLng,$toLat?overview=full&geometries=geojson'
+        'https://router.project-osrm.org/route/v1/foot/$fromLng,$fromLat;$toLng,$toLat?overview=full&geometries=geojson',
       );
 
-      final response = await _client.get(
-        uri,
-        headers: kDefaultHeaders,
-      ).timeout(const Duration(seconds: 4));
+      final response = await _client
+          .get(uri, headers: kDefaultHeaders)
+          .timeout(const Duration(seconds: 4));
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = json.decode(response.body);
@@ -48,7 +48,10 @@ class WalkingRouteService {
 
               // Ensure the path starts exactly at fromLat, fromLng
               final distanceToStart = Geolocator.distanceBetween(
-                fromLat, fromLng, pathPoints.first.latitude, pathPoints.first.longitude
+                fromLat,
+                fromLng,
+                pathPoints.first.latitude,
+                pathPoints.first.longitude,
               );
               if (distanceToStart > 1.0) {
                 pathPoints.insert(0, LatLng(fromLat, fromLng));
@@ -58,7 +61,10 @@ class WalkingRouteService {
 
               // Ensure the path ends exactly at toLat, toLng
               final distanceToEnd = Geolocator.distanceBetween(
-                toLat, toLng, pathPoints.last.latitude, pathPoints.last.longitude
+                toLat,
+                toLng,
+                pathPoints.last.latitude,
+                pathPoints.last.longitude,
               );
               if (distanceToEnd > 1.0) {
                 pathPoints.add(LatLng(toLat, toLng));
@@ -72,7 +78,10 @@ class WalkingRouteService {
         }
       }
     } catch (e) {
-      AppLogger.error('OSRM walking path fetch failed: $e. Falling back to Manhattan grid path.', error: e);
+      AppLogger.error(
+        'OSRM walking path fetch failed: $e. Falling back to Manhattan grid path.',
+        error: e,
+      );
     }
 
     // Offline / Error Fallback: Manhattan grid path

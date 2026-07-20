@@ -89,13 +89,15 @@ class ThaiSearch implements BaseSearch {
   @override
   String get selectStationTitle => 'คุณเดินทางจากสถานีใด?';
   @override
-  String get selectStationSubtitle => 'แตะเลือกสถานีเพื่อเช็คอินและตั้งเป็นต้นทาง';
+  String get selectStationSubtitle =>
+      'แตะเลือกสถานีเพื่อเช็คอินและตั้งเป็นต้นทาง';
   @override
   String get loadingStations => 'กำลังโหลดข้อมูลสถานี...';
   @override
   String get calculatingRoute => 'กำลังค้นหาเส้นทางที่ดีที่สุด...';
   @override
-  String get searchDesc => 'พิมพ์ชื่อสถานีเพื่อค้นหา\nรองรับ BTS, MRT, Airport Rail Link';
+  String get searchDesc =>
+      'พิมพ์ชื่อสถานีเพื่อค้นหา\nรองรับ BTS, MRT, Airport Rail Link';
   @override
   String get noStationFound => 'ไม่พบสถานี';
   @override
@@ -107,7 +109,8 @@ class ThaiSearch implements BaseSearch {
   @override
   String get useCurrentLocation => 'ใช้ตำแหน่งปัจจุบันของคุณ';
   @override
-  String get useCurrentLocationDesc => 'ค้นหาเส้นทางโดยเริ่มจากตำแหน่งที่คุณอยู่';
+  String get useCurrentLocationDesc =>
+      'ค้นหาเส้นทางโดยเริ่มจากตำแหน่งที่คุณอยู่';
   @override
   String get locationDeniedSnack => 'ปฏิเสธการเข้าถึงตำแหน่งที่ตั้ง';
   @override
@@ -149,11 +152,13 @@ class ThaiFavorites implements BaseFavorites {
   @override
   String get emptyFavTitle => 'ยังไม่มีสถานีโปรด';
   @override
-  String get emptyFavSubtitle => 'ค้นหาสถานีและกดรูปหัวใจเพื่อบันทึกสถานีที่ใช้เป็นประจำ';
+  String get emptyFavSubtitle =>
+      'ค้นหาสถานีและกดรูปหัวใจเพื่อบันทึกสถานีที่ใช้เป็นประจำ';
   @override
   String get emptyRouteTitle => 'ยังไม่มีเส้นทางที่บันทึก';
   @override
-  String get emptyRouteSubtitle => 'คุณสามารถบันทึกเส้นทางที่ใช้ประจำหลังจากคำนวณเส้นทางแล้ว';
+  String get emptyRouteSubtitle =>
+      'คุณสามารถบันทึกเส้นทางที่ใช้ประจำหลังจากคำนวณเส้นทางแล้ว';
   @override
   String get setOriginBtn => 'ตั้งเป็นต้นทาง';
   @override
@@ -234,13 +239,15 @@ class ThaiRouteResult implements BaseRouteResult {
   @override
   String get accuracyWarning => 'เส้นทางนี้อาจไม่แม่นยำ 100%';
   @override
-  String get accuracyBody => 'เนื่องจากไม่สามารถดึงข้อมูลทางออกของสถานีได้ ระบบจึงคำนวณระยะทางจากจุดกึ่งกลางสถานีแทน';
+  String get accuracyBody =>
+      'เนื่องจากไม่สามารถดึงข้อมูลทางออกของสถานีได้ ระบบจึงคำนวณระยะทางจากจุดกึ่งกลางสถานีแทน';
   @override
   String get reportIssueLink => 'คลิกที่นี่เพื่อรายงานปัญหา';
   @override
   String get reportDialogTitle => 'รายงานปัญหาเส้นทาง';
   @override
-  String get reportDialogBody => 'ระบบจะส่งพิกัดและข้อมูลเส้นทางเพื่อให้ทีมงานนำไปปรับปรุง คุณต้องการดำเนินการต่อหรือไม่?';
+  String get reportDialogBody =>
+      'ระบบจะส่งพิกัดและข้อมูลเส้นทางเพื่อให้ทีมงานนำไปปรับปรุง คุณต้องการดำเนินการต่อหรือไม่?';
   @override
   String get reportSuccess => 'ส่งรายงานปัญหาเรียบร้อยแล้ว!';
 }
@@ -253,7 +260,8 @@ class ThaiErrors implements BaseErrors {
   @override
   String errorFailed(String error) => 'เกิดข้อผิดพลาด: $error';
   @override
-  String get errorNoInternet => 'ไม่มีการเชื่อมต่ออินเทอร์เน็ต หยุดดาวน์โหลดแผนที่ชั่วคราว';
+  String get errorNoInternet =>
+      'ไม่มีการเชื่อมต่ออินเทอร์เน็ต หยุดดาวน์โหลดแผนที่ชั่วคราว';
 }
 
 class ThaiDirections implements BaseDirections {
@@ -320,7 +328,9 @@ class ThaiDirections implements BaseDirections {
       case 'MRT_PINK':
         return boundIndex == 0 ? dirToMinBuri : dirToNonthaburiCivicCenter;
       case 'MRT_PINK_BRANCH':
-        return boundIndex == 0 ? dirToMuangThongThaniLake : dirToSiRatMuangThongThani;
+        return boundIndex == 0
+            ? dirToMuangThongThaniLake
+            : dirToSiRatMuangThongThani;
       case 'SRT_RED_NORTH':
         return boundIndex == 0 ? dirToRangsit : dirToKrungThepAphiwat;
       case 'SRT_RED_WEST':
@@ -333,60 +343,81 @@ class ThaiDirections implements BaseDirections {
 
 class ThaiTransfers implements BaseTransfers {
   @override
-  String get transferThaphraUp => 'ขึ้นบันไดเลื่อนไปชานชาลาชั้น 4 (สายวงกลม ไปทางจรัญฯ/เตาปูน) · เดิน ~1 นาที';
+  String get transferThaphraUp =>
+      'ขึ้นบันไดเลื่อนไปชานชาลาชั้น 4 (สายวงกลม ไปทางจรัญฯ/เตาปูน) · เดิน ~1 นาที';
   @override
-  String get transferThaphraDown => 'ลงบันไดเลื่อนไปชานชาลาชั้น 3 (สายกิ่ง ไปทางบางหว้า/หลักสอง) · เดิน ~1 นาที';
+  String get transferThaphraDown =>
+      'ลงบันไดเลื่อนไปชานชาลาชั้น 3 (สายกิ่ง ไปทางบางหว้า/หลักสอง) · เดิน ~1 นาที';
   @override
-  String transferSiamSameLevel(int floor) => 'เดินสลับฝั่งชานชาลาที่ชั้นเดียวกัน (ชั้น $floor) · เดิน ~1 นาที';
+  String transferSiamSameLevel(int floor) =>
+      'เดินสลับฝั่งชานชาลาที่ชั้นเดียวกัน (ชั้น $floor) · เดิน ~1 นาที';
   @override
-  String get transferSiamUp => 'ขึ้นบันไดเลื่อนขึ้นไปชานชาลาชั้น 3 · เดิน ~1 นาที';
+  String get transferSiamUp =>
+      'ขึ้นบันไดเลื่อนขึ้นไปชานชาลาชั้น 3 · เดิน ~1 นาที';
   @override
-  String get transferSiamDown => 'ลงบันไดเลื่อนลงไปชานชาลาชั้น 4 · เดิน ~1 นาที';
+  String get transferSiamDown =>
+      'ลงบันไดเลื่อนลงไปชานชาลาชั้น 4 · เดิน ~1 นาที';
   @override
-  String get transferLatphraoYellow => 'ขึ้นบันไดเลื่อนขึ้นไปชานชาลารถไฟฟ้ายกระดับสายสีเหลือง · เดิน ~2 นาที';
+  String get transferLatphraoYellow =>
+      'ขึ้นบันไดเลื่อนขึ้นไปชานชาลารถไฟฟ้ายกระดับสายสีเหลือง · เดิน ~2 นาที';
   @override
-  String get transferLatphraoBlue => 'ลงบันไดเลื่อนลงไปสถานีรถไฟฟ้าใต้ดินสายสีน้ำเงิน · เดิน ~2 นาที';
+  String get transferLatphraoBlue =>
+      'ลงบันไดเลื่อนลงไปสถานีรถไฟฟ้าใต้ดินสายสีน้ำเงิน · เดิน ~2 นาที';
   @override
-  String get transferPhayathai => 'เดินผ่านทางเชื่อมเพื่อเปลี่ยนชานชาลาต่างระดับ · เดิน ~2 นาที';
+  String get transferPhayathai =>
+      'เดินผ่านทางเชื่อมเพื่อเปลี่ยนชานชาลาต่างระดับ · เดิน ~2 นาที';
   @override
-  String get transferSamrong => 'เดินผ่านทางเชื่อมสกายวอล์คเปลี่ยนชานชาลายกระดับ · เดิน ~2 นาที';
+  String get transferSamrong =>
+      'เดินผ่านทางเชื่อมสกายวอล์คเปลี่ยนชานชาลายกระดับ · เดิน ~2 นาที';
   @override
-  String get transferHuamak => 'เดินผ่านทางเชื่อมสกายวอล์คเพื่อเปลี่ยนสาย · เดิน ~2 นาที';
+  String get transferHuamak =>
+      'เดินผ่านทางเชื่อมสกายวอล์คเพื่อเปลี่ยนสาย · เดิน ~2 นาที';
   @override
-  String transferAsokSukhumvit(String targetStation) => 'ออกทางออก 3 เพื่อเชื่อมต่อไปยังสถานี$targetStation · เดิน ~2 นาที';
+  String transferAsokSukhumvit(String targetStation) =>
+      'ออกทางออก 3 เพื่อเชื่อมต่อไปยังสถานี$targetStation · เดิน ~2 นาที';
   @override
-  String transferSilomSaladaeng(String targetStation, String exitNum) => 'ออกทางออก $exitNum เพื่อเชื่อมต่อไปยังสถานี$targetStation · เดิน ~3 นาที';
+  String transferSilomSaladaeng(String targetStation, String exitNum) =>
+      'ออกทางออก $exitNum เพื่อเชื่อมต่อไปยังสถานี$targetStation · เดิน ~3 นาที';
   @override
-  String transferMoChitChatuchak(String targetStation, String exits) => 'ออกทางออก $exits เพื่อเชื่อมต่อไปยังสถานี$targetStation · เดิน ~2 นาที';
+  String transferMoChitChatuchak(String targetStation, String exits) =>
+      'ออกทางออก $exits เพื่อเชื่อมต่อไปยังสถานี$targetStation · เดิน ~2 นาที';
   @override
   String interchangeWalk(int time) => 'เปลี่ยนสาย · เดิน ~$time นาที';
   @override
-  String interchangeLevels(int time) => 'เปลี่ยนชานชาลาต่างระดับชั้น · เดิน ~$time นาที';
+  String interchangeLevels(int time) =>
+      'เปลี่ยนชานชาลาต่างระดับชั้น · เดิน ~$time นาที';
 }
 
 class ThaiProximity implements BaseProximity {
   @override
   String get nearbyAlertTitle => 'อยู่ใกล้สถานี!';
   @override
-  String nearbyAlertBody(String stationName) => 'คุณเข้าใกล้สถานี $stationName ระยะ 200 เมตรแล้ว';
+  String nearbyAlertBody(String stationName) =>
+      'คุณเข้าใกล้สถานี $stationName ระยะ 200 เมตรแล้ว';
   @override
   String get nearestStationTitle => 'สถานีรถไฟฟ้าใกล้คุณที่สุด';
   @override
-  String nearestStationBody(String stationName, String distance) => 'สถานี $stationName อยู่ห่างจากคุณ $distance';
+  String nearestStationBody(String stationName, String distance) =>
+      'สถานี $stationName อยู่ห่างจากคุณ $distance';
   @override
   String get inAppNotifTitle => 'พบสถานีรถไฟฟ้าใกล้เคียง!';
   @override
-  String inAppNotifBody(int count) => 'มี $count สถานีใกล้คุณ แตะเพื่อดูตัวเลือกเดินทาง';
+  String inAppNotifBody(int count) =>
+      'มี $count สถานีใกล้คุณ แตะเพื่อดูตัวเลือกเดินทาง';
   @override
   String get interconnectText => 'เชื่อมต่อ: ';
   @override
-  String checkinSuccess(String stationName) => 'เช็คอินสถานี $stationName สำเร็จ และตั้งเป็นต้นทางแล้ว!';
+  String checkinSuccess(String stationName) =>
+      'เช็คอินสถานี $stationName สำเร็จ และตั้งเป็นต้นทางแล้ว!';
   @override
-  String nearStationWalk(String stationName, String time) => 'ใกล้สถานี$stationName · เดิน ~$time นาที';
+  String nearStationWalk(String stationName, String time) =>
+      'ใกล้สถานี$stationName · เดิน ~$time นาที';
   @override
-  String promptDelayAtStation(String stationName) => 'คุณติดอยู่ที่สถานี $stationName หรือไม่?';
+  String promptDelayAtStation(String stationName) =>
+      'คุณติดอยู่ที่สถานี $stationName หรือไม่?';
   @override
-  String get promptDelayBody => 'แตะที่นี่เพื่อยืนยันว่ารถไฟฟ้ามีความล่าช้าหรือปกติ';
+  String get promptDelayBody =>
+      'แตะที่นี่เพื่อยืนยันว่ารถไฟฟ้ามีความล่าช้าหรือปกติ';
   @override
   String get normalStatusLabel => 'เดินรถปกติ';
   @override
@@ -417,13 +448,15 @@ class ThaiSettings implements BaseSettings {
   @override
   String get aboutSetting => 'เกี่ยวกับ';
   @override
-  String get aboutDesc => 'แอปพลิเคชันวางแผนเดินทางรถไฟฟ้ากรุงเทพฯ พัฒนาด้วย Flutter & Riverpod';
+  String get aboutDesc =>
+      'แอปพลิเคชันวางแผนเดินทางรถไฟฟ้ากรุงเทพฯ พัฒนาด้วย Flutter & Riverpod';
   @override
   String get versionInfo => 'BKK Transit Planner\nv1.0.0';
   @override
   String get locationPermissionRequired => 'ต้องการสิทธิ์ระบุตำแหน่ง';
   @override
-  String get locationPermissionDesc => 'แอป BKK Transit ต้องการสิทธิ์ระบุตำแหน่งของคุณ เพื่อตรวจหาและแจ้งเตือนสถานีที่อยู่ใกล้เคียงโดยรอบ กรุณากดเปิดสิทธิ์ในการตั้งค่า';
+  String get locationPermissionDesc =>
+      'แอป BKK Transit ต้องการสิทธิ์ระบุตำแหน่งของคุณ เพื่อตรวจหาและแจ้งเตือนสถานีที่อยู่ใกล้เคียงโดยรอบ กรุณากดเปิดสิทธิ์ในการตั้งค่า';
   @override
   String get openSettingsBtn => 'เปิดการตั้งค่า';
   @override
@@ -433,13 +466,15 @@ class ThaiSettings implements BaseSettings {
   @override
   String get downloadDialogTitle => 'ดาวน์โหลดแผนที่อัปเดตใหม่';
   @override
-  String get downloadDialogBody => 'กรุณารอสักครู่ขณะที่ระบบทำการดาวน์โหลดและติดตั้งข้อมูลแผนที่ออฟไลน์...';
+  String get downloadDialogBody =>
+      'กรุณารอสักครู่ขณะที่ระบบทำการดาวน์โหลดและติดตั้งข้อมูลแผนที่ออฟไลน์...';
   @override
   String get downloadStarted => 'เริ่มดาวน์โหลดการอัปเดตแผนที่แล้ว...';
   @override
   String get versionLabel => 'เวอร์ชัน';
   @override
-  String get disclaimer => 'ข้อมูลและเส้นทางในแอปพลิเคชันเป็นเพียงการประมาณการเพื่อช่วยในการตัดสินใจ';
+  String get disclaimer =>
+      'ข้อมูลและเส้นทางในแอปพลิเคชันเป็นเพียงการประมาณการเพื่อช่วยในการตัดสินใจ';
   @override
   String get copyright => '© 2026 BKK Transit Planner';
   @override
@@ -447,13 +482,17 @@ class ThaiSettings implements BaseSettings {
   @override
   String get offlineMapDownloading => 'ดาวน์โหลดแผนที่ออฟไลน์';
   @override
-  String get offlineMapPreparing => 'กำลังจัดเตรียมแผนที่สำหรับใช้งานออฟไลน์...';
+  String get offlineMapPreparing =>
+      'กำลังจัดเตรียมแผนที่สำหรับใช้งานออฟไลน์...';
   @override
-  String offlineMapDownloaded(int current, int total) => 'ดาวน์โหลดแล้ว $current / $total รูป';
+  String offlineMapDownloaded(int current, int total) =>
+      'ดาวน์โหลดแล้ว $current / $total รูป';
   @override
-  String offlineMapCachedAndNew(int cached, int newCount) => 'เก็บในเครื่องแล้ว: $cached รูป | โหลดใหม่: $newCount รูป';
+  String offlineMapCachedAndNew(int cached, int newCount) =>
+      'เก็บในเครื่องแล้ว: $cached รูป | โหลดใหม่: $newCount รูป';
   @override
-  String prefetchProgress(String current, String total) => 'ดาวน์โหลดแล้ว $current / $total รูป';
+  String prefetchProgress(String current, String total) =>
+      'ดาวน์โหลดแล้ว $current / $total รูป';
   @override
   String prefetchStats(String cached) => 'เก็บในเครื่องแล้ว: $cached';
 }
@@ -539,7 +578,8 @@ class ThaiAuth implements BaseAuth {
   @override
   String get signInToSync => 'เข้าสู่ระบบเพื่อซิงค์ข้อมูล';
   @override
-  String get signInToSyncDesc => 'บันทึกสถานีโปรดและเส้นทางเดินรถเพื่อใช้งานข้ามอุปกรณ์ได้ทุกที่';
+  String get signInToSyncDesc =>
+      'บันทึกสถานีโปรดและเส้นทางเดินรถเพื่อใช้งานข้ามอุปกรณ์ได้ทุกที่';
   @override
   String get invalidEmail => 'รูปแบบอีเมลไม่ถูกต้อง';
   @override
@@ -551,7 +591,8 @@ class ThaiAuth implements BaseAuth {
   @override
   String get loginFailed => 'เข้าสู่ระบบล้มเหลว กรุณาตรวจสอบอีเมลและรหัสผ่าน';
   @override
-  String get registrationFailed => 'สมัครสมาชิกไม่สำเร็จ อีเมลนี้อาจถูกใช้งานไปแล้ว';
+  String get registrationFailed =>
+      'สมัครสมาชิกไม่สำเร็จ อีเมลนี้อาจถูกใช้งานไปแล้ว';
   @override
   String get syncSuccess => 'ซิงค์ข้อมูลสำเร็จ!';
   @override
@@ -566,7 +607,8 @@ class ThaiUtility implements BaseUtility {
   @override
   String get newsSectionTitle => 'ข่าวสารและประกาศ';
   @override
-  String get noNewsAnnouncements => 'ไม่มีข่าวสารหรือประกาศเดินรถขัดข้องในขณะนี้';
+  String get noNewsAnnouncements =>
+      'ไม่มีข่าวสารหรือประกาศเดินรถขัดข้องในขณะนี้';
   @override
   String get cardsSectionTitle => 'บัตรโดยสารและสิทธิ์ของฉัน';
   @override
@@ -611,7 +653,8 @@ class ThaiUtility implements BaseUtility {
   @override
   String get debugSimGpsTitle => 'จำลองตำแหน่งพิกัด GPS';
   @override
-  String get debugSimGpsDisabled => 'ปิดใช้งาน (ใช้ GPS จริง)\n(โหมด Debug เท่านั้น)';
+  String get debugSimGpsDisabled =>
+      'ปิดใช้งาน (ใช้ GPS จริง)\n(โหมด Debug เท่านั้น)';
   @override
   String debugSimGpsActive(String lat, String lng) =>
       'กำลังจำลอง: $lat, $lng\n(โหมด Debug เท่านั้น)';
@@ -620,7 +663,8 @@ class ThaiUtility implements BaseUtility {
   @override
   String get debugSimGpsDisableOption => 'ปิดการจำลอง';
   @override
-  String get debugSimGpsDisableSubtitle => 'ใช้ GPS จริงจากเครื่องหรือ Emulator';
+  String get debugSimGpsDisableSubtitle =>
+      'ใช้ GPS จริงจากเครื่องหรือ Emulator';
   @override
   String get debugSimGpsDisabledSnack => 'ปิดการจำลองตำแหน่งแล้ว';
   @override
@@ -671,5 +715,6 @@ class ThaiUtility implements BaseUtility {
   @override
   String get lineSrtRed => 'สายสีแดง';
   @override
-  String get reportDelayDesc => 'ร่วมแจ้งความหนาแน่นและความล่าช้าในระบบรถไฟฟ้าเพื่อเป็นประโยชน์ต่อผู้เดินทางท่านอื่น';
+  String get reportDelayDesc =>
+      'ร่วมแจ้งความหนาแน่นและความล่าช้าในระบบรถไฟฟ้าเพื่อเป็นประโยชน์ต่อผู้เดินทางท่านอื่น';
 }

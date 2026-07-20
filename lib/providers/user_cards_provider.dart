@@ -110,11 +110,13 @@ class UserCards extends _$UserCards {
     );
 
     // Persist locally
-    SharedPreferences.getInstance().then((prefs) {
-      prefs.setString('bts_card_type', btsCardType);
-      prefs.setString('mrt_card_type', mrtCardType);
-      prefs.setString('arl_card_type', arlCardType);
-      prefs.setString('srt_card_type', srtCardType);
-    }).catchError((_) {});
+    SharedPreferences.getInstance()
+        .then((prefs) {
+          prefs.setString('bts_card_type', btsCardType);
+          prefs.setString('mrt_card_type', mrtCardType);
+          prefs.setString('arl_card_type', arlCardType);
+          prefs.setString('srt_card_type', srtCardType);
+        })
+        .catchError((_) {});
   }
 }

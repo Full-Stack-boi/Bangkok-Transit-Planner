@@ -30,7 +30,12 @@ class AppLogger {
     _log(message, tag: tag, color: LogColor.yellow);
   }
 
-  static void error(String message, {String tag = 'ERROR', Object? error, StackTrace? stackTrace}) {
+  static void error(
+    String message, {
+    String tag = 'ERROR',
+    Object? error,
+    StackTrace? stackTrace,
+  }) {
     final buffer = StringBuffer(message);
     if (error != null) buffer.write('\nError: $error');
     if (stackTrace != null) buffer.write('\nStackTrace:\n$stackTrace');
@@ -41,7 +46,11 @@ class AppLogger {
     _log(message, tag: tag, color: LogColor.magenta);
   }
 
-  static void _log(String message, {required String tag, required String color}) {
+  static void _log(
+    String message, {
+    required String tag,
+    required String color,
+  }) {
     if (kDebugMode) {
       // ignore: avoid_print
       print('$color[$tag] $message${LogColor.reset}');

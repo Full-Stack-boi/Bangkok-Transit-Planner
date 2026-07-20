@@ -227,7 +227,7 @@ class RouteResultSheet extends ConsumerWidget {
     final fromId = transfer.fromStation.id;
     final toId = transfer.toStation.id;
 
-    // ─── Case 1: Tha Phra (MRT Blue Line Self-Interchange) ───
+    // Case 1: Tha Phra (MRT Blue Line Self-Interchange)
     if ((fromId == 'MRT_BL01' && toId == 'MRT_BL33') ||
         (fromId == 'MRT_BL33' && toId == 'MRT_BL01')) {
       final toUpper = toId == 'MRT_BL01';
@@ -236,7 +236,7 @@ class RouteResultSheet extends ConsumerWidget {
           : t.transfers.transferThaphraDown;
     }
 
-    // ─── Case 2: Siam (BTS Sukhumvit <-> Silom) ───
+    // Case 2: Siam (BTS Sukhumvit <-> Silom)
     if ((fromId == 'BTS_CEN' && toId == 'BTS_CEN_SILOM') ||
         (fromId == 'BTS_CEN_SILOM' && toId == 'BTS_CEN')) {
       int arrivalFloor = 3;
@@ -260,7 +260,7 @@ class RouteResultSheet extends ConsumerWidget {
       }
     }
 
-    // ─── Case 3: Other Same-Name Interchanges ───
+    // Case 3: Other Same-Name Interchanges
     final stationId = transfer.fromStation.id;
     final toLine = transfer.toLineId;
 
@@ -312,7 +312,7 @@ class RouteResultSheet extends ConsumerWidget {
       return t.transfers.transferHuamak;
     }
 
-    // ─── Case 4: Default Walk ───
+    // Case 4: Default Walk
     return t.transfers.interchangeWalk(transfer.walkingMinutes.toInt());
   }
 }

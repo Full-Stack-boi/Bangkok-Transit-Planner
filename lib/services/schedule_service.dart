@@ -75,16 +75,21 @@ class ScheduleService {
         _parsedHours[line.key] = {};
         for (final day in line.value.entries) {
           final firstParts = day.value['first']!.split(':');
-          final firstMins = int.parse(firstParts[0]) * 60 + int.parse(firstParts[1]);
+          final firstMins =
+              int.parse(firstParts[0]) * 60 + int.parse(firstParts[1]);
           final lastParts = day.value['last']!.split(':');
           final lastHour = int.parse(lastParts[0]);
           final lastMins = lastHour == 0 ? 1440 : lastHour * 60;
-          _parsedHours[line.key]![day.key] = {'first': firstMins, 'last': lastMins};
+          _parsedHours[line.key]![day.key] = {
+            'first': firstMins,
+            'last': lastMins,
+          };
         }
       }
     }
 
-    final isWeekend = time.weekday == DateTime.saturday || time.weekday == DateTime.sunday;
+    final isWeekend =
+        time.weekday == DateTime.saturday || time.weekday == DateTime.sunday;
     final dayType = isWeekend ? 'weekend' : 'weekday';
     final hours = _parsedHours[lineId]?[dayType];
 
@@ -103,7 +108,10 @@ class ScheduleService {
   }
 
   /// Get estimated travel time between two stations
-  double getEstimatedTravelTime(int stationCount, {bool includeTransfer = false}) {
+  double getEstimatedTravelTime(
+    int stationCount, {
+    bool includeTransfer = false,
+  }) {
     double time = stationCount * TransitConstants.avgTimeBetweenStations;
     if (includeTransfer) {
       time += TransitConstants.transferWalkingTime;

@@ -63,15 +63,15 @@ class TransitNewsService {
       }
       return envUrl;
     }
-    return envUrl.isNotEmpty
-        ? envUrl
-        : 'https://www.drt.go.th/feed';
+    return envUrl.isNotEmpty ? envUrl : 'https://www.drt.go.th/feed';
   }();
 
   Future<List<TransitNewsArticle>> fetchDrtNews() async {
     try {
       final url = Uri.parse(_feedUrl);
-      final response = await _client.get(url).timeout(const Duration(seconds: 8));
+      final response = await _client
+          .get(url)
+          .timeout(const Duration(seconds: 8));
       if (response.statusCode == 200) {
         return _parseDrtRss(response.body);
       } else {
@@ -81,7 +81,9 @@ class TransitNewsService {
       AppLogger.error('Error fetching DRT news: $e', error: e);
       if (kDebugMode) {
         // Fallback to official mock announcements in debug mode only
-        return _getMockDrtArticles().where((art) => _isCommuterRelevant(art.titleTh, art.bodyTh)).toList();
+        return _getMockDrtArticles()
+            .where((art) => _isCommuterRelevant(art.titleTh, art.bodyTh))
+            .toList();
       }
       rethrow;
     }
@@ -90,7 +92,7 @@ class TransitNewsService {
   /// Check if the announcement is actually relevant to daily commuters
   bool _isCommuterRelevant(String title, String desc) {
     final text = '$title $desc'.toLowerCase();
-    
+
     // 1. Blacklist administrative, procurement, recruitment, internal events
     final blacklist = [
       'จัดซื้อจัดจ้าง',
@@ -145,13 +147,13 @@ class TransitNewsService {
       'การเปิดรับ',
       'เชิญชวน',
     ];
-    
+
     for (final word in blacklist) {
       if (text.contains(word)) {
         return false;
       }
     }
-    
+
     // 2. Requires at least one commuter keyword OR transit brand keyword to be shown
     final commuterKeywords = [
       'ขัดข้อง',
@@ -177,13 +179,13 @@ class TransitNewsService {
       'สถานี',
       'แอร์พอร์ตลิงก์',
     ];
-    
+
     for (final word in commuterKeywords) {
       if (text.contains(word)) {
         return true;
       }
     }
-    
+
     return false;
   }
 
@@ -198,21 +200,33 @@ class TransitNewsService {
       final item = items[i].split('</item>')[0];
 
       // Extract title
-      final titleMatch = RegExp(r'<title>(.*?)<\/title>', dotAll: true).firstMatch(item);
+      final titleMatch = RegExp(
+        r'<title>(.*?)<\/title>',
+        dotAll: true,
+      ).firstMatch(item);
       var title = titleMatch != null ? titleMatch.group(1) ?? '' : '';
       title = _cleanXmlString(title);
 
       // Extract link
-      final linkMatch = RegExp(r'<link>(.*?)<\/link>', dotAll: true).firstMatch(item);
+      final linkMatch = RegExp(
+        r'<link>(.*?)<\/link>',
+        dotAll: true,
+      ).firstMatch(item);
       final link = linkMatch != null ? linkMatch.group(1) ?? '' : '';
 
       // Extract pubDate
-      final dateMatch = RegExp(r'<pubDate>(.*?)<\/pubDate>', dotAll: true).firstMatch(item);
+      final dateMatch = RegExp(
+        r'<pubDate>(.*?)<\/pubDate>',
+        dotAll: true,
+      ).firstMatch(item);
       final dateStr = dateMatch != null ? dateMatch.group(1) ?? '' : '';
       final pubDate = _parseRssDate(dateStr);
 
       // Extract description
-      final descMatch = RegExp(r'<description>(.*?)<\/description>', dotAll: true).firstMatch(item);
+      final descMatch = RegExp(
+        r'<description>(.*?)<\/description>',
+        dotAll: true,
+      ).firstMatch(item);
       var desc = descMatch != null ? descMatch.group(1) ?? '' : '';
       desc = _cleanXmlString(desc);
       desc = desc.replaceAll(RegExp(r'<[^>]*>'), '');
@@ -224,16 +238,18 @@ class TransitNewsService {
       final lineId = _detectLineId('$title $desc');
 
       if (_isCommuterRelevant(title, desc)) {
-        articles.add(TransitNewsArticle(
-          id: 'drt_$i',
-          titleTh: title,
-          titleEn: '', // DRT website is mainly Thai
-          bodyTh: desc,
-          bodyEn: '',
-          date: pubDate,
-          lineId: lineId,
-          link: link.isNotEmpty ? link.trim() : null,
-        ));
+        articles.add(
+          TransitNewsArticle(
+            id: 'drt_$i',
+            titleTh: title,
+            titleEn: '', // DRT website is mainly Thai
+            bodyTh: desc,
+            bodyEn: '',
+            date: pubDate,
+            lineId: lineId,
+            link: link.isNotEmpty ? link.trim() : null,
+          ),
+        );
       }
     }
     return articles;
@@ -241,19 +257,32 @@ class TransitNewsService {
 
   DateTime _parseRssDate(String dateStr) {
     try {
-      final cleaned = dateStr.trim().replaceFirst(RegExp(r'^[A-Za-z]+,\s*'), '');
+      final cleaned = dateStr.trim().replaceFirst(
+        RegExp(r'^[A-Za-z]+,\s*'),
+        '',
+      );
       final parts = cleaned.split(' ');
       if (parts.length >= 4) {
         final day = parts[0].padLeft(2, '0');
         final monthStr = parts[1];
         final year = parts[2];
         final time = parts[3];
-        
+
         final months = {
-          'Jan': '01', 'Feb': '02', 'Mar': '03', 'Apr': '04', 'May': '05', 'Jun': '06',
-          'Jul': '07', 'Aug': '08', 'Sep': '09', 'Oct': '10', 'Nov': '11', 'Dec': '12'
+          'Jan': '01',
+          'Feb': '02',
+          'Mar': '03',
+          'Apr': '04',
+          'May': '05',
+          'Jun': '06',
+          'Jul': '07',
+          'Aug': '08',
+          'Sep': '09',
+          'Oct': '10',
+          'Nov': '11',
+          'Dec': '12',
         };
-        
+
         final month = months[monthStr] ?? '01';
         final isoStr = '$year-$month-${day}T${time}Z';
         return DateTime.parse(isoStr).toLocal();
@@ -280,7 +309,9 @@ class TransitNewsService {
 
   String _detectLineId(String text) {
     final lower = text.toLowerCase();
-    if (lower.contains('bts') || lower.contains('sukhumvit') || lower.contains('สุขุมวิท')) {
+    if (lower.contains('bts') ||
+        lower.contains('sukhumvit') ||
+        lower.contains('สุขุมวิท')) {
       return 'BTS_SUKHUMVIT';
     } else if (lower.contains('silom') || lower.contains('สีลม')) {
       return 'BTS_SILOM';
@@ -292,7 +323,9 @@ class TransitNewsService {
       return 'MRT_PINK';
     } else if (lower.contains('mrt purple') || lower.contains('สีม่วง')) {
       return 'MRT_PURPLE';
-    } else if (lower.contains('airport rail') || lower.contains('arl') || lower.contains('แอร์พอร์ต')) {
+    } else if (lower.contains('airport rail') ||
+        lower.contains('arl') ||
+        lower.contains('แอร์พอร์ต')) {
       return 'ARL';
     } else if (lower.contains('srt') || lower.contains('สายสีแดง')) {
       return 'SRT_RED_NORTH';
@@ -304,28 +337,40 @@ class TransitNewsService {
     return [
       TransitNewsArticle(
         id: 'mock_drt_1',
-        titleTh: 'กรมรางประสาน MRT ขยายเวลาเปิดให้บริการรถไฟฟ้าสายสีน้ำเงินคืนปีใหม่ถึงตี 2',
-        titleEn: 'DRT collaborates with MRT to extend Blue Line service hours until 2 AM on New Year\'s Eve',
-        bodyTh: 'กรมการขนส่งทางรางร่วมกับ รฟม. และ BEM ประกาศขยายเวลาเปิดให้บริการรถไฟฟ้ามหานคร สายเฉลิมรัชมงคล (MRT สายสีน้ำเงิน) และสายฉลองรัชธรรม (MRT สายสีม่วง) ในคืนวันที่ 31 ธันวาคม 2569 จนถึงเวลา 02.00 น. ของวันที่ 1 มกราคม 2570 เพื่ออำนวยความสะดวกในการเดินทางเคาท์ดาวน์แก่ประชาชนอย่างปลอดภัย',
-        bodyEn: 'Department of Rail Transport in partnership with MRTA and BEM announces extended services for MRT Blue and Purple lines on Dec 31st until 2 AM to facilitate safe countdown travel.',
+        titleTh:
+            'กรมรางประสาน MRT ขยายเวลาเปิดให้บริการรถไฟฟ้าสายสีน้ำเงินคืนปีใหม่ถึงตี 2',
+        titleEn:
+            'DRT collaborates with MRT to extend Blue Line service hours until 2 AM on New Year\'s Eve',
+        bodyTh:
+            'กรมการขนส่งทางรางร่วมกับ รฟม. และ BEM ประกาศขยายเวลาเปิดให้บริการรถไฟฟ้ามหานคร สายเฉลิมรัชมงคล (MRT สายสีน้ำเงิน) และสายฉลองรัชธรรม (MRT สายสีม่วง) ในคืนวันที่ 31 ธันวาคม 2569 จนถึงเวลา 02.00 น. ของวันที่ 1 มกราคม 2570 เพื่ออำนวยความสะดวกในการเดินทางเคาท์ดาวน์แก่ประชาชนอย่างปลอดภัย',
+        bodyEn:
+            'Department of Rail Transport in partnership with MRTA and BEM announces extended services for MRT Blue and Purple lines on Dec 31st until 2 AM to facilitate safe countdown travel.',
         date: DateTime.now().subtract(const Duration(hours: 2)),
         lineId: 'MRT_BLUE',
       ),
       TransitNewsArticle(
         id: 'mock_drt_2',
-        titleTh: 'ประกาศปรับความถี่ขบวนรถไฟฟ้าสายสีแดงเข้ม ช่วงเร่งด่วนเช้า-เย็น เพื่อลดความหนาแน่นบนชานชาลา',
-        titleEn: 'SRT Red Line updates peak-hour train frequency to reduce platform crowding',
-        bodyTh: 'กรมการขนส่งทางรางประสาน รฟท. และบริษัท รถไฟฟ้า ร.ฟ.ท. จำกัด ปรับเพิ่มความถี่และปรับเวลาการเดินรถไฟชานเมืองสายสีแดง (สายสีแดงเข้ม ช่วงบางซื่อ-รังสิต) ในช่วงเวลาเร่งด่วนเช้า 07.00 - 09.00 น. และเร่งด่วนเย็น 17.00 - 19.30 น. เป็นทุกๆ 8 นาที เพื่อช่วยลดปัญหาผู้โดยสารพักคอยสะสมบนชานชาลา',
-        bodyEn: 'DRT coordinates frequency adjustment for SRT Red Line (Bang Sue - Rangsit) during morning (7-9 AM) and evening (5-7:30 PM) peak hours to 8-minute headways to minimize passenger waiting time.',
+        titleTh:
+            'ประกาศปรับความถี่ขบวนรถไฟฟ้าสายสีแดงเข้ม ช่วงเร่งด่วนเช้า-เย็น เพื่อลดความหนาแน่นบนชานชาลา',
+        titleEn:
+            'SRT Red Line updates peak-hour train frequency to reduce platform crowding',
+        bodyTh:
+            'กรมการขนส่งทางรางประสาน รฟท. และบริษัท รถไฟฟ้า ร.ฟ.ท. จำกัด ปรับเพิ่มความถี่และปรับเวลาการเดินรถไฟชานเมืองสายสีแดง (สายสีแดงเข้ม ช่วงบางซื่อ-รังสิต) ในช่วงเวลาเร่งด่วนเช้า 07.00 - 09.00 น. และเร่งด่วนเย็น 17.00 - 19.30 น. เป็นทุกๆ 8 นาที เพื่อช่วยลดปัญหาผู้โดยสารพักคอยสะสมบนชานชาลา',
+        bodyEn:
+            'DRT coordinates frequency adjustment for SRT Red Line (Bang Sue - Rangsit) during morning (7-9 AM) and evening (5-7:30 PM) peak hours to 8-minute headways to minimize passenger waiting time.',
         date: DateTime.now().subtract(const Duration(days: 1)),
         lineId: 'SRT_RED_NORTH',
       ),
       TransitNewsArticle(
         id: 'mock_drt_3',
-        titleTh: 'กรมการขนส่งทางรางแจ้ง ฟรีค่าโดยสารรถไฟฟ้าแอร์พอร์ต เรล ลิงก์ และสายสีแดง สำหรับเด็กในวันเด็กแห่งชาติ',
-        titleEn: 'Free rides on Airport Rail Link and SRT Red Line for kids on National Children\'s Day',
-        bodyTh: 'กรมการขนส่งทางรางแถลงความร่วมมือ มอบของขวัญวันเด็กแห่งชาติประจำปี 2569 เปิดให้เด็กที่มีอายุไม่เกิน 14 ปี และมีความสูงไม่เกิน 140 ซม. สามารถโดยสารรถไฟฟ้าแอร์พอร์ต เรล ลิงก์ และรถไฟชานเมืองสายสีแดง ฟรีตลอดระยะเวลาให้บริการ ตั้งแต่เวลา 06.00 - 24.00 น.',
-        bodyEn: 'DRT announces free travel gift for children under 14 years old (height not exceeding 140cm) on Airport Rail Link and SRT Red Line during operating hours on Children\'s Day.',
+        titleTh:
+            'กรมการขนส่งทางรางแจ้ง ฟรีค่าโดยสารรถไฟฟ้าแอร์พอร์ต เรล ลิงก์ และสายสีแดง สำหรับเด็กในวันเด็กแห่งชาติ',
+        titleEn:
+            'Free rides on Airport Rail Link and SRT Red Line for kids on National Children\'s Day',
+        bodyTh:
+            'กรมการขนส่งทางรางแถลงความร่วมมือ มอบของขวัญวันเด็กแห่งชาติประจำปี 2569 เปิดให้เด็กที่มีอายุไม่เกิน 14 ปี และมีความสูงไม่เกิน 140 ซม. สามารถโดยสารรถไฟฟ้าแอร์พอร์ต เรล ลิงก์ และรถไฟชานเมืองสายสีแดง ฟรีตลอดระยะเวลาให้บริการ ตั้งแต่เวลา 06.00 - 24.00 น.',
+        bodyEn:
+            'DRT announces free travel gift for children under 14 years old (height not exceeding 140cm) on Airport Rail Link and SRT Red Line during operating hours on Children\'s Day.',
         date: DateTime.now().subtract(const Duration(days: 2)),
         lineId: 'ARL',
       ),
@@ -333,16 +378,19 @@ class TransitNewsService {
         id: 'mock_drt_4',
         titleTh: 'สรุปผลการจัดซื้อจัดจ้างประจำเดือนมิถุนายน 2569',
         titleEn: '',
-        bodyTh: 'สรุปผลการจัดซื้อจัดจ้างประจำเดือนมิถุนายน 2569 ของกรมการขนส่งทางราง กระทรวงคมนาคม ประกาศรายงานเพื่อความโปร่งใสประจำปีงบประมาณ (จะถูกกรองออก)',
+        bodyTh:
+            'สรุปผลการจัดซื้อจัดจ้างประจำเดือนมิถุนายน 2569 ของกรมการขนส่งทางราง กระทรวงคมนาคม ประกาศรายงานเพื่อความโปร่งใสประจำปีงบประมาณ (จะถูกกรองออก)',
         bodyEn: '',
         date: DateTime.now().subtract(const Duration(days: 3)),
         lineId: 'GENERAL',
       ),
       TransitNewsArticle(
         id: 'mock_drt_5',
-        titleTh: 'ประกาศกรมการขนส่งทางราง เรื่อง รับสมัครบุคคลเพื่อเลือกสรรเป็นพนักงานราชการทั่วไป',
+        titleTh:
+            'ประกาศกรมการขนส่งทางราง เรื่อง รับสมัครบุคคลเพื่อเลือกสรรเป็นพนักงานราชการทั่วไป',
         titleEn: '',
-        bodyTh: 'กรมการขนส่งทางรางประกาศรับสมัครงานราชการทั่วไปเพื่อบรรจุแต่งตั้งบุคลากรปฏิบัติงานสนับสนุนระบบคมนาคมและนโยบายขนส่งระบบราง (จะถูกกรองออก)',
+        bodyTh:
+            'กรมการขนส่งทางรางประกาศรับสมัครงานราชการทั่วไปเพื่อบรรจุแต่งตั้งบุคลากรปฏิบัติงานสนับสนุนระบบคมนาคมและนโยบายขนส่งระบบราง (จะถูกกรองออก)',
         bodyEn: '',
         date: DateTime.now().subtract(const Duration(days: 4)),
         lineId: 'GENERAL',
@@ -351,4 +399,6 @@ class TransitNewsService {
   }
 }
 
-final transitNewsServiceProvider = Provider((ref) => TransitNewsService(createHttpClient()));
+final transitNewsServiceProvider = Provider(
+  (ref) => TransitNewsService(createHttpClient()),
+);

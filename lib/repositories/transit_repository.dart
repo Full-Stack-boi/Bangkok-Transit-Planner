@@ -25,7 +25,7 @@ class TransitRepository {
   late final OverpassService _overpassService;
 
   TransitRepository([http.Client? client])
-      : _httpClient = client ?? createHttpClient() {
+    : _httpClient = client ?? createHttpClient() {
     _osrmService = OsrmService(_httpClient);
     _overpassService = OverpassService(_httpClient);
   }
@@ -73,7 +73,9 @@ class TransitRepository {
 
   Future<void> _loadExits() async {
     try {
-      final jsonStr = await rootBundle.loadString('assets/data/station_exits.json');
+      final jsonStr = await rootBundle.loadString(
+        'assets/data/station_exits.json',
+      );
       final List<dynamic> jsonList = json.decode(jsonStr);
       var exitsList = jsonList.map((j) {
         final map = Map<String, dynamic>.from(j as Map);
@@ -85,10 +87,11 @@ class TransitRepository {
       if (!kDebugMode) {
         exitsList = exitsList.where((e) {
           final id = e.stationId;
-          final isNew = id.startsWith('MRT_PK') || 
-                        id.startsWith('MRT_MT') || 
-                        id.startsWith('SRT_RN') || 
-                        id.startsWith('SRT_RW');
+          final isNew =
+              id.startsWith('MRT_PK') ||
+              id.startsWith('MRT_MT') ||
+              id.startsWith('SRT_RN') ||
+              id.startsWith('SRT_RW');
           return !isNew;
         }).toList();
       }
@@ -107,14 +110,19 @@ class TransitRepository {
     try {
       final jsonStr = await rootBundle.loadString('assets/data/stations.json');
       final List<dynamic> jsonList = json.decode(jsonStr);
-      var stationsList = jsonList.map((j) => Station.fromJson(j as Map<String, dynamic>)).toList();
+      var stationsList = jsonList
+          .map((j) => Station.fromJson(j as Map<String, dynamic>))
+          .toList();
       if (!kDebugMode) {
-        stationsList = stationsList.where((s) => 
-          s.lineId != 'MRT_PINK' && 
-          s.lineId != 'MRT_PINK_BRANCH' && 
-          s.lineId != 'SRT_RED_NORTH' && 
-          s.lineId != 'SRT_RED_WEST'
-        ).toList();
+        stationsList = stationsList
+            .where(
+              (s) =>
+                  s.lineId != 'MRT_PINK' &&
+                  s.lineId != 'MRT_PINK_BRANCH' &&
+                  s.lineId != 'SRT_RED_NORTH' &&
+                  s.lineId != 'SRT_RED_WEST',
+            )
+            .toList();
       }
       _stations = stationsList;
       _stationCache.clear();
@@ -131,14 +139,19 @@ class TransitRepository {
     try {
       final jsonStr = await rootBundle.loadString('assets/data/lines.json');
       final List<dynamic> jsonList = json.decode(jsonStr);
-      var linesList = jsonList.map((j) => TransitLine.fromJson(j as Map<String, dynamic>)).toList();
+      var linesList = jsonList
+          .map((j) => TransitLine.fromJson(j as Map<String, dynamic>))
+          .toList();
       if (!kDebugMode) {
-        linesList = linesList.where((l) => 
-          l.id != 'MRT_PINK' && 
-          l.id != 'MRT_PINK_BRANCH' && 
-          l.id != 'SRT_RED_NORTH' && 
-          l.id != 'SRT_RED_WEST'
-        ).toList();
+        linesList = linesList
+            .where(
+              (l) =>
+                  l.id != 'MRT_PINK' &&
+                  l.id != 'MRT_PINK_BRANCH' &&
+                  l.id != 'SRT_RED_NORTH' &&
+                  l.id != 'SRT_RED_WEST',
+            )
+            .toList();
       }
       _lines = linesList;
       _lineCache.clear();
@@ -154,15 +167,19 @@ class TransitRepository {
     try {
       final jsonStr = await rootBundle.loadString('assets/data/landmarks.json');
       final List<dynamic> jsonList = json.decode(jsonStr);
-      final list = jsonList.map((j) => Landmark.fromJson(j as Map<String, dynamic>)).toList();
+      final list = jsonList
+          .map((j) => Landmark.fromJson(j as Map<String, dynamic>))
+          .toList();
       _landmarks = list;
 
       // Precompute normalized search strings
       _normalizedLandmarkTh = {
-        for (final l in list) l.id: l.nameTh.toLowerCase().replaceAll(RegExp(r'\s+'), '')
+        for (final l in list)
+          l.id: l.nameTh.toLowerCase().replaceAll(RegExp(r'\s+'), ''),
       };
       _normalizedLandmarkEn = {
-        for (final l in list) l.id: l.nameEn.toLowerCase().replaceAll(RegExp(r'\s+'), '')
+        for (final l in list)
+          l.id: l.nameEn.toLowerCase().replaceAll(RegExp(r'\s+'), ''),
       };
     } catch (e) {
       _landmarks = [];
@@ -174,23 +191,27 @@ class TransitRepository {
     if (_namtangStops != null || _namtangLoading) return;
     _namtangLoading = true;
     try {
-      final jsonStr = await rootBundle.loadString('assets/data/namtang_stops.json');
-      
+      final jsonStr = await rootBundle.loadString(
+        'assets/data/namtang_stops.json',
+      );
+
       // Use compute to parse and process the large 2MB JSON in a background isolate
       // to prevent blocking the main UI thread.
       final processedStops = await compute(_parseAndProcessStops, {
         'jsonStr': jsonStr,
         'stations': _stations,
       });
-      
+
       _namtangStops = processedStops;
 
       // Precompute normalized search strings
       _normalizedNamtangTh = {
-        for (final s in processedStops) s.id: s.nameTh.toLowerCase().replaceAll(RegExp(r'\s+'), '')
+        for (final s in processedStops)
+          s.id: s.nameTh.toLowerCase().replaceAll(RegExp(r'\s+'), ''),
       };
       _normalizedNamtangEn = {
-        for (final s in processedStops) s.id: s.nameEn.toLowerCase().replaceAll(RegExp(r'\s+'), '')
+        for (final s in processedStops)
+          s.id: s.nameEn.toLowerCase().replaceAll(RegExp(r'\s+'), ''),
       };
     } catch (e) {
       _namtangStops = [];
@@ -204,10 +225,12 @@ class TransitRepository {
   static List<NamtangStop> _parseAndProcessStops(Map<String, dynamic> params) {
     final String jsonStr = params['jsonStr'];
     final List<Station>? stations = params['stations'];
-    
+
     final List<dynamic> jsonList = json.decode(jsonStr);
-    final rawStops = jsonList.map((j) => NamtangStop.fromJson(j as Map<String, dynamic>)).toList();
-    
+    final rawStops = jsonList
+        .map((j) => NamtangStop.fromJson(j as Map<String, dynamic>))
+        .toList();
+
     if (stations == null || stations.isEmpty) return rawStops;
 
     // Calculate nearest stations for all stops
@@ -230,9 +253,12 @@ class TransitRepository {
         // 1 deg lat ~= 111km, 1 deg lon ~= 111km * cos(lat)
         // This is accurate enough for "nearest station" detection.
         final dLatM = (stop.lat - closest.lat) * 111320.0;
-        final dLonM = (stop.lng - closest.lng) * 111320.0 * 0.97; // cos(13.7 deg) approx 0.97
+        final dLonM =
+            (stop.lng - closest.lng) *
+            111320.0 *
+            0.97; // cos(13.7 deg) approx 0.97
         final dist = math.sqrt(dLatM * dLatM + dLonM * dLonM);
-        
+
         final walkMin = (dist / 80.0).clamp(1.0, 30.0);
         return stop.copyWith(
           nearestStationId: closest.id,
@@ -242,7 +268,6 @@ class TransitRepository {
       return stop;
     }).toList();
   }
-
 
   void _buildGraph() {
     _graph = TransitGraph();
@@ -258,7 +283,12 @@ class TransitRepository {
         final s1 = getStation(line.stationIds[i]);
         final s2 = getStation(line.stationIds[i + 1]);
         if (s1 != null && s2 != null) {
-          final dist = Geolocator.distanceBetween(s1.lat, s1.lng, s2.lat, s2.lng);
+          final dist = Geolocator.distanceBetween(
+            s1.lat,
+            s1.lng,
+            s2.lat,
+            s2.lng,
+          );
           // Average transit speed ~35 km/h -> ~583 m/min. Add 0.5 min for dwell time.
           final weight = (dist / 583.0) + 0.5;
           _graph!.addEdge(
@@ -275,7 +305,12 @@ class TransitRepository {
         final s1 = getStation(line.stationIds.last);
         final s2 = getStation(line.stationIds.first);
         if (s1 != null && s2 != null) {
-          final dist = Geolocator.distanceBetween(s1.lat, s1.lng, s2.lat, s2.lng);
+          final dist = Geolocator.distanceBetween(
+            s1.lat,
+            s1.lng,
+            s2.lat,
+            s2.lng,
+          );
           final weight = (dist / 583.0) + 0.5;
           _graph!.addEdge(
             line.stationIds.last,
@@ -292,17 +327,22 @@ class TransitRepository {
       for (final interchangeId in station.interchange) {
         final target = getStation(interchangeId);
         if (target != null) {
-          final dist = Geolocator.distanceBetween(station.lat, station.lng, target.lat, target.lng);
+          final dist = Geolocator.distanceBetween(
+            station.lat,
+            station.lng,
+            target.lat,
+            target.lng,
+          );
           // Base wait time of 2.0 mins + walking time (80 meters/min)
           // If distance is 0 (e.g. cross-platform transfer like Siam), walking time is 0.
           // Minimum transfer time is clamped to 1.0 minute for realism.
           double walkMin = (dist / 80.0) + 2.0;
-          
+
           // Special case: Exact same coordinates (cross-platform transfer)
           if (dist < 10) {
-            walkMin = 1.0; 
+            walkMin = 1.0;
           }
-          
+
           _graph!.addTransferEdge(
             station.id,
             interchangeId,
@@ -366,16 +406,17 @@ class TransitRepository {
       return normTh.contains(q) || normEn.contains(q);
     }).toList();
 
-    final matchingNamtangStops = (_namtangStops ?? []).where((s) {
-      final normTh = _normalizedNamtangTh?[s.id] ?? '';
-      final normEn = _normalizedNamtangEn?[s.id] ?? '';
-      return normTh.contains(q) || normEn.contains(q);
-    }).take(20).toList();
+    final matchingNamtangStops = (_namtangStops ?? [])
+        .where((s) {
+          final normTh = _normalizedNamtangTh?[s.id] ?? '';
+          final normEn = _normalizedNamtangEn?[s.id] ?? '';
+          return normTh.contains(q) || normEn.contains(q);
+        })
+        .take(20)
+        .toList();
 
     return [...matchingStations, ...matchingLandmarks, ...matchingNamtangStops];
   }
-
-
 
   /// Resolves the best entrance for a CustomLocation using Overpass and OSRM
   Future<CustomLocation?> resolveOnlinePlaceAsync(CustomLocation place) async {
@@ -403,19 +444,24 @@ class TransitRepository {
           osmId: osmId,
         );
       } catch (e) {
-        AppLogger.error('Overpass resolution failed after retries: $e', error: e);
+        AppLogger.error(
+          'Overpass resolution failed after retries: $e',
+          error: e,
+        );
         entrances = [];
         hasWarning = true;
       }
     }
-    
+
     if (entrances.isEmpty) {
       // Fallback: use the centroid itself if no entrances found
       final result = await findTrueNearestStationAsync(place.lat, place.lng);
       if (result != null) {
         return place.copyWith(
           nearestStationId: result.station.id,
-          walkingMinutes: result.osrmResult?.durationSeconds != null ? (result.osrmResult!.durationSeconds / 60.0).clamp(1.0, 30.0) : place.walkingMinutes,
+          walkingMinutes: result.osrmResult?.durationSeconds != null
+              ? (result.osrmResult!.durationSeconds / 60.0).clamp(1.0, 30.0)
+              : place.walkingMinutes,
           walkingPath: result.osrmResult?.coordinates,
           hasAccuracyWarning: hasWarning,
         );
@@ -430,17 +476,33 @@ class TransitRepository {
     final anchorStation = findNearestStation(place.lat, place.lng);
     final anchorLat = anchorStation?.lat ?? place.lat;
     final anchorLng = anchorStation?.lng ?? place.lng;
-    entrances.sort((a, b) =>
-      Geolocator.distanceBetween(anchorLat, anchorLng, a.latitude, a.longitude)
-      .compareTo(Geolocator.distanceBetween(anchorLat, anchorLng, b.latitude, b.longitude))
+    entrances.sort(
+      (a, b) =>
+          Geolocator.distanceBetween(
+            anchorLat,
+            anchorLng,
+            a.latitude,
+            a.longitude,
+          ).compareTo(
+            Geolocator.distanceBetween(
+              anchorLat,
+              anchorLng,
+              b.latitude,
+              b.longitude,
+            ),
+          ),
     );
     final topEntrances = entrances.take(5).toList();
 
-    ({Station station, OsrmRouteResult? osrmResult, LatLng entrance})? bestMatch;
+    ({Station station, OsrmRouteResult? osrmResult, LatLng entrance})?
+    bestMatch;
     double shortestDuration = double.infinity;
 
     // Fetch OSRM walking paths for all 5 entrances in parallel
-    final List<Future<({Station station, OsrmRouteResult? osrmResult, LatLng entrance})?>> futures = [];
+    final List<
+      Future<({Station station, OsrmRouteResult? osrmResult, LatLng entrance})?>
+    >
+    futures = [];
 
     for (final entrance in topEntrances) {
       final nearest = findNearestStation(entrance.latitude, entrance.longitude);
@@ -478,7 +540,10 @@ class TransitRepository {
         customRouteLat: bestMatch.entrance.latitude,
         customRouteLng: bestMatch.entrance.longitude,
         nearestStationId: bestMatch.station.id,
-        walkingMinutes: (bestMatch.osrmResult!.durationSeconds / 60.0).clamp(1.0, 30.0),
+        walkingMinutes: (bestMatch.osrmResult!.durationSeconds / 60.0).clamp(
+          1.0,
+          30.0,
+        ),
         walkingPath: bestMatch.osrmResult!.coordinates,
         entrances: entrances,
       );
@@ -494,7 +559,12 @@ class TransitRepository {
     double minDist = double.infinity;
 
     for (final station in _stations!) {
-      final dist = Geolocator.distanceBetween(lat, lon, station.lat, station.lng);
+      final dist = Geolocator.distanceBetween(
+        lat,
+        lon,
+        station.lat,
+        station.lng,
+      );
       if (dist < minDist) {
         minDist = dist;
         closest = station;
@@ -504,18 +574,26 @@ class TransitRepository {
   }
 
   /// Finds the truly nearest station using OSRM walking paths for the top candidate stations.
-  Future<({Station station, OsrmRouteResult? osrmResult})?> findTrueNearestStationAsync(double lat, double lon) async {
+  Future<({Station station, OsrmRouteResult? osrmResult})?>
+  findTrueNearestStationAsync(double lat, double lon) async {
     if (_stations == null || _stations!.isEmpty) return null;
 
     // 1. Find top 3 nearest stations by straight-line distance
-    final List<MapEntry<Station, double>> candidates = _stations!.map((station) {
-      final dist = Geolocator.distanceBetween(lat, lon, station.lat, station.lng);
+    final List<MapEntry<Station, double>> candidates = _stations!.map((
+      station,
+    ) {
+      final dist = Geolocator.distanceBetween(
+        lat,
+        lon,
+        station.lat,
+        station.lng,
+      );
       return MapEntry(station, dist);
     }).toList();
 
     // Sort by straight line distance
     candidates.sort((a, b) => a.value.compareTo(b.value));
-    
+
     // Take top 3 closest by straight line
     final topCandidates = candidates.take(3).map((e) => e.key).toList();
 
@@ -526,9 +604,15 @@ class TransitRepository {
     // 2. Query OSRM for true walking duration in parallel
     final results = await Future.wait(
       topCandidates.map((station) async {
-        final res = await _osrmService.getWalkingRoute(lat, lon, station.lat, station.lng, fetchGeometry: true);
+        final res = await _osrmService.getWalkingRoute(
+          lat,
+          lon,
+          station.lat,
+          station.lng,
+          fetchGeometry: true,
+        );
         return (station: station, osrmResult: res);
-      })
+      }),
     );
 
     for (final r in results) {

@@ -48,5 +48,6 @@ abstract class CustomLocation extends SearchableItem with _$CustomLocation {
     );
   }
 
-  factory CustomLocation.fromJson(Map<String, dynamic> json) => _$CustomLocationFromJson(json);
+  factory CustomLocation.fromJson(Map<String, dynamic> json) =>
+      _$CustomLocationFromJson(json);
 }

@@ -29,7 +29,8 @@ class TransitLineStatusCard extends StatelessWidget {
         color: Colors.green,
       );
       statusColor = Colors.green;
-    } else if (item.statusTh.contains('รอยืนยัน') || item.statusEn.contains('Pending')) {
+    } else if (item.statusTh.contains('รอยืนยัน') ||
+        item.statusEn.contains('Pending')) {
       statusIcon = Icon(
         Icons.warning_rounded,
         size: 14,

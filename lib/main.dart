@@ -11,7 +11,8 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Set default moderate limits for image cache (safe for most devices)
-  PaintingBinding.instance.imageCache.maximumSizeBytes = 150 * 1024 * 1024; // 150 MB
+  PaintingBinding.instance.imageCache.maximumSizeBytes =
+      150 * 1024 * 1024; // 150 MB
   PaintingBinding.instance.imageCache.maximumSize = 1000; // 1000 images
 
   // Listen to OS memory pressure signals to clear and downgrade caches automatically
@@ -46,9 +47,7 @@ Future<void> main() async {
 
   runApp(
     ProviderScope(
-      overrides: [
-        sharedPreferencesProvider.overrideWithValue(prefs),
-      ],
+      overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
       child: const BkkTransitApp(),
     ),
   );
@@ -58,15 +57,18 @@ Future<void> main() async {
 class MemoryPressureObserver extends WidgetsBindingObserver {
   @override
   void didHaveMemoryPressure() {
-    debugPrint('LOW MEMORY WARNING: OS memory pressure detected. Downgrading caches.');
-    
+    debugPrint(
+      'LOW MEMORY WARNING: OS memory pressure detected. Downgrading caches.',
+    );
+
     // Clear all caches in RAM
     PaintingBinding.instance.imageCache.clear();
     PaintingBinding.instance.imageCache.clearLiveImages();
     MapBundleManager.instance.clearCache();
-    
+
     // Dynamically downgrade cache limits to save the app from being killed
-    PaintingBinding.instance.imageCache.maximumSizeBytes = 40 * 1024 * 1024; // 40 MB
+    PaintingBinding.instance.imageCache.maximumSizeBytes =
+        40 * 1024 * 1024; // 40 MB
     PaintingBinding.instance.imageCache.maximumSize = 300; // 300 images
     MapBundleManager.instance.setMaxCacheLimit(16); // 16 tiles
   }

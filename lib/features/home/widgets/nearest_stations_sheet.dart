@@ -69,169 +69,174 @@ class NearestStationsSheet extends ConsumerWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: nearestEntries.map((entry) {
-                final station = entry.key;
-                final distanceM = entry.value;
+                  final station = entry.key;
+                  final distanceM = entry.value;
 
-                final lineColor = TransitColors.getLineColor(station.lineId);
-                final stationName = localeCode == 'th'
-                    ? station.nameTh
-                    : station.nameEn;
-                final stationSubName = localeCode == 'th'
-                    ? station.nameEn
-                    : station.nameTh;
+                  final lineColor = TransitColors.getLineColor(station.lineId);
+                  final stationName = localeCode == 'th'
+                      ? station.nameTh
+                      : station.nameEn;
+                  final stationSubName = localeCode == 'th'
+                      ? station.nameEn
+                      : station.nameTh;
 
-                // Format distance
-                final String distanceText;
-                if (distanceM >= 1000.0) {
-                  final km = (distanceM / 1000.0).toStringAsFixed(1);
-                  distanceText = '$km ${t.common.kmUnit}';
-                } else {
-                  final m = distanceM.round();
-                  distanceText = '$m ${t.common.metersUnit}';
-                }
+                  // Format distance
+                  final String distanceText;
+                  if (distanceM >= 1000.0) {
+                    final km = (distanceM / 1000.0).toStringAsFixed(1);
+                    distanceText = '$km ${t.common.kmUnit}';
+                  } else {
+                    final m = distanceM.round();
+                    distanceText = '$m ${t.common.metersUnit}';
+                  }
 
-                return Card(
-                  margin: const EdgeInsets.only(bottom: 12),
-                  elevation: 2,
-                  child: ListTile(
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
-                    ),
-                    onTap: () async {
-                      // 1. Passive check-in
-                      await crowdRepo.reportPresence(
-                        stationId: station.id,
-                        accuracy: accuracy,
-                      );
-
-                      // 2. Set as origin in Search
-                      searchVm.setOrigin(station);
-
-                      // 3. Switch to Map tab (index 1) — search lives inside Map screen
-                      ref.read(homeTabIndexProvider.notifier).setTab(1);
-
-                      if (context.mounted) {
-                        Navigator.pop(context); // Close bottom sheet
-
-                        // 4. Show success banner
-                        final msg = t.proximity.checkinSuccess(stationName);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(msg),
-                            backgroundColor: theme.colorScheme.primary,
-                            behavior: SnackBarBehavior.floating,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
+                  return Card(
+                    margin: const EdgeInsets.only(bottom: 12),
+                    elevation: 2,
+                    child: ListTile(
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
+                      onTap: () async {
+                        // 1. Passive check-in
+                        await crowdRepo.reportPresence(
+                          stationId: station.id,
+                          accuracy: accuracy,
                         );
-                      }
-                    },
-                    leading: Container(
-                      width: 44,
-                      height: 44,
-                      decoration: BoxDecoration(
-                        color: lineColor.withValues(alpha: 0.15),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Center(
-                        child: Text(
-                          station.code,
-                          style: TextStyle(
-                            color: lineColor,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 12,
-                          ),
-                        ),
-                      ),
-                    ),
-                    title: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: Text(
-                            stationName,
-                            style: theme.textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
+
+                        // 2. Set as origin in Search
+                        searchVm.setOrigin(station);
+
+                        // 3. Switch to Map tab (index 1) — search lives inside Map screen
+                        ref.read(homeTabIndexProvider.notifier).setTab(1);
+
+                        if (context.mounted) {
+                          Navigator.pop(context); // Close bottom sheet
+
+                          // 4. Show success banner
+                          final msg = t.proximity.checkinSuccess(stationName);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(msg),
+                              backgroundColor: theme.colorScheme.primary,
+                              behavior: SnackBarBehavior.floating,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
                             ),
-                            overflow: TextOverflow.ellipsis,
+                          );
+                        }
+                      },
+                      leading: Container(
+                        width: 44,
+                        height: 44,
+                        decoration: BoxDecoration(
+                          color: lineColor.withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Center(
+                          child: Text(
+                            station.code,
+                            style: TextStyle(
+                              color: lineColor,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12,
+                            ),
                           ),
                         ),
-                        Text(
-                          distanceText,
-                          style: TextStyle(
-                            color: theme.colorScheme.primary,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 13,
-                          ),
-                        ),
-                      ],
-                    ),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          stationSubName,
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            fontSize: 12,
-                          ),
-                        ),
-                        if (station.interchange.isNotEmpty) ...[
-                          const SizedBox(height: 6),
-                          Row(
-                            children: [
-                              Text(
-                                t.proximity.interconnectText,
-                                style: theme.textTheme.bodyMedium?.copyWith(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w500,
-                                ),
+                      ),
+                      title: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              stationName,
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.bold,
                               ),
-                              const SizedBox(width: 4),
-                              Wrap(
-                                spacing: 4,
-                                children: station.interchange.map((id) {
-                                  final connStation = transitRepo.getStation(
-                                    id,
-                                  );
-                                  if (connStation == null) {
-                                    return const SizedBox();
-                                  }
-                                  final connColor = TransitColors.getLineColor(
-                                    connStation.lineId,
-                                  );
-                                  return Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 6,
-                                      vertical: 2,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: connColor,
-                                      borderRadius: BorderRadius.circular(4),
-                                    ),
-                                    child: Text(
-                                      connStation.code,
-                                      style: TextStyle(
-                                        color: TransitColors.getLineTextColor(connStation.lineId),
-                                        fontSize: 9,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  );
-                                }).toList(),
-                              ),
-                            ],
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          Text(
+                            distanceText,
+                            style: TextStyle(
+                              color: theme.colorScheme.primary,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 13,
+                            ),
                           ),
                         ],
-                      ],
+                      ),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            stationSubName,
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              fontSize: 12,
+                            ),
+                          ),
+                          if (station.interchange.isNotEmpty) ...[
+                            const SizedBox(height: 6),
+                            Row(
+                              children: [
+                                Text(
+                                  t.proximity.interconnectText,
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                const SizedBox(width: 4),
+                                Wrap(
+                                  spacing: 4,
+                                  children: station.interchange.map((id) {
+                                    final connStation = transitRepo.getStation(
+                                      id,
+                                    );
+                                    if (connStation == null) {
+                                      return const SizedBox();
+                                    }
+                                    final connColor =
+                                        TransitColors.getLineColor(
+                                          connStation.lineId,
+                                        );
+                                    return Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 6,
+                                        vertical: 2,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: connColor,
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                      child: Text(
+                                        connStation.code,
+                                        style: TextStyle(
+                                          color: TransitColors.getLineTextColor(
+                                            connStation.lineId,
+                                          ),
+                                          fontSize: 9,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    );
+                                  }).toList(),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ],
+                      ),
+                      trailing: Icon(
+                        Icons.chevron_right_rounded,
+                        color: theme.colorScheme.onSurface.withValues(
+                          alpha: 0.4,
+                        ),
+                      ),
                     ),
-                    trailing: Icon(
-                      Icons.chevron_right_rounded,
-                      color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
-                    ),
-                  ),
-                );
+                  );
                 }).toList(),
               ),
             ),

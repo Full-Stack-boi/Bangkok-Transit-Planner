@@ -6,7 +6,7 @@ class GraphEdge {
   final String fromId;
   final String toId;
   final String lineId;
-  final double weight;  // travel time in minutes
+  final double weight; // travel time in minutes
 
   const GraphEdge({
     required this.fromId,
@@ -44,41 +44,48 @@ class TransitGraph {
   }
 
   /// Add a bidirectional edge (same-line connection)
-  void addEdge(String fromId, String toId, String lineId, {double weight = 2.0}) {
+  void addEdge(
+    String fromId,
+    String toId,
+    String lineId, {
+    double weight = 2.0,
+  }) {
     _adjacency.putIfAbsent(fromId, () => []);
     _adjacency.putIfAbsent(toId, () => []);
 
-    _adjacency[fromId]!.add(GraphEdge(
-      fromId: fromId,
-      toId: toId,
-      lineId: lineId,
-      weight: weight,
-    ));
-    _adjacency[toId]!.add(GraphEdge(
-      fromId: toId,
-      toId: fromId,
-      lineId: lineId,
-      weight: weight,
-    ));
+    _adjacency[fromId]!.add(
+      GraphEdge(fromId: fromId, toId: toId, lineId: lineId, weight: weight),
+    );
+    _adjacency[toId]!.add(
+      GraphEdge(fromId: toId, toId: fromId, lineId: lineId, weight: weight),
+    );
   }
 
   /// Add a transfer edge between interchange stations (walking between platforms)
-  void addTransferEdge(String fromId, String toId, {double walkingMinutes = 5.0}) {
+  void addTransferEdge(
+    String fromId,
+    String toId, {
+    double walkingMinutes = 5.0,
+  }) {
     _adjacency.putIfAbsent(fromId, () => []);
     _adjacency.putIfAbsent(toId, () => []);
 
-    _adjacency[fromId]!.add(GraphEdge(
-      fromId: fromId,
-      toId: toId,
-      lineId: 'TRANSFER',
-      weight: walkingMinutes,
-    ));
-    _adjacency[toId]!.add(GraphEdge(
-      fromId: toId,
-      toId: fromId,
-      lineId: 'TRANSFER',
-      weight: walkingMinutes,
-    ));
+    _adjacency[fromId]!.add(
+      GraphEdge(
+        fromId: fromId,
+        toId: toId,
+        lineId: 'TRANSFER',
+        weight: walkingMinutes,
+      ),
+    );
+    _adjacency[toId]!.add(
+      GraphEdge(
+        fromId: toId,
+        toId: fromId,
+        lineId: 'TRANSFER',
+        weight: walkingMinutes,
+      ),
+    );
   }
 
   /// Get all edges from a station
@@ -130,7 +137,7 @@ class TransitGraph {
         final currentDist = dist[current.stationId] ?? double.infinity;
         final newDist = currentDist + edge.weight;
         final edgeToDist = dist[edge.toId] ?? double.infinity;
-        
+
         if (newDist < edgeToDist) {
           // Remove old entry if exists
           if (edgeToDist != double.infinity) {
@@ -151,11 +158,13 @@ class TransitGraph {
     String? current = toId;
     while (current != null) {
       final edge = prevEdge[current];
-      path.add(PathStep(
-        stationId: current,
-        lineId: edge?.lineId ?? '',
-        edgeWeight: edge?.weight ?? 0,
-      ));
+      path.add(
+        PathStep(
+          stationId: current,
+          lineId: edge?.lineId ?? '',
+          edgeWeight: edge?.weight ?? 0,
+        ),
+      );
       current = prev[current];
     }
 
@@ -170,15 +179,24 @@ class TransitGraph {
     if (query.isEmpty) return [];
     final q = query.toLowerCase().replaceAll(_whitespaceRegex, '');
     return _stations.values.where((s) {
-      final normalizedTh = s.nameTh.toLowerCase().replaceAll(_whitespaceRegex, '');
-      final normalizedEn = s.nameEn.toLowerCase().replaceAll(_whitespaceRegex, '');
-      final normalizedCode = s.code.toLowerCase().replaceAll(_whitespaceRegex, '');
+      final normalizedTh = s.nameTh.toLowerCase().replaceAll(
+        _whitespaceRegex,
+        '',
+      );
+      final normalizedEn = s.nameEn.toLowerCase().replaceAll(
+        _whitespaceRegex,
+        '',
+      );
+      final normalizedCode = s.code.toLowerCase().replaceAll(
+        _whitespaceRegex,
+        '',
+      );
       final normalizedId = s.id.toLowerCase().replaceAll(_whitespaceRegex, '');
 
       return normalizedTh.contains(q) ||
-             normalizedEn.contains(q) ||
-             normalizedCode.contains(q) ||
-             normalizedId.contains(q);
+          normalizedEn.contains(q) ||
+          normalizedCode.contains(q) ||
+          normalizedId.contains(q);
     }).toList();
   }
 }
@@ -186,7 +204,7 @@ class TransitGraph {
 /// A step in the Dijkstra path result
 class PathStep {
   final String stationId;
-  final String lineId;   // Line used to reach this station ('' for origin)
+  final String lineId; // Line used to reach this station ('' for origin)
   final double edgeWeight;
 
   const PathStep({
@@ -201,20 +219,17 @@ class DijkstraResult {
   final List<PathStep> path;
   final double totalWeight;
 
-  const DijkstraResult({
-    required this.path,
-    required this.totalWeight,
-  });
+  const DijkstraResult({required this.path, required this.totalWeight});
 
   /// Number of stations in the path
   int get stationCount => path.length;
 
   /// Get list of unique line IDs used (excluding TRANSFER)
-  List<String> get lineIds =>
-      path.map((s) => s.lineId)
-          .where((id) => id.isNotEmpty && id != 'TRANSFER')
-          .toSet()
-          .toList();
+  List<String> get lineIds => path
+      .map((s) => s.lineId)
+      .where((id) => id.isNotEmpty && id != 'TRANSFER')
+      .toSet()
+      .toList();
 
   /// Number of transfers
   int get transferCount {
