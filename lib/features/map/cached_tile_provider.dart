@@ -148,7 +148,7 @@ class CachedTileProvider extends TileProvider {
 
   @override
   ImageProvider getImage(TileCoordinates coordinates, TileLayer options) {
-    if (Platform.environment.containsKey('FLUTTER_TEST')) {
+    if (!kIsWeb && Platform.environment.containsKey('FLUTTER_TEST')) {
       return MemoryImage(
         Uint8List.fromList(<int>[
           0x89,
