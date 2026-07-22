@@ -1,11 +1,11 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../providers/providers.dart';
 import '../auth/login_screen.dart';
 import '../map/cached_tile_provider.dart';
+import '../utility/widgets/developer_test_sheet.dart';
 import '../../core/constants/translation_helper.dart';
 
 /// Settings screen supporting interactive Theme and Language selection
@@ -18,7 +18,6 @@ class SettingsScreen extends ConsumerWidget {
     final t = ref.watch(translationsProvider);
     final themeMode = ref.watch(themeModeProvider);
     final localeCode = ref.watch(localeProvider);
-    final mockLocation = ref.watch(mockLocationProvider);
 
     String getThemeModeText(ThemeMode mode) {
       switch (mode) {
@@ -241,42 +240,34 @@ class SettingsScreen extends ConsumerWidget {
               : const SizedBox.shrink(),
           const SizedBox(height: 8),
 
-          // Location Simulation Option (DEBUG ONLY - Hidden in release build)
+          // Developer & Testing Suite (DEBUG ONLY)
           if (kDebugMode) ...[
             Card(
-              color: theme.colorScheme.errorContainer.withValues(alpha: 0.1),
+              color: Colors.amber.shade700.withValues(alpha: 0.1),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
                 side: BorderSide(
-                  color: theme.colorScheme.error.withValues(alpha: 0.4),
+                  color: Colors.amber.shade700.withValues(alpha: 0.4),
                 ),
               ),
               child: ListTile(
                 leading: Icon(
                   Icons.bug_report_rounded,
-                  color: theme.colorScheme.error,
+                  color: Colors.amber.shade700,
                 ),
-                title: Text(
-                  t.utility.debugSimGpsTitle,
+                title: const Text(
+                  'Developer & Testing Suite',
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 subtitle: Text(
-                  mockLocation != null
-                      ? t.utility.debugSimGpsActive(
-                          mockLocation.latitude.toStringAsFixed(4),
-                          mockLocation.longitude.toStringAsFixed(4),
-                        )
-                      : t.utility.debugSimGpsDisabled,
+                  '1-Tap Mock Control • GPS & Disruption Simulation',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
                 ),
                 trailing: const Icon(Icons.chevron_right),
-                onTap: () => _showLocationSimulationDialog(
-                  context,
-                  ref,
-                  mockLocation,
-                  theme,
-                  localeCode,
-                  t,
-                ),
+                onTap: () => DeveloperTestSheet.show(context),
               ),
             ),
             const SizedBox(height: 8),
@@ -575,138 +566,5 @@ class SettingsScreen extends ConsumerWidget {
         ),
       );
     }
-  }
-
-  void _showLocationSimulationDialog(
-    BuildContext context,
-    WidgetRef ref,
-    Position? mockPos,
-    ThemeData theme,
-    String localeCode,
-    AppLocalizations t,
-  ) {
-    final transitRepo = ref.read(transitRepositoryProvider);
-    final stations = transitRepo.stations;
-
-    showDialog(
-      context: context,
-      builder: (context) {
-        String searchQuery = '';
-        return StatefulBuilder(
-          builder: (context, setState) {
-            final filtered = stations.where((s) {
-              final query = searchQuery.toLowerCase();
-              return s.nameEn.toLowerCase().contains(query) ||
-                  s.nameTh.contains(query) ||
-                  s.id.toLowerCase().contains(query);
-            }).toList();
-
-            return AlertDialog(
-              title: const Row(
-                children: [
-                  Icon(Icons.bug_report_rounded, color: Colors.red),
-                  SizedBox(width: 8),
-                  Text('Simulate Location'),
-                ],
-              ),
-              content: SizedBox(
-                width: double.maxFinite,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    TextField(
-                      decoration: const InputDecoration(
-                        hintText: 'Search station...',
-                        prefixIcon: Icon(Icons.search),
-                      ),
-                      onChanged: (val) {
-                        setState(() {
-                          searchQuery = val;
-                        });
-                      },
-                    ),
-                    const SizedBox(height: 8),
-                    if (mockPos != null)
-                      ListTile(
-                        leading: const Icon(
-                          Icons.gps_off_rounded,
-                          color: Colors.red,
-                        ),
-                        title: Text(t.utility.debugSimGpsDisableOption),
-                        subtitle: Text(t.utility.debugSimGpsDisableSubtitle),
-                        onTap: () {
-                          ref
-                              .read(mockLocationProvider.notifier)
-                              .clearMockLocation();
-                          Navigator.pop(context);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(t.utility.debugSimGpsDisabledSnack),
-                            ),
-                          );
-                        },
-                      ),
-                    const Divider(),
-                    Expanded(
-                      child: ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: filtered.length,
-                        itemBuilder: (context, index) {
-                          final station = filtered[index];
-                          final isCurrent =
-                              mockPos != null &&
-                              (mockPos.latitude - station.lat).abs() < 0.0001 &&
-                              (mockPos.longitude - station.lng).abs() < 0.0001;
-
-                          return ListTile(
-                            leading: Icon(
-                              Icons.directions_transit_rounded,
-                              color: isCurrent
-                                  ? theme.colorScheme.primary
-                                  : null,
-                            ),
-                            title: Text(
-                              localeCode == 'th'
-                                  ? station.nameTh
-                                  : station.nameEn,
-                            ),
-                            subtitle: Text(
-                              '${station.id} • ${station.lat.toStringAsFixed(4)}, ${station.lng.toStringAsFixed(4)}',
-                            ),
-                            trailing: isCurrent
-                                ? const Icon(
-                                    Icons.check_circle_rounded,
-                                    color: Colors.green,
-                                  )
-                                : null,
-                            onTap: () {
-                              ref
-                                  .read(mockLocationProvider.notifier)
-                                  .setMockLocation(station.lat, station.lng);
-                              Navigator.pop(context);
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    t.utility.debugSimGpsEnabledSnack(
-                                      localeCode == 'th'
-                                          ? station.nameTh
-                                          : station.nameEn,
-                                    ),
-                                  ),
-                                ),
-                              );
-                            },
-                          );
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          },
-        );
-      },
-    );
   }
 }
