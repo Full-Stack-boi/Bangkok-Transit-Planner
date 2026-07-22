@@ -5,6 +5,7 @@ import '../../../models/station.dart';
 import '../../../models/crowd_report.dart';
 import '../../../providers/providers.dart';
 import '../../favorites/favorites_view_model.dart';
+import '../../utility/widgets/disruption_detail_sheet.dart';
 
 class StationDetailsCard extends ConsumerWidget {
   final Station station;
@@ -29,6 +30,10 @@ class StationDetailsCard extends ConsumerWidget {
     final theme = Theme.of(context);
     final t = ref.read(translationsProvider);
     final transitRepo = ref.read(transitRepositoryProvider);
+    final disruptionState = ref.watch(disruptionProvider);
+    final activeDisruption = disruptionState.getDisruptionForStation(
+      station.id,
+    );
 
     // Watch these only at the card level to prevent full screen rebuilds!
     final scheduleService = ref.watch(scheduleServiceProvider);
@@ -171,6 +176,59 @@ class StationDetailsCard extends ConsumerWidget {
                 ),
               ],
             ),
+            if (activeDisruption != null) ...[
+              const SizedBox(height: 8),
+              InkWell(
+                onTap: () =>
+                    DisruptionDetailSheet.show(context, activeDisruption),
+                borderRadius: BorderRadius.circular(10),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.amber.shade900.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: Colors.amber.shade700.withValues(alpha: 0.5),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.warning_amber_rounded,
+                        color: Colors.amber.shade800,
+                        size: 18,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          localeCode == 'th'
+                              ? '⚠️ ${activeDisruption.titleTh}'
+                              : '⚠️ ${activeDisruption.titleEn}',
+                          style: TextStyle(
+                            color: Colors.amber.shade800,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      Text(
+                        localeCode == 'th' ? 'ดูรายละเอียด >' : 'Details >',
+                        style: TextStyle(
+                          color: Colors.amber.shade900,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 11,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
             if (hubStations.length > 1) ...[
               const SizedBox(height: 12),
               SingleChildScrollView(

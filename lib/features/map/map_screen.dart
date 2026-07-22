@@ -50,12 +50,14 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   List<Polyline> _cachedPolylines = [];
   RouteResult? _lastRouteResultForPolylines;
   Brightness? _lastBrightnessForPolylines;
+  DisruptionState? _lastDisruptionStateForPolylines;
 
   List<Marker> _cachedBaseMarkers = [];
   RouteResult? _lastRouteResultForMarkers;
   Brightness? _lastBrightnessForMarkers;
   String? _lastCurrentStationId;
   double? _lastZoomForMarkers;
+  DisruptionState? _lastDisruptionStateForMarkers;
 
   @override
   void initState() {
@@ -306,13 +308,16 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     final isCalculating = ref.watch(
       searchViewModelProvider.select((s) => s.isCalculating),
     );
+    final disruptionState = ref.watch(disruptionProvider);
 
     // Build Polylines for transit lines
     final themeBrightness = theme.brightness;
     if (_lastRouteResultForPolylines != routeResult ||
-        _lastBrightnessForPolylines != themeBrightness) {
+        _lastBrightnessForPolylines != themeBrightness ||
+        _lastDisruptionStateForPolylines != disruptionState) {
       _lastRouteResultForPolylines = routeResult;
       _lastBrightnessForPolylines = themeBrightness;
+      _lastDisruptionStateForPolylines = disruptionState;
       final newPolylines = <Polyline>[];
       if (isRouteActive) {
         // Highlight ONLY the active route
@@ -360,17 +365,43 @@ class _MapScreenState extends ConsumerState<MapScreen> {
             return LatLng(station!.lat, station.lng);
           }).toList();
 
-          newPolylines.add(
-            Polyline(
-              points: points,
-              color: TransitColors.getLineColor(line.id),
-              strokeWidth: 4.5,
-              borderColor: themeBrightness == Brightness.dark
-                  ? Colors.black.withValues(alpha: 0.3)
-                  : Colors.white.withValues(alpha: 0.3),
-              borderStrokeWidth: 1.0,
-            ),
+          final lineDisruptions = disruptionState.getDisruptionsForLine(
+            line.id,
           );
+          final activeDisruption = lineDisruptions.isNotEmpty
+              ? lineDisruptions.first
+              : null;
+
+          if (activeDisruption != null &&
+              (activeDisruption.isFullClosure ||
+                  activeDisruption.isPartialClosure)) {
+            final alertColor = Colors.red.shade700;
+
+            newPolylines.add(
+              Polyline(
+                points: points,
+                color: alertColor,
+                strokeWidth: 7.0,
+                pattern: StrokePattern.dashed(segments: const [10, 6]),
+                borderColor: themeBrightness == Brightness.dark
+                    ? Colors.black.withValues(alpha: 0.5)
+                    : Colors.white.withValues(alpha: 0.5),
+                borderStrokeWidth: 1.5,
+              ),
+            );
+          } else {
+            newPolylines.add(
+              Polyline(
+                points: points,
+                color: TransitColors.getLineColor(line.id),
+                strokeWidth: 4.5,
+                borderColor: themeBrightness == Brightness.dark
+                    ? Colors.black.withValues(alpha: 0.3)
+                    : Colors.white.withValues(alpha: 0.3),
+                borderStrokeWidth: 1.0,
+              ),
+            );
+          }
         }
       }
       _cachedPolylines = newPolylines;
@@ -382,11 +413,13 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     if (_lastRouteResultForMarkers != routeResult ||
         _lastBrightnessForMarkers != themeBrightness ||
         _lastCurrentStationId != currentStationId ||
-        _lastZoomForMarkers != _currentZoom.value) {
+        _lastZoomForMarkers != _currentZoom.value ||
+        _lastDisruptionStateForMarkers != disruptionState) {
       _lastRouteResultForMarkers = routeResult;
       _lastBrightnessForMarkers = themeBrightness;
       _lastCurrentStationId = currentStationId;
       _lastZoomForMarkers = _currentZoom.value;
+      _lastDisruptionStateForMarkers = disruptionState;
       final newMarkers = <Marker>[];
 
       if (isRouteActive) {
@@ -423,27 +456,58 @@ class _MapScreenState extends ConsumerState<MapScreen> {
               ? 44.0
               : (isInterchange ? 32.0 : 24.0);
           final double sizeValue = baseSize * scale;
+          final disruption = disruptionState.getDisruptionForStation(
+            station.id,
+          );
 
           newMarkers.add(
             Marker(
               point: point,
-              width: sizeValue,
-              height: sizeValue,
+              width: disruption != null ? sizeValue * 1.3 : sizeValue,
+              height: disruption != null ? sizeValue * 1.3 : sizeValue,
               alignment: Alignment.center,
               child: RepaintBoundary(
                 child: GestureDetector(
                   onTap: () {
                     setState(() => _selectedStation = station);
                   },
-                  child: CustomPaint(
-                    size: Size(sizeValue, sizeValue),
-                    painter: StationMarkerPainter(
-                      lineColor: lineColor,
-                      isInterchange: isInterchange,
-                      brightness: theme.brightness,
-                      isCurrentStation: isCurrentStation,
-                      scale: scale,
-                    ),
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    alignment: Alignment.center,
+                    children: [
+                      CustomPaint(
+                        size: Size(sizeValue, sizeValue),
+                        painter: StationMarkerPainter(
+                          lineColor: disruption != null
+                              ? Colors.red.shade700
+                              : lineColor,
+                          isInterchange: isInterchange,
+                          brightness: theme.brightness,
+                          isCurrentStation: isCurrentStation,
+                          scale: scale,
+                        ),
+                      ),
+                      if (disruption != null)
+                        Positioned(
+                          right: -2,
+                          top: -2,
+                          child: Container(
+                            padding: const EdgeInsets.all(2),
+                            decoration: BoxDecoration(
+                              color: Colors.red.shade700,
+                              shape: BoxShape.circle,
+                              boxShadow: const [
+                                BoxShadow(color: Colors.black38, blurRadius: 4),
+                              ],
+                            ),
+                            child: const Icon(
+                              Icons.warning_amber_rounded,
+                              color: Colors.white,
+                              size: 11,
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
                 ),
               ),
@@ -509,26 +573,57 @@ class _MapScreenState extends ConsumerState<MapScreen> {
           final double scale = (0.80 + (_currentZoom.value - 11.5) * 0.14)
               .clamp(0.80, 1.2);
           final double sizeValue = (isInterchange ? 32.0 : 24.0) * scale;
+          final disruption = disruptionState.getDisruptionForStation(
+            station.id,
+          );
 
           newMarkers.add(
             Marker(
               point: point,
-              width: sizeValue,
-              height: sizeValue,
+              width: disruption != null ? sizeValue * 1.3 : sizeValue,
+              height: disruption != null ? sizeValue * 1.3 : sizeValue,
               alignment: Alignment.center,
               child: RepaintBoundary(
                 child: GestureDetector(
                   onTap: () {
                     setState(() => _selectedStation = station);
                   },
-                  child: CustomPaint(
-                    size: Size(sizeValue, sizeValue),
-                    painter: StationMarkerPainter(
-                      lineColor: lineColor,
-                      isInterchange: isInterchange,
-                      brightness: themeBrightness,
-                      scale: scale,
-                    ),
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    alignment: Alignment.center,
+                    children: [
+                      CustomPaint(
+                        size: Size(sizeValue, sizeValue),
+                        painter: StationMarkerPainter(
+                          lineColor: disruption != null
+                              ? Colors.red.shade700
+                              : lineColor,
+                          isInterchange: isInterchange,
+                          brightness: themeBrightness,
+                          scale: scale,
+                        ),
+                      ),
+                      if (disruption != null)
+                        Positioned(
+                          right: -2,
+                          top: -2,
+                          child: Container(
+                            padding: const EdgeInsets.all(2),
+                            decoration: BoxDecoration(
+                              color: Colors.red.shade700,
+                              shape: BoxShape.circle,
+                              boxShadow: const [
+                                BoxShadow(color: Colors.black38, blurRadius: 4),
+                              ],
+                            ),
+                            child: const Icon(
+                              Icons.warning_amber_rounded,
+                              color: Colors.white,
+                              size: 11,
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
                 ),
               ),

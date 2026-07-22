@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/constants/translation_helper.dart';
 import '../../../core/theme/transit_colors.dart';
+import '../../../providers/providers.dart';
 import '../../../services/transit_news_service.dart';
+import 'disruption_detail_sheet.dart';
 
-class TransitLineStatusCard extends StatelessWidget {
+class TransitLineStatusCard extends ConsumerWidget {
   final ThemeData theme;
   final AppLocalizations t;
   final TransitLineStatus item;
@@ -16,27 +19,48 @@ class TransitLineStatusCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final lineColor = TransitColors.getLineColor(item.lineId);
+    final disruptionState = ref.watch(disruptionProvider);
+    final disruptions = disruptionState.getDisruptionsForLine(item.lineId);
+    final activeDisruption = disruptions.isNotEmpty ? disruptions.first : null;
 
     Widget statusIcon;
     Color statusColor;
+    String statusText;
 
-    if (item.isNormal) {
+    if (activeDisruption != null) {
+      if (activeDisruption.isFullClosure || activeDisruption.isPartialClosure) {
+        statusIcon = Icon(
+          Icons.error_rounded,
+          size: 14,
+          color: Colors.red.shade700,
+        );
+        statusColor = Colors.red.shade700;
+        statusText = t.isTh
+            ? (activeDisruption.isFullClosure
+                  ? 'ระงับบริการทั้งสาย'
+                  : 'งดบริการบางช่วง')
+            : (activeDisruption.isFullClosure
+                  ? 'Full Closure'
+                  : 'Partial Closure');
+      } else {
+        statusIcon = Icon(
+          Icons.warning_rounded,
+          size: 14,
+          color: Colors.amber.shade800,
+        );
+        statusColor = Colors.amber.shade800;
+        statusText = t.isTh ? 'ล่าช้าบางสถานี' : 'Minor Delay';
+      }
+    } else if (item.isNormal) {
       statusIcon = const Icon(
         Icons.check_circle_rounded,
         size: 14,
         color: Colors.green,
       );
       statusColor = Colors.green;
-    } else if (item.statusTh.contains('รอยืนยัน') ||
-        item.statusEn.contains('Pending')) {
-      statusIcon = Icon(
-        Icons.warning_rounded,
-        size: 14,
-        color: Colors.amber.shade700,
-      );
-      statusColor = Colors.amber.shade800;
+      statusText = t.isTh ? item.statusTh : item.statusEn;
     } else {
       statusIcon = Icon(
         Icons.error_rounded,
@@ -44,6 +68,7 @@ class TransitLineStatusCard extends StatelessWidget {
         color: Colors.red.shade700,
       );
       statusColor = Colors.red.shade700;
+      statusText = t.isTh ? item.statusTh : item.statusEn;
     }
 
     String getShortLineName(String id, bool isTh) {
@@ -71,63 +96,79 @@ class TransitLineStatusCard extends StatelessWidget {
 
     final shortName = getShortLineName(item.lineId, t.isTh);
 
-    return Container(
-      decoration: BoxDecoration(
-        color: theme.cardColor,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () {
+          if (activeDisruption != null) {
+            DisruptionDetailSheet.show(context, activeDisruption);
+          }
+        },
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: theme.colorScheme.outline.withValues(alpha: 0.15),
-        ),
-      ),
-      child: Row(
-        children: [
-          // Vertical line indicator on the left (4px)
-          Container(
-            width: 4,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
             decoration: BoxDecoration(
-              color: lineColor,
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(12),
-                bottomLeft: Radius.circular(12),
+              color: activeDisruption != null
+                  ? (activeDisruption.isFullClosure ||
+                            activeDisruption.isPartialClosure
+                        ? Colors.red.shade900.withValues(alpha: 0.15)
+                        : Colors.amber.shade900.withValues(alpha: 0.15))
+                  : theme.cardColor,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: activeDisruption != null
+                    ? (activeDisruption.isFullClosure ||
+                              activeDisruption.isPartialClosure
+                          ? Colors.red.shade600.withValues(alpha: 0.4)
+                          : Colors.amber.shade600.withValues(alpha: 0.4))
+                    : theme.colorScheme.outline.withValues(alpha: 0.15),
+                width: 1.0,
               ),
             ),
-          ),
-          const SizedBox(width: 8),
-          // Text info
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
+            child: Row(
               children: [
-                Text(
-                  shortName,
-                  style: theme.textTheme.labelMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 11,
+                // Clean solid line color bar on left
+                Container(width: 5, height: 48, color: lineColor),
+                const SizedBox(width: 8),
+                // Text info
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        shortName,
+                        style: theme.textTheme.labelMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 11,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        statusText,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: statusColor,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 10,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
                   ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  t.isTh ? item.statusTh : item.statusEn,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: statusColor,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 10,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+                // Status Dot or Icon
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: statusIcon,
                 ),
               ],
             ),
           ),
-          // Status Dot or Icon
-          Padding(
-            padding: const EdgeInsets.only(right: 8.0),
-            child: statusIcon,
-          ),
-        ],
+        ),
       ),
     );
   }
