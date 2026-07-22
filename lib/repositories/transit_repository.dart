@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:math' as math;
+import 'package:archive/archive.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
@@ -191,14 +192,18 @@ class TransitRepository {
     if (_namtangStops != null || _namtangLoading) return;
     _namtangLoading = true;
     try {
-      final jsonStr = await rootBundle.loadString(
-        'assets/data/namtang_stops.json',
+      final byteData = await rootBundle.load(
+        'assets/data/namtang_stops.json.gz',
+      );
+      final bytes = byteData.buffer.asUint8List(
+        byteData.offsetInBytes,
+        byteData.lengthInBytes,
       );
 
-      // Use compute to parse and process the large 2MB JSON in a background isolate
+      // Use compute to decompress Gzip and parse JSON in a background isolate
       // to prevent blocking the main UI thread.
       final processedStops = await compute(_parseAndProcessStops, {
-        'jsonStr': jsonStr,
+        'gzipBytes': bytes,
         'stations': _stations,
       });
 
@@ -223,8 +228,11 @@ class TransitRepository {
 
   // Top-level or static function for compute
   static List<NamtangStop> _parseAndProcessStops(Map<String, dynamic> params) {
-    final String jsonStr = params['jsonStr'];
+    final Uint8List bytes = params['gzipBytes'];
     final List<Station>? stations = params['stations'];
+
+    final decompressed = GZipDecoder().decodeBytes(bytes);
+    final jsonStr = utf8.decode(decompressed);
 
     final List<dynamic> jsonList = json.decode(jsonStr);
     final rawStops = jsonList
