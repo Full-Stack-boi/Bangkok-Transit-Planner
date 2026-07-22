@@ -27,29 +27,23 @@ class StatusDashboard extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 10),
-        Align(
-          alignment: Alignment.centerLeft,
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 800),
-            child: GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                maxCrossAxisExtent: 220,
-                crossAxisSpacing: 10,
-                mainAxisSpacing: 8,
-                mainAxisExtent: 52,
-              ),
-              itemCount: statuses.length,
-              itemBuilder: (context, index) {
-                return TransitLineStatusCard(
-                  theme: theme,
-                  t: t,
-                  item: statuses[index],
-                );
-              },
-            ),
+        GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+            maxCrossAxisExtent: 220,
+            crossAxisSpacing: 10,
+            mainAxisSpacing: 8,
+            mainAxisExtent: 52,
           ),
+          itemCount: statuses.length,
+          itemBuilder: (context, index) {
+            return TransitLineStatusCard(
+              theme: theme,
+              t: t,
+              item: statuses[index],
+            );
+          },
         ),
       ],
     );

@@ -35,150 +35,146 @@ class TransitCardRow extends ConsumerWidget {
           ),
         ),
         const SizedBox(height: 12),
-        Align(
-          alignment: Alignment.centerLeft,
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 800),
-            child: GridView.count(
-              crossAxisCount: 2,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10,
-              childAspectRatio: 1.8,
-              children: [
-                _buildCompactCardPreview(
-                  context: context,
-                  ref: ref,
-                  theme: theme,
-                  t: t,
-                  networkId: 'BTS',
-                  cardName: t.utility.rabbitCardName,
-                  gradient: LinearGradient(
-                    colors: [Colors.green.shade400, Colors.green.shade700],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  activeType: cardState.btsCardType,
-                  options: [
-                    _CardOption(
-                      value: 'standard',
-                      title: t.utility.optionStandardTitle,
-                      subtitle: t.utility.optionStandardSubtitle,
-                    ),
-                    _CardOption(
-                      value: 'student',
-                      title: t.utility.optionStudentTitle,
-                      subtitle: t.utility.optionStudentBtsSubtitle,
-                    ),
-                    _CardOption(
-                      value: 'senior',
-                      title: t.utility.optionSeniorTitle,
-                      subtitle: t.utility.optionSeniorBtsSubtitle,
-                    ),
-                    _CardOption(
-                      value: 'trip_package',
-                      title: t.utility.optionTripPackageTitle,
-                      subtitle: t.utility.optionTripPackageBtsSubtitle,
-                    ),
-                  ],
+        GridView(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+            maxCrossAxisExtent: 230,
+            crossAxisSpacing: 10,
+            mainAxisSpacing: 10,
+            childAspectRatio: 1.8,
+          ),
+          children: [
+            _buildCompactCardPreview(
+              context: context,
+              ref: ref,
+              theme: theme,
+              t: t,
+              networkId: 'BTS',
+              cardName: t.utility.rabbitCardName,
+              gradient: LinearGradient(
+                colors: [Colors.green.shade400, Colors.green.shade700],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              activeType: cardState.btsCardType,
+              options: [
+                _CardOption(
+                  value: 'standard',
+                  title: t.utility.optionStandardTitle,
+                  subtitle: t.utility.optionStandardSubtitle,
                 ),
-                _buildCompactCardPreview(
-                  context: context,
-                  ref: ref,
-                  theme: theme,
-                  t: t,
-                  networkId: 'MRT',
-                  cardName: t.utility.mrtCardName,
-                  gradient: LinearGradient(
-                    colors: [Colors.blue.shade500, Colors.blue.shade800],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  activeType: cardState.mrtCardType,
-                  options: [
-                    _CardOption(
-                      value: 'standard',
-                      title: t.utility.optionStandardTitle,
-                      subtitle: t.utility.optionStandardSubtitle,
-                    ),
-                    _CardOption(
-                      value: 'student',
-                      title: t.utility.optionStudentTitle,
-                      subtitle: t.utility.optionStudentMrtSubtitle,
-                    ),
-                    _CardOption(
-                      value: 'senior',
-                      title: t.utility.optionSeniorTitle,
-                      subtitle: t.utility.optionSeniorMrtSubtitle,
-                    ),
-                  ],
+                _CardOption(
+                  value: 'student',
+                  title: t.utility.optionStudentTitle,
+                  subtitle: t.utility.optionStudentBtsSubtitle,
                 ),
-                _buildCompactCardPreview(
-                  context: context,
-                  ref: ref,
-                  theme: theme,
-                  t: t,
-                  networkId: 'ARL',
-                  cardName: t.utility.arlCardName,
-                  gradient: LinearGradient(
-                    colors: [Colors.red.shade400, Colors.red.shade700],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  activeType: cardState.arlCardType,
-                  options: [
-                    _CardOption(
-                      value: 'standard',
-                      title: t.utility.optionStandardTitle,
-                      subtitle: t.utility.optionStandardSubtitle,
-                    ),
-                    _CardOption(
-                      value: 'student',
-                      title: t.utility.optionStudentTitle,
-                      subtitle: t.utility.optionStudentArlSubtitle,
-                    ),
-                    _CardOption(
-                      value: 'senior',
-                      title: t.utility.optionSeniorTitle,
-                      subtitle: t.utility.optionSeniorArlSubtitle,
-                    ),
-                  ],
+                _CardOption(
+                  value: 'senior',
+                  title: t.utility.optionSeniorTitle,
+                  subtitle: t.utility.optionSeniorBtsSubtitle,
                 ),
-                _buildCompactCardPreview(
-                  context: context,
-                  ref: ref,
-                  theme: theme,
-                  t: t,
-                  networkId: 'SRT',
-                  cardName: t.utility.srtCardName,
-                  gradient: LinearGradient(
-                    colors: [Colors.red.shade800, Colors.red.shade900],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  activeType: cardState.srtCardType,
-                  options: [
-                    _CardOption(
-                      value: 'standard',
-                      title: t.utility.optionStandardTitle,
-                      subtitle: t.utility.optionStandardSubtitle,
-                    ),
-                    _CardOption(
-                      value: 'student',
-                      title: t.utility.optionStudentTitle,
-                      subtitle: t.utility.optionStudentSrtSubtitle,
-                    ),
-                    _CardOption(
-                      value: 'senior',
-                      title: t.utility.optionSeniorTitle,
-                      subtitle: t.utility.optionSeniorSrtSubtitle,
-                    ),
-                  ],
+                _CardOption(
+                  value: 'trip_package',
+                  title: t.utility.optionTripPackageTitle,
+                  subtitle: t.utility.optionTripPackageBtsSubtitle,
                 ),
               ],
             ),
-          ),
+            _buildCompactCardPreview(
+              context: context,
+              ref: ref,
+              theme: theme,
+              t: t,
+              networkId: 'MRT',
+              cardName: t.utility.mrtCardName,
+              gradient: LinearGradient(
+                colors: [Colors.blue.shade500, Colors.blue.shade800],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              activeType: cardState.mrtCardType,
+              options: [
+                _CardOption(
+                  value: 'standard',
+                  title: t.utility.optionStandardTitle,
+                  subtitle: t.utility.optionStandardSubtitle,
+                ),
+                _CardOption(
+                  value: 'student',
+                  title: t.utility.optionStudentTitle,
+                  subtitle: t.utility.optionStudentMrtSubtitle,
+                ),
+                _CardOption(
+                  value: 'senior',
+                  title: t.utility.optionSeniorTitle,
+                  subtitle: t.utility.optionSeniorMrtSubtitle,
+                ),
+              ],
+            ),
+            _buildCompactCardPreview(
+              context: context,
+              ref: ref,
+              theme: theme,
+              t: t,
+              networkId: 'ARL',
+              cardName: t.utility.arlCardName,
+              gradient: LinearGradient(
+                colors: [Colors.red.shade400, Colors.red.shade700],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              activeType: cardState.arlCardType,
+              options: [
+                _CardOption(
+                  value: 'standard',
+                  title: t.utility.optionStandardTitle,
+                  subtitle: t.utility.optionStandardSubtitle,
+                ),
+                _CardOption(
+                  value: 'student',
+                  title: t.utility.optionStudentTitle,
+                  subtitle: t.utility.optionStudentArlSubtitle,
+                ),
+                _CardOption(
+                  value: 'senior',
+                  title: t.utility.optionSeniorTitle,
+                  subtitle: t.utility.optionSeniorArlSubtitle,
+                ),
+              ],
+            ),
+            _buildCompactCardPreview(
+              context: context,
+              ref: ref,
+              theme: theme,
+              t: t,
+              networkId: 'SRT',
+              cardName: t.utility.srtCardName,
+              gradient: LinearGradient(
+                colors: [Colors.red.shade800, Colors.red.shade900],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              activeType: cardState.srtCardType,
+              options: [
+                _CardOption(
+                  value: 'standard',
+                  title: t.utility.optionStandardTitle,
+                  subtitle: t.utility.optionStandardSubtitle,
+                ),
+                _CardOption(
+                  value: 'student',
+                  title: t.utility.optionStudentTitle,
+                  subtitle: t.utility.optionStudentSrtSubtitle,
+                ),
+                _CardOption(
+                  value: 'senior',
+                  title: t.utility.optionSeniorTitle,
+                  subtitle: t.utility.optionSeniorSrtSubtitle,
+                ),
+              ],
+            ),
+          ],
         ),
       ],
     );
