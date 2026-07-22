@@ -106,7 +106,11 @@ void main() {
       () {
         // 1. ลงมือทำ (Act): เรียกคำนวณเส้นทางจาก A ไป D (ข้ามสายผ่านจุดเปลี่ยนเส้นทาง)
         final offPeakTime = DateTime(2026, 1, 1, 12, 0);
-        final result = graph.findShortestPath('BTS_A', 'MRT_D', time: offPeakTime);
+        final result = graph.findShortestPath(
+          'BTS_A',
+          'MRT_D',
+          time: offPeakTime,
+        );
 
         // 2. ตรวจสอบผลลัพธ์ (Assert)
         expect(result, isNotNull);

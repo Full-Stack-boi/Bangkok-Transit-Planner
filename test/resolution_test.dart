@@ -17,7 +17,7 @@ Future<void> debugOnlinePlaceResolution(
   print('\n======================================================');
   print('RESOLVING QUERY: $query');
   print('======================================================');
-  
+
   final results = await photon.searchOnlinePlaces(query);
   if (results.isEmpty) {
     print('No results found for "$query".');
@@ -25,30 +25,37 @@ Future<void> debugOnlinePlaceResolution(
   }
 
   final place = results.first;
-  print('Found: ${place.nameTh} / ${place.nameEn} (lat=${place.lat}, lng=${place.lng})');
+  print(
+    'Found: ${place.nameTh} / ${place.nameEn} (lat=${place.lat}, lng=${place.lng})',
+  );
   print('Resolving deep entrances...');
-  
+
   final resolved = await repo.resolveOnlinePlaceAsync(place);
   expect(resolved, isNotNull);
-  
+
   if (resolved != null) {
     print('Display pin (lat/lng): ${resolved.lat}, ${resolved.lng}');
-    print('Routing coord (routeLat/routeLng): ${resolved.routeLat}, ${resolved.routeLng}');
-    
+    print(
+      'Routing coord (routeLat/routeLng): ${resolved.routeLat}, ${resolved.routeLng}',
+    );
+
     if (place.lat == resolved.routeLat && place.lng == resolved.routeLng) {
-      print('Warning: Routing coord UNCHANGED (still pointing to centroid/back alley or no entrance found)');
+      print(
+        'Warning: Routing coord UNCHANGED (still pointing to centroid/back alley or no entrance found)',
+      );
     } else {
       print('Success: Routing coord UPDATED to an entrance!');
     }
 
     print('Nearest Station ID: ${resolved.nearestStationId}');
     print('Walking path length: ${resolved.walkingPath?.length}');
-    
+
     if (expectedNearestStations != null && expectedNearestStations.isNotEmpty) {
       expect(
         expectedNearestStations.contains(resolved.nearestStationId),
         isTrue,
-        reason: 'Nearest station ${resolved.nearestStationId} is not in expected list $expectedNearestStations',
+        reason:
+            'Nearest station ${resolved.nearestStationId} is not in expected list $expectedNearestStations',
       );
     }
   }
@@ -63,32 +70,48 @@ Future<void> debugCustomLocationResolution(
   print('\n======================================================');
   print('RESOLVING CUSTOM LOCATION: ${location.nameEn}');
   print('======================================================');
-  
+
   final resolved = await repo.resolveOnlinePlaceAsync(location);
   expect(resolved, isNotNull);
-  
+
   if (resolved != null) {
     print('Original Centroid (lat/lng): ${location.lat}, ${location.lng}');
     print('Display pin (lat/lng): ${resolved.lat}, ${resolved.lng}');
-    print('Routing coord (routeLat/routeLng): ${resolved.routeLat}, ${resolved.routeLng}');
+    print(
+      'Routing coord (routeLat/routeLng): ${resolved.routeLat}, ${resolved.routeLng}',
+    );
     print('Nearest Station ID: ${resolved.nearestStationId}');
     print('Walking Minutes: ${resolved.walkingMinutes}');
     print('Walking Path Length: ${resolved.walkingPath?.length}');
 
-    expect(resolved.lat, equals(location.lat), reason: 'lat (display pin) must stay at centroid after resolution');
-    expect(resolved.lng, equals(location.lng), reason: 'lng (display pin) must stay at centroid after resolution');
+    expect(
+      resolved.lat,
+      equals(location.lat),
+      reason: 'lat (display pin) must stay at centroid after resolution',
+    );
+    expect(
+      resolved.lng,
+      equals(location.lng),
+      reason: 'lng (display pin) must stay at centroid after resolution',
+    );
 
-    if (resolved.routeLat != location.lat || resolved.routeLng != location.lng) {
-      print('Success: Routing coord UPDATED to entrance at (${resolved.routeLat}, ${resolved.routeLng})');
+    if (resolved.routeLat != location.lat ||
+        resolved.routeLng != location.lng) {
+      print(
+        'Success: Routing coord UPDATED to entrance at (${resolved.routeLat}, ${resolved.routeLng})',
+      );
     } else {
-      print('Info: No entrance found (possible Overpass timeout) — using centroid as routing point');
+      print(
+        'Info: No entrance found (possible Overpass timeout) — using centroid as routing point',
+      );
     }
 
     if (expectedNearestStations != null && expectedNearestStations.isNotEmpty) {
       expect(
         expectedNearestStations.contains(resolved.nearestStationId),
         isTrue,
-        reason: 'Nearest station ${resolved.nearestStationId} is not in expected list $expectedNearestStations',
+        reason:
+            'Nearest station ${resolved.nearestStationId} is not in expected list $expectedNearestStations',
       );
     }
   }
@@ -105,8 +128,8 @@ void main() {
     // Scenario 1: MBK Center (Search by string)
     // ---------------------------------------------------------
     await debugOnlinePlaceResolution(
-      repo, 
-      photonService, 
+      repo,
+      photonService,
       'MBK Center',
       expectedNearestStations: ['BTS_W1', 'BTS_CEN'],
     );
@@ -124,11 +147,11 @@ void main() {
       lng: 100.5414,
     );
     await debugCustomLocationResolution(
-      repo, 
+      repo,
       lumpini,
       expectedNearestStations: ['MRT_BL26', 'BTS_S2'],
     );
-    
+
     // ---------------------------------------------------------
     // Add more scenarios below as needed:
     // await debugOnlinePlaceResolution(repo, photonService, 'Siam Paragon');

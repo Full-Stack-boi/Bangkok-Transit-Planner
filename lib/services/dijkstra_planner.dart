@@ -101,7 +101,11 @@ class TransitGraph {
 
   /// Find shortest path using Dijkstra's algorithm
   /// Returns list of (stationId, lineId) pairs representing the path
-  DijkstraResult? findShortestPath(String fromId, String toId, {DateTime? time}) {
+  DijkstraResult? findShortestPath(
+    String fromId,
+    String toId, {
+    DateTime? time,
+  }) {
     if (!_stations.containsKey(fromId) || !_stations.containsKey(toId)) {
       return null;
     }
@@ -139,12 +143,12 @@ class TransitGraph {
         if (visited.contains(edge.toId)) continue;
 
         final currentDist = dist[current.stationId] ?? double.infinity;
-        
+
         double dynamicWeight = edge.weight;
         if (edge.lineId == 'TRANSFER') {
           dynamicWeight += transferWaitTime;
         }
-        
+
         final newDist = currentDist + dynamicWeight;
         final edgeToDist = dist[edge.toId] ?? double.infinity;
 

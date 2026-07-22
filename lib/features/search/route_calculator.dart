@@ -524,7 +524,8 @@ class RouteCalculator {
     SearchableItem origin,
     RouteTranslations t,
   ) {
-    if (origin.nearestStationId == null || origin.id == origin.nearestStationId) {
+    if (origin.nearestStationId == null ||
+        origin.id == origin.nearestStationId) {
       return;
     }
 
