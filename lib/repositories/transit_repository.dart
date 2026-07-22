@@ -10,6 +10,7 @@ import '../models/station.dart';
 import '../models/line.dart';
 import '../models/landmark.dart';
 import '../models/station_exit.dart';
+import '../providers/disruption_provider.dart';
 import '../services/dijkstra_planner.dart';
 import '../services/osrm_service.dart';
 import '../services/overpass_service.dart';
@@ -397,8 +398,18 @@ class TransitRepository {
   }
 
   /// Find shortest path between two stations
-  DijkstraResult? findRoute(String fromId, String toId, {DateTime? time}) {
-    return _graph?.findShortestPath(fromId, toId, time: time);
+  DijkstraResult? findRoute(
+    String fromId,
+    String toId, {
+    DateTime? time,
+    DisruptionState? disruptionState,
+  }) {
+    return _graph?.findShortestPath(
+      fromId,
+      toId,
+      time: time,
+      disruptionState: disruptionState,
+    );
   }
 
   /// Search stations and local landmarks by query

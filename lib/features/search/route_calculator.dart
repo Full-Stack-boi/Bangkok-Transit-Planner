@@ -7,6 +7,7 @@ import '../../models/searchable_item.dart';
 import '../../models/custom_location.dart';
 import '../../models/station_exit.dart';
 import '../../models/landmark.dart';
+import '../../providers/disruption_provider.dart';
 import '../../repositories/transit_repository.dart';
 import '../../services/dijkstra_planner.dart';
 import '../../services/fare_service.dart';
@@ -77,8 +78,9 @@ class RouteCalculator {
     SearchableItem origin,
     SearchableItem destination,
     CardStateSnapshot cardState,
-    RouteTranslations t,
-  ) {
+    RouteTranslations t, {
+    DisruptionState? disruptionState,
+  }) {
     if (origin.id == destination.id) {
       return null; // Same place error — handled by caller
     }
@@ -132,7 +134,11 @@ class RouteCalculator {
         t,
       );
     } else {
-      final dijkstra = _repo.findRoute(originStationId, destinationStationId);
+      final dijkstra = _repo.findRoute(
+        originStationId,
+        destinationStationId,
+        disruptionState: disruptionState,
+      );
       if (dijkstra == null) {
         return null; // No route error — handled by caller
       }

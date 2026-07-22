@@ -259,11 +259,13 @@ class SearchViewModel extends _$SearchViewModel {
         srtCardType: cardState.srtCardType,
       );
 
+      final disruptionState = ref.read(disruptionProvider);
       final result = calculator.calculate(
         origin,
         destination,
         cardSnapshot,
         translations,
+        disruptionState: disruptionState,
       );
 
       if (result == null) {

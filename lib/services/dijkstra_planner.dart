@@ -1,5 +1,6 @@
 import 'dart:collection';
 import '../models/station.dart';
+import '../providers/disruption_provider.dart';
 import '../core/constants/transit_constants.dart';
 
 /// Edge in the transit graph
@@ -105,6 +106,7 @@ class TransitGraph {
     String fromId,
     String toId, {
     DateTime? time,
+    DisruptionState? disruptionState,
   }) {
     if (!_stations.containsKey(fromId) || !_stations.containsKey(toId)) {
       return null;
@@ -144,12 +146,45 @@ class TransitGraph {
 
         final currentDist = dist[current.stationId] ?? double.infinity;
 
-        double dynamicWeight = edge.weight;
+        double actualWeight = edge.weight;
         if (edge.lineId == 'TRANSFER') {
-          dynamicWeight += transferWaitTime;
+          actualWeight += transferWaitTime;
         }
 
-        final newDist = currentDist + dynamicWeight;
+        double dijkstraCost = actualWeight;
+
+        // Apply Disruption Penalties
+        if (disruptionState != null && disruptionState.disruptions.isNotEmpty) {
+          final isFromDisrupted = disruptionState.isStationDisrupted(
+            current.stationId,
+          );
+          final isToDisrupted = disruptionState.isStationDisrupted(edge.toId);
+          final isSegDisrupted = disruptionState.isSegmentDisrupted(
+            current.stationId,
+            edge.toId,
+          );
+
+          if (isFromDisrupted || isToDisrupted || isSegDisrupted) {
+            final disruption =
+                disruptionState.getDisruptionForStation(current.stationId) ??
+                disruptionState.getDisruptionForStation(edge.toId);
+
+            if (disruption != null) {
+              if (disruption.isFullClosure || disruption.isPartialClosure) {
+                dijkstraCost += 9999.0; // Force pathfinding to detour
+              } else if (disruption.isMinorDelay) {
+                final delay = (disruption.estimatedDelayMinutes ?? 10)
+                    .toDouble();
+                dijkstraCost += delay;
+                actualWeight += delay;
+              }
+            } else if (isSegDisrupted) {
+              dijkstraCost += 9999.0;
+            }
+          }
+        }
+
+        final newDist = currentDist + dijkstraCost;
         final edgeToDist = dist[edge.toId] ?? double.infinity;
 
         if (newDist < edgeToDist) {
@@ -170,13 +205,32 @@ class TransitGraph {
 
     final path = <PathStep>[];
     String? current = toId;
+    double totalPhysicalWeight = 0.0;
+
     while (current != null) {
       final edge = prevEdge[current];
+      double stepWeight = edge?.weight ?? 0.0;
+
+      if (edge != null) {
+        if (edge.lineId == 'TRANSFER') {
+          stepWeight += transferWaitTime;
+        }
+        if (disruptionState != null && disruptionState.disruptions.isNotEmpty) {
+          final disruption =
+              disruptionState.getDisruptionForStation(edge.fromId) ??
+              disruptionState.getDisruptionForStation(edge.toId);
+          if (disruption != null && disruption.isMinorDelay) {
+            stepWeight += (disruption.estimatedDelayMinutes ?? 10).toDouble();
+          }
+        }
+        totalPhysicalWeight += stepWeight;
+      }
+
       path.add(
         PathStep(
           stationId: current,
           lineId: edge?.lineId ?? '',
-          edgeWeight: edge?.weight ?? 0,
+          edgeWeight: stepWeight,
         ),
       );
       current = prev[current];
@@ -184,7 +238,7 @@ class TransitGraph {
 
     return DijkstraResult(
       path: path.reversed.toList(),
-      totalWeight: dist[toId]!,
+      totalWeight: totalPhysicalWeight,
     );
   }
 

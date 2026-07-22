@@ -21,6 +21,8 @@ import 'package:bkk_transit_planner/core/utils/logger.dart';
 export 'auth_providers.dart';
 export 'location_providers.dart';
 export 'user_cards_provider.dart';
+export 'disruption_provider.dart';
+export '../models/transit_disruption.dart';
 
 part 'providers.g.dart';
 
