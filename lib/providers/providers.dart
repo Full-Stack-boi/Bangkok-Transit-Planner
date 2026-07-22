@@ -152,7 +152,7 @@ class AppThemeMode extends _$AppThemeMode {
     if (themeStr == 'light') return ThemeMode.light;
     if (themeStr == 'dark') return ThemeMode.dark;
     if (themeStr == 'system') return ThemeMode.system;
-    return ThemeMode.dark; // Default theme
+    return ThemeMode.system; // Default theme
   }
 
   Future<void> setTheme(ThemeMode mode) async {
