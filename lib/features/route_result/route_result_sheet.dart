@@ -5,6 +5,7 @@ import '../../models/custom_location.dart';
 
 import '../../providers/providers.dart';
 import '../search/search_view_model.dart';
+import '../utility/widgets/disruption_detail_sheet.dart';
 import '../../core/constants/translation_helper.dart';
 import 'widgets/route_header.dart';
 import 'widgets/route_type_selector.dart';
@@ -32,6 +33,7 @@ class RouteResultSheet extends ConsumerWidget {
     );
     final t = ref.watch(translationsProvider);
     final localeCode = ref.watch(localeProvider);
+    final disruptionState = ref.watch(disruptionProvider);
 
     if (result == null) {
       return SizedBox(
@@ -41,6 +43,20 @@ class RouteResultSheet extends ConsumerWidget {
     }
 
     final theme = Theme.of(context);
+
+    // Check if route contains disrupted stations
+    final routeStationIds = <String>{};
+    for (final seg in result.segments) {
+      routeStationIds.add(seg.fromStation.id);
+      routeStationIds.add(seg.toStation.id);
+      for (final s in seg.intermediateStations) {
+        routeStationIds.add(s.id);
+      }
+    }
+
+    final activeDisruptions = disruptionState.disruptions.where((d) {
+      return d.affectedStationIds.any((id) => routeStationIds.contains(id));
+    }).toList();
 
     return DraggableScrollableSheet(
       initialChildSize: 0.7,
@@ -77,6 +93,51 @@ class RouteResultSheet extends ConsumerWidget {
                 t: t,
                 localeCode: localeCode,
               ),
+
+              // Disruption Warning Banner
+              if (activeDisruptions.isNotEmpty) ...[
+                const SizedBox(height: 12),
+                InkWell(
+                  onTap: () => DisruptionDetailSheet.show(
+                    context,
+                    activeDisruptions.first,
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.amber.shade900.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: Colors.amber.shade700.withValues(alpha: 0.5),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.warning_rounded,
+                          color: Colors.amber.shade800,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            localeCode == 'th'
+                                ? '⚠️ เส้นทางนี้ผ่านสถานีที่มีปัญหา: ${activeDisruptions.first.titleTh}'
+                                : '⚠️ This route passes through disrupted station: ${activeDisruptions.first.titleEn}',
+                            style: TextStyle(
+                              color: Colors.amber.shade800,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
+                        const Icon(Icons.chevron_right, size: 18),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
 
               // Route Type Selector (Recommended vs Saver)
               if (saverRoute != null) ...[

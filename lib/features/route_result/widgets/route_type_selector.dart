@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../models/route_result.dart';
 import '../../../core/constants/translation_helper.dart';
+import '../../../core/utils/formatters.dart';
+import '../../../providers/providers.dart';
 import '../../search/search_view_model.dart';
 
 class RouteTypeSelector extends ConsumerWidget {
@@ -23,6 +25,17 @@ class RouteTypeSelector extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     if (recommended == null || saver == null) return const SizedBox.shrink();
+
+    final localeCode = ref.watch(localeProvider);
+
+    final recDuration = Formatters.formatDuration(
+      recommended!.totalMinutes,
+      localeCode,
+    );
+    final saverDuration = Formatters.formatDuration(
+      saver!.totalMinutes,
+      localeCode,
+    );
 
     Widget buildTabButton({
       required String type,
@@ -105,8 +118,8 @@ class RouteTypeSelector extends ConsumerWidget {
           type: 'recommended',
           title: t.routeResult.routeRecommended,
           subtitle: recommended!.totalDiscountThb > 0
-              ? '~${recommended!.totalMinutes.toInt()} ${t.common.minutesUnit} · ${recommended!.totalFareThb} ${t.common.currencyUnit} (-${recommended!.totalDiscountThb} ฿)'
-              : '~${recommended!.totalMinutes.toInt()} ${t.common.minutesUnit} · ${recommended!.totalFareThb} ${t.common.currencyUnit}',
+              ? '$recDuration · ${recommended!.totalFareThb} ${t.common.currencyUnit} (-${recommended!.totalDiscountThb} ฿)'
+              : '$recDuration · ${recommended!.totalFareThb} ${t.common.currencyUnit}',
           icon: Icons.star_rounded,
         ),
         const SizedBox(width: 12),
@@ -114,8 +127,8 @@ class RouteTypeSelector extends ConsumerWidget {
           type: 'saver',
           title: t.routeResult.routeSaver,
           subtitle: saver!.totalDiscountThb > 0
-              ? '~${saver!.totalMinutes.toInt()} ${t.common.minutesUnit} · ${saver!.totalFareThb} ${t.common.currencyUnit} (-${saver!.totalDiscountThb} ฿)'
-              : '~${saver!.totalMinutes.toInt()} ${t.common.minutesUnit} · ${saver!.totalFareThb} ${t.common.currencyUnit}',
+              ? '$saverDuration · ${saver!.totalFareThb} ${t.common.currencyUnit} (-${saver!.totalDiscountThb} ฿)'
+              : '$saverDuration · ${saver!.totalFareThb} ${t.common.currencyUnit}',
           icon: Icons.savings_rounded,
         ),
       ],

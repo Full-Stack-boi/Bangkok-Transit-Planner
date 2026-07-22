@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/constants/translation_helper.dart';
+import '../../../core/utils/formatters.dart';
 import '../../../models/custom_location.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../providers/providers.dart';
 
-class RouteResultBanner extends StatelessWidget {
+class RouteResultBanner extends ConsumerWidget {
   final dynamic result;
   final AppLocalizations t;
   final VoidCallback onTap;
@@ -16,13 +19,19 @@ class RouteResultBanner extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final localeCode = ref.watch(localeProvider);
     final hasWarning =
         (result.origin is CustomLocation &&
             (result.origin as CustomLocation).hasAccuracyWarning) ||
         (result.destination is CustomLocation &&
             (result.destination as CustomLocation).hasAccuracyWarning);
+
+    final durationText = Formatters.formatDuration(
+      (result.totalMinutes as num).toDouble(),
+      localeCode,
+    );
 
     return Card(
       color: hasWarning
@@ -50,8 +59,8 @@ class RouteResultBanner extends StatelessWidget {
                   children: [
                     Text(
                       result.totalDiscountThb > 0
-                          ? '~${result.totalMinutes.toInt()} ${t.common.minutesUnit} · ${result.totalFareThb} ${t.common.currencyUnit} (-${result.totalDiscountThb} ฿)'
-                          : '~${result.totalMinutes.toInt()} ${t.common.minutesUnit} · ${result.totalFareThb} ${t.common.currencyUnit}',
+                          ? '$durationText · ${result.totalFareThb} ${t.common.currencyUnit} (-${result.totalDiscountThb} ฿)'
+                          : '$durationText · ${result.totalFareThb} ${t.common.currencyUnit}',
                       style: theme.textTheme.titleMedium?.copyWith(
                         color: theme.colorScheme.onSurface,
                         fontWeight: FontWeight.bold,

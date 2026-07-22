@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../models/route_result.dart';
 import '../../../core/constants/translation_helper.dart';
+import '../../../core/utils/formatters.dart';
 import '../../../providers/route_tracker.dart';
 import 'bookmark_button.dart';
 
@@ -38,8 +39,10 @@ class RouteHeader extends ConsumerWidget {
             Flexible(
               child: _buildInfoChip(
                 icon: Icons.timer_outlined,
-                label:
-                    '~${result.totalMinutes.toInt()} ${t.common.minutesUnit}',
+                label: Formatters.formatDuration(
+                  result.totalMinutes,
+                  localeCode,
+                ),
                 theme: theme,
                 iconColor: theme.appColors.timeColor,
               ),
