@@ -38,7 +38,6 @@ class StationDetailsCard extends ConsumerWidget {
       station.id,
     );
 
-    final lineColor = TransitColors.getLineColor(station.lineId);
     final crowdInfo = crowdService.getCrowdInfo(station.id);
     final minutesUntilNext = scheduleService.getMinutesUntilNextTrain(
       station.lineId,

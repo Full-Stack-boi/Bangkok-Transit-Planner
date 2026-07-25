@@ -7,6 +7,7 @@ import '../../../models/station.dart';
 import '../../../models/searchable_item.dart';
 import '../../../core/constants/translation_helper.dart';
 import '../../../providers/providers.dart';
+import '../../../core/constants/transit_constants.dart';
 import '../../../widgets/shared/crowd_level_badge.dart';
 import '../../../widgets/shared/station_badge.dart';
 
@@ -26,6 +27,11 @@ class SegmentCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    if (segment.lineId == 'WALK' ||
+        segment.lineId == TransitConstants.kWalkLineId) {
+      return _buildWalkSegmentCard(context, ref);
+    }
+
     final transitRepo = ref.watch(transitRepositoryProvider);
     final crowdService = ref.watch(crowdServiceProvider);
     final scheduleService = ref.watch(scheduleServiceProvider);

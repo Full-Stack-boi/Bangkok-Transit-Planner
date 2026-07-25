@@ -387,10 +387,14 @@ class TransitRepository {
   /// Get a line by ID
   TransitLine? getLine(String lineId) {
     if (_lineCache.containsKey(lineId)) return _lineCache[lineId];
-    return _lines?.firstWhere(
-      (l) => l.id == lineId,
-      orElse: () => throw StateError('Line not found: $lineId'),
-    );
+    if (_lines == null) return null;
+    for (final line in _lines!) {
+      if (line.id == lineId) {
+        _lineCache[lineId] = line;
+        return line;
+      }
+    }
+    return null;
   }
 
   /// Get all stations on a line

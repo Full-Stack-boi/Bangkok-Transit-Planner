@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
-import '../../core/theme/transit_colors.dart';
 import '../../core/theme/app_theme.dart';
-import '../../models/crowd_report.dart';
 import '../../models/searchable_item.dart';
 import '../../models/station.dart';
 import '../../models/custom_location.dart';
@@ -154,7 +152,6 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
         );
 
         final String stationName = station.localizedName(localeCode);
-        final String stationSubName = station.subName(localeCode);
 
         final String trainStatusText;
         if (minutesUntilNext == null) {
