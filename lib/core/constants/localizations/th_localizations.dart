@@ -373,6 +373,9 @@ class ThaiTransfers implements BaseTransfers {
   String get transferHuamak =>
       'เดินผ่านทางเชื่อมสกายวอล์คเพื่อเปลี่ยนสาย · เดิน ~2 นาที';
   @override
+  String transferMakkasanPhetchaburi(String targetStation) =>
+      'เดินผ่านทางเชื่อมสกายวอล์คเพื่อเชื่อมต่อไปยังสถานี$targetStation · เดิน ~3 นาที';
+  @override
   String transferAsokSukhumvit(String targetStation) =>
       'ออกทางออก 3 เพื่อเชื่อมต่อไปยังสถานี$targetStation · เดิน ~2 นาที';
   @override

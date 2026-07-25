@@ -371,6 +371,9 @@ class EnglishTransfers implements BaseTransfers {
   String get transferHuamak =>
       'Walk via skywalk transfer bridge to the other line · Walk ~2 min';
   @override
+  String transferMakkasanPhetchaburi(String targetStation) =>
+      'Walk via skywalk connection to $targetStation Station · Walk ~3 min';
+  @override
   String transferAsokSukhumvit(String targetStation) =>
       'Take Exit 3 to connect to $targetStation Station · Walk ~2 min';
   @override

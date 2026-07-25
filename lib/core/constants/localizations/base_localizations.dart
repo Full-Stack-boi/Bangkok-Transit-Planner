@@ -173,6 +173,7 @@ abstract class BaseTransfers {
   String get transferPhayathai;
   String get transferSamrong;
   String get transferHuamak;
+  String transferMakkasanPhetchaburi(String targetStation);
   String transferAsokSukhumvit(String targetStation);
   String transferSilomSaladaeng(String targetStation, String exitNum);
   String transferMoChitChatuchak(String targetStation, String exits);

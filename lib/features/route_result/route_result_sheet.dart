@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../models/route_result.dart';
 import '../../models/custom_location.dart';
+import '../../core/constants/transit_constants.dart';
 
 import '../../providers/providers.dart';
 import '../search/search_view_model.dart';
@@ -168,47 +169,65 @@ class RouteResultSheet extends ConsumerWidget {
                 builder: (context) {
                   final transferMap = <String, TransferStep>{};
                   for (final tr in result.transfers) {
-                    transferMap['${tr.fromStation.id}-${tr.toStation.id}-${tr.fromLineId}-${tr.toLineId}'] =
-                        tr;
+                    transferMap[tr.fromStation.id] = tr;
                   }
-                  return RepaintBoundary(
-                    child: Column(
-                      children: result.segments.asMap().entries.map((entry) {
-                        final i = entry.key;
-                        final segment = entry.value;
-                        return Column(
-                          children: [
-                            SegmentCard(
-                              segment: segment,
-                              theme: theme,
-                              t: t,
-                              localeCode: localeCode,
-                            ),
-                            if (i < result.segments.length - 1)
-                              Builder(
-                                builder: (context) {
-                                  final nextSegment = result.segments[i + 1];
-                                  final key =
-                                      '${segment.toStation.id}-${nextSegment.fromStation.id}-${segment.lineId}-${nextSegment.lineId}';
-                                  final matchingTransfer = transferMap[key];
-                                  if (matchingTransfer != null) {
-                                    return _buildTransferIndicator(
-                                      context,
-                                      matchingTransfer,
-                                      segment,
-                                      nextSegment,
-                                      theme,
-                                      t,
-                                      localeCode,
-                                    );
-                                  }
-                                  return const SizedBox.shrink();
-                                },
-                              ),
-                          ],
+
+                  final children = <Widget>[];
+
+                  // Check for initial transfer before first segment
+                  if (result.segments.isNotEmpty && result.transfers.isNotEmpty) {
+                    final firstSeg = result.segments.first;
+                    for (final tr in result.transfers) {
+                      if (tr.toStation.id == firstSeg.fromStation.id) {
+                        children.add(
+                          _buildTransferIndicator(
+                            context,
+                            tr,
+                            firstSeg,
+                            firstSeg,
+                            theme,
+                            t,
+                            localeCode,
+                          ),
                         );
-                      }).toList(),
-                    ),
+                        break;
+                      }
+                    }
+                  }
+
+                  for (int i = 0; i < result.segments.length; i++) {
+                    final segment = result.segments[i];
+                    final nextSegment = i < result.segments.length - 1
+                        ? result.segments[i + 1]
+                        : null;
+
+                    children.add(
+                      SegmentCard(
+                        segment: segment,
+                        theme: theme,
+                        t: t,
+                        localeCode: localeCode,
+                      ),
+                    );
+
+                    final matchingTransfer = transferMap[segment.toStation.id];
+                    if (matchingTransfer != null) {
+                      children.add(
+                        _buildTransferIndicator(
+                          context,
+                          matchingTransfer,
+                          segment,
+                          nextSegment,
+                          theme,
+                          t,
+                          localeCode,
+                        ),
+                      );
+                    }
+                  }
+
+                  return RepaintBoundary(
+                    child: Column(children: children),
                   );
                 },
               ),
@@ -233,7 +252,7 @@ class RouteResultSheet extends ConsumerWidget {
     BuildContext context,
     TransferStep transfer,
     RouteSegment prevSegment,
-    RouteSegment nextSegment,
+    RouteSegment? nextSegment,
     ThemeData theme,
     AppLocalizations t,
     String localeCode,
@@ -281,7 +300,7 @@ class RouteResultSheet extends ConsumerWidget {
   String _getTransferInstruction({
     required TransferStep transfer,
     required RouteSegment prevSegment,
-    required RouteSegment nextSegment,
+    RouteSegment? nextSegment,
     required String localeCode,
     required AppLocalizations t,
   }) {
@@ -289,26 +308,31 @@ class RouteResultSheet extends ConsumerWidget {
     final toId = transfer.toStation.id;
 
     // Case 1: Tha Phra (MRT Blue Line Self-Interchange)
-    if ((fromId == 'MRT_BL01' && toId == 'MRT_BL33') ||
-        (fromId == 'MRT_BL33' && toId == 'MRT_BL01')) {
-      final toUpper = toId == 'MRT_BL01';
+    if ((fromId == TransitConstants.kStationMrtThaphraBl01 &&
+            toId == TransitConstants.kStationMrtThaphraUpperBl33) ||
+        (fromId == TransitConstants.kStationMrtThaphraUpperBl33 &&
+            toId == TransitConstants.kStationMrtThaphraBl01)) {
+      final toUpper = toId == TransitConstants.kStationMrtThaphraBl01;
       return toUpper
           ? t.transfers.transferThaphraUp
           : t.transfers.transferThaphraDown;
     }
 
     // Case 2: Siam (BTS Sukhumvit <-> Silom)
-    if ((fromId == 'BTS_CEN' && toId == 'BTS_CEN_SILOM') ||
-        (fromId == 'BTS_CEN_SILOM' && toId == 'BTS_CEN')) {
+    if ((fromId == TransitConstants.kStationBtsSiamCen &&
+            toId == TransitConstants.kStationBtsSiamSilom) ||
+        (fromId == TransitConstants.kStationBtsSiamSilom &&
+            toId == TransitConstants.kStationBtsSiamCen)) {
       int arrivalFloor = 3;
-      if (prevSegment.lineId == 'BTS_SUKHUMVIT' ||
-          prevSegment.lineId == 'BTS_SILOM') {
+      if (prevSegment.lineId == TransitConstants.kBtsSukhumvit ||
+          prevSegment.lineId == TransitConstants.kBtsSilom) {
         arrivalFloor = prevSegment.boundIndex == 1 ? 4 : 3;
       }
 
       int departureFloor = 3;
-      if (nextSegment.lineId == 'BTS_SUKHUMVIT' ||
-          nextSegment.lineId == 'BTS_SILOM') {
+      if (nextSegment != null &&
+          (nextSegment.lineId == TransitConstants.kBtsSukhumvit ||
+              nextSegment.lineId == TransitConstants.kBtsSilom)) {
         departureFloor = nextSegment.boundIndex == 1 ? 4 : 3;
       }
 
@@ -330,46 +354,65 @@ class RouteResultSheet extends ConsumerWidget {
         : transfer.toStation.nameEn;
 
     // Sukhumvit (MRT_BL22) <-> Asok (BTS_E4)
-    if ((stationId == 'MRT_BL22' && toId == 'BTS_E4') ||
-        (stationId == 'BTS_E4' && toId == 'MRT_BL22')) {
+    if ((stationId == TransitConstants.kStationMrtAsokBl22 &&
+            toId == TransitConstants.kStationBtsSukhumvitE4) ||
+        (stationId == TransitConstants.kStationBtsSukhumvitE4 &&
+            toId == TransitConstants.kStationMrtAsokBl22)) {
       return t.transfers.transferAsokSukhumvit(targetStationName);
     }
 
     // Si Lom (MRT_BL26) <-> Sala Daeng (BTS_S2)
-    if ((stationId == 'MRT_BL26' && toId == 'BTS_S2') ||
-        (stationId == 'BTS_S2' && toId == 'MRT_BL26')) {
-      final exitNum = stationId == 'MRT_BL26' ? '2' : '4';
+    if ((stationId == TransitConstants.kStationMrtSilomBl26 &&
+            toId == TransitConstants.kStationBtsSaladaengS2) ||
+        (stationId == TransitConstants.kStationBtsSaladaengS2 &&
+            toId == TransitConstants.kStationMrtSilomBl26)) {
+      final exitNum =
+          stationId == TransitConstants.kStationMrtSilomBl26 ? '2' : '4';
       return t.transfers.transferSilomSaladaeng(targetStationName, exitNum);
     }
 
     // Chatuchak Park (MRT_BL13) <-> Mo Chit (BTS_N8)
-    if ((stationId == 'MRT_BL13' && toId == 'BTS_N8') ||
-        (stationId == 'BTS_N8' && toId == 'MRT_BL13')) {
-      final exits = stationId == 'MRT_BL13'
+    if ((stationId == TransitConstants.kStationMrtChatuchakBl13 &&
+            toId == TransitConstants.kStationBtsMochitN8) ||
+        (stationId == TransitConstants.kStationBtsMochitN8 &&
+            toId == TransitConstants.kStationMrtChatuchakBl13)) {
+      final exits = stationId == TransitConstants.kStationMrtChatuchakBl13
           ? (localeCode == 'th' ? '1 หรือ 2' : '1 or 2')
           : (localeCode == 'th' ? '1 หรือ 3' : '1 or 3');
       return t.transfers.transferMoChitChatuchak(targetStationName, exits);
     }
 
     // Lat Phrao (Blue <-> Yellow)
-    if (stationId == 'MRT_BL15' || stationId == 'MRT_YL01') {
-      return toLine == 'MRT_YELLOW'
+    if (stationId == TransitConstants.kStationMrtLatphraoBl15 ||
+        stationId == TransitConstants.kStationMrtLatphraoYl01) {
+      return toLine == TransitConstants.kMrtYellow
           ? t.transfers.transferLatphraoYellow
           : t.transfers.transferLatphraoBlue;
     }
 
     // Phaya Thai (BTS <-> ARL)
-    if (stationId == 'BTS_N2' || stationId == 'ARL_A8') {
+    if (stationId == TransitConstants.kStationBtsPhayathaiN2 ||
+        stationId == TransitConstants.kStationArlPhayathaiA8) {
       return t.transfers.transferPhayathai;
     }
 
+    // Makkasan (ARL) <-> Phetchaburi (MRT)
+    if ((stationId == TransitConstants.kStationArlMakkasanA6 &&
+            toId == TransitConstants.kStationMrtPhetchaburiBl21) ||
+        (stationId == TransitConstants.kStationMrtPhetchaburiBl21 &&
+            toId == TransitConstants.kStationArlMakkasanA6)) {
+      return t.transfers.transferMakkasanPhetchaburi(targetStationName);
+    }
+
     // Samrong (BTS <-> Yellow)
-    if (stationId == 'BTS_E15' || stationId == 'MRT_YL23') {
+    if (stationId == TransitConstants.kStationBtsSamrongE15 ||
+        stationId == TransitConstants.kStationMrtSamrongYl23) {
       return t.transfers.transferSamrong;
     }
 
     // Hua Mak (ARL <-> Yellow)
-    if (stationId == 'ARL_A4' || stationId == 'MRT_YL11') {
+    if (stationId == TransitConstants.kStationArlHuamakA4 ||
+        stationId == TransitConstants.kStationMrtHuamakYl11) {
       return t.transfers.transferHuamak;
     }
 
@@ -377,3 +420,4 @@ class RouteResultSheet extends ConsumerWidget {
     return t.transfers.interchangeWalk(transfer.walkingMinutes.toInt());
   }
 }
+
