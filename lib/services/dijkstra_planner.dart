@@ -128,8 +128,21 @@ class TransitGraph {
       return a.stationId.compareTo(b.stationId);
     });
 
-    final isPeak = TransitConstants.isPeakHour(time ?? DateTime.now());
-    final transferWaitTime = isPeak ? 3.0 : 5.0;
+    final evalTime = time ?? DateTime.now();
+    double getTransferWaitPenalty(String targetStationId) {
+      final targetStation = getStation(targetStationId);
+      if (targetStation != null && targetStation.lineId.isNotEmpty) {
+        final interval = TransitConstants.getInterval(
+          targetStation.lineId,
+          evalTime,
+        );
+        return interval / 2.0;
+      }
+      final isPeak = TransitConstants.isPeakHour(evalTime);
+      return isPeak
+          ? TransitConstants.kPeakTransferWaitMinutes
+          : TransitConstants.kOffPeakTransferWaitMinutes;
+    }
 
     pq.add(_DijkstraNode(fromId, 0));
 
@@ -148,7 +161,7 @@ class TransitGraph {
 
         double actualWeight = edge.weight;
         if (edge.lineId == 'TRANSFER') {
-          actualWeight += transferWaitTime;
+          actualWeight += getTransferWaitPenalty(edge.toId);
         }
 
         double dijkstraCost = actualWeight;
@@ -213,7 +226,7 @@ class TransitGraph {
 
       if (edge != null) {
         if (edge.lineId == 'TRANSFER') {
-          stepWeight += transferWaitTime;
+          stepWeight += getTransferWaitPenalty(edge.toId);
         }
         if (disruptionState != null && disruptionState.disruptions.isNotEmpty) {
           final disruption =

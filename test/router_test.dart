@@ -123,8 +123,8 @@ void main() {
           equals(1),
         ); // ต้องมีการเปลี่ยนสาย 1 ครั้ง (จาก BTS ไป MRT)
 
-        // เวลาเดินทางรวม: A->B (2.0) + เดินเปลี่ยนสาย B->C (5.0) + รอรถ (5.0) + C->D (3.0) = 15.0 นาที
-        expect(result.totalWeight, equals(15.0));
+        // เวลาเดินทางรวม: A->B (2.0) + เดินเปลี่ยนสาย B->C (5.0) + รอรถ MRT (5.0/2 = 2.5) + C->D (3.0) = 12.5 นาที
+        expect(result.totalWeight, equals(12.5));
 
         // ตรวจสอบโครงสร้างลำดับสถานีจริง
         expect(result.path[0].stationId, equals('BTS_A'));

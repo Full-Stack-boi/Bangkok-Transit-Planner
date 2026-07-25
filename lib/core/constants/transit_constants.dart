@@ -31,6 +31,20 @@ class TransitConstants {
   static const String kStationBtsSiamSilom = 'BTS_CEN_SILOM';
   static const String kStationMrtAsokBl22 = 'MRT_BL22';
   static const String kStationBtsSukhumvitE4 = 'BTS_E4';
+  static const String kStationArlMakkasanA6 = 'ARL_A6';
+  static const String kStationMrtPhetchaburiBl21 = 'MRT_BL21';
+  static const String kStationBtsPhayathaiN2 = 'BTS_N2';
+  static const String kStationArlPhayathaiA8 = 'ARL_A8';
+  static const String kStationBtsSamrongE15 = 'BTS_E15';
+  static const String kStationMrtSamrongYl23 = 'MRT_YL23';
+  static const String kStationArlHuamakA4 = 'ARL_A4';
+  static const String kStationMrtHuamakYl11 = 'MRT_YL11';
+  static const String kStationMrtSilomBl26 = 'MRT_BL26';
+  static const String kStationBtsSaladaengS2 = 'BTS_S2';
+  static const String kStationMrtChatuchakBl13 = 'MRT_BL13';
+  static const String kStationBtsMochitN8 = 'BTS_N8';
+  static const String kStationMrtLatphraoBl15 = 'MRT_BL15';
+  static const String kStationMrtLatphraoYl01 = 'MRT_YL01';
 
   // Status Strings
   static const String kStatusPendingTh = 'รอยืนยัน';
@@ -43,6 +57,8 @@ class TransitConstants {
   static const double kWalkingSpeedMpm = 80.0;
   static const double kMinWalkMinutes = 1.0;
   static const double kMaxWalkMinutes = 30.0;
+  static const double kPeakTransferWaitMinutes = 3.0;
+  static const double kOffPeakTransferWaitMinutes = 5.0;
 
   // GPS Passive Crowd Detection
   static const double stationProximityMeters = 200.0;

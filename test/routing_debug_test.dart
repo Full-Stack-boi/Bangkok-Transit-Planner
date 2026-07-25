@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:bkk_transit_planner/providers/providers.dart';
 import 'package:bkk_transit_planner/services/dijkstra_planner.dart';
+import 'package:bkk_transit_planner/core/constants/transit_constants.dart';
 
 /// Helper function to debug and print any route
 void debugRoute(
@@ -46,7 +47,13 @@ void debugRoute(
       }
       if (e != null) {
         double weight = e.weight;
-        if (e.lineId == 'TRANSFER') weight += 5.0; // Off-peak transfer wait
+        if (e.lineId == 'TRANSFER') {
+          final targetSt = graph.getStation(expectedManualPath[i + 1]);
+          final waitPenalty = targetSt != null && targetSt.lineId.isNotEmpty
+              ? TransitConstants.getInterval(targetSt.lineId, offPeakTime) / 2.0
+              : 5.0;
+          weight += waitPenalty;
+        }
         manual += weight;
         final s = graph.getStation(expectedManualPath[i + 1]);
         print(
