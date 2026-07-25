@@ -29,25 +29,37 @@ void main() {
       errorFailed: _failedMsg,
     );
 
-    final result = routeCalculator.calculate(origin!, destination!, cardState, t);
+    final result = routeCalculator.calculate(
+      origin!,
+      destination!,
+      cardState,
+      t,
+    );
 
     expect(result, isNotNull);
     final recommended = result!.recommended;
 
     print('\n=== ROUTE SEGMENTS ===');
     for (final seg in recommended.segments) {
-      print('Segment: ${seg.fromStation.nameEn} -> ${seg.toStation.nameEn} [${seg.lineId}]');
+      print(
+        'Segment: ${seg.fromStation.nameEn} -> ${seg.toStation.nameEn} [${seg.lineId}]',
+      );
     }
 
     print('\n=== TRANSFERS ===');
     for (final tr in recommended.transfers) {
-      print('Transfer: ${tr.fromStation.nameEn} (${tr.fromStation.id}) -> ${tr.toStation.nameEn} (${tr.toStation.id})');
+      print(
+        'Transfer: ${tr.fromStation.nameEn} (${tr.fromStation.id}) -> ${tr.toStation.nameEn} (${tr.toStation.id})',
+      );
     }
 
     // 1. Should have ARL transit segment from Lat Krabang to Makkasan
     expect(recommended.segments.isNotEmpty, isTrue);
     expect(recommended.segments.first.fromStation.id, equals('ARL_A2'));
-    expect(recommended.segments.first.toStation.id, equals('ARL_A6')); // Makkasan
+    expect(
+      recommended.segments.first.toStation.id,
+      equals('ARL_A6'),
+    ); // Makkasan
 
     // 2. Should have a TransferStep from ARL Makkasan (ARL_A6) to MRT Phetchaburi (MRT_BL21)
     expect(recommended.transfers.isNotEmpty, isTrue);

@@ -735,8 +735,9 @@ class RouteCalculator {
           final nextLineId = i + 1 < dijkstraResult.path.length
               ? dijkstraResult.path[i + 1].lineId
               : '';
-          final prevStationId =
-              i > 0 ? dijkstraResult.path[i - 1].stationId : '';
+          final prevStationId = i > 0
+              ? dijkstraResult.path[i - 1].stationId
+              : '';
           final fromSt = _repo.getStation(prevStationId) ?? station;
           transfers.add(
             TransferStep(

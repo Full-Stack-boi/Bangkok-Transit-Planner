@@ -35,10 +35,9 @@ class BookmarkButton extends ConsumerWidget {
       ),
       onPressed: () async {
         if (isSaved) {
-          await ref.read(favoritesViewModelProvider.notifier).deleteRoute(
-            result.origin.id,
-            result.destination.id,
-          );
+          await ref
+              .read(favoritesViewModelProvider.notifier)
+              .deleteRoute(result.origin.id, result.destination.id);
           if (context.mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(t.routeResult.routeDeletedSuccess)),

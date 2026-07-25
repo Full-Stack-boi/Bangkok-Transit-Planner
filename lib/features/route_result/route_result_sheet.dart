@@ -175,7 +175,8 @@ class RouteResultSheet extends ConsumerWidget {
                   final children = <Widget>[];
 
                   // Check for initial transfer before first segment
-                  if (result.segments.isNotEmpty && result.transfers.isNotEmpty) {
+                  if (result.segments.isNotEmpty &&
+                      result.transfers.isNotEmpty) {
                     final firstSeg = result.segments.first;
                     for (final tr in result.transfers) {
                       if (tr.toStation.id == firstSeg.fromStation.id) {
@@ -226,9 +227,7 @@ class RouteResultSheet extends ConsumerWidget {
                     }
                   }
 
-                  return RepaintBoundary(
-                    child: Column(children: children),
-                  );
+                  return RepaintBoundary(child: Column(children: children));
                 },
               ),
 
@@ -366,8 +365,9 @@ class RouteResultSheet extends ConsumerWidget {
             toId == TransitConstants.kStationBtsSaladaengS2) ||
         (stationId == TransitConstants.kStationBtsSaladaengS2 &&
             toId == TransitConstants.kStationMrtSilomBl26)) {
-      final exitNum =
-          stationId == TransitConstants.kStationMrtSilomBl26 ? '2' : '4';
+      final exitNum = stationId == TransitConstants.kStationMrtSilomBl26
+          ? '2'
+          : '4';
       return t.transfers.transferSilomSaladaeng(targetStationName, exitNum);
     }
 
@@ -420,4 +420,3 @@ class RouteResultSheet extends ConsumerWidget {
     return t.transfers.interchangeWalk(transfer.walkingMinutes.toInt());
   }
 }
-
