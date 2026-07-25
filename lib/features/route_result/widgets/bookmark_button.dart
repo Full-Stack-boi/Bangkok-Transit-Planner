@@ -4,7 +4,6 @@ import '../../../core/theme/app_theme.dart';
 import '../../../models/route_result.dart';
 import '../../../core/constants/translation_helper.dart';
 import '../../favorites/favorites_view_model.dart';
-import '../../../providers/providers.dart';
 
 class BookmarkButton extends ConsumerWidget {
   final RouteResult result;
@@ -22,10 +21,11 @@ class BookmarkButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final favoritesRepo = ref.watch(favoritesRepositoryProvider);
-    final isSaved = favoritesRepo.isRouteSaved(
-      result.origin.id,
-      result.destination.id,
+    final favState = ref.watch(favoritesViewModelProvider);
+    final isSaved = favState.savedRoutes.any(
+      (r) =>
+          r['origin_id'] == result.origin.id &&
+          r['destination_id'] == result.destination.id,
     );
 
     return IconButton(
@@ -35,11 +35,10 @@ class BookmarkButton extends ConsumerWidget {
       ),
       onPressed: () async {
         if (isSaved) {
-          await favoritesRepo.deleteRoute(
+          await ref.read(favoritesViewModelProvider.notifier).deleteRoute(
             result.origin.id,
             result.destination.id,
           );
-          ref.read(favoritesViewModelProvider.notifier).refresh();
           if (context.mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(t.routeResult.routeDeletedSuccess)),
