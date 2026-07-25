@@ -146,15 +146,13 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
       padding: const EdgeInsets.all(16),
       itemBuilder: (context, index) {
         final station = state.favoriteStations[index];
-        final lineColor = TransitColors.getLineColor(station.lineId);
         final crowdInfo = crowdService.getCrowdInfo(station.id);
         final minutesUntilNext = scheduleService.getMinutesUntilNextTrain(
           station.lineId,
         );
 
-        final String stationName = localeCode == 'th'
-            ? station.nameTh
-            : station.nameEn;
+        final String stationName = station.localizedName(localeCode);
+        final String stationSubName = station.subName(localeCode);
 
         final String trainStatusText;
         if (minutesUntilNext == null) {
@@ -164,19 +162,6 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
         } else {
           trainStatusText =
               '${t.routeResult.nextTrain}: ~$minutesUntilNext ${t.common.minutesUnit}';
-        }
-
-        String getCrowdLevelText(CrowdLevel level) {
-          switch (level) {
-            case CrowdLevel.low:
-              return t.routeResult.crowdLow;
-            case CrowdLevel.medium:
-              return t.routeResult.crowdMedium;
-            case CrowdLevel.high:
-              return t.routeResult.crowdHigh;
-            case CrowdLevel.unknown:
-              return t.routeResult.crowdUnknown;
-          }
         }
 
         return Card(
@@ -189,23 +174,10 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
                 // Header (Code + Name + Delete)
                 Row(
                   children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: lineColor,
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Text(
-                        station.code,
-                        style: TextStyle(
-                          color: TransitColors.getLineTextColor(station.lineId),
-                          fontWeight: FontWeight.bold,
-                          fontSize: 12,
-                        ),
-                      ),
+                    StationBadge(
+                      text: station.code,
+                      lineId: station.lineId,
+                      fontSize: 12,
                     ),
                     const SizedBox(width: 12),
                     Expanded(
@@ -283,31 +255,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
                     ),
 
                     // Crowd Level
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.people_outline_rounded,
-                          size: 14,
-                          color: crowdInfo.level == CrowdLevel.high
-                              ? Colors.red
-                              : (crowdInfo.level == CrowdLevel.medium
-                                    ? Colors.orange
-                                    : Colors.green),
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          '${t.routeResult.crowdLevel}: ${getCrowdLevelText(crowdInfo.level)} (~${crowdInfo.presenceCount} ${t.common.peopleUnit})',
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: crowdInfo.level == CrowdLevel.high
-                                ? Colors.red.shade400
-                                : (crowdInfo.level == CrowdLevel.medium
-                                      ? Colors.orange.shade400
-                                      : Colors.green.shade400),
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
+                    CrowdLevelBadge(crowdInfo: crowdInfo, theme: theme, t: t),
                   ],
                 ),
                 const SizedBox(height: 16),

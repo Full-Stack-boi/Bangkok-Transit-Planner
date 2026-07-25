@@ -8,6 +8,7 @@ import '../../../models/searchable_item.dart';
 import '../../../core/constants/translation_helper.dart';
 import '../../../providers/providers.dart';
 import '../../../widgets/shared/crowd_level_badge.dart';
+import '../../../widgets/shared/station_badge.dart';
 
 class SegmentCard extends ConsumerWidget {
   final RouteSegment segment;
@@ -25,38 +26,27 @@ class SegmentCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    if (segment.lineId == 'WALK') {
-      return _buildWalkSegmentCard(context, ref);
-    }
-
-    final crowdService = ref.watch(crowdServiceProvider);
-    final scheduleService = ref.watch(scheduleServiceProvider);
-
+    final transitRepo = ref.watch(transitRepositoryProvider);
+    final crowdRepo = ref.watch(crowdRepositoryProvider);
     final lineColor = TransitColors.getLineColor(segment.lineId);
-    final crowdInfo = crowdService.getCrowdInfo(segment.fromStation.id);
-    final minutesUntilNext = scheduleService.getMinutesUntilNextTrain(
-      segment.lineId,
-    );
 
-    final String displayLineName = segment.lineName;
-    final displayDirection = t.directions.getDirectionLabel(
-      segment.lineId,
-      segment.boundIndex,
-      segment.direction,
-    );
+    // Get display name for line
+    final lineObj = transitRepo.getLine(segment.lineId);
+    final displayLineName = lineObj != null
+        ? (localeCode == 'th' ? lineObj.nameTh : lineObj.nameEn)
+        : segment.lineId;
 
-    final String trainStatusText;
-    if (minutesUntilNext == null) {
-      trainStatusText = t.routeResult.serviceEnded;
-    } else if (minutesUntilNext == 0) {
-      trainStatusText = t.routeResult.trainArriving;
-    } else {
-      trainStatusText =
-          '${t.routeResult.nextTrain}: ~$minutesUntilNext ${t.common.minutesUnit}';
-    }
+    // Get direction station name
+    final dirStation = transitRepo.getStation(segment.directionStationId);
+    final displayDirection = dirStation != null
+        ? (localeCode == 'th' ? dirStation.nameTh : dirStation.nameEn)
+        : segment.directionStationId;
+
+    final fromStation = transitRepo.getStation(segment.fromStationId);
+    final toStation = transitRepo.getStation(segment.toStationId);
 
     return Card(
-      margin: const EdgeInsets.symmetric(vertical: 4),
+      margin: const EdgeInsets.symmetric(vertical: 6),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -64,23 +54,15 @@ class SegmentCard extends ConsumerWidget {
           children: [
             Row(
               children: [
-                Container(
+                StationBadge(
+                  text: displayLineName,
+                  lineId: segment.lineId,
+                  fontSize: 12,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 10,
                     vertical: 4,
                   ),
-                  decoration: BoxDecoration(
-                    color: lineColor,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    displayLineName,
-                    style: TextStyle(
-                      color: TransitColors.getLineTextColor(segment.lineId),
-                      fontWeight: FontWeight.bold,
-                      fontSize: 12,
-                    ),
-                  ),
+                  borderRadius: BorderRadius.circular(8),
                 ),
                 const SizedBox(width: 8),
                 Icon(Icons.arrow_forward, size: 16, color: lineColor),

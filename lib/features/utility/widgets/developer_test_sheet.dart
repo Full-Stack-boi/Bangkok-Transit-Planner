@@ -232,39 +232,31 @@ class _DeveloperTestSheetState extends ConsumerState<DeveloperTestSheet> {
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Row(
-                  children:
-                      [
-                        'BTS_SUKHUMVIT',
-                        'BTS_SILOM',
-                        'MRT_BLUE',
-                        'MRT_PURPLE',
-                        'MRT_YELLOW',
-                        'ARL',
-                      ].map((lineId) {
-                        final line = transitRepo.getLine(lineId);
-                        final isSel = _selectedLineId == lineId;
-                        final lineLabel = line != null
-                            ? (localeCode == 'th' ? line.nameTh : line.nameEn)
-                            : lineId;
-                        return Padding(
-                          padding: const EdgeInsets.only(right: 6.0),
-                          child: ChoiceChip(
-                            label: Text(lineLabel),
-                            selected: isSel,
-                            onSelected: (_) {
-                              setState(() {
-                                _selectedLineId = lineId;
-                                final newStations = transitRepo.stations
-                                    .where((s) => s.lineId == lineId)
-                                    .toList();
-                                if (newStations.isNotEmpty) {
-                                  _selectedStationIds = {newStations.first.id};
-                                }
-                              });
-                            },
-                          ),
-                        );
-                      }).toList(),
+                  children: transitRepo.lines.map((l) => l.id).map((lineId) {
+                    final line = transitRepo.getLine(lineId);
+                    final isSel = _selectedLineId == lineId;
+                    final lineLabel = line != null
+                        ? line.displayName(isEnglish: localeCode == 'en')
+                        : lineId;
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 6.0),
+                      child: ChoiceChip(
+                        label: Text(lineLabel),
+                        selected: isSel,
+                        onSelected: (_) {
+                          setState(() {
+                            _selectedLineId = lineId;
+                            final newStations = transitRepo.stations
+                                .where((s) => s.lineId == lineId)
+                                .toList();
+                            if (newStations.isNotEmpty) {
+                              _selectedStationIds = {newStations.first.id};
+                            }
+                          });
+                        },
+                      ),
+                    );
+                  }).toList(),
                 ),
               ),
               const SizedBox(height: 12),

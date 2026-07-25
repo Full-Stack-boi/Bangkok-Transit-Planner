@@ -4,6 +4,7 @@ import '../../../core/theme/transit_colors.dart';
 import '../../../models/station.dart';
 import '../../../models/crowd_report.dart';
 import '../../../providers/providers.dart';
+import '../../../widgets/shared/station_badge.dart';
 import '../../favorites/favorites_view_model.dart';
 import '../../utility/widgets/disruption_detail_sheet.dart';
 
@@ -27,15 +28,9 @@ class StationDetailsCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final t = ref.watch(translationProvider);
     final theme = Theme.of(context);
-    final t = ref.read(translationsProvider);
-    final transitRepo = ref.read(transitRepositoryProvider);
-    final disruptionState = ref.watch(disruptionProvider);
-    final activeDisruption = disruptionState.getDisruptionForStation(
-      station.id,
-    );
-
-    // Watch these only at the card level to prevent full screen rebuilds!
+    final transitRepo = ref.watch(transitRepositoryProvider);
     final scheduleService = ref.watch(scheduleServiceProvider);
     final crowdService = ref.watch(crowdServiceProvider);
 
@@ -45,8 +40,8 @@ class StationDetailsCard extends ConsumerWidget {
       station.lineId,
     );
 
-    final stationName = localeCode == 'th' ? station.nameTh : station.nameEn;
-    final stationSubName = localeCode == 'th' ? station.nameEn : station.nameTh;
+    final stationName = station.localizedName(localeCode);
+    final stationSubName = station.subName(localeCode);
 
     // Find all stations in the same interchange hub
     final hubStations = <Station>[station];
@@ -58,16 +53,25 @@ class StationDetailsCard extends ConsumerWidget {
     }
     hubStations.sort((a, b) {
       int getPriority(String lineId) {
-        if (lineId.startsWith('BTS')) return 0;
-        if (lineId.startsWith('MRT')) return 1;
-        return 2;
+        if (lineId.startsWith('BTS')) return 1;
+        if (lineId.startsWith('MRT')) return 2;
+        if (lineId.startsWith('ARL')) return 3;
+        if (lineId.startsWith('SRT')) return 4;
+        return 5;
       }
 
-      final pA = getPriority(a.lineId);
-      final pB = getPriority(b.lineId);
-      if (pA != pB) return pA.compareTo(pB);
-      return a.id.compareTo(b.id);
+      return getPriority(a.lineId).compareTo(getPriority(b.lineId));
     });
+
+    final activeDisruptionMatches = transitRepo.disruptions.where(
+      (d) =>
+          d.isActive &&
+          (d.affectedLineIds.contains(station.lineId) ||
+              d.affectedStationIds.contains(station.id)),
+    );
+    final activeDisruption = activeDisruptionMatches.isNotEmpty
+        ? activeDisruptionMatches.first
+        : null;
 
     final String trainStatusText;
     if (minutesUntilNext == null) {
@@ -94,9 +98,10 @@ class StationDetailsCard extends ConsumerWidget {
 
     return Card(
       elevation: 8,
-      shadowColor: Colors.black26,
       margin: EdgeInsets.zero,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -106,23 +111,10 @@ class StationDetailsCard extends ConsumerWidget {
             // Header Row (Name + Close Button)
             Row(
               children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: lineColor,
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Text(
-                    station.code,
-                    style: TextStyle(
-                      color: TransitColors.getLineTextColor(station.lineId),
-                      fontWeight: FontWeight.bold,
-                      fontSize: 12,
-                    ),
-                  ),
+                StationBadge(
+                  text: station.code,
+                  lineId: station.lineId,
+                  fontSize: 12,
                 ),
                 const SizedBox(width: 8),
                 Expanded(
@@ -204,9 +196,7 @@ class StationDetailsCard extends ConsumerWidget {
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          localeCode == 'th'
-                              ? '⚠️ ${activeDisruption.titleTh}'
-                              : '⚠️ ${activeDisruption.titleEn}',
+                          '⚠️ ${activeDisruption.displayName(isEnglish: localeCode == 'en')}',
                           style: TextStyle(
                             color: Colors.amber.shade800,
                             fontWeight: FontWeight.bold,
@@ -217,7 +207,7 @@ class StationDetailsCard extends ConsumerWidget {
                         ),
                       ),
                       Text(
-                        localeCode == 'th' ? 'ดูรายละเอียด >' : 'Details >',
+                        t.common.viewDetails,
                         style: TextStyle(
                           color: Colors.amber.shade900,
                           fontWeight: FontWeight.w600,
@@ -241,7 +231,7 @@ class StationDetailsCard extends ConsumerWidget {
                     );
                     final isSelected = hubStation.id == station.id;
                     final hubLineName = hubLine != null
-                        ? (localeCode == 'th' ? hubLine.nameTh : hubLine.nameEn)
+                        ? hubLine.displayName(isEnglish: localeCode == 'en')
                         : hubStation.lineId;
 
                     return Padding(

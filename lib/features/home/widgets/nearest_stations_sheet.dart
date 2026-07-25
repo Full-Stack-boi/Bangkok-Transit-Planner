@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/transit_colors.dart';
 import '../../../models/station.dart';
 import '../../../providers/providers.dart';
+import '../../../widgets/shared/interchange_badges_row.dart';
+import '../../../widgets/shared/station_badge.dart';
 import '../../search/search_view_model.dart';
 
 /// Bottom sheet displaying nearest stations with distances, line badges,
@@ -19,12 +21,12 @@ class NearestStationsSheet extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
     final t = ref.watch(translationsProvider);
     final localeCode = ref.watch(localeProvider);
-    final transitRepo = ref.watch(transitRepositoryProvider);
-    final crowdRepo = ref.watch(crowdRepositoryProvider);
+    final theme = Theme.of(context);
     final searchVm = ref.read(searchViewModelProvider.notifier);
+    final crowdRepo = ref.read(crowdRepositoryProvider);
+    final transitRepo = ref.read(transitRepositoryProvider);
 
     return Container(
       decoration: BoxDecoration(
@@ -73,12 +75,8 @@ class NearestStationsSheet extends ConsumerWidget {
                   final distanceM = entry.value;
 
                   final lineColor = TransitColors.getLineColor(station.lineId);
-                  final stationName = localeCode == 'th'
-                      ? station.nameTh
-                      : station.nameEn;
-                  final stationSubName = localeCode == 'th'
-                      ? station.nameEn
-                      : station.nameTh;
+                  final stationName = station.localizedName(localeCode);
+                  final stationSubName = station.subName(localeCode);
 
                   // Format distance
                   final String distanceText;
@@ -136,12 +134,13 @@ class NearestStationsSheet extends ConsumerWidget {
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Center(
-                          child: Text(
-                            station.code,
-                            style: TextStyle(
-                              color: lineColor,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 12,
+                          child: StationBadge(
+                            text: station.code,
+                            lineId: station.lineId,
+                            fontSize: 12,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 2,
                             ),
                           ),
                         ),
@@ -179,52 +178,10 @@ class NearestStationsSheet extends ConsumerWidget {
                           ),
                           if (station.interchange.isNotEmpty) ...[
                             const SizedBox(height: 6),
-                            Row(
-                              children: [
-                                Text(
-                                  t.proximity.interconnectText,
-                                  style: theme.textTheme.bodyMedium?.copyWith(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                                const SizedBox(width: 4),
-                                Wrap(
-                                  spacing: 4,
-                                  children: station.interchange.map((id) {
-                                    final connStation = transitRepo.getStation(
-                                      id,
-                                    );
-                                    if (connStation == null) {
-                                      return const SizedBox();
-                                    }
-                                    final connColor =
-                                        TransitColors.getLineColor(
-                                          connStation.lineId,
-                                        );
-                                    return Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 6,
-                                        vertical: 2,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: connColor,
-                                        borderRadius: BorderRadius.circular(4),
-                                      ),
-                                      child: Text(
-                                        connStation.code,
-                                        style: TextStyle(
-                                          color: TransitColors.getLineTextColor(
-                                            connStation.lineId,
-                                          ),
-                                          fontSize: 9,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    );
-                                  }).toList(),
-                                ),
-                              ],
+                            InterchangeBadgesRow(
+                              interchangeStationIds: station.interchange,
+                              transitRepo: transitRepo,
+                              labelText: t.proximity.interconnectText,
                             ),
                           ],
                         ],

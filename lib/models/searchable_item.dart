@@ -20,6 +20,13 @@ abstract class SearchableItem {
     return isEnglish ? nameEn : nameTh;
   }
 
+  /// Convenience getter for localized primary name using localeCode ('th' or 'en')
+  String localizedName(String localeCode) =>
+      displayName(isEnglish: localeCode == 'en');
+
+  /// Convenience getter for secondary sub-name in alternative language
+  String subName(String localeCode) => localeCode == 'en' ? nameTh : nameEn;
+
   /// The nearest transit station ID if this is a walkable place (landmark, custom location)
   String? get nearestStationId => null;
 

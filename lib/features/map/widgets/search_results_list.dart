@@ -8,6 +8,7 @@ import '../../../models/searchable_item.dart';
 import '../../../models/custom_location.dart';
 import '../../../models/namtang_stop.dart';
 import '../../../models/landmark.dart';
+import '../../../widgets/shared/station_badge.dart';
 import '../../search/search_view_model.dart';
 import '../../../providers/providers.dart';
 import '../../../core/constants/translation_helper.dart';
@@ -422,7 +423,7 @@ class StationListTile extends ConsumerWidget {
     if (isStation) {
       final s = station as Station;
       itemColor = TransitColors.getLineColor(s.lineId);
-      subtitle = localeCode == 'th' ? s.nameEn : s.nameTh;
+      subtitle = s.subName(localeCode);
 
       leadingWidget = Container(
         width: 42,
@@ -432,13 +433,11 @@ class StationListTile extends ConsumerWidget {
           borderRadius: BorderRadius.circular(12),
         ),
         child: Center(
-          child: Text(
-            s.code,
-            style: TextStyle(
-              color: itemColor,
-              fontWeight: FontWeight.bold,
-              fontSize: 12,
-            ),
+          child: StationBadge(
+            text: s.code,
+            lineId: s.lineId,
+            fontSize: 12,
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
           ),
         ),
       );

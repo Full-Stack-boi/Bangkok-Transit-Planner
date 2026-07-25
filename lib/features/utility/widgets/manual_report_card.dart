@@ -23,16 +23,9 @@ class ManualReportCard extends ConsumerWidget {
     Station? selectedStation;
     int selectedLevel = 3;
 
-    final lines = [
-      {'id': 'BTS_SUKHUMVIT', 'name': t.utility.lineBtsSukhumvit},
-      {'id': 'BTS_SILOM', 'name': t.utility.lineBtsSilom},
-      {'id': 'MRT_BLUE', 'name': t.utility.lineMrtBlue},
-      {'id': 'MRT_PURPLE', 'name': t.utility.lineMrtPurple},
-      {'id': 'MRT_YELLOW', 'name': t.utility.lineMrtYellow},
-      {'id': 'MRT_PINK', 'name': t.utility.lineMrtPink},
-      {'id': 'ARL', 'name': t.utility.lineArl},
-      {'id': 'SRT_RED_NORTH', 'name': t.utility.lineSrtRed},
-    ];
+    final lines = transitRepo.lines.map((l) {
+      return {'id': l.id, 'name': t.isTh ? l.nameTh : l.nameEn};
+    }).toList();
 
     showModalBottomSheet(
       context: context,
@@ -47,32 +40,23 @@ class ManualReportCard extends ConsumerWidget {
             final filteredStations = selectedLineId == null
                 ? <Station>[]
                 : stations.where((s) {
-                    if (selectedLineId == 'BTS_SUKHUMVIT') {
-                      return s.lineId == 'BTS_SUKHUMVIT';
-                    } else if (selectedLineId == 'BTS_SILOM') {
-                      return s.lineId == 'BTS_SILOM';
-                    } else if (selectedLineId == 'MRT_BLUE') {
-                      return s.lineId == 'MRT_BLUE';
-                    } else if (selectedLineId == 'MRT_PURPLE') {
-                      return s.lineId == 'MRT_PURPLE';
-                    } else if (selectedLineId == 'MRT_YELLOW') {
-                      return s.lineId == 'MRT_YELLOW';
-                    } else if (selectedLineId == 'MRT_PINK') {
-                      return s.lineId == 'MRT_PINK' ||
-                          s.lineId == 'MRT_PINK_BRANCH';
-                    } else if (selectedLineId == 'ARL') {
-                      return s.lineId == 'ARL';
-                    } else if (selectedLineId == 'SRT_RED_NORTH') {
-                      return s.lineId == 'SRT_RED_NORTH' ||
-                          s.lineId == 'SRT_RED_WEST';
+                    if (s.lineId == selectedLineId) return true;
+                    if (selectedLineId == 'MRT_PINK' &&
+                        s.lineId == 'MRT_PINK_BRANCH') {
+                      return true;
+                    }
+                    if (selectedLineId == 'SRT_RED_NORTH' &&
+                        s.lineId == 'SRT_RED_WEST') {
+                      return true;
                     }
                     return false;
                   }).toList();
 
             filteredStations.sort((a, b) {
-              final nameA = t.isTh ? a.nameTh : a.nameEn;
-              final nameB = t.isTh ? b.nameTh : b.nameEn;
-              return nameA.compareTo(nameB);
+              final localeCode = t.isTh ? 'th' : 'en';
+              return a
+                  .localizedName(localeCode)
+                  .compareTo(b.localizedName(localeCode));
             });
 
             return SafeArea(
@@ -177,7 +161,9 @@ class ManualReportCard extends ConsumerWidget {
                           items: filteredStations.map((s) {
                             return DropdownMenuItem<Station>(
                               value: s,
-                              child: Text(t.isTh ? s.nameTh : s.nameEn),
+                              child: Text(
+                                s.localizedName(t.isTh ? 'th' : 'en'),
+                              ),
                             );
                           }).toList(),
                           onChanged: selectedLineId == null
