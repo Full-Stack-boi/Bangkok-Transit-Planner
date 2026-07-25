@@ -60,6 +60,10 @@ class ThaiCommon implements BaseCommon {
   String get download => 'ดาวน์โหลด';
   @override
   String get genericError => 'เกิดข้อผิดพลาด';
+  @override
+  String get viewDetails => 'ดูรายละเอียด >';
+  @override
+  String minutesFormat(int mins) => '~$mins นาที';
 }
 
 class ThaiNavigation implements BaseNavigation {
@@ -389,6 +393,18 @@ class ThaiTransfers implements BaseTransfers {
   @override
   String interchangeLevels(int time) =>
       'เปลี่ยนชานชาลาต่างระดับชั้น · เดิน ~$time นาที';
+  @override
+  String transferSkywalk(String targetStation, int walkMins) =>
+      'เดินผ่านทางเชื่อมสกายวอล์คเพื่อเชื่อมต่อไปยังสถานี$targetStation · เดิน ~$walkMins นาที';
+  @override
+  String transferExit(String targetStation, String exitInfo, int walkMins) =>
+      'ออกทางออก $exitInfo เพื่อเชื่อมต่อไปยังสถานี$targetStation · เดิน ~$walkMins นาที';
+  @override
+  String transferPlatformLevel(String levelInfo, int walkMins) =>
+      'เปลี่ยนชานชาลา ($levelInfo) · เดิน ~$walkMins นาที';
+  @override
+  String transferGenericWalk(String targetStation, int walkMins) =>
+      'เดินเชื่อมต่อไปยังสถานี$targetStation · เดิน ~$walkMins นาที';
 }
 
 class ThaiProximity implements BaseProximity {
@@ -720,4 +736,10 @@ class ThaiUtility implements BaseUtility {
   @override
   String get reportDelayDesc =>
       'ร่วมแจ้งความหนาแน่นและความล่าช้าในระบบรถไฟฟ้าเพื่อเป็นประโยชน์ต่อผู้เดินทางท่านอื่น';
+  @override
+  String get fullClosure => 'ระงับบริการทั้งสาย';
+  @override
+  String get partialClosure => 'งดบริการบางช่วง';
+  @override
+  String get minorDelay => 'ล่าช้าบางสถานี';
 }

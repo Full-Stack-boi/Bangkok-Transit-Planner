@@ -30,6 +30,8 @@ abstract class BaseCommon {
   String get closeBtn;
   String get download;
   String get genericError;
+  String get viewDetails;
+  String minutesFormat(int mins);
 }
 
 abstract class BaseNavigation {
@@ -179,6 +181,10 @@ abstract class BaseTransfers {
   String transferMoChitChatuchak(String targetStation, String exits);
   String interchangeWalk(int time);
   String interchangeLevels(int time);
+  String transferSkywalk(String targetStation, int walkMins);
+  String transferExit(String targetStation, String exitInfo, int walkMins);
+  String transferPlatformLevel(String levelInfo, int walkMins);
+  String transferGenericWalk(String targetStation, int walkMins);
 }
 
 abstract class BaseProximity {
@@ -309,6 +315,9 @@ abstract class BaseUtility {
   String get lineArl;
   String get lineSrtRed;
   String get reportDelayDesc;
+  String get fullClosure;
+  String get partialClosure;
+  String get minorDelay;
 }
 
 abstract class BaseAuth {

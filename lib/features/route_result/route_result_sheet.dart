@@ -247,16 +247,16 @@ class RouteResultSheet extends ConsumerWidget {
     );
   }
 
-  Widget _buildTransferIndicator(
-    BuildContext context,
-    TransferStep transfer,
-    RouteSegment prevSegment,
+  Widget _buildTransferInstructionCard({
+    required BuildContext context,
+    required TransferStep transfer,
+    required RouteSegment prevSegment,
     RouteSegment? nextSegment,
-    ThemeData theme,
-    AppLocalizations t,
-    String localeCode,
-  ) {
-    final text = _getTransferInstruction(
+    required String localeCode,
+    required AppLocalizations t,
+    required ThemeData theme,
+  }) {
+    final instruction = _getTransferInstruction(
       transfer: transfer,
       prevSegment: prevSegment,
       nextSegment: nextSegment,
@@ -265,29 +265,29 @@ class RouteResultSheet extends ConsumerWidget {
     );
 
     return Container(
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
-        color: theme.colorScheme.secondary.withValues(alpha: 0.1),
+        color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: theme.colorScheme.secondary.withValues(alpha: 0.3),
+          color: theme.colorScheme.outline.withValues(alpha: 0.15),
         ),
       ),
       child: Row(
         children: [
           Icon(
             Icons.directions_walk_rounded,
-            color: theme.colorScheme.secondary,
             size: 20,
+            color: theme.colorScheme.primary,
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 10),
           Expanded(
             child: Text(
-              text,
+              instruction,
               style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.secondary,
-                fontWeight: FontWeight.w500,
+                fontWeight: FontWeight.w600,
+                color: theme.colorScheme.onSurface,
               ),
             ),
           ),
@@ -305,6 +305,7 @@ class RouteResultSheet extends ConsumerWidget {
   }) {
     final fromId = transfer.fromStation.id;
     final toId = transfer.toStation.id;
+    final isEnglish = localeCode == 'en';
 
     // Case 1: Tha Phra (MRT Blue Line Self-Interchange)
     if ((fromId == TransitConstants.kStationMrtThaphraBl01 &&
@@ -344,79 +345,41 @@ class RouteResultSheet extends ConsumerWidget {
       }
     }
 
-    // Case 3: Other Same-Name Interchanges
-    final stationId = transfer.fromStation.id;
-    final toLine = transfer.toLineId;
+    // Case 3: Data-driven lookup via InterchangeRegistry
+    final targetStationName = transfer.toStation.displayName(
+      isEnglish: isEnglish,
+    );
+    final record = InterchangeRegistry.lookup(fromId, toId);
 
-    final targetStationName = localeCode == 'th'
-        ? transfer.toStation.nameTh
-        : transfer.toStation.nameEn;
-
-    // Sukhumvit (MRT_BL22) <-> Asok (BTS_E4)
-    if ((stationId == TransitConstants.kStationMrtAsokBl22 &&
-            toId == TransitConstants.kStationBtsSukhumvitE4) ||
-        (stationId == TransitConstants.kStationBtsSukhumvitE4 &&
-            toId == TransitConstants.kStationMrtAsokBl22)) {
-      return t.transfers.transferAsokSukhumvit(targetStationName);
+    if (record != null) {
+      switch (record.type) {
+        case TransferType.skywalk:
+          return t.transfers.transferSkywalk(
+            targetStationName,
+            record.defaultWalkMinutes,
+          );
+        case TransferType.exit:
+          final exitInfo = record.getExitInfo(fromId, isEnglish);
+          return t.transfers.transferExit(
+            targetStationName,
+            exitInfo,
+            record.defaultWalkMinutes,
+          );
+        case TransferType.platformLevel:
+          final levelInfo = record.getLevelInfo(isEnglish);
+          return t.transfers.transferPlatformLevel(
+            levelInfo,
+            record.defaultWalkMinutes,
+          );
+        case TransferType.walk:
+          return t.transfers.transferGenericWalk(
+            targetStationName,
+            record.defaultWalkMinutes,
+          );
+      }
     }
 
-    // Si Lom (MRT_BL26) <-> Sala Daeng (BTS_S2)
-    if ((stationId == TransitConstants.kStationMrtSilomBl26 &&
-            toId == TransitConstants.kStationBtsSaladaengS2) ||
-        (stationId == TransitConstants.kStationBtsSaladaengS2 &&
-            toId == TransitConstants.kStationMrtSilomBl26)) {
-      final exitNum = stationId == TransitConstants.kStationMrtSilomBl26
-          ? '2'
-          : '4';
-      return t.transfers.transferSilomSaladaeng(targetStationName, exitNum);
-    }
-
-    // Chatuchak Park (MRT_BL13) <-> Mo Chit (BTS_N8)
-    if ((stationId == TransitConstants.kStationMrtChatuchakBl13 &&
-            toId == TransitConstants.kStationBtsMochitN8) ||
-        (stationId == TransitConstants.kStationBtsMochitN8 &&
-            toId == TransitConstants.kStationMrtChatuchakBl13)) {
-      final exits = stationId == TransitConstants.kStationMrtChatuchakBl13
-          ? (localeCode == 'th' ? '1 หรือ 2' : '1 or 2')
-          : (localeCode == 'th' ? '1 หรือ 3' : '1 or 3');
-      return t.transfers.transferMoChitChatuchak(targetStationName, exits);
-    }
-
-    // Lat Phrao (Blue <-> Yellow)
-    if (stationId == TransitConstants.kStationMrtLatphraoBl15 ||
-        stationId == TransitConstants.kStationMrtLatphraoYl01) {
-      return toLine == TransitConstants.kMrtYellow
-          ? t.transfers.transferLatphraoYellow
-          : t.transfers.transferLatphraoBlue;
-    }
-
-    // Phaya Thai (BTS <-> ARL)
-    if (stationId == TransitConstants.kStationBtsPhayathaiN2 ||
-        stationId == TransitConstants.kStationArlPhayathaiA8) {
-      return t.transfers.transferPhayathai;
-    }
-
-    // Makkasan (ARL) <-> Phetchaburi (MRT)
-    if ((stationId == TransitConstants.kStationArlMakkasanA6 &&
-            toId == TransitConstants.kStationMrtPhetchaburiBl21) ||
-        (stationId == TransitConstants.kStationMrtPhetchaburiBl21 &&
-            toId == TransitConstants.kStationArlMakkasanA6)) {
-      return t.transfers.transferMakkasanPhetchaburi(targetStationName);
-    }
-
-    // Samrong (BTS <-> Yellow)
-    if (stationId == TransitConstants.kStationBtsSamrongE15 ||
-        stationId == TransitConstants.kStationMrtSamrongYl23) {
-      return t.transfers.transferSamrong;
-    }
-
-    // Hua Mak (ARL <-> Yellow)
-    if (stationId == TransitConstants.kStationArlHuamakA4 ||
-        stationId == TransitConstants.kStationMrtHuamakYl11) {
-      return t.transfers.transferHuamak;
-    }
-
-    // Case 4: Default Walk
+    // Case 4: Default Walk Fallback
     return t.transfers.interchangeWalk(transfer.walkingMinutes.toInt());
   }
 }

@@ -60,6 +60,10 @@ class EnglishCommon implements BaseCommon {
   String get download => 'Download';
   @override
   String get genericError => 'Error occurred';
+  @override
+  String get viewDetails => 'Details >';
+  @override
+  String minutesFormat(int mins) => '~$mins min';
 }
 
 class EnglishNavigation implements BaseNavigation {
@@ -387,6 +391,18 @@ class EnglishTransfers implements BaseTransfers {
   @override
   String interchangeLevels(int time) =>
       'Transfer platforms (different levels) · Walk ~$time min';
+  @override
+  String transferSkywalk(String targetStation, int walkMins) =>
+      'Walk via skywalk connection to $targetStation Station · Walk ~$walkMins min';
+  @override
+  String transferExit(String targetStation, String exitInfo, int walkMins) =>
+      'Take Exit $exitInfo to connect to $targetStation Station · Walk ~$walkMins min';
+  @override
+  String transferPlatformLevel(String levelInfo, int walkMins) =>
+      'Transfer platforms ($levelInfo) · Walk ~$walkMins min';
+  @override
+  String transferGenericWalk(String targetStation, int walkMins) =>
+      'Walk to connect to $targetStation Station · Walk ~$walkMins min';
 }
 
 class EnglishProximity implements BaseProximity {
@@ -716,4 +732,10 @@ class EnglishUtility implements BaseUtility {
   @override
   String get reportDelayDesc =>
       'Share delay and platform crowding info to help other passengers.';
+  @override
+  String get fullClosure => 'Full Closure';
+  @override
+  String get partialClosure => 'Partial Closure';
+  @override
+  String get minorDelay => 'Minor Delay';
 }
