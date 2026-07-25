@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../models/route_result.dart';
 import '../../models/custom_location.dart';
 import '../../core/constants/transit_constants.dart';
+import '../../core/constants/interchange_registry.dart';
 
 import '../../providers/providers.dart';
 import '../search/search_view_model.dart';
@@ -181,14 +182,14 @@ class RouteResultSheet extends ConsumerWidget {
                     for (final tr in result.transfers) {
                       if (tr.toStation.id == firstSeg.fromStation.id) {
                         children.add(
-                          _buildTransferIndicator(
-                            context,
-                            tr,
-                            firstSeg,
-                            firstSeg,
-                            theme,
-                            t,
-                            localeCode,
+                          _buildTransferInstructionCard(
+                            context: context,
+                            transfer: tr,
+                            prevSegment: firstSeg,
+                            nextSegment: firstSeg,
+                            theme: theme,
+                            t: t,
+                            localeCode: localeCode,
                           ),
                         );
                         break;
@@ -214,14 +215,14 @@ class RouteResultSheet extends ConsumerWidget {
                     final matchingTransfer = transferMap[segment.toStation.id];
                     if (matchingTransfer != null) {
                       children.add(
-                        _buildTransferIndicator(
-                          context,
-                          matchingTransfer,
-                          segment,
-                          nextSegment,
-                          theme,
-                          t,
-                          localeCode,
+                        _buildTransferInstructionCard(
+                          context: context,
+                          transfer: matchingTransfer,
+                          prevSegment: segment,
+                          nextSegment: nextSegment,
+                          theme: theme,
+                          t: t,
+                          localeCode: localeCode,
                         ),
                       );
                     }

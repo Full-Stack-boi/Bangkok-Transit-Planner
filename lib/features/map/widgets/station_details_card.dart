@@ -28,11 +28,15 @@ class StationDetailsCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final t = ref.watch(translationProvider);
+    final t = ref.watch(translationsProvider);
     final theme = Theme.of(context);
     final transitRepo = ref.watch(transitRepositoryProvider);
     final scheduleService = ref.watch(scheduleServiceProvider);
     final crowdService = ref.watch(crowdServiceProvider);
+    final disruptionState = ref.watch(disruptionProvider);
+    final activeDisruption = disruptionState.getDisruptionForStation(
+      station.id,
+    );
 
     final lineColor = TransitColors.getLineColor(station.lineId);
     final crowdInfo = crowdService.getCrowdInfo(station.id);
@@ -62,16 +66,6 @@ class StationDetailsCard extends ConsumerWidget {
 
       return getPriority(a.lineId).compareTo(getPriority(b.lineId));
     });
-
-    final activeDisruptionMatches = transitRepo.disruptions.where(
-      (d) =>
-          d.isActive &&
-          (d.affectedLineIds.contains(station.lineId) ||
-              d.affectedStationIds.contains(station.id)),
-    );
-    final activeDisruption = activeDisruptionMatches.isNotEmpty
-        ? activeDisruptionMatches.first
-        : null;
 
     final String trainStatusText;
     if (minutesUntilNext == null) {
@@ -196,7 +190,9 @@ class StationDetailsCard extends ConsumerWidget {
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          '⚠️ ${activeDisruption.displayName(isEnglish: localeCode == 'en')}',
+                          localeCode == 'th'
+                              ? '⚠️ ${activeDisruption.titleTh}'
+                              : '⚠️ ${activeDisruption.titleEn}',
                           style: TextStyle(
                             color: Colors.amber.shade800,
                             fontWeight: FontWeight.bold,

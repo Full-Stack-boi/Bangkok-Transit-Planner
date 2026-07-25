@@ -60,6 +60,22 @@ class TransitConstants {
   static const double kPeakTransferWaitMinutes = 3.0;
   static const double kOffPeakTransferWaitMinutes = 5.0;
 
+  // Graph Routing & Physical Constants
+  static const double kDefaultEdgeWeight = 2.0;
+  static const double kDefaultTransferWalkMinutes = 5.0;
+  static const double kDisruptedPenaltyWeight = 9999.0;
+  static const int kDefaultDelayMinutes = 10;
+  static const double kMetersPerDegreeLat = 111320.0;
+  static const double kBangkokCosLat = 0.97;
+  static const double kTrainSpeedMpm = 583.0;
+  static const double kDwellTimeMinutes = 0.5;
+  static const double kCandidateSearchRadiusMeters = 700.0;
+  static const double kOverpassSearchRadiusMeters = 800.0;
+  static const double kCrossPlatformThresholdMeters = 10.0;
+  static const double kBaseTransferWaitMinutes = 2.0;
+  static const double kOsrmDetourThresholdMeters = 150.0;
+  static const double kOsrmMaxDetourMeters = 600.0;
+
   // GPS Passive Crowd Detection
   static const double stationProximityMeters = 200.0;
   static const Duration crowdReportExpiry = Duration(minutes: 15);

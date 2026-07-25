@@ -14,6 +14,8 @@ import '../utility/route_calculating_overlay.dart';
 import 'favorites_view_model.dart';
 import '../../core/constants/translation_helper.dart';
 import '../../repositories/transit_repository.dart';
+import '../../widgets/shared/crowd_level_badge.dart';
+import '../../widgets/shared/station_badge.dart';
 
 /// Favorites screen showing favorite stations and saved routes with language localization
 class FavoritesScreen extends ConsumerStatefulWidget {

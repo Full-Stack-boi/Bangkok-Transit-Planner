@@ -50,7 +50,7 @@ class TransitGraph {
     String fromId,
     String toId,
     String lineId, {
-    double weight = 2.0,
+    double weight = TransitConstants.kDefaultEdgeWeight,
   }) {
     _adjacency.putIfAbsent(fromId, () => []);
     _adjacency.putIfAbsent(toId, () => []);
@@ -67,7 +67,7 @@ class TransitGraph {
   void addTransferEdge(
     String fromId,
     String toId, {
-    double walkingMinutes = 5.0,
+    double walkingMinutes = TransitConstants.kDefaultTransferWalkMinutes,
   }) {
     _adjacency.putIfAbsent(fromId, () => []);
     _adjacency.putIfAbsent(toId, () => []);
@@ -184,15 +184,18 @@ class TransitGraph {
 
             if (disruption != null) {
               if (disruption.isFullClosure || disruption.isPartialClosure) {
-                dijkstraCost += 9999.0; // Force pathfinding to detour
+                dijkstraCost += TransitConstants
+                    .kDisruptedPenaltyWeight; // Force pathfinding to detour
               } else if (disruption.isMinorDelay) {
-                final delay = (disruption.estimatedDelayMinutes ?? 10)
-                    .toDouble();
+                final delay =
+                    (disruption.estimatedDelayMinutes ??
+                            TransitConstants.kDefaultDelayMinutes)
+                        .toDouble();
                 dijkstraCost += delay;
                 actualWeight += delay;
               }
             } else if (isSegDisrupted) {
-              dijkstraCost += 9999.0;
+              dijkstraCost += TransitConstants.kDisruptedPenaltyWeight;
             }
           }
         }

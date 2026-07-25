@@ -18,6 +18,7 @@ import 'package:latlong2/latlong.dart';
 import '../models/custom_location.dart';
 import '../models/searchable_item.dart';
 import '../models/namtang_stop.dart';
+import '../core/constants/transit_constants.dart';
 import 'package:bkk_transit_planner/core/utils/logger.dart';
 
 /// Repository for loading and accessing static transit data
@@ -261,14 +262,18 @@ class TransitRepository {
         // Simple distance math (fast) instead of Geolocator.distanceBetween (slow/isolate-dependent)
         // 1 deg lat ~= 111km, 1 deg lon ~= 111km * cos(lat)
         // This is accurate enough for "nearest station" detection.
-        final dLatM = (stop.lat - closest.lat) * 111320.0;
+        final dLatM =
+            (stop.lat - closest.lat) * TransitConstants.kMetersPerDegreeLat;
         final dLonM =
             (stop.lng - closest.lng) *
-            111320.0 *
-            0.97; // cos(13.7 deg) approx 0.97
+            TransitConstants.kMetersPerDegreeLat *
+            TransitConstants.kBangkokCosLat; // cos(13.7 deg) approx 0.97
         final dist = math.sqrt(dLatM * dLatM + dLonM * dLonM);
 
-        final walkMin = (dist / 80.0).clamp(1.0, 30.0);
+        final walkMin = (dist / TransitConstants.kWalkingSpeedMpm).clamp(
+          TransitConstants.kMinWalkMinutes,
+          TransitConstants.kMaxWalkMinutes,
+        );
         return stop.copyWith(
           nearestStationId: closest.id,
           walkingMinutes: walkMin,
@@ -299,7 +304,9 @@ class TransitRepository {
             s2.lng,
           );
           // Average transit speed ~35 km/h -> ~583 m/min. Add 0.5 min for dwell time.
-          final weight = (dist / 583.0) + 0.5;
+          final weight =
+              (dist / TransitConstants.kTrainSpeedMpm) +
+              TransitConstants.kDwellTimeMinutes;
           _graph!.addEdge(
             line.stationIds[i],
             line.stationIds[i + 1],
@@ -320,7 +327,9 @@ class TransitRepository {
             s2.lat,
             s2.lng,
           );
-          final weight = (dist / 583.0) + 0.5;
+          final weight =
+              (dist / TransitConstants.kTrainSpeedMpm) +
+              TransitConstants.kDwellTimeMinutes;
           _graph!.addEdge(
             line.stationIds.last,
             line.stationIds.first,
@@ -345,11 +354,13 @@ class TransitRepository {
           // Base wait time of 2.0 mins + walking time (80 meters/min)
           // If distance is 0 (e.g. cross-platform transfer like Siam), walking time is 0.
           // Minimum transfer time is clamped to 1.0 minute for realism.
-          double walkMin = (dist / 80.0) + 2.0;
+          double walkMin =
+              (dist / TransitConstants.kWalkingSpeedMpm) +
+              TransitConstants.kBaseTransferWaitMinutes;
 
           // Special case: Exact same coordinates (cross-platform transfer)
-          if (dist < 10) {
-            walkMin = 1.0;
+          if (dist < TransitConstants.kCrossPlatformThresholdMeters) {
+            walkMin = TransitConstants.kMinWalkMinutes;
           }
 
           _graph!.addTransferEdge(

@@ -27,8 +27,24 @@ class SegmentCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final transitRepo = ref.watch(transitRepositoryProvider);
-    final crowdRepo = ref.watch(crowdRepositoryProvider);
+    final crowdService = ref.watch(crowdServiceProvider);
+    final scheduleService = ref.watch(scheduleServiceProvider);
     final lineColor = TransitColors.getLineColor(segment.lineId);
+
+    final crowdInfo = crowdService.getCrowdInfo(segment.fromStation.id);
+    final minutesUntilNext = scheduleService.getMinutesUntilNextTrain(
+      segment.lineId,
+    );
+
+    final String trainStatusText;
+    if (minutesUntilNext == null) {
+      trainStatusText = t.routeResult.serviceEnded;
+    } else if (minutesUntilNext == 0) {
+      trainStatusText = t.routeResult.trainArriving;
+    } else {
+      trainStatusText =
+          '${t.routeResult.nextTrain}: ~$minutesUntilNext ${t.common.minutesUnit}';
+    }
 
     // Get display name for line
     final lineObj = transitRepo.getLine(segment.lineId);
@@ -36,14 +52,11 @@ class SegmentCard extends ConsumerWidget {
         ? (localeCode == 'th' ? lineObj.nameTh : lineObj.nameEn)
         : segment.lineId;
 
-    // Get direction station name
-    final dirStation = transitRepo.getStation(segment.directionStationId);
-    final displayDirection = dirStation != null
-        ? (localeCode == 'th' ? dirStation.nameTh : dirStation.nameEn)
-        : segment.directionStationId;
-
-    final fromStation = transitRepo.getStation(segment.fromStationId);
-    final toStation = transitRepo.getStation(segment.toStationId);
+    final displayDirection = t.directions.getDirectionLabel(
+      segment.lineId,
+      segment.boundIndex,
+      segment.direction,
+    );
 
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 6),

@@ -1076,9 +1076,10 @@ class RouteCalculator {
         );
 
         final straightDist = Geolocator.distanceBetween(fLat, fLng, tLat, tLng);
-        if (straightDist < 150.0) {
+        if (straightDist < TransitConstants.kOsrmDetourThresholdMeters) {
           path = [LatLng(fLat, fLng), LatLng(tLat, tLng)];
-        } else if (straightDist < 600.0 && path.isNotEmpty) {
+        } else if (straightDist < TransitConstants.kOsrmMaxDetourMeters &&
+            path.isNotEmpty) {
           double pathDist = 0.0;
           for (int idx = 0; idx < path.length - 1; idx++) {
             pathDist += Geolocator.distanceBetween(
