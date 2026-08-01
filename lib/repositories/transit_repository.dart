@@ -345,22 +345,31 @@ class TransitRepository {
       for (final interchangeId in station.interchange) {
         final target = getStation(interchangeId);
         if (target != null) {
-          final dist = Geolocator.distanceBetween(
-            station.lat,
-            station.lng,
-            target.lat,
-            target.lng,
+          // 1. Try station-specific estimated walk time first
+          final specificWalk = TransitConstants.getInterchangeWalkMinutes(
+            station.id,
+            interchangeId,
           );
-          // Base wait time of 2.0 mins + walking time (80 meters/min)
-          // If distance is 0 (e.g. cross-platform transfer like Siam), walking time is 0.
-          // Minimum transfer time is clamped to 1.0 minute for realism.
-          double walkMin =
-              (dist / TransitConstants.kWalkingSpeedMpm) +
-              TransitConstants.kBaseTransferWaitMinutes;
 
-          // Special case: Exact same coordinates (cross-platform transfer)
-          if (dist < TransitConstants.kCrossPlatformThresholdMeters) {
-            walkMin = TransitConstants.kMinWalkMinutes;
+          double walkMin;
+          if (specificWalk != null) {
+            walkMin = specificWalk;
+          } else {
+            // 2. Fall back to distance-based formula
+            final dist = Geolocator.distanceBetween(
+              station.lat,
+              station.lng,
+              target.lat,
+              target.lng,
+            );
+            walkMin =
+                (dist / TransitConstants.kWalkingSpeedMpm) +
+                TransitConstants.kBaseTransferWaitMinutes;
+
+            // Special case: Exact same coordinates (cross-platform transfer)
+            if (dist < TransitConstants.kCrossPlatformThresholdMeters) {
+              walkMin = TransitConstants.kMinWalkMinutes;
+            }
           }
 
           _graph!.addTransferEdge(

@@ -27,8 +27,7 @@ class SegmentCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    if (segment.lineId == 'WALK' ||
-        segment.lineId == TransitConstants.kWalkLineId) {
+    if (segment.lineId == TransitConstants.kWalkLineId) {
       return _buildWalkSegmentCard(context, ref);
     }
 
@@ -99,7 +98,7 @@ class SegmentCard extends ConsumerWidget {
             ),
             const SizedBox(height: 12),
             _buildStationDot(
-              station: segment.fromStation,
+              station: segment.fromStation as Station,
               color: lineColor,
               isFirst: true,
             ),
@@ -156,7 +155,7 @@ class SegmentCard extends ConsumerWidget {
                 ),
               ),
             _buildStationDot(
-              station: segment.toStation,
+              station: segment.toStation as Station,
               color: lineColor,
               isFirst: false,
             ),
@@ -362,12 +361,12 @@ class SegmentCard extends ConsumerWidget {
   }
 
   Widget _buildStationDot({
-    required dynamic station,
+    required Station station,
     required Color color,
     required bool isFirst,
   }) {
-    final name = localeCode == 'th' ? station.nameTh : station.nameEn;
-    final subName = localeCode == 'th' ? station.nameEn : station.nameTh;
+    final name = station.localizedName(localeCode);
+    final subName = station.subName(localeCode);
 
     return Row(
       children: [

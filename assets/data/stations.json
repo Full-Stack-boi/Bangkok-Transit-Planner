@@ -217,7 +217,9 @@
     "line_id": "BTS_SUKHUMVIT",
     "lat": 13.8164145649644,
     "lng": 100.561961084604,
-    "interchange": ["MRT_BL14"],
+    "interchange": [
+      "MRT_BL14"
+    ],
     "exit_info": {
       "bound_0": "ไปคูคต",
       "bound_1": "ไปเคหะฯ"
@@ -231,7 +233,9 @@
     "line_id": "BTS_SUKHUMVIT",
     "lat": 13.802386877821885,
     "lng": 100.55372863742627,
-    "interchange": ["MRT_BL13"],
+    "interchange": [
+      "MRT_BL13"
+    ],
     "exit_info": {
       "bound_0": "ไปคูคต",
       "bound_1": "ไปเคหะฯ"
@@ -301,7 +305,9 @@
     "line_id": "BTS_SUKHUMVIT",
     "lat": 13.756910704970037,
     "lng": 100.5338157484245,
-    "interchange": ["ARL_A8"],
+    "interchange": [
+      "ARL_A8"
+    ],
     "exit_info": {
       "bound_0": "ไปคูคต",
       "bound_1": "ไปเคหะฯ"
@@ -329,7 +335,9 @@
     "line_id": "BTS_SUKHUMVIT",
     "lat": 13.745608079660181,
     "lng": 100.53420190547386,
-    "interchange": ["BTS_CEN_SILOM"],
+    "interchange": [
+      "BTS_CEN_SILOM"
+    ],
     "exit_info": {
       "bound_0": "ไปคูคต",
       "bound_1": "ไปเคหะฯ"
@@ -385,7 +393,9 @@
     "line_id": "BTS_SUKHUMVIT",
     "lat": 13.737060368134365,
     "lng": 100.5603259474249,
-    "interchange": ["MRT_BL22"],
+    "interchange": [
+      "MRT_BL22"
+    ],
     "exit_info": {
       "bound_0": "ไปคูคต",
       "bound_1": "ไปเคหะฯ"
@@ -539,7 +549,9 @@
     "line_id": "BTS_SUKHUMVIT",
     "lat": 13.646175284292461,
     "lng": 100.59564352557456,
-    "interchange": ["MRT_YL23"],
+    "interchange": [
+      "MRT_YL23"
+    ],
     "exit_info": {
       "bound_0": "ไปคูคต",
       "bound_1": "ไปเคหะฯ"
@@ -679,7 +691,9 @@
     "line_id": "BTS_SILOM",
     "lat": 13.745608079660181,
     "lng": 100.53420190547386,
-    "interchange": ["BTS_CEN"],
+    "interchange": [
+      "BTS_CEN"
+    ],
     "exit_info": {
       "bound_0": "ไปสนามกีฬาแห่งชาติ",
       "bound_1": "ไปบางหว้า"
@@ -707,7 +721,9 @@
     "line_id": "BTS_SILOM",
     "lat": 13.72852833338344,
     "lng": 100.53434444774771,
-    "interchange": ["MRT_BL26"],
+    "interchange": [
+      "MRT_BL26"
+    ],
     "exit_info": {
       "bound_0": "ไปสนามกีฬาแห่งชาติ",
       "bound_1": "ไปบางหว้า"
@@ -777,7 +793,9 @@
     "line_id": "BTS_SILOM",
     "lat": 13.720901703441616,
     "lng": 100.50261293124643,
-    "interchange": ["BTS_G1"],
+    "interchange": [
+      "BTS_G1"
+    ],
     "exit_info": {
       "bound_0": "ไปสนามกีฬาแห่งชาติ",
       "bound_1": "ไปบางหว้า"
@@ -861,7 +879,9 @@
     "line_id": "BTS_GOLD",
     "lat": 13.720901703441616,
     "lng": 100.50261293124643,
-    "interchange": ["BTS_S7"],
+    "interchange": [
+      "BTS_S7"
+    ],
     "exit_info": {
       "bound_0": "ไปกรุงธนบุรี",
       "bound_1": "ไปคลองสาน"
@@ -1029,7 +1049,9 @@
     "line_id": "MRT_BLUE",
     "lat": 13.80612994914501,
     "lng": 100.53079784013575,
-    "interchange": ["MRT_PP16"],
+    "interchange": [
+      "MRT_PP16"
+    ],
     "exit_info": {
       "bound_0": "วงกลม (ตามเข็ม)",
       "bound_1": "วงกลม (ทวนเข็ม)"
@@ -1043,7 +1065,9 @@
     "line_id": "MRT_BLUE",
     "lat": 13.802980633284573,
     "lng": 100.53913704799047,
-    "interchange": ["SRT_RN00"],
+    "interchange": [
+      "SRT_RN00"
+    ],
     "exit_info": {
       "bound_0": "วงกลม (ตามเข็ม)",
       "bound_1": "วงกลม (ทวนเข็ม)"
@@ -1071,7 +1095,9 @@
     "line_id": "MRT_BLUE",
     "lat": 13.802765780123295,
     "lng": 100.55374975777596,
-    "interchange": ["BTS_N8"],
+    "interchange": [
+      "BTS_N8"
+    ],
     "exit_info": {
       "bound_0": "วงกลม (ตามเข็ม)",
       "bound_1": "วงกลม (ทวนเข็ม)"
@@ -1085,7 +1111,9 @@
     "line_id": "MRT_BLUE",
     "lat": 13.81315174006896,
     "lng": 100.56090243174354,
-    "interchange": ["BTS_N9"],
+    "interchange": [
+      "BTS_N9"
+    ],
     "exit_info": {
       "bound_0": "วงกลม (ตามเข็ม)",
       "bound_1": "วงกลม (ทวนเข็ม)"
@@ -1099,7 +1127,9 @@
     "line_id": "MRT_BLUE",
     "lat": 13.80645406488398,
     "lng": 100.57291228208642,
-    "interchange": ["MRT_YL01"],
+    "interchange": [
+      "MRT_YL01"
+    ],
     "exit_info": {
       "bound_0": "วงกลม (ตามเข็ม)",
       "bound_1": "วงกลม (ทวนเข็ม)"
@@ -1183,7 +1213,9 @@
     "line_id": "MRT_BLUE",
     "lat": 13.749330410827774,
     "lng": 100.56348938507715,
-    "interchange": ["ARL_A6"],
+    "interchange": [
+      "ARL_A6"
+    ],
     "exit_info": {
       "bound_0": "วงกลม (ตามเข็ม)",
       "bound_1": "วงกลม (ทวนเข็ม)"
@@ -1197,7 +1229,9 @@
     "line_id": "MRT_BLUE",
     "lat": 13.737667585785157,
     "lng": 100.56146914988385,
-    "interchange": ["BTS_E4"],
+    "interchange": [
+      "BTS_E4"
+    ],
     "exit_info": {
       "bound_0": "วงกลม (ตามเข็ม)",
       "bound_1": "วงกลม (ทวนเข็ม)"
@@ -1253,7 +1287,9 @@
     "line_id": "MRT_BLUE",
     "lat": 13.729364088500606,
     "lng": 100.53735221272413,
-    "interchange": ["BTS_S2"],
+    "interchange": [
+      "BTS_S2"
+    ],
     "exit_info": {
       "bound_0": "วงกลม (ตามเข็ม)",
       "bound_1": "วงกลม (ทวนเข็ม)"
@@ -1365,7 +1401,9 @@
     "line_id": "MRT_BLUE",
     "lat": 13.720766616303294,
     "lng": 100.45783572591478,
-    "interchange": ["BTS_S12"],
+    "interchange": [
+      "BTS_S12"
+    ],
     "exit_info": {
       "bound_0": "วงกลม (ตามเข็ม)",
       "bound_1": "วงกลม (ทวนเข็ม)"
@@ -1575,7 +1613,9 @@
     "line_id": "MRT_PURPLE",
     "lat": 13.860188545828612,
     "lng": 100.51299446229038,
-    "interchange": ["MRT_PK01"],
+    "interchange": [
+      "MRT_PK01"
+    ],
     "exit_info": {
       "bound_0": "ไปคลองบางไผ่",
       "bound_1": "ไปเตาปูน"
@@ -1631,7 +1671,9 @@
     "line_id": "MRT_PURPLE",
     "lat": 13.820054230209303,
     "lng": 100.53242664295837,
-    "interchange": ["SRT_RW01"],
+    "interchange": [
+      "SRT_RW01"
+    ],
     "exit_info": {
       "bound_0": "ไปคลองบางไผ่",
       "bound_1": "ไปเตาปูน"
@@ -1645,7 +1687,9 @@
     "line_id": "MRT_PURPLE",
     "lat": 13.80612994914501,
     "lng": 100.53079784013575,
-    "interchange": ["MRT_BL10"],
+    "interchange": [
+      "MRT_BL10"
+    ],
     "exit_info": {
       "bound_0": "ไปคลองบางไผ่",
       "bound_1": "ไปเตาปูน"
@@ -1659,7 +1703,9 @@
     "line_id": "MRT_YELLOW",
     "lat": 13.806661656443467,
     "lng": 100.57486429703907,
-    "interchange": ["MRT_BL15"],
+    "interchange": [
+      "MRT_BL15"
+    ],
     "exit_info": {
       "bound_0": "ไปลาดพร้าว",
       "bound_1": "ไปสำโรง"
@@ -1809,7 +1855,9 @@
     "line_id": "MRT_YELLOW",
     "lat": 13.736554778696716,
     "lng": 100.64144168509715,
-    "interchange": ["ARL_A4"],
+    "interchange": [
+      "ARL_A4"
+    ],
     "exit_info": {
       "bound_0": "ไปลาดพร้าว",
       "bound_1": "ไปสำโรง"
@@ -1987,7 +2035,9 @@
     "line_id": "MRT_YELLOW",
     "lat": 13.646175284292461,
     "lng": 100.59564352557456,
-    "interchange": ["BTS_E15"],
+    "interchange": [
+      "BTS_E15"
+    ],
     "exit_info": {
       "bound_0": "ไปลาดพร้าว",
       "bound_1": "ไปสำโรง"
@@ -2001,7 +2051,9 @@
     "line_id": "ARL",
     "lat": 13.756910704970037,
     "lng": 100.5338157484245,
-    "interchange": ["BTS_N2"],
+    "interchange": [
+      "BTS_N2"
+    ],
     "exit_info": {
       "bound_0": "ไปสุวรรณภูมิ",
       "bound_1": "ไปพญาไท"
@@ -2029,7 +2081,9 @@
     "line_id": "ARL",
     "lat": 13.750833163678905,
     "lng": 100.56122519248193,
-    "interchange": ["MRT_BL21"],
+    "interchange": [
+      "MRT_BL21"
+    ],
     "exit_info": {
       "bound_0": "ไปสุวรรณภูมิ",
       "bound_1": "ไปพญาไท"
@@ -2057,7 +2111,9 @@
     "line_id": "ARL",
     "lat": 13.737923964923223,
     "lng": 100.64482273430833,
-    "interchange": ["MRT_YL11"],
+    "interchange": [
+      "MRT_YL11"
+    ],
     "exit_info": {
       "bound_0": "ไปสุวรรณภูมิ",
       "bound_1": "ไปพญาไท"
@@ -2112,9 +2168,11 @@
     "name_th": "กรุงเทพอภิวัฒน์",
     "name_en": "Krung Thep Aphiwat",
     "line_id": "SRT_RED_NORTH",
-    "lat": 13.802028,
-    "lng": 100.543056,
-    "interchange": ["MRT_BL11"],
+    "lat": 13.8046961672143,
+    "lng": 100.541766732931,
+    "interchange": [
+      "MRT_BL11"
+    ],
     "exit_info": {
       "bound_0": "ไปรังสิต",
       "bound_1": "ไปกรุงเทพอภิวัฒน์"
@@ -2126,8 +2184,8 @@
     "name_th": "จตุจักร",
     "name_en": "Chatuchak",
     "line_id": "SRT_RED_NORTH",
-    "lat": 13.818694,
-    "lng": 100.550139,
+    "lat": 13.8262376132103,
+    "lng": 100.54946064949,
     "interchange": [],
     "exit_info": {
       "bound_0": "ไปรังสิต",
@@ -2140,8 +2198,8 @@
     "name_th": "วัดเสมียนนารี",
     "name_en": "Wat Samian Nari",
     "line_id": "SRT_RED_NORTH",
-    "lat": 13.8415,
-    "lng": 100.5574,
+    "lat": 13.8417116871433,
+    "lng": 100.557650774717,
     "interchange": [],
     "exit_info": {
       "bound_0": "ไปรังสิต",
@@ -2154,8 +2212,8 @@
     "name_th": "บางเขน",
     "name_en": "Bang Khen",
     "line_id": "SRT_RED_NORTH",
-    "lat": 13.849306,
-    "lng": 100.56175,
+    "lat": 13.849454197578138,
+    "lng": 100.56174516677856,
     "interchange": [],
     "exit_info": {
       "bound_0": "ไปรังสิต",
@@ -2168,8 +2226,8 @@
     "name_th": "ทุ่งสองห้อง",
     "name_en": "Thung Song Hong",
     "line_id": "SRT_RED_NORTH",
-    "lat": 13.860056,
-    "lng": 100.567472,
+    "lat": 13.8601026578644,
+    "lng": 100.567475706339,
     "interchange": [],
     "exit_info": {
       "bound_0": "ไปรังสิต",
@@ -2182,9 +2240,11 @@
     "name_th": "หลักสี่",
     "name_en": "Lak Si",
     "line_id": "SRT_RED_NORTH",
-    "lat": 13.884348,
-    "lng": 100.580793,
-    "interchange": ["MRT_PK14"],
+    "lat": 13.8863480240497,
+    "lng": 100.581841617823,
+    "interchange": [
+      "MRT_PK14"
+    ],
     "exit_info": {
       "bound_0": "ไปรังสิต",
       "bound_1": "ไปกรุงเทพอภิวัฒน์"
@@ -2196,8 +2256,8 @@
     "name_th": "การเคหะฯ",
     "name_en": "Kan Kheha",
     "line_id": "SRT_RED_NORTH",
-    "lat": 13.898656,
-    "lng": 100.588872,
+    "lat": 13.8984463482845,
+    "lng": 100.588769763708,
     "interchange": [],
     "exit_info": {
       "bound_0": "ไปรังสิต",
@@ -2210,8 +2270,8 @@
     "name_th": "ดอนเมือง",
     "name_en": "Don Mueang",
     "line_id": "SRT_RED_NORTH",
-    "lat": 13.919727,
-    "lng": 100.601072,
+    "lat": 13.9147773672768,
+    "lng": 100.597914755344,
     "interchange": [],
     "exit_info": {
       "bound_0": "ไปรังสิต",
@@ -2224,8 +2284,8 @@
     "name_th": "หลักหก",
     "name_en": "Lak Hok",
     "line_id": "SRT_RED_NORTH",
-    "lat": 13.965556,
-    "lng": 100.605278,
+    "lat": 13.9658334,
+    "lng": 100.6053409,
     "interchange": [],
     "exit_info": {
       "bound_0": "ไปรังสิต",
@@ -2238,8 +2298,8 @@
     "name_th": "รังสิต",
     "name_en": "Rangsit",
     "line_id": "SRT_RED_NORTH",
-    "lat": 13.989694,
-    "lng": 100.602194,
+    "lat": 13.9905124207755,
+    "lng": 100.602196902037,
     "interchange": [],
     "exit_info": {
       "bound_0": "ไปรังสิต",
@@ -2252,9 +2312,11 @@
     "name_th": "บางซ่อน",
     "name_en": "Bang Son",
     "line_id": "SRT_RED_WEST",
-    "lat": 13.822133,
-    "lng": 100.534213,
-    "interchange": ["MRT_PP15"],
+    "lat": 13.8221159683554,
+    "lng": 100.534240454435,
+    "interchange": [
+      "MRT_PP15"
+    ],
     "exit_info": {
       "bound_0": "ไปตลิ่งชัน",
       "bound_1": "ไปกรุงเทพอภิวัฒน์"
@@ -2266,8 +2328,8 @@
     "name_th": "บางบำหรุ",
     "name_en": "Bang Bamru",
     "line_id": "SRT_RED_WEST",
-    "lat": 13.7918,
-    "lng": 100.4776,
+    "lat": 13.7921826958138,
+    "lng": 100.477441996336,
     "interchange": [],
     "exit_info": {
       "bound_0": "ไปตลิ่งชัน",
@@ -2280,8 +2342,8 @@
     "name_th": "ตลิ่งชัน",
     "name_en": "Taling Chan",
     "line_id": "SRT_RED_WEST",
-    "lat": 13.788261,
-    "lng": 100.4412,
+    "lat": 13.789244381265998,
+    "lng": 100.44008418917656,
     "interchange": [],
     "exit_info": {
       "bound_0": "ไปตลิ่งชัน",
@@ -2294,9 +2356,11 @@
     "name_th": "ศูนย์ราชการนนทบุรี",
     "name_en": "Nonthaburi Civic Center",
     "line_id": "MRT_PINK",
-    "lat": 13.85869,
-    "lng": 100.51135,
-    "interchange": ["MRT_PP11"],
+    "lat": 13.860188545828612,
+    "lng": 100.51299446229038,
+    "interchange": [
+      "MRT_PP11"
+    ],
     "exit_info": {
       "bound_0": "ไปมีนบุรี",
       "bound_1": "ไปศูนย์ราชการนนทบุรี"
@@ -2308,8 +2372,8 @@
     "name_th": "แคราย",
     "name_en": "Khae Rai",
     "line_id": "MRT_PINK",
-    "lat": 13.879869,
-    "lng": 100.520899,
+    "lat": 13.8627158701009,
+    "lng": 100.520602762699,
     "interchange": [],
     "exit_info": {
       "bound_0": "ไปมีนบุรี",
@@ -2322,8 +2386,8 @@
     "name_th": "สนามบินน้ำ",
     "name_en": "Sanambin Nam",
     "line_id": "MRT_PINK",
-    "lat": 13.882476,
-    "lng": 100.527913,
+    "lat": 13.8740667913817,
+    "lng": 100.516327321529,
     "interchange": [],
     "exit_info": {
       "bound_0": "ไปมีนบุรี",
@@ -2336,8 +2400,8 @@
     "name_th": "สามัคคี",
     "name_en": "Samakkhi",
     "line_id": "MRT_PINK",
-    "lat": 13.882617,
-    "lng": 100.537752,
+    "lat": 13.8892838101952,
+    "lng": 100.510565936565,
     "interchange": [],
     "exit_info": {
       "bound_0": "ไปมีนบุรี",
@@ -2350,8 +2414,8 @@
     "name_th": "กรมชลประทาน",
     "name_en": "Royal Irrigation Department",
     "line_id": "MRT_PINK",
-    "lat": 13.882148,
-    "lng": 100.546789,
+    "lat": 13.898511440324569,
+    "lng": 100.50709247589111,
     "interchange": [],
     "exit_info": {
       "bound_0": "ไปมีนบุรี",
@@ -2364,8 +2428,8 @@
     "name_th": "แยกปากเกร็ด",
     "name_en": "Yaek Pak Kret",
     "line_id": "MRT_PINK",
-    "lat": 13.884137,
-    "lng": 100.556547,
+    "lat": 13.906293712734822,
+    "lng": 100.50541341304779,
     "interchange": [],
     "exit_info": {
       "bound_0": "ไปมีนบุรี",
@@ -2378,8 +2442,8 @@
     "name_th": "เลี่ยงเมืองปากเกร็ด",
     "name_en": "Pak Kret Bypass",
     "line_id": "MRT_PINK",
-    "lat": 13.886299,
-    "lng": 100.56596,
+    "lat": 13.9065345450271,
+    "lng": 100.5155374109745,
     "interchange": [],
     "exit_info": {
       "bound_0": "ไปมีนบุรี",
@@ -2392,8 +2456,8 @@
     "name_th": "แจ้งวัฒนะ-ปากเกร็ด 28",
     "name_en": "Chaeng Watthana-Pak Kret 28",
     "line_id": "MRT_PINK",
-    "lat": 13.888007,
-    "lng": 100.574802,
+    "lat": 13.904197810312567,
+    "lng": 100.52925020456314,
     "interchange": [],
     "exit_info": {
       "bound_0": "ไปมีนบุรี",
@@ -2406,8 +2470,8 @@
     "name_th": "ศรีรัช",
     "name_en": "Si Rat",
     "line_id": "MRT_PINK",
-    "lat": 13.876697,
-    "lng": 100.569084,
+    "lat": 13.900583961313483,
+    "lng": 100.53998708724976,
     "interchange": [],
     "exit_info": {
       "bound_0": "ไปมีนบุรี",
@@ -2420,8 +2484,8 @@
     "name_th": "เมืองทองธานี",
     "name_en": "Muang Thong Thani",
     "line_id": "MRT_PINK",
-    "lat": 13.868013,
-    "lng": 100.56606,
+    "lat": 13.897446532249862,
+    "lng": 100.5483703315258,
     "interchange": [],
     "exit_info": {
       "bound_0": "ไปมีนบุรี",
@@ -2434,8 +2498,8 @@
     "name_th": "แจ้งวัฒนะ 14",
     "name_en": "Chaeng Watthana 14",
     "line_id": "MRT_PINK",
-    "lat": 13.859283,
-    "lng": 100.557917,
+    "lat": 13.893309226781366,
+    "lng": 100.56009292602539,
     "interchange": [],
     "exit_info": {
       "bound_0": "ไปมีนบุรี",
@@ -2448,8 +2512,8 @@
     "name_th": "ศูนย์ราชการเฉลิมพระเกียรติ",
     "name_en": "Government Complex",
     "line_id": "MRT_PINK",
-    "lat": 13.852088,
-    "lng": 100.553879,
+    "lat": 13.890779679829011,
+    "lng": 100.56730672717094,
     "interchange": [],
     "exit_info": {
       "bound_0": "ไปมีนบุรี",
@@ -2462,8 +2526,8 @@
     "name_th": "โทรคมนาคมแห่งชาติ",
     "name_en": "National Telecom",
     "line_id": "MRT_PINK",
-    "lat": 13.845827,
-    "lng": 100.5532,
+    "lat": 13.887577022864512,
+    "lng": 100.575602799654,
     "interchange": [],
     "exit_info": {
       "bound_0": "ไปมีนบุรี",
@@ -2476,9 +2540,11 @@
     "name_th": "หลักสี่",
     "name_en": "Lak Si",
     "line_id": "MRT_PINK",
-    "lat": 13.884348,
-    "lng": 100.580793,
-    "interchange": ["SRT_RN05"],
+    "lat": 13.884158202806777,
+    "lng": 100.58260336518288,
+    "interchange": [
+      "SRT_RN05"
+    ],
     "exit_info": {
       "bound_0": "ไปมีนบุรี",
       "bound_1": "ไปศูนย์ราชการนนทบุรี"
@@ -2490,8 +2556,8 @@
     "name_th": "ราชภัฏพระนคร",
     "name_en": "Rajabhat Phranakhon",
     "line_id": "MRT_PINK",
-    "lat": 13.835869,
-    "lng": 100.562028,
+    "lat": 13.879921712262163,
+    "lng": 100.58927401900291,
     "interchange": [],
     "exit_info": {
       "bound_0": "ไปมีนบุรี",
@@ -2504,8 +2570,8 @@
     "name_th": "วัดพระศรีมหาธาตุ",
     "name_en": "Wat Phra Sri Mahathat",
     "line_id": "MRT_PINK",
-    "lat": 13.828699,
-    "lng": 100.569037,
+    "lat": 13.874840164986763,
+    "lng": 100.59707522392273,
     "interchange": [],
     "exit_info": {
       "bound_0": "ไปมีนบุรี",
@@ -2518,8 +2584,8 @@
     "name_th": "รามอินทรา 3",
     "name_en": "Ram Inthra 3",
     "line_id": "MRT_PINK",
-    "lat": 13.821869,
-    "lng": 100.57506,
+    "lat": 13.870956345239533,
+    "lng": 100.60255900025368,
     "interchange": [],
     "exit_info": {
       "bound_0": "ไปมีนบุรี",
@@ -2532,8 +2598,8 @@
     "name_th": "ลาดปลาเค้า",
     "name_en": "Lat Pla Khao",
     "line_id": "MRT_PINK",
-    "lat": 13.813983,
-    "lng": 100.579979,
+    "lat": 13.86280571095533,
+    "lng": 100.61775639653206,
     "interchange": [],
     "exit_info": {
       "bound_0": "ไปมีนบุรี",
@@ -2546,8 +2612,8 @@
     "name_th": "รามอินทรา กม.4",
     "name_en": "Ram Inthra Kor Mor 4",
     "line_id": "MRT_PINK",
-    "lat": 13.808379,
-    "lng": 100.58242,
+    "lat": 13.858331854580559,
+    "lng": 100.62605783343315,
     "interchange": [],
     "exit_info": {
       "bound_0": "ไปมีนบุรี",
@@ -2560,8 +2626,8 @@
     "name_th": "มัยลาภ",
     "name_en": "Maiyalap",
     "line_id": "MRT_PINK",
-    "lat": 13.800861,
-    "lng": 100.588531,
+    "lat": 13.854998541184237,
+    "lng": 100.6322430074215,
     "interchange": [],
     "exit_info": {
       "bound_0": "ไปมีนบุรี",
@@ -2574,8 +2640,8 @@
     "name_th": "วัชรพล",
     "name_en": "Vacharaphol",
     "line_id": "MRT_PINK",
-    "lat": 13.849973590449604,
-    "lng": 100.64161140452063,
+    "lat": 13.849265390687453,
+    "lng": 100.6428337097168,
     "interchange": [],
     "exit_info": {
       "bound_0": "ไปมีนบุรี",
@@ -2589,8 +2655,8 @@
     "name_th": "รามอินทรา กม.6",
     "name_en": "Ram Inthra Kor Mor 6",
     "line_id": "MRT_PINK",
-    "lat": 13.845201527735078,
-    "lng": 100.65033318820642,
+    "lat": 13.845207958650015,
+    "lng": 100.65019369125366,
     "interchange": [],
     "exit_info": {
       "bound_0": "ไปมีนบุรี",
@@ -2604,8 +2670,8 @@
     "name_th": "คู้บอน",
     "name_en": "Khu Bon",
     "line_id": "MRT_PINK",
-    "lat": 13.776231,
-    "lng": 100.608788,
+    "lat": 13.840548855956863,
+    "lng": 100.65876334905624,
     "interchange": [],
     "exit_info": {
       "bound_0": "ไปมีนบุรี",
@@ -2618,8 +2684,8 @@
     "name_th": "รามอินทรา กม.9",
     "name_en": "Ram Inthra Kor Mor 9",
     "line_id": "MRT_PINK",
-    "lat": 13.769051,
-    "lng": 100.616568,
+    "lat": 13.833787912663162,
+    "lng": 100.6674537062645,
     "interchange": [],
     "exit_info": {
       "bound_0": "ไปมีนบุรี",
@@ -2632,8 +2698,8 @@
     "name_th": "วงแหวนรามอินทรา",
     "name_en": "Outer Ring Road-Ram Inthra",
     "line_id": "MRT_PINK",
-    "lat": 13.763511,
-    "lng": 100.621904,
+    "lat": 13.824482179076428,
+    "lng": 100.67706674337387,
     "interchange": [],
     "exit_info": {
       "bound_0": "ไปมีนบุรี",
@@ -2646,8 +2712,8 @@
     "name_th": "นพรัตน์",
     "name_en": "Nopparat",
     "line_id": "MRT_PINK",
-    "lat": 13.758591,
-    "lng": 100.628904,
+    "lat": 13.816551306514578,
+    "lng": 100.68549424409866,
     "interchange": [],
     "exit_info": {
       "bound_0": "ไปมีนบุรี",
@@ -2660,8 +2726,8 @@
     "name_th": "บางชัน",
     "name_en": "Bang Chan",
     "line_id": "MRT_PINK",
-    "lat": 13.753031,
-    "lng": 100.636736,
+    "lat": 13.812719908133074,
+    "lng": 100.7027918100357,
     "interchange": [],
     "exit_info": {
       "bound_0": "ไปมีนบุรี",
@@ -2674,8 +2740,8 @@
     "name_th": "เศรษฐบุตรบำเพ็ญ",
     "name_en": "Setthabutbamphen",
     "line_id": "MRT_PINK",
-    "lat": 13.748431,
-    "lng": 100.643104,
+    "lat": 13.812683443127948,
+    "lng": 100.7124799489975,
     "interchange": [],
     "exit_info": {
       "bound_0": "ไปมีนบุรี",
@@ -2688,8 +2754,8 @@
     "name_th": "ตลาดมีนบุรี",
     "name_en": "Min Buri Market",
     "line_id": "MRT_PINK",
-    "lat": 13.745741,
-    "lng": 100.648448,
+    "lat": 13.812514141243762,
+    "lng": 100.72568714618683,
     "interchange": [],
     "exit_info": {
       "bound_0": "ไปมีนบุรี",
@@ -2702,8 +2768,8 @@
     "name_th": "มีนบุรี",
     "name_en": "Min Buri",
     "line_id": "MRT_PINK",
-    "lat": 13.7435,
-    "lng": 100.6528,
+    "lat": 13.808439138019946,
+    "lng": 100.73256030678749,
     "interchange": [],
     "exit_info": {
       "bound_0": "ไปมีนบุรี",
@@ -2716,8 +2782,8 @@
     "name_th": "อิมแพ็ค เมืองทองธานี",
     "name_en": "Impact Muang Thong Thani",
     "line_id": "MRT_PINK_BRANCH",
-    "lat": 13.872097,
-    "lng": 100.553028,
+    "lat": 13.9109007259292,
+    "lng": 100.544325560331,
     "interchange": [],
     "exit_info": {
       "bound_0": "ไปทะเลสาบเมืองทองธานี",
@@ -2730,8 +2796,8 @@
     "name_th": "ทะเลสาบเมืองทองธานี",
     "name_en": "Lake Muang Thong Thani",
     "line_id": "MRT_PINK_BRANCH",
-    "lat": 13.876547,
-    "lng": 100.545928,
+    "lat": 13.918305080465617,
+    "lng": 100.5456505715847,
     "interchange": [],
     "exit_info": {
       "bound_0": "ไปทะเลสาบเมืองทองธานี",

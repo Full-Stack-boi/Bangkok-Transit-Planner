@@ -112,9 +112,9 @@ class ScheduleService {
     int stationCount, {
     bool includeTransfer = false,
   }) {
-    double time = stationCount * TransitConstants.avgTimeBetweenStations;
+    double time = stationCount * TransitConstants.kAvgTimeBetweenStations;
     if (includeTransfer) {
-      time += TransitConstants.transferWalkingTime;
+      time += TransitConstants.kTransferWalkingTime;
     }
     return time;
   }

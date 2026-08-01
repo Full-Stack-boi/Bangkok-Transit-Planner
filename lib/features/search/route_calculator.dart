@@ -832,7 +832,7 @@ class RouteCalculator {
             : [],
         stationCount: stationCount,
         estimatedMinutes:
-            stationCount * TransitConstants.avgTimeBetweenStations,
+            stationCount * TransitConstants.kAvgTimeBetweenStations,
         fareThb: discountedFare,
         standardFareThb: standardFare,
       ),

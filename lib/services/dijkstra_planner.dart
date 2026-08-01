@@ -50,7 +50,7 @@ class TransitGraph {
     String fromId,
     String toId,
     String lineId, {
-    double weight = TransitConstants.kDefaultEdgeWeight,
+    double weight = TransitConstants.kAvgTimeBetweenStations,
   }) {
     _adjacency.putIfAbsent(fromId, () => []);
     _adjacency.putIfAbsent(toId, () => []);
@@ -67,7 +67,7 @@ class TransitGraph {
   void addTransferEdge(
     String fromId,
     String toId, {
-    double walkingMinutes = TransitConstants.kDefaultTransferWalkMinutes,
+    double walkingMinutes = TransitConstants.kTransferWalkingTime,
   }) {
     _adjacency.putIfAbsent(fromId, () => []);
     _adjacency.putIfAbsent(toId, () => []);
