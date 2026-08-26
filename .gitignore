@@ -12,15 +12,11 @@
 .swiftpm/
 migrate_working_dir/
 
-# IntelliJ related
+# IDE & Editors
 *.iml
 *.ipr
 *.iws
 .idea/
-
-# The .vscode folder contains launch configuration and tasks you configure in
-# VS Code which you may wish to be included in version control, so this line
-# is commented out by default.
 #.vscode/
 
 # Flutter/Dart/Pub related
@@ -32,45 +28,45 @@ migrate_working_dir/
 .pub/
 /build/
 /coverage/
+lib/generated_plugin_registrant.dart
 
-# Firebase - Android config
+# Firebase configs
 /android/app/google-services.json
-
-# Firebase - iOS config 
 /ios/Runner/GoogleService-Info.plist
 
 # Generated code (Riverpod, Freezed, JsonSerializable)
 *.g.dart
 *.freezed.dart
 
-# Symbolication related
+# Symbolication & Obfuscation
 app.*.symbols
-
-# Obfuscation related
 app.*.map.json
 
-# Android Studio will place build artifacts here
+# Android build artifacts
 /android/app/debug
 /android/app/profile
 /android/app/release
 
-# Avoid committing generated/ephemeral files for desktop platforms
+# Platform ephemeral & auto-generated plugin registrant files
 /linux/flutter/ephemeral/
+/linux/flutter/generated_plugin_registrant.*
+/linux/flutter/generated_plugins.cmake
 /macos/Flutter/ephemeral/
+/macos/Flutter/GeneratedPluginRegistrant.swift
 /windows/flutter/ephemeral/
+/windows/flutter/generated_plugin_registrant.*
+/windows/flutter/generated_plugins.cmake
 
-# Avoid committing local SQL files
+# Assets & Data files
 /assets/data/*.sql
-
-# Avoid committing large generated binary map bundles
 /assets/map_tiles.bundle
+
+# Environment & Config (use config.example.json as template)
 .vercel
 .env*
-
-# Local compile-time config (use config.example.json as template)
 config.json
 
-# Node/web dependencies
+# Node/Web dependencies
 node_modules/
 
 # Temporary scratch folders

@@ -9,6 +9,7 @@ targets:
         generate_for:
           include:
             - lib/providers/*.dart
+            - lib/core/router/*.dart
             - lib/features/**/*_view_model.dart
       json_serializable:
         options:
