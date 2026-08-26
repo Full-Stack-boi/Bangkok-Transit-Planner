@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'app_colors_extension.dart';
 import 'app_theme_shared.dart';
 
-/// Dark theme builder using shared components decorators
 ThemeData buildDarkTheme() {
   const Color primaryDark = Color(0xFF2DAB9D); // Dusty Sage/Teal
   const Color surfaceDark = Color(0xFF11141A); // Comforting Slate Navy
@@ -16,9 +15,11 @@ ThemeData buildDarkTheme() {
     onSecondary: Colors.black,
     surface: surfaceDark,
     onSurface: Color(0xFFECF0F6), // Soft Cool White
+    onSurfaceVariant: Color(0xFF94A3B8), // Slate 400
     error: Color(0xFFEF4444),
     onError: Colors.white,
     outline: outlineDark,
+    outlineVariant: Color(0xFF1E2638),
   );
 
   return ThemeData(
@@ -29,6 +30,15 @@ ThemeData buildDarkTheme() {
     cardColor: cardDark,
     extensions: const <ThemeExtension<dynamic>>[AppColorsExtension.dark],
     appBarTheme: buildSharedAppBarTheme(scheme),
+    iconTheme: const IconThemeData(
+      color: Color(0xFF94A3B8),
+      size: 24,
+    ),
+    iconButtonTheme: IconButtonThemeData(
+      style: IconButton.styleFrom(
+        foregroundColor: const Color(0xFF94A3B8),
+      ),
+    ),
     navigationBarTheme: buildSharedNavigationBarTheme(scheme, cardDark),
     cardTheme: buildSharedCardTheme(
       scheme,
@@ -41,14 +51,6 @@ ThemeData buildDarkTheme() {
     inputDecorationTheme: buildSharedInputDecorationTheme(
       scheme,
       fillColor: cardDark,
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: outlineDark),
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: outlineDark),
-      ),
     ),
     elevatedButtonTheme: buildSharedElevatedButtonTheme(scheme, isDark: true),
     outlinedButtonTheme: buildSharedOutlinedButtonTheme(

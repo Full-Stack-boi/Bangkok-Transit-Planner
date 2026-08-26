@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../../../core/constants/translation_helper.dart';
 import '../../../models/custom_location.dart';
@@ -29,6 +30,8 @@ class MapOverlayStack extends StatelessWidget {
   final bool isBottomCardVisible;
   final bool isCalculating;
   final bool isTrackingActive;
+  final ValueNotifier<double> currentRotation;
+  final VoidCallback onResetRotation;
   final Station? selectedStation;
   final CustomLocation? selectedLocation;
   final NamtangStop? selectedNamtangStop;
@@ -60,6 +63,8 @@ class MapOverlayStack extends StatelessWidget {
     required this.isBottomCardVisible,
     required this.isCalculating,
     required this.isTrackingActive,
+    required this.currentRotation,
+    required this.onResetRotation,
     required this.selectedStation,
     required this.selectedLocation,
     required this.selectedNamtangStop,
@@ -125,18 +130,47 @@ class MapOverlayStack extends StatelessWidget {
         Positioned(
           right: 16,
           bottom: isBottomCardVisible ? 180 : 24,
-          child: FloatingActionButton.small(
-            heroTag: 'map_gps_fab',
-            onPressed: onCenterOnUser,
-            backgroundColor: theme.colorScheme.surface,
-            foregroundColor: theme.colorScheme.onSurface,
-            child: isLocating
-                ? const SizedBox(
-                    width: 18,
-                    height: 18,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : const Icon(Icons.my_location_rounded),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Compass Button (Always visible above GPS, resets map rotation to North)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 10.0),
+                child: ValueListenableBuilder<double>(
+                  valueListenable: currentRotation,
+                  builder: (context, rotation, _) {
+                    return FloatingActionButton.small(
+                      heroTag: 'map_compass_fab',
+                      onPressed: onResetRotation,
+                      tooltip: t.search.resetNorthTooltip,
+                      backgroundColor: theme.colorScheme.surface,
+                      foregroundColor: theme.colorScheme.onSurface,
+                      elevation: 3,
+                      child: CompassNeedle(
+                        rotation: rotation,
+                        theme: theme,
+                      ),
+                    );
+                  },
+                ),
+              ),
+
+              // GPS / Center on User Button
+              FloatingActionButton.small(
+                heroTag: 'map_gps_fab',
+                onPressed: onCenterOnUser,
+                backgroundColor: theme.colorScheme.surface,
+                foregroundColor: theme.colorScheme.onSurface,
+                elevation: 3,
+                child: isLocating
+                    ? const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Icon(Icons.my_location_rounded),
+              ),
+            ],
           ),
         ),
         Positioned(
@@ -243,5 +277,93 @@ class MapOverlayStack extends StatelessWidget {
           ),
       ],
     );
+  }
+}
+
+class CompassNeedle extends StatelessWidget {
+  final double rotation;
+  final ThemeData theme;
+
+  const CompassNeedle({
+    super.key,
+    required this.rotation,
+    required this.theme,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Transform.rotate(
+      angle: -rotation * (math.pi / 180.0),
+      child: CustomPaint(
+        size: const Size(22, 22),
+        painter: _CompassNeedlePainter(
+          isDark: theme.brightness == Brightness.dark,
+        ),
+      ),
+    );
+  }
+}
+
+class _CompassNeedlePainter extends CustomPainter {
+  final bool isDark;
+
+  _CompassNeedlePainter({required this.isDark});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final cx = size.width / 2;
+    final cy = size.height / 2;
+
+    // North Needle (Red)
+    final northPaint = Paint()..color = const Color(0xFFEF4444);
+    final northPath = Path()
+      ..moveTo(cx, 2)
+      ..lineTo(cx + 4.5, cy)
+      ..lineTo(cx, cy - 2)
+      ..lineTo(cx - 4.5, cy)
+      ..close();
+    canvas.drawPath(northPath, northPaint);
+
+    // North Needle Shading (Slightly darker red on left half)
+    final northShadePaint = Paint()..color = const Color(0xFFDC2626);
+    final northShadePath = Path()
+      ..moveTo(cx, 2)
+      ..lineTo(cx - 4.5, cy)
+      ..lineTo(cx, cy - 2)
+      ..close();
+    canvas.drawPath(northShadePath, northShadePaint);
+
+    // South Needle (Muted Slate)
+    final southPaint = Paint()
+      ..color = isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
+    final southPath = Path()
+      ..moveTo(cx, size.height - 2)
+      ..lineTo(cx + 4.5, cy)
+      ..lineTo(cx, cy + 2)
+      ..lineTo(cx - 4.5, cy)
+      ..close();
+    canvas.drawPath(southPath, southPaint);
+
+    // South Needle Shading (Slightly darker on left half)
+    final southShadePaint = Paint()
+      ..color = isDark ? const Color(0xFF64748B) : const Color(0xFF475569);
+    final southShadePath = Path()
+      ..moveTo(cx, size.height - 2)
+      ..lineTo(cx - 4.5, cy)
+      ..lineTo(cx, cy + 2)
+      ..close();
+    canvas.drawPath(southShadePath, southShadePaint);
+
+    // Center Pivot Ring
+    final pivotPaint = Paint()..color = isDark ? Colors.black : Colors.white;
+    canvas.drawCircle(Offset(cx, cy), 2.5, pivotPaint);
+
+    final pivotCenter = Paint()..color = const Color(0xFFEF4444);
+    canvas.drawCircle(Offset(cx, cy), 1.2, pivotCenter);
+  }
+
+  @override
+  bool shouldRepaint(covariant _CompassNeedlePainter oldDelegate) {
+    return oldDelegate.isDark != isDark;
   }
 }

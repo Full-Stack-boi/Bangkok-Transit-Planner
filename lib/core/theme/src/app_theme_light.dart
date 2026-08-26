@@ -3,7 +3,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'app_colors_extension.dart';
 import 'app_theme_shared.dart';
 
-/// Light theme builder using shared components decorators
 ThemeData buildLightTheme() {
   const Color primaryLight = Color(0xFF4F46E5);
   const Color surfaceLight = Color(0xFFF8FAFC); // Slate 50
@@ -17,9 +16,11 @@ ThemeData buildLightTheme() {
     onSecondary: Colors.white,
     surface: surfaceLight,
     onSurface: Color(0xFF1E293B), // Slate 800
+    onSurfaceVariant: Color(0xFF64748B), // Slate 500
     error: Color(0xFFDC2626),
     onError: Colors.white,
     outline: outlineLight,
+    outlineVariant: Color(0xFFE2E8F0),
   );
 
   return ThemeData(
@@ -30,6 +31,15 @@ ThemeData buildLightTheme() {
     cardColor: cardLight,
     extensions: const <ThemeExtension<dynamic>>[AppColorsExtension.light],
     appBarTheme: buildSharedAppBarTheme(scheme),
+    iconTheme: const IconThemeData(
+      color: Color(0xFF64748B),
+      size: 24,
+    ),
+    iconButtonTheme: IconButtonThemeData(
+      style: IconButton.styleFrom(
+        foregroundColor: const Color(0xFF64748B),
+      ),
+    ),
     navigationBarTheme: buildSharedNavigationBarTheme(scheme, cardLight)
         .copyWith(
           indicatorColor: primaryLight.withValues(alpha: 0.1),
@@ -65,14 +75,6 @@ ThemeData buildLightTheme() {
     inputDecorationTheme: buildSharedInputDecorationTheme(
       scheme,
       fillColor: Colors.white,
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: outlineLight),
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: outlineLight),
-      ),
     ),
     elevatedButtonTheme: buildSharedElevatedButtonTheme(scheme, isDark: false),
     outlinedButtonTheme: buildSharedOutlinedButtonTheme(

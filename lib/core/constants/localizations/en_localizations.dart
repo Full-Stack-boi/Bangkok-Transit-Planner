@@ -143,6 +143,8 @@ class EnglishSearch implements BaseSearch {
   @override
   String get swapTooltip => 'Swap Origin/Destination';
   @override
+  String get resetNorthTooltip => 'Reset North (0°)';
+  @override
   String get fromPrefix => 'From:';
   @override
   String get toPrefix => 'To:';

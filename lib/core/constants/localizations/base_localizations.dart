@@ -73,6 +73,7 @@ abstract class BaseSearch {
 
   String get clearRoute;
   String get swapTooltip;
+  String get resetNorthTooltip;
   String get fromPrefix;
   String get toPrefix;
   String get chooseDest;

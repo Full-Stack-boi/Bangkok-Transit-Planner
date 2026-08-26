@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import '../../../core/router/route_constants.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/transit_colors.dart';
 import '../../../models/station.dart';
@@ -7,8 +9,6 @@ import '../../../widgets/shared/interchange_badges_row.dart';
 import '../../../widgets/shared/station_badge.dart';
 import '../../search/search_view_model.dart';
 
-/// Bottom sheet displaying nearest stations with distances, line badges,
-/// and interchange options, allowing the user to select their departure point.
 class NearestStationsSheet extends ConsumerWidget {
   final List<MapEntry<Station, double>> nearestEntries;
   final double accuracy;
@@ -106,10 +106,9 @@ class NearestStationsSheet extends ConsumerWidget {
                         // 2. Set as origin in Search
                         searchVm.setOrigin(station);
 
-                        // 3. Switch to Map tab (index 1) — search lives inside Map screen
-                        ref.read(homeTabIndexProvider.notifier).setTab(1);
-
                         if (context.mounted) {
+                          // 3. Switch to Map tab (index 1) — search lives inside Map screen
+                          context.go(AppRoute.map);
                           Navigator.pop(context); // Close bottom sheet
 
                           // 4. Show success banner

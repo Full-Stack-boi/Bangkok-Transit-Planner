@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import '../../core/router/route_constants.dart';
 import 'dart:math' as math;
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
@@ -16,7 +18,6 @@ import '../../providers/providers.dart';
 import '../search/search_view_model.dart';
 
 import '../../core/constants/translation_helper.dart';
-import 'widgets/map_search_overlay.dart';
 import 'widgets/map_overlay_stack.dart';
 import 'painters/station_marker_painter.dart';
 import 'painters/custom_map_pin.dart';
@@ -26,7 +27,6 @@ import 'cached_tile_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:bkk_transit_planner/core/utils/logger.dart';
 
-/// Map screen showing an interactive transit map with overlays
 class MapScreen extends ConsumerStatefulWidget {
   const MapScreen({super.key});
 
@@ -44,6 +44,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   bool _isLocating = false;
   bool _isPrefetchExpanded = true;
   final ValueNotifier<double> _currentZoom = ValueNotifier(12.0);
+  final ValueNotifier<double> _currentRotation = ValueNotifier(0.0);
   bool _isOfflineMapInitializing = false;
 
   // Caches for Map Layer Optimization
@@ -180,7 +181,14 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   @override
   void dispose() {
     _mapController.dispose();
+    _currentZoom.dispose();
+    _currentRotation.dispose();
     super.dispose();
+  }
+
+  void _resetRotation() {
+    _mapController.rotate(0.0);
+    _currentRotation.value = 0.0;
   }
 
   void _fitRouteBounds(RouteResult routeResult) {
@@ -963,6 +971,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                           _currentZoom.value = position.zoom;
                         });
                       }
+                      if ((position.rotation - _currentRotation.value).abs() > 0.5) {
+                        _currentRotation.value = position.rotation;
+                      }
                     },
                     onTap: (position, point) {
                       if (_selectedStation != null) {
@@ -1052,6 +1063,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
               isBottomCardVisible: isBottomCardVisible,
               isCalculating: isCalculating,
               isTrackingActive: isTrackingActive,
+              currentRotation: _currentRotation,
+              onResetRotation: _resetRotation,
               selectedStation: _selectedStation,
               selectedLocation: _customSelectedLocation,
               selectedNamtangStop: _selectedNamtangStop,
@@ -1331,16 +1344,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     BuildContext context, {
     bool focusDestination = false,
   }) {
-    Navigator.of(context).push(
-      PageRouteBuilder(
-        pageBuilder: (context, animation, secondaryAnimation) =>
-            MapSearchOverlay(focusDestination: focusDestination),
-        transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          return FadeTransition(opacity: animation, child: child);
-        },
-        transitionDuration: const Duration(milliseconds: 200),
-        reverseTransitionDuration: const Duration(milliseconds: 150),
-      ),
+    context.push(
+      '${AppRoute.mapSearch}?${AppRoute.qFocusDest}=$focusDestination',
     );
   }
 }

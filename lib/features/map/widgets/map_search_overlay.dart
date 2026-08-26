@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../search/search_view_model.dart';
 import '../../../providers/providers.dart';
 import 'search_input_bar.dart';
 import 'search_results_list.dart';
 
-/// Fullscreen search overlay for origin and destination station selection
 class MapSearchOverlay extends ConsumerStatefulWidget {
   final bool focusDestination;
 
@@ -139,7 +139,7 @@ class _MapSearchOverlayState extends ConsumerState<MapSearchOverlay> {
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () => context.pop(),
         ),
         title: Text(t.navigation.searchTitle),
         elevation: 0,
@@ -264,7 +264,7 @@ class _MapSearchOverlayState extends ConsumerState<MapSearchOverlay> {
                     _startEditingDest(nextState);
                   } else {
                     FocusScope.of(context).unfocus();
-                    Navigator.of(context).pop(true);
+                    context.pop(true);
                   }
                   vm.search('');
                 },
@@ -278,7 +278,7 @@ class _MapSearchOverlayState extends ConsumerState<MapSearchOverlay> {
                     _startEditingOrigin(nextState);
                   } else {
                     FocusScope.of(context).unfocus();
-                    Navigator.of(context).pop(true);
+                    context.pop(true);
                   }
                   vm.search('');
                 },

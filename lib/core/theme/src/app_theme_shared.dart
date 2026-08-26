@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-/// Pure, color-scheme-driven builders for shared component styling parameters.
-/// Ensures design consistency and eliminates visual code duplication.
-
 AppBarTheme buildSharedAppBarTheme(ColorScheme scheme) {
   return AppBarTheme(
     backgroundColor: scheme.surface,
@@ -80,28 +77,88 @@ InputDecorationTheme buildSharedInputDecorationTheme(
   InputBorder? border,
   InputBorder? enabledBorder,
 }) {
+  final defaultBorder = OutlineInputBorder(
+    borderRadius: BorderRadius.circular(12),
+    borderSide: BorderSide(
+      color: scheme.outline.withValues(alpha: 0.5),
+      width: 1,
+    ),
+  );
+
   return InputDecorationTheme(
     filled: true,
     fillColor: fillColor ?? scheme.surfaceContainerLowest,
-    border:
-        border ??
-        OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: scheme.outline.withValues(alpha: 0.2)),
-        ),
-    enabledBorder:
-        enabledBorder ??
-        OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: scheme.outline.withValues(alpha: 0.2)),
-        ),
+    hoverColor: scheme.primary.withValues(alpha: 0.04),
+    focusColor: scheme.primary.withValues(alpha: 0.06),
+    border: border ?? defaultBorder,
+    enabledBorder: enabledBorder ?? defaultBorder,
     focusedBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(12),
       borderSide: BorderSide(color: scheme.primary, width: 2),
     ),
+    errorBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(12),
+      borderSide: BorderSide(color: scheme.error, width: 1.5),
+    ),
+    focusedErrorBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(12),
+      borderSide: BorderSide(color: scheme.error, width: 2),
+    ),
     contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-    hintStyle: GoogleFonts.outfit(color: const Color(0xFF64748B)),
-    labelStyle: GoogleFonts.outfit(),
+    hintStyle: GoogleFonts.outfit(
+      color: scheme.onSurfaceVariant.withValues(alpha: 0.6),
+      fontSize: 15,
+    ),
+    labelStyle: GoogleFonts.outfit(
+      color: scheme.onSurfaceVariant,
+      fontSize: 15,
+      fontWeight: FontWeight.w400,
+    ),
+    floatingLabelStyle: WidgetStateTextStyle.resolveWith((states) {
+      if (states.contains(WidgetState.error)) {
+        return GoogleFonts.outfit(
+          color: scheme.error,
+          fontSize: 13,
+          fontWeight: FontWeight.w600,
+        );
+      }
+      if (states.contains(WidgetState.focused)) {
+        return GoogleFonts.outfit(
+          color: scheme.primary,
+          fontSize: 13,
+          fontWeight: FontWeight.w600,
+        );
+      }
+      return GoogleFonts.outfit(
+        color: scheme.onSurfaceVariant,
+        fontSize: 13,
+        fontWeight: FontWeight.w500,
+      );
+    }),
+    errorStyle: GoogleFonts.outfit(
+      color: scheme.error,
+      fontSize: 12,
+      fontWeight: FontWeight.w500,
+    ),
+    prefixIconColor: WidgetStateColor.resolveWith((states) {
+      if (states.contains(WidgetState.error)) {
+        return scheme.error;
+      }
+      if (states.contains(WidgetState.focused)) {
+        return scheme.primary;
+      }
+      return scheme.onSurfaceVariant;
+    }),
+    suffixIconColor: WidgetStateColor.resolveWith((states) {
+      if (states.contains(WidgetState.error)) {
+        return scheme.error;
+      }
+      if (states.contains(WidgetState.focused)) {
+        return scheme.primary;
+      }
+      return scheme.onSurfaceVariant;
+    }),
+    iconColor: scheme.onSurfaceVariant,
   );
 }
 

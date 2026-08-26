@@ -143,6 +143,8 @@ class ThaiSearch implements BaseSearch {
   @override
   String get swapTooltip => 'สลับต้นทาง/ปลายทาง';
   @override
+  String get resetNorthTooltip => 'รีเซ็ตทิศเหนือ (0°)';
+  @override
   String get fromPrefix => 'ต้นทาง:';
   @override
   String get toPrefix => 'ปลายทาง:';
