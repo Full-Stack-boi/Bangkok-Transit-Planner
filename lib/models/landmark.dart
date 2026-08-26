@@ -63,10 +63,9 @@ class AlternativeWalksConverter
   }
 }
 
-/// Landmark model representing a popular attraction/place near transit stations
 @freezed
 abstract class Landmark extends SearchableItem with _$Landmark {
-  const Landmark._(); // Allows custom methods/getters
+  const Landmark._();
 
   const factory Landmark({
     required String id,

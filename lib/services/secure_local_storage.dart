@@ -1,11 +1,7 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-/// Persists the Supabase session in platform-protected storage on native apps.
-///
-/// Android uses a Keystore-backed encrypted store; Apple platforms use Keychain.
-/// Web intentionally uses Supabase's default browser storage because native
-/// platform secure stores are not available there.
+/// Persists Supabase auth session in Keychain / Keystore
 class SecureLocalStorage extends LocalStorage {
   SecureLocalStorage({FlutterSecureStorage? storage})
     : _storage = storage ?? const FlutterSecureStorage();

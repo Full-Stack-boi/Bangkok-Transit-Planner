@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import '../../core/router/route_constants.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import '../../core/theme/app_theme.dart';
@@ -15,7 +17,6 @@ import '../../repositories/transit_repository.dart';
 import '../../widgets/shared/crowd_level_badge.dart';
 import '../../widgets/shared/station_badge.dart';
 
-/// Favorites screen showing favorite stations and saved routes with language localization
 class FavoritesScreen extends ConsumerStatefulWidget {
   const FavoritesScreen({super.key});
 
@@ -266,11 +267,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
                       child: OutlinedButton.icon(
                         onPressed: () {
                           searchVm.setOrigin(station);
-                          ref
-                              .read(homeTabIndexProvider.notifier)
-                              .setTab(
-                                1,
-                              ); // Switch to Map Screen (search is on Map)
+                          context.go(AppRoute.map); // Switch to Map Screen (search is on Map)
                         },
                         icon: const Icon(
                           Icons.trip_origin_rounded,
@@ -288,11 +285,7 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
                       child: OutlinedButton.icon(
                         onPressed: () {
                           searchVm.setDestination(station);
-                          ref
-                              .read(homeTabIndexProvider.notifier)
-                              .setTab(
-                                1,
-                              ); // Switch to Map Screen (search is on Map)
+                          context.go(AppRoute.map); // Switch to Map Screen (search is on Map)
                         },
                         icon: const Icon(
                           Icons.location_on_rounded,
@@ -539,9 +532,9 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
             onTap: () async {
               if (originItem != null && destItem != null) {
                 await searchVm.setRoute(originItem, destItem);
-                ref
-                    .read(homeTabIndexProvider.notifier)
-                    .setTab(1); // Switch to Map Screen
+                if (context.mounted) {
+                  context.go(AppRoute.map); // Switch to Map Screen
+                }
               }
             },
           ),

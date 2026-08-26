@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// Custom theme extension for centralizing app colors to ensure consistency
 class AppColorsExtension extends ThemeExtension<AppColorsExtension> {
   final Color? timeColor;
   final Color? moneyColor;
@@ -18,7 +17,6 @@ class AppColorsExtension extends ThemeExtension<AppColorsExtension> {
     required this.gpsPinColor,
   });
 
-  /// Dark theme palette constant
   static const AppColorsExtension dark = AppColorsExtension(
     timeColor: Color(0xFFFCD34D), // Colors.amber.shade300
     moneyColor: Color(0xFF2DD4BF), // Soft Green/Teal
@@ -28,7 +26,6 @@ class AppColorsExtension extends ThemeExtension<AppColorsExtension> {
     gpsPinColor: Color(0xFF2DD4BF), // Soft Teal
   );
 
-  /// Light theme palette constant
   static const AppColorsExtension light = AppColorsExtension(
     timeColor: Color(0xFFD97706), // Warm Dark Amber/Gold
     moneyColor: Color(0xFF0D9488), // Teal Green

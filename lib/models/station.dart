@@ -6,23 +6,22 @@ import 'station_exit.dart';
 part 'station.freezed.dart';
 part 'station.g.dart';
 
-/// Station model for a transit station
 @freezed
 abstract class Station extends SearchableItem with _$Station {
-  const Station._(); // Allows custom methods/getters
+  const Station._();
 
   const factory Station({
-    required String id, // e.g. "BTS_N1", "MRT_BL01", "ARL_A1"
-    required String code, // e.g. "N1", "BL01", "A1"
-    @JsonKey(name: 'name_th') required String nameTh, // Thai name
-    @JsonKey(name: 'name_en') required String nameEn, // English name
-    @JsonKey(name: 'line_id') required String lineId, // e.g. "BTS_SUKHUMVIT"
+    required String id,
+    required String code,
+    @JsonKey(name: 'name_th') required String nameTh,
+    @JsonKey(name: 'name_en') required String nameEn,
+    @JsonKey(name: 'line_id') required String lineId,
     required double lat,
     required double lng,
-    @Default([]) List<String> interchange, // Other station IDs this connects to
+    @Default([]) List<String> interchange,
     @Default({})
     @JsonKey(name: 'exit_info')
-    Map<String, String> exitInfo, // bound_0, bound_1 direction labels
+    Map<String, String> exitInfo,
   }) = _Station;
 
   factory Station.fromJson(Map<String, dynamic> json) =>

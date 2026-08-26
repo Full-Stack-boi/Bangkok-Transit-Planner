@@ -3,7 +3,6 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'crowd_report.freezed.dart';
 part 'crowd_report.g.dart';
 
-/// Crowd report from a user (active report)
 @freezed
 abstract class CrowdReport with _$CrowdReport {
   const factory CrowdReport({
@@ -19,7 +18,6 @@ abstract class CrowdReport with _$CrowdReport {
       _$CrowdReportFromJson(json);
 }
 
-/// Passive GPS presence detection
 @freezed
 abstract class CrowdPresence with _$CrowdPresence {
   const factory CrowdPresence({
@@ -34,12 +32,11 @@ abstract class CrowdPresence with _$CrowdPresence {
       _$CrowdPresenceFromJson(json);
 }
 
-/// Aggregated crowd level for a station
 enum CrowdLevel {
-  low, // 🟢 โล่ง
-  medium, // 🟡 ปานกลาง
-  high, // 🔴 แน่นมาก
-  unknown, // ไม่มีข้อมูล
+  low,
+  medium,
+  high,
+  unknown,
 }
 
 class StationCrowdInfo {

@@ -4,14 +4,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/providers.dart';
 import 'package:bkk_transit_planner/core/utils/logger.dart';
 
-/// Service to handle local push notifications (e.g. proximity geofence alerts)
 class NotificationService {
   final FlutterLocalNotificationsPlugin _notificationsPlugin =
       FlutterLocalNotificationsPlugin();
   bool _isInitialized = false;
   Ref? _ref;
 
-  /// Initialize notification settings for Android and iOS
   Future<void> initialize(Ref ref) async {
     if (_isInitialized) return;
     _ref = ref;

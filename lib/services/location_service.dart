@@ -8,13 +8,11 @@ import '../models/station.dart';
 import '../providers/location_providers.dart';
 import 'package:bkk_transit_planner/core/utils/logger.dart';
 
-/// Service for handling GPS permissions, user location, and proximity detection
 class LocationService {
   final Ref? _ref;
 
   LocationService([this._ref]);
 
-  /// Request location permissions from the user
   Future<LocationPermissionStatus> requestLocationPermission() async {
     if (kIsWeb) {
       final status = await Geolocator.requestPermission();
@@ -35,7 +33,6 @@ class LocationService {
     return LocationPermissionStatus.denied;
   }
 
-  /// Check if location permission is granted
   Future<bool> isLocationPermissionGranted() async {
     if (kIsWeb) {
       final status = await Geolocator.checkPermission();
@@ -45,20 +42,17 @@ class LocationService {
     return await Permission.location.isGranted;
   }
 
-  /// Request notification permission (Android 13+)
   Future<bool> requestNotificationPermission() async {
     if (kIsWeb) return false;
     final status = await Permission.notification.request();
     return status.isGranted;
   }
 
-  /// Open Android/iOS App settings screen directly
   Future<bool> openSettings() async {
     if (kIsWeb) return false;
     return await openAppSettings();
   }
 
-  /// Get user's current position (returns null if disabled or denied)
   Future<Position?> getCurrentPosition() async {
     try {
       // Check if simulation mode is active in debug mode
@@ -134,7 +128,6 @@ class LocationService {
     }
   }
 
-  /// Calculate distance in meters between two points
   double calculateDistance(
     double startLat,
     double startLng,
@@ -144,7 +137,6 @@ class LocationService {
     return Geolocator.distanceBetween(startLat, startLng, endLat, endLng);
   }
 
-  /// Find the closest station within a threshold (e.g. 200 meters)
   Station? findNearbyStation(
     Position position,
     List<Station> stations, {

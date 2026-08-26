@@ -1,9 +1,10 @@
 import 'dart:convert';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../services/supabase_service.dart';
-import 'package:bkk_transit_planner/core/utils/logger.dart';
 
-/// Repository for managing user favorite stations and saved routes
+import 'package:bkk_transit_planner/core/utils/logger.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../services/supabase_service.dart';
+
 class FavoritesRepository {
   final SupabaseService _supabaseService;
   SharedPreferences? _prefs;
@@ -14,17 +15,12 @@ class FavoritesRepository {
   static const _favoritesKeyPrefix = 'favorite_station_ids_v2';
   static const _routesKeyPrefix = 'saved_routes_v2';
 
-  /// Keeps local data separate for every signed-in account.
-  ///
-  /// The anonymous scope supports favorites used before a user signs in, while
-  /// preventing one user's cached data from being read or uploaded for another.
   String get _storageScope =>
       _supabaseService.client?.auth.currentUser?.id ?? 'anonymous';
 
   String get _favoritesKey => '${_favoritesKeyPrefix}_$_storageScope';
   String get _routesKey => '${_routesKeyPrefix}_$_storageScope';
 
-  /// Initialize SharedPreferences
   Future<void> initialize() async {
     if (_initialized) return;
     _prefs = await SharedPreferences.getInstance();
@@ -32,13 +28,10 @@ class FavoritesRepository {
   }
 
   // Favorite Stations
-
-  /// Get list of favorite station IDs
   List<String> getFavoriteStationIds() {
     return _prefs?.getStringList(_favoritesKey) ?? [];
   }
 
-  /// Toggle favorite status of a station (returns true if now favorited, false if removed)
   Future<bool> toggleFavoriteStation(String stationId) async {
     await initialize();
     final list = getFavoriteStationIds();
@@ -79,14 +72,11 @@ class FavoritesRepository {
     return !isFav;
   }
 
-  /// Check if a station is favorited
   bool isFavoriteStation(String stationId) {
     return getFavoriteStationIds().contains(stationId);
   }
 
   // Saved Routes
-
-  /// Get list of saved routes as maps
   List<Map<String, String>> getSavedRoutes() {
     final list = _prefs?.getStringList(_routesKey) ?? [];
     return list.map((item) {
@@ -95,7 +85,6 @@ class FavoritesRepository {
     }).toList();
   }
 
-  /// Save a route
   Future<void> saveRoute({
     required String originId,
     required String destinationId,
@@ -154,7 +143,6 @@ class FavoritesRepository {
     }
   }
 
-  /// Delete a saved route
   Future<void> deleteRoute(String originId, String destinationId) async {
     await initialize();
     final list = getSavedRoutes();
@@ -187,7 +175,6 @@ class FavoritesRepository {
     }
   }
 
-  /// Check if a route is saved
   bool isRouteSaved(String originId, String destinationId) {
     return getSavedRoutes().any(
       (item) =>
@@ -196,11 +183,6 @@ class FavoritesRepository {
     );
   }
 
-  /// Refreshes the current user's local cache from Supabase.
-  ///
-  /// Mutations are synced immediately by save/delete/toggle methods. At login,
-  /// Supabase is the source of truth so a stale device cache cannot recreate a
-  /// route or favorite deleted from another device or account.
   Future<void> syncOfflineDataWithSupabase() async {
     await initialize();
     if (!_supabaseService.isInitialized) return;

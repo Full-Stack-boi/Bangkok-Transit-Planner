@@ -3,18 +3,15 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:bkk_transit_planner/core/utils/logger.dart';
 import 'secure_local_storage.dart';
 
-/// Service for managing Supabase integration and offline fallback
 class SupabaseService {
   bool _isInitialized = false;
 
   bool get isInitialized => _isInitialized;
 
-  /// Initialize Supabase with try-catch wrapper to avoid crashes if offline or credentials are wrong
   Future<void> initialize() async {
     if (_isInitialized) return;
 
     try {
-      // In production, these would be loaded from environment config
       const envUrl = String.fromEnvironment('SUPABASE_URL');
       const envKey = String.fromEnvironment('SUPABASE_ANON_KEY');
 
@@ -25,7 +22,6 @@ class SupabaseService {
           ? envKey
           : 'REDACTED_SUPABASE_ANON_KEY';
 
-      // Simple validation to ensure non-empty strings before initializing
       if (supabaseUrl.isNotEmpty &&
           supabaseAnonKey.isNotEmpty &&
           !supabaseUrl.contains('PLACEHOLDER')) {

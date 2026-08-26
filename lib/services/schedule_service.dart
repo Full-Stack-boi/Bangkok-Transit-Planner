@@ -1,8 +1,6 @@
 import '../core/constants/transit_constants.dart';
 
-/// Service for calculating next train arrival times
 class ScheduleService {
-  /// Operating hours per line: {lineId: {weekday: {first, last}, weekend: {first, last}}}
   static const Map<String, Map<String, Map<String, String>>> _operatingHours = {
     'BTS_SUKHUMVIT': {
       'weekday': {'first': '05:15', 'last': '00:00'},

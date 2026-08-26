@@ -15,7 +15,6 @@ import 'widgets/accuracy_warning_card.dart';
 import 'widgets/segment_card.dart';
 import 'widgets/fare_breakdown.dart';
 
-/// Bottom sheet showing detailed route result with dynamic localization
 class RouteResultSheet extends ConsumerWidget {
   const RouteResultSheet({super.key});
 

@@ -1,8 +1,6 @@
 import '../models/crowd_report.dart';
 
-/// Service for calculating station crowd levels and passenger counts
 class CrowdService {
-  /// Check if a station is a major interchange hub
   bool _isInterchangeHub(String stationId) {
     final majorHubs = {
       'BTS_CEN', // Siam (Sukhumvit)

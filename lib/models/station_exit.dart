@@ -3,7 +3,6 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'station_exit.freezed.dart';
 part 'station_exit.g.dart';
 
-/// Represents a physical entrance/exit of a transit station
 @freezed
 abstract class StationExit with _$StationExit {
   const factory StationExit({

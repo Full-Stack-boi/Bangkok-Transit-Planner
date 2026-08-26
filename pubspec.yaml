@@ -12,43 +12,43 @@ dependencies:
   flutter_localizations:
     sdk: flutter
 
-  # Required by GlobalCupertinoLocalizations.delegate in app.dart
+  # UI & Icons
   cupertino_icons: ^1.0.8
+  google_fonts: ^8.1.0
+  animations: ^2.0.11
 
-  # State Management (MVVM glue)
+  # State Management
   flutter_riverpod: ^3.1.0
   riverpod_annotation: ^4.0.0
 
-  # Backend + Auth
+  # Navigation & Routing
+  go_router: ^18.0.0
+
+  # Backend & Auth
   supabase_flutter: ^2.9.0
   flutter_secure_storage: ^10.3.1
+  google_sign_in: ^7.2.0
 
-
-
-  # Map
+  # Map & Location
   flutter_map: ^8.3.0
   latlong2: ^0.10.1
-
-  # Location (GPS passive crowd)
   geolocator: ^14.0.3
   permission_handler: ^12.0.3
 
-  # Google Auth
-  google_sign_in: ^7.2.0
+  # Notifications & Live Activities
+  flutter_local_notifications: ^22.0.0
+  live_activities: ^2.5.1
 
-  # Utilities
+  # Utilities & Storage
   intl: ^0.20.2
   shared_preferences: ^2.5.3
   path_provider: ^2.1.2
   http: ^1.2.0
   archive: ^4.0.2
-  # Models
+
+  # Models & Serialization
   freezed_annotation: ^3.0.0
   json_annotation: ^4.9.0
-  flutter_local_notifications: ^22.0.0
-  live_activities: ^2.4.9
-  google_fonts: ^8.1.0
-  animations: ^2.0.11
 
 dev_dependencies:
   flutter_test:

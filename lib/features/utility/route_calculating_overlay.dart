@@ -2,8 +2,6 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../../core/constants/translation_helper.dart';
 
-/// A premium, glassmorphic loading overlay displayed during route calculations.
-/// Shows a beautiful shimmering skeleton layout representing route segment calculation.
 class RouteCalculatingOverlay extends StatelessWidget {
   final ThemeData theme;
   final AppLocalizations t;
@@ -156,7 +154,6 @@ class RouteCalculatingOverlay extends StatelessWidget {
   }
 }
 
-/// A lightweight, state-of-the-art shimmering placeholder widget that does not rely on third-party packages.
 class ShimmerPlaceholder extends StatefulWidget {
   final double width;
   final double height;

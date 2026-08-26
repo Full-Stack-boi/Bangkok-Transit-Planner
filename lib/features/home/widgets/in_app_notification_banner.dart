@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 
-/// In-app notification banner component.
 class InAppNotificationBanner extends StatefulWidget {
   final String title;
   final String body;

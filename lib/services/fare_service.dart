@@ -1,6 +1,3 @@
-/// Fare calculation service with real fare tables
-/// NOTE: Fares are hardcoded based on 2025/2026 rates
-/// Stored here for easy updates — consider moving to assets/data/fares.json
 class FareService {
   // BTS Fare Table (Zone-based)
   // Number of stations traveled → fare in THB

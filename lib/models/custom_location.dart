@@ -5,10 +5,9 @@ import 'searchable_item.dart';
 part 'custom_location.freezed.dart';
 part 'custom_location.g.dart';
 
-/// Represents a custom coordinate or place from the map pin, GPS, or online search
 @freezed
 abstract class CustomLocation extends SearchableItem with _$CustomLocation {
-  const CustomLocation._(); // Allows custom methods/getters
+  const CustomLocation._();
 
   const factory CustomLocation({
     required String id,

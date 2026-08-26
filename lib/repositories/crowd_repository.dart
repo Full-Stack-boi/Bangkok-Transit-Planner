@@ -1,13 +1,11 @@
 import '../services/supabase_service.dart';
 import 'package:bkk_transit_planner/core/utils/logger.dart';
 
-/// Repository for handling crowd reports and presence signals
 class CrowdRepository {
   final SupabaseService _supabaseService;
 
   CrowdRepository(this._supabaseService);
 
-  /// Report passive GPS presence at a station
   Future<void> reportPresence({
     required String stationId,
     required double accuracy,
@@ -36,7 +34,6 @@ class CrowdRepository {
     }
   }
 
-  /// Submit manual active crowd report
   Future<void> submitCrowdReport({
     required String stationId,
     required int level, // 1-5

@@ -13,8 +13,6 @@ import 'package:flutter/services.dart' show rootBundle;
 import '../../models/station.dart';
 import 'package:bkk_transit_planner/core/utils/logger.dart';
 
-/// Custom tile provider that caches map tiles locally on disk and uses
-/// HTTP Headers (ETag / Last-Modified) to check for updates asynchronously.
 class CachedTileProvider extends TileProvider {
   CachedTileProvider();
 
@@ -24,7 +22,6 @@ class CachedTileProvider extends TileProvider {
   static const String _bundleVersion = '2026-06-21-v3';
   static final Set<String> _looseTilePaths = {};
 
-  /// Get the local cache directory path for map tiles
   static Future<String> getCachePath() async {
     if (kIsWeb) return '';
     if (_resolvedCachePath != null) return _resolvedCachePath!;
@@ -91,9 +88,6 @@ class CachedTileProvider extends TileProvider {
     return _resolvedCachePath!;
   }
 
-  /// Generates a stable and readable folder name from a URL template.
-  /// Using String.hashCode is unstable for persistent storage because it can
-  /// change across runs, compilations, or platform environments.
   static String getFolderHash(String urlTemplate) {
     if (urlTemplate.contains('dark_all')) {
       return 'dark_all';
@@ -112,7 +106,6 @@ class CachedTileProvider extends TileProvider {
     }
   }
 
-  /// Copies the map tiles bundle binary asset directly to the local disk cache
   static Future<void> copyBundleAsset(
     String assetPath,
     String targetPath,
@@ -274,16 +267,11 @@ class CachedTileProvider extends TileProvider {
         .floor();
   }
 
-  /// Prefetch map tiles for the Bangkok transit network in the background.
-  /// Loops through all stations and downloads tiles for zoom levels 12 to 15 (with surrounding padding).
-  /// Result codes for tile prefetching
   static const int _tileSuccess = 0;
   static const int _tileUnmodified = 1;
   static const int _tileErrorHttp = 2;
   static const int _tileErrorNetwork = 3;
 
-  /// Prefetch map tiles for the Bangkok transit network in the background.
-  /// Loops through all stations and downloads tiles for zoom levels 12 to 15 (with surrounding padding).
   static Future<void> prefetchBangkokTiles(
     List<Station> stations, {
     void Function(int total)? onStart,
@@ -593,7 +581,6 @@ class _Semaphore {
 
 final _bgSemaphore = _Semaphore(4);
 
-/// Custom ImageProvider to handle tile caching and background revalidation
 class CachedTileImageProvider extends ImageProvider<CachedTileImageProvider> {
   final String url;
   final File tileFile;
@@ -1035,7 +1022,6 @@ final Uint8List _kTransparentImageBytes = Uint8List.fromList([
   0x82,
 ]);
 
-/// Manages random access reads from the compressed binary bundle `map_tiles.bundle`
 class MapBundleManager {
   static final MapBundleManager instance = MapBundleManager._();
   MapBundleManager._();

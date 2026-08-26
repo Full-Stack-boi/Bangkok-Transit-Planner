@@ -21,7 +21,6 @@ import '../models/namtang_stop.dart';
 import '../core/constants/transit_constants.dart';
 import 'package:bkk_transit_planner/core/utils/logger.dart';
 
-/// Repository for loading and accessing static transit data
 class TransitRepository {
   final http.Client _httpClient;
   late final OsrmService _osrmService;
@@ -382,18 +381,15 @@ class TransitRepository {
     }
   }
 
-  /// Search stations by query (Thai/English name or code)
   List<Station> searchStations(String query) {
     if (_graph == null) return [];
     return _graph!.searchStations(query);
   }
 
-  /// Get a station by ID
   Station? getStation(String id) {
     return _stationCache[id] ?? _graph?.getStation(id);
   }
 
-  /// Get a line by ID
   TransitLine? getLine(String lineId) {
     if (_lineCache.containsKey(lineId)) return _lineCache[lineId];
     if (_lines == null) return null;
@@ -406,7 +402,6 @@ class TransitRepository {
     return null;
   }
 
-  /// Get all stations on a line
   List<Station> getStationsOnLine(String lineId) {
     if (_lineStationsCache.containsKey(lineId)) {
       return _lineStationsCache[lineId]!;
@@ -421,7 +416,6 @@ class TransitRepository {
     return list;
   }
 
-  /// Find shortest path between two stations
   DijkstraResult? findRoute(
     String fromId,
     String toId, {
@@ -436,7 +430,6 @@ class TransitRepository {
     );
   }
 
-  /// Search stations and local landmarks by query
   List<SearchableItem> searchLocalPlaces(String query) {
     if (query.isEmpty) return [];
     final q = query.toLowerCase().replaceAll(RegExp(r'\s+'), '');

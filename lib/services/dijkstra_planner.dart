@@ -3,12 +3,11 @@ import '../models/station.dart';
 import '../providers/disruption_provider.dart';
 import '../core/constants/transit_constants.dart';
 
-/// Edge in the transit graph
 class GraphEdge {
   final String fromId;
   final String toId;
   final String lineId;
-  final double weight; // travel time in minutes
+  final double weight;
 
   const GraphEdge({
     required this.fromId,
@@ -18,7 +17,6 @@ class GraphEdge {
   });
 }
 
-/// Node with distance for Dijkstra priority queue
 class _DijkstraNode implements Comparable<_DijkstraNode> {
   final String stationId;
   final double distance;
@@ -29,23 +27,19 @@ class _DijkstraNode implements Comparable<_DijkstraNode> {
   int compareTo(_DijkstraNode other) => distance.compareTo(other.distance);
 }
 
-/// Transit graph for all Bangkok rail stations
 class TransitGraph {
   static final _whitespaceRegex = RegExp(r'\s+');
 
   final Map<String, Station> _stations = {};
   final Map<String, List<GraphEdge>> _adjacency = {};
 
-  /// All stations in the graph
   Map<String, Station> get stations => Map.unmodifiable(_stations);
 
-  /// Add a station to the graph
   void addStation(Station station) {
     _stations[station.id] = station;
     _adjacency.putIfAbsent(station.id, () => []);
   }
 
-  /// Add a bidirectional edge (same-line connection)
   void addEdge(
     String fromId,
     String toId,
@@ -63,7 +57,6 @@ class TransitGraph {
     );
   }
 
-  /// Add a transfer edge between interchange stations (walking between platforms)
   void addTransferEdge(
     String fromId,
     String toId, {
@@ -90,18 +83,14 @@ class TransitGraph {
     );
   }
 
-  /// Get all edges from a station
   List<GraphEdge> getEdges(String stationId) {
     return _adjacency[stationId] ?? [];
   }
 
-  /// Get a station by ID
   Station? getStation(String stationId) {
     return _stations[stationId];
   }
 
-  /// Find shortest path using Dijkstra's algorithm
-  /// Returns list of (stationId, lineId) pairs representing the path
   DijkstraResult? findShortestPath(
     String fromId,
     String toId, {
@@ -258,7 +247,6 @@ class TransitGraph {
     );
   }
 
-  /// Search stations by name (Thai or English)
   List<Station> searchStations(String query) {
     if (query.isEmpty) return [];
     final q = query.toLowerCase().replaceAll(_whitespaceRegex, '');
@@ -285,10 +273,9 @@ class TransitGraph {
   }
 }
 
-/// A step in the Dijkstra path result
 class PathStep {
   final String stationId;
-  final String lineId; // Line used to reach this station ('' for origin)
+  final String lineId;
   final double edgeWeight;
 
   const PathStep({
@@ -298,24 +285,20 @@ class PathStep {
   });
 }
 
-/// Result of Dijkstra shortest path
 class DijkstraResult {
   final List<PathStep> path;
   final double totalWeight;
 
   const DijkstraResult({required this.path, required this.totalWeight});
 
-  /// Number of stations in the path
   int get stationCount => path.length;
 
-  /// Get list of unique line IDs used (excluding TRANSFER)
   List<String> get lineIds => path
       .map((s) => s.lineId)
       .where((id) => id.isNotEmpty && id != 'TRANSFER')
       .toSet()
       .toList();
 
-  /// Number of transfers
   int get transferCount {
     int count = 0;
     for (int i = 1; i < path.length; i++) {

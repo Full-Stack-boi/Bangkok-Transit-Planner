@@ -4,7 +4,6 @@ import '../../providers/providers.dart';
 
 part 'favorites_view_model.g.dart';
 
-/// State for the favorites screen
 class FavoritesState {
   final List<Station> favoriteStations;
   final List<Map<String, String>> savedRoutes;
@@ -25,7 +24,6 @@ class FavoritesState {
   }
 }
 
-/// ViewModel for managing favorites and saved routes
 @riverpod
 class FavoritesViewModel extends _$FavoritesViewModel {
   @override
@@ -51,19 +49,16 @@ class FavoritesViewModel extends _$FavoritesViewModel {
     );
   }
 
-  /// Reload favorites and saved routes from repository
   void refresh() {
     state = _getFavoritesState();
   }
 
-  /// Toggle favorite station
   Future<void> toggleFavoriteStation(String stationId) async {
     final repo = ref.read(favoritesRepositoryProvider);
     await repo.toggleFavoriteStation(stationId);
     refresh();
   }
 
-  /// Save a new route
   Future<void> saveRoute({
     required String originId,
     required String destinationId,
@@ -90,7 +85,6 @@ class FavoritesViewModel extends _$FavoritesViewModel {
     refresh();
   }
 
-  /// Delete a saved route
   Future<void> deleteRoute(String originId, String destinationId) async {
     final repo = ref.read(favoritesRepositoryProvider);
     await repo.deleteRoute(originId, destinationId);

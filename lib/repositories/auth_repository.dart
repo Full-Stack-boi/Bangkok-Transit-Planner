@@ -3,7 +3,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../services/supabase_service.dart';
 import 'package:bkk_transit_planner/core/utils/logger.dart';
 
-/// Repository for handling all Authentication actions via Supabase Auth & Google Sign-In
 class AuthRepository {
   final SupabaseService _supabaseService;
 
@@ -11,10 +10,8 @@ class AuthRepository {
 
   SupabaseClient? get _client => _supabaseService.client;
 
-  /// Current user in the active Supabase session
   User? get currentUser => _client?.auth.currentUser;
 
-  /// Stream of authentication state changes
   Stream<AuthState> get onAuthStateChanged {
     if (_client == null) {
       return const Stream.empty();
@@ -22,7 +19,6 @@ class AuthRepository {
     return _client!.auth.onAuthStateChange;
   }
 
-  /// Sign up a new user using Email & Password, storing metadata like display_name
   Future<AuthResponse> signUp({
     required String email,
     required String password,
@@ -46,7 +42,6 @@ class AuthRepository {
     }
   }
 
-  /// Sign in an existing user with Email & Password
   Future<AuthResponse> signIn({
     required String email,
     required String password,
@@ -68,7 +63,6 @@ class AuthRepository {
     }
   }
 
-  /// Sign in natively using Google SDK and pass ID token to Supabase
   Future<AuthResponse?> signInWithGoogle() async {
     final client = _client;
     if (client == null) {
@@ -113,7 +107,6 @@ class AuthRepository {
     }
   }
 
-  /// Sign out the current user session
   Future<void> signOut() async {
     final client = _client;
     if (client == null) return;
@@ -128,9 +121,6 @@ class AuthRepository {
       return;
     }
 
-    // Google account cleanup is only relevant to users who signed in with
-    // Google. A failure here must not turn a successful Supabase logout into
-    // an application error (for example, on platforms without Google Sign-In).
     if (isGoogleSession) {
       try {
         await GoogleSignIn.instance.signOut();
@@ -142,7 +132,6 @@ class AuthRepository {
     }
   }
 
-  /// Fetch user profile details from the custom public.profiles table
   Future<Map<String, dynamic>?> getUserProfile(String userId) async {
     final client = _client;
     if (client == null) return null;
@@ -160,7 +149,6 @@ class AuthRepository {
     }
   }
 
-  /// Update the authenticated user's card preferences in Supabase userMetadata
   Future<void> updateUserCards({
     required String btsCardType,
     required String mrtCardType,

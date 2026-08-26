@@ -8,7 +8,6 @@ import 'package:bkk_transit_planner/core/utils/logger.dart';
 
 part 'search_view_model.g.dart';
 
-/// State for search feature
 class SearchState {
   final String query;
   final List<SearchableItem> searchResults;
@@ -69,8 +68,6 @@ class SearchState {
   }
 }
 
-/// ViewModel for search feature — orchestrates search, place resolution, and route calculation.
-/// Heavy logic is delegated to [PlaceResolver] and [RouteCalculator].
 @Riverpod(keepAlive: true)
 class SearchViewModel extends _$SearchViewModel {
   bool _mounted = true;
@@ -89,9 +86,6 @@ class SearchViewModel extends _$SearchViewModel {
     return const SearchState();
   }
 
-  //  Search
-
-  /// Search stations and landmarks by query, querying online places if needed
   Future<void> search(String query) async {
     state = state.copyWith(query: query, clearError: true);
 

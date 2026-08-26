@@ -4,15 +4,11 @@ import 'package:bkk_transit_planner/models/custom_location.dart';
 import 'package:bkk_transit_planner/repositories/transit_repository.dart';
 import 'package:bkk_transit_planner/core/utils/logger.dart';
 
-/// Resolves online place results (CustomLocation) to local landmarks
-/// or deep-resolved entrances via Overpass + OSRM.
 class PlaceResolver {
   final TransitRepository _repo;
 
   PlaceResolver(this._repo);
 
-  /// Resolve a SearchableItem — match to local landmark if possible,
-  /// otherwise deep-resolve via Overpass + OSRM.
   Future<SearchableItem> resolve(SearchableItem item) async {
     if (item is! CustomLocation) return item;
 

@@ -15,7 +15,6 @@ import '../../services/walking_route_service.dart';
 import '../../core/constants/transit_constants.dart';
 import 'package:bkk_transit_planner/core/utils/logger.dart';
 
-/// Card state snapshot passed to RouteCalculator to avoid Riverpod dependency.
 class CardStateSnapshot {
   final String btsCardType;
   final String mrtCardType;
@@ -30,7 +29,6 @@ class CardStateSnapshot {
   });
 }
 
-/// Translation strings needed by RouteCalculator.
 class RouteTranslations {
   final String walkToStation;
   final String walkToDestination;
@@ -47,7 +45,6 @@ class RouteTranslations {
   });
 }
 
-/// Result of a route calculation — contains recommended and optional saver route.
 class CalculationResult {
   final RouteResult recommended;
   final RouteResult? saver;
@@ -56,12 +53,6 @@ class CalculationResult {
   const CalculationResult({required this.recommended, this.saver, this.error});
 }
 
-/// Encapsulates all route calculation logic extracted from SearchViewModel:
-/// - Dijkstra path finding
-/// - Fare calculation
-/// - Walk segment building
-/// - Saver route search
-/// - Walking path hydration
 class RouteCalculator {
   final TransitRepository _repo;
   final FareService _fareService;
@@ -69,11 +60,6 @@ class RouteCalculator {
 
   RouteCalculator(this._repo, this._fareService, this._httpClient);
 
-  //  Public API
-
-  /// Calculate routes between origin and destination.
-  /// Returns [CalculationResult] with recommended + optional saver route,
-  /// or a result with [error] if calculation fails.
   CalculationResult? calculate(
     SearchableItem origin,
     SearchableItem destination,

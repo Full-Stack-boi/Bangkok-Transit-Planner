@@ -135,15 +135,6 @@ SharedPreferences sharedPreferences(Ref ref) {
   );
 }
 
-@riverpod
-class HomeTabIndex extends _$HomeTabIndex {
-  @override
-  int build() => 1;
-
-  void setTab(int index) {
-    state = index;
-  }
-}
 
 @riverpod
 class AppThemeMode extends _$AppThemeMode {
