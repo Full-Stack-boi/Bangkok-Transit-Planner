@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../core/constants/app_constants.dart';
+import '../../core/router/route_constants.dart';
 import '../../providers/providers.dart';
-import 'register_screen.dart';
 
-/// A premium login screen featuring Email/Password and Google Sign-In options
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
@@ -81,7 +81,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               backgroundColor: Colors.green,
             ),
           );
-          Navigator.pop(context);
+          context.pop();
         }
       }
     });
@@ -95,7 +95,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             Icons.arrow_back_ios_new_rounded,
             color: theme.colorScheme.onSurface,
           ),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => context.pop(),
         ),
       ),
       extendBodyBehindAppBar: true,
@@ -159,9 +159,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         labelText: t.auth.emailLabel,
                         hintText: t.auth.emailHint,
                         prefixIcon: const Icon(Icons.email_outlined),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
@@ -193,15 +190,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             _obscurePassword
                                 ? Icons.visibility_off_outlined
                                 : Icons.visibility_outlined,
+                            color: theme.colorScheme.onSurfaceVariant,
                           ),
                           onPressed: () {
                             setState(() {
                               _obscurePassword = !_obscurePassword;
                             });
                           },
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
                         ),
                       ),
                       validator: (value) {
@@ -326,12 +321,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     // Redirect to Register
                     TextButton(
                       onPressed: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const RegisterScreen(),
-                          ),
-                        );
+                        context.pushReplacement(AppRoute.register);
                       },
                       child: Text(
                         t.auth.dontHaveAccount,

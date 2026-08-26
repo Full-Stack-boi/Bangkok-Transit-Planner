@@ -1,30 +1,27 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../providers/providers.dart';
-import '../utility/utility_screen.dart';
-import '../map/map_screen.dart' deferred as map_screen;
-import '../favorites/favorites_screen.dart';
-import '../settings/settings_screen.dart';
-import '../../core/constants/translation_helper.dart';
-import '../../services/location_service.dart';
-import '../../models/station.dart';
-import '../../models/location_permission_status.dart';
-import 'widgets/nearest_stations_sheet.dart';
-import 'widgets/in_app_notification_banner.dart';
-import 'widgets/animated_indexed_stack.dart';
-import 'widgets/home_navigation_rail.dart';
-import 'widgets/home_bottom_nav_bar.dart';
+import 'package:go_router/go_router.dart';
 
-/// Main home screen with bottom navigation
-class HomeScreen extends ConsumerStatefulWidget {
-  const HomeScreen({super.key});
+import '../../core/constants/translation_helper.dart';
+import '../../models/location_permission_status.dart';
+import '../../models/station.dart';
+import '../../providers/providers.dart';
+import '../../services/location_service.dart';
+import 'widgets/home_bottom_nav_bar.dart';
+import 'widgets/home_navigation_rail.dart';
+import 'widgets/in_app_notification_banner.dart';
+import 'widgets/nearest_stations_sheet.dart';
+
+class HomeShell extends ConsumerStatefulWidget {
+  final StatefulNavigationShell navigationShell;
+  const HomeShell({super.key, required this.navigationShell});
 
   @override
-  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+  ConsumerState<HomeShell> createState() => _HomeShellState();
 }
 
-class _HomeScreenState extends ConsumerState<HomeScreen> {
+class _HomeShellState extends ConsumerState<HomeShell> {
   bool _showInAppBanner = false;
   String _bannerTitle = '';
   String _bannerBody = '';
@@ -35,6 +32,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   String? _currentStationId;
   DateTime? _enteredStationAt;
   bool _promptShownForCurrentPresence = false;
+
+  void _onTabSelected(int index) {
+    widget.navigationShell.goBranch(
+      index,
+      initialLocation: index == widget.navigationShell.currentIndex,
+    );
+  }
 
   void _onBannerTap() {
     setState(() {
@@ -137,8 +141,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           } else {
             if (_enteredStationAt != null && !_promptShownForCurrentPresence) {
               final duration = DateTime.now().difference(_enteredStationAt!);
-              // In debug or mock location mode, set threshold to 1 minute to simplify testing.
-              // In production, set to 10 minutes.
               final thresholdMinutes =
                   (kDebugMode || ref.read(mockLocationProvider) != null)
                   ? 1
@@ -383,22 +385,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     });
 
     final initState = ref.watch(transitInitProvider);
-    final currentIndex = ref.watch(homeTabIndexProvider);
+    final currentIndex = widget.navigationShell.currentIndex;
     final t = ref.watch(translationsProvider);
     final isWide = MediaQuery.sizeOf(context).width >= 900;
 
     final content = initState.when(
       data: (_) => Stack(
         children: [
-          AnimatedIndexedStack(
-            index: currentIndex,
-            children: const [
-              UtilityScreen(),
-              _DeferredMapScreen(),
-              FavoritesScreen(),
-              SettingsScreen(),
-            ],
-          ),
+          widget.navigationShell,
           if (_showInAppBanner)
             Positioned(
               top: 0,
@@ -428,11 +422,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               padding: EdgeInsets.only(left: leftContentPadding),
               child: content,
             ),
-            const Positioned(
+            Positioned(
               left: 0,
               top: 0,
               bottom: 0,
-              child: AppNavigationRail(),
+              child: AppNavigationRail(
+                currentIndex: currentIndex,
+                onTabSelected: _onTabSelected,
+              ),
             ),
           ],
         ),
@@ -441,7 +438,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     return Scaffold(
       body: content,
-      bottomNavigationBar: const AppBottomNavigationBar(),
+      bottomNavigationBar: AppBottomNavigationBar(
+        currentIndex: currentIndex,
+        onTabSelected: _onTabSelected,
+      ),
     );
   }
 }
@@ -500,46 +500,6 @@ class _ErrorView extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
-}
-
-class _DeferredMapScreen extends StatefulWidget {
-  const _DeferredMapScreen();
-
-  @override
-  State<_DeferredMapScreen> createState() => _DeferredMapScreenState();
-}
-
-class _DeferredMapScreenState extends State<_DeferredMapScreen> {
-  bool _loaded = false;
-  Future<void>? _loadFuture;
-
-  void _load() {
-    if (_loadFuture != null) return;
-    _loadFuture = map_screen.loadLibrary().then((_) {
-      if (mounted) {
-        setState(() {
-          _loaded = true;
-        });
-      }
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (_loaded) {
-      return map_screen.MapScreen();
-    }
-
-    return Consumer(
-      builder: (context, ref, child) {
-        final currentIndex = ref.watch(homeTabIndexProvider);
-        if (currentIndex == 1) {
-          _load();
-        }
-        return const Center(child: CircularProgressIndicator(strokeWidth: 3));
-      },
     );
   }
 }

@@ -1,14 +1,14 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../core/router/route_constants.dart';
 import '../../providers/providers.dart';
-import '../auth/login_screen.dart';
 import '../map/cached_tile_provider.dart';
 import '../utility/widgets/developer_test_sheet.dart';
 import '../../core/constants/translation_helper.dart';
 
-/// Settings screen supporting interactive Theme and Language selection
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
@@ -516,10 +516,7 @@ class SettingsScreen extends ConsumerWidget {
         ),
         child: InkWell(
           onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const LoginScreen()),
-            );
+            context.push(AppRoute.login);
           },
           child: Padding(
             padding: const EdgeInsets.all(18),

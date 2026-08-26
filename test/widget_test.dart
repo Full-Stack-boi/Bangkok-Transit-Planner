@@ -372,7 +372,11 @@ void main() {
       await tester.pumpAndSettle();
 
       // Switch to Favorites tab
-      ref.read(homeTabIndexProvider.notifier).setTab(2);
+      final favTab = find.descendant(
+        of: navBar,
+        matching: find.text('รายการโปรด'),
+      );
+      await tester.tap(favTab);
       await tester.pumpAndSettle();
 
       // Tap on Saved Routes tab inside Favorites screen
@@ -407,6 +411,34 @@ void main() {
       expect(state.origin!.id, equals('BTS_A'));
       expect(state.destination!.id, equals('BTS_B'));
       expect(state.routeResult, isNotNull);
+    });
+
+    testWidgets('Should display map controls including GPS and Compass needle', (
+      WidgetTester tester,
+    ) async {
+      final container = ProviderScope(
+        overrides: [
+          transitInitProvider.overrideWith((ref) => Future.value(null)),
+          transitRepositoryProvider.overrideWithValue(MockTransitRepository()),
+          locationServiceProvider.overrideWithValue(MockLocationService()),
+          notificationServiceProvider.overrideWithValue(
+            MockNotificationService(),
+          ),
+          transitNewsServiceProvider.overrideWithValue(
+            MockTransitNewsService(),
+          ),
+        ],
+        child: const BkkTransitApp(),
+      );
+
+      await tester.pumpWidget(container);
+      await tester.pumpAndSettle();
+
+      // Verify MapScreen is rendered
+      expect(find.byType(MapScreen), findsOneWidget);
+
+      // Verify FloatingActionButtons exist (GPS + Compass container)
+      expect(find.byType(FloatingActionButton), findsWidgets);
     });
   });
 }

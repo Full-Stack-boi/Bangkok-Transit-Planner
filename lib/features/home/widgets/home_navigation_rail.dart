@@ -14,11 +14,17 @@ const double _kRailFontSize = 13.0;
 const double _kRailPadding = 16.0;
 
 class AppNavigationRail extends ConsumerWidget {
-  const AppNavigationRail({super.key});
+  final int currentIndex;
+  final ValueChanged<int> onTabSelected;
+
+  const AppNavigationRail({
+    super.key,
+    required this.currentIndex,
+    required this.onTabSelected,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final currentIndex = ref.watch(homeTabIndexProvider);
     final locale = ref.watch(localeProvider);
     final t = AppLocalizations(locale);
     final theme = Theme.of(context);
@@ -120,9 +126,7 @@ class AppNavigationRail extends ConsumerWidget {
                 groupAlignment: 0.0,
                 backgroundColor: Colors.transparent,
                 selectedIndex: currentIndex,
-                onDestinationSelected: (index) {
-                  ref.read(homeTabIndexProvider.notifier).setTab(index);
-                },
+                onDestinationSelected: onTabSelected,
                 labelType: NavigationRailLabelType.all,
                 destinations: [
                   NavigationRailDestination(

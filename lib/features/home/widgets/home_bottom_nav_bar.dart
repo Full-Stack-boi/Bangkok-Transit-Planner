@@ -6,11 +6,17 @@ import '../../../core/constants/translation_helper.dart';
 import '../../../core/theme/app_theme.dart';
 
 class AppBottomNavigationBar extends ConsumerWidget {
-  const AppBottomNavigationBar({super.key});
+  final int currentIndex;
+  final ValueChanged<int> onTabSelected;
+
+  const AppBottomNavigationBar({
+    super.key,
+    required this.currentIndex,
+    required this.onTabSelected,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final currentIndex = ref.watch(homeTabIndexProvider);
     final locale = ref.watch(localeProvider);
     final t = AppLocalizations(locale);
     final theme = Theme.of(context);
@@ -47,9 +53,7 @@ class AppBottomNavigationBar extends ConsumerWidget {
         height: 66.0,
         key: ValueKey('nav_bar_$locale'),
         selectedIndex: currentIndex,
-        onDestinationSelected: (index) {
-          ref.read(homeTabIndexProvider.notifier).setTab(index);
-        },
+        onDestinationSelected: onTabSelected,
         destinations: [
           NavigationDestination(
             icon: const Icon(Icons.dashboard_customize_outlined),

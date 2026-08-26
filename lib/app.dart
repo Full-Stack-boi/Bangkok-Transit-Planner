@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
 import 'providers/providers.dart';
-import 'features/home/home_screen.dart';
 
 class BkkTransitApp extends ConsumerWidget {
   const BkkTransitApp({super.key});
@@ -15,8 +15,10 @@ class BkkTransitApp extends ConsumerWidget {
 
     final themeMode = ref.watch(themeModeProvider);
     final localeCode = ref.watch(localeProvider);
+    final router = ref.watch(appRouterProvider);
 
-    return MaterialApp(
+    return MaterialApp.router(
+      key: ValueKey('app_$localeCode'),
       title: 'BKK Transit',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
@@ -29,11 +31,7 @@ class BkkTransitApp extends ConsumerWidget {
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: const [Locale('th'), Locale('en')],
-      // Use a ValueKey based on the locale code to force a clean redraw
-      // of the entire main UI tree when the language changes.
-      // This is the most robust way to ensure that all state and
-      // event listeners (especially on Web) are correctly updated.
-      home: HomeScreen(key: ValueKey('home_root_$localeCode')),
+      routerConfig: router,
     );
   }
 }

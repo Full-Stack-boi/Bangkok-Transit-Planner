@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import '../../core/router/route_constants.dart';
 import '../../providers/providers.dart';
-import 'login_screen.dart';
 
-/// A premium registration screen matching the application aesthetics
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
 
@@ -46,7 +46,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           backgroundColor: Colors.green,
         ),
       );
-      Navigator.pop(context); // Go back to settings or previous screen
+      context.pop(); // Go back to settings or previous screen
     } else if (mounted) {
       final authState = ref.read(authProvider);
       ScaffoldMessenger.of(context).showSnackBar(
@@ -76,7 +76,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             Icons.arrow_back_ios_new_rounded,
             color: theme.colorScheme.onSurface,
           ),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => context.pop(),
         ),
       ),
       extendBodyBehindAppBar: true,
@@ -132,9 +132,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         labelText: t.auth.displayNameLabel,
                         hintText: t.auth.displayNameHint,
                         prefixIcon: const Icon(Icons.person_outline_rounded),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
                       ),
                       validator: (value) {
                         if (value == null || value.trim().isEmpty) {
@@ -154,9 +151,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         labelText: t.auth.emailLabel,
                         hintText: t.auth.emailHint,
                         prefixIcon: const Icon(Icons.email_outlined),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
@@ -187,15 +181,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                             _obscurePassword
                                 ? Icons.visibility_off_outlined
                                 : Icons.visibility_outlined,
+                            color: theme.colorScheme.onSurfaceVariant,
                           ),
                           onPressed: () {
                             setState(() {
                               _obscurePassword = !_obscurePassword;
                             });
                           },
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
                         ),
                       ),
                       validator: (value) {
@@ -224,6 +216,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                             _obscureConfirmPassword
                                 ? Icons.visibility_off_outlined
                                 : Icons.visibility_outlined,
+                            color: theme.colorScheme.onSurfaceVariant,
                           ),
                           onPressed: () {
                             setState(() {
@@ -231,9 +224,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                   !_obscureConfirmPassword;
                             });
                           },
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
                         ),
                       ),
                       validator: (value) {
@@ -280,12 +270,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     // Redirect to Login
                     TextButton(
                       onPressed: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const LoginScreen(),
-                          ),
-                        );
+                        context.pushReplacement(AppRoute.login);
                       },
                       child: Text(
                         t.auth.alreadyHaveAccount,
