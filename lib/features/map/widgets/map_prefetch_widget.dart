@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/constants/translation_helper.dart';
 import '../../../providers/providers.dart';
-import '../cached_tile_provider.dart';
 import '../painters/progress_painter.dart';
 
 class MapPrefetchWidget extends ConsumerWidget {
@@ -43,7 +42,6 @@ class MapPrefetchWidget extends ConsumerWidget {
           child: GestureDetector(
             onTap: () {
               if (prefetchState.isPaused) {
-                CachedTileProvider.isPaused = false;
                 ref.read(mapPrefetchProvider.notifier).resumePrefetch();
                 if (!isExpanded) onToggleExpand();
                 onStartPrefetch();
@@ -51,7 +49,7 @@ class MapPrefetchWidget extends ConsumerWidget {
                 if (!isExpanded) {
                   onToggleExpand();
                 } else {
-                  CachedTileProvider.isPaused = true;
+                  OfflineMapService.instance.cancelDownload();
                   ref.read(mapPrefetchProvider.notifier).pausePrefetch();
                   onToggleExpand();
                 }
@@ -132,7 +130,9 @@ class MapPrefetchWidget extends ConsumerWidget {
                           ),
                           const SizedBox(width: 4),
                           GestureDetector(
-                            onTap: onToggleExpand,
+                            onTap: () {
+                              ref.read(mapPrefetchProvider.notifier).finishPrefetch();
+                            },
                             child: Icon(
                               Icons.close,
                               size: 18,
@@ -156,10 +156,15 @@ class MapPrefetchWidget extends ConsumerWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            t.settings.offlineMapDownloaded(
-                              prefetchState.currentTile,
-                              prefetchState.totalTiles,
-                            ),
+                            prefetchState.totalBytes > 0
+                                ? '${(prefetchState.receivedBytes / (1024 * 1024)).toStringAsFixed(1)} / ${(prefetchState.totalBytes / (1024 * 1024)).toStringAsFixed(1)} MB'
+                                : t.settings.offlineMapDownloaded(
+                                    prefetchState.currentTile.clamp(
+                                      0,
+                                      prefetchState.totalTiles,
+                                    ),
+                                    prefetchState.totalTiles,
+                                  ),
                             style: theme.textTheme.bodySmall?.copyWith(
                               color: theme.colorScheme.onSurfaceVariant,
                             ),
@@ -175,10 +180,7 @@ class MapPrefetchWidget extends ConsumerWidget {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        t.settings.offlineMapCachedAndNew(
-                          prefetchState.cachedCount,
-                          prefetchState.successCount,
-                        ),
+                        'Bangkok Offline Map (Vector)',
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: theme.colorScheme.onSurfaceVariant.withValues(
                             alpha: 0.7,

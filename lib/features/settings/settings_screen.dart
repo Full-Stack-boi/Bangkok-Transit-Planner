@@ -2,10 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/router/route_constants.dart';
 import '../../providers/providers.dart';
-import '../map/cached_tile_provider.dart';
 import '../utility/widgets/developer_test_sheet.dart';
 import '../../core/constants/translation_helper.dart';
 
@@ -136,106 +134,140 @@ class SettingsScreen extends ConsumerWidget {
 
           // Offline Map Option (Manual check/download updates)
           !kIsWeb
-              ? Card(
-                  child: ListTile(
-                    leading: const Icon(Icons.map_rounded),
-                    title: Text(t.settings.offlineMapTitle),
-                    subtitle: Text(t.settings.offlineMapSubtitle),
-                    trailing: const Icon(Icons.chevron_right),
-                    onTap: () {
-                      showDialog(
-                        context: context,
-                        builder: (dialogContext) => AlertDialog(
-                          title: Text(t.settings.downloadDialogTitle),
-                          content: Text(t.settings.downloadDialogBody),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.pop(dialogContext),
-                              child: Text(t.common.cancelBtn),
-                            ),
-                            ElevatedButton(
-                              onPressed: () async {
-                                Navigator.pop(dialogContext);
+              ? Consumer(
+                  builder: (context, ref, _) {
+                    final statusAsync = ref.watch(offlineMapStatusProvider);
+                    final isInstalled = statusAsync.value?.isInstalled ?? false;
+                    final sizeText = statusAsync.value?.formattedSize ?? '';
 
-                                // Mark prefetch as NOT completed in SharedPreferences so it will run
-                                final prefs =
-                                    await SharedPreferences.getInstance();
-                                await prefs.setBool(
-                                  'map_prefetch_completed_v6_greater',
-                                  false,
-                                );
+                    return Card(
+                      child: ListTile(
+                        leading: Icon(
+                          isInstalled
+                              ? Icons.offline_pin_rounded
+                              : Icons.map_rounded,
+                          color: isInstalled ? Colors.teal : null,
+                        ),
+                        title: Text(t.settings.offlineMapTitle),
+                        subtitle: Text(
+                          isInstalled
+                              ? 'Bangkok Offline Map: $sizeText (Vector)'
+                              : t.settings.offlineMapSubtitle,
+                        ),
+                        trailing: const Icon(Icons.chevron_right),
+                        onTap: () {
+                          showDialog(
+                            context: context,
+                            builder: (dialogContext) => AlertDialog(
+                              title: Text(t.settings.downloadDialogTitle),
+                              content: Text(
+                                isInstalled
+                                    ? 'Bangkok offline map is installed ($sizeText). Would you like to re-download or update to the latest vector map?'
+                                    : t.settings.downloadDialogBody,
+                              ),
+                              actions: [
+                                if (isInstalled)
+                                  TextButton(
+                                    onPressed: () async {
+                                      Navigator.pop(dialogContext);
+                                      await OfflineMapService.instance
+                                          .deleteOfflineMap();
+                                      ref.invalidate(offlineMapStatusProvider);
+                                      if (context.mounted) {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                              const SnackBar(
+                                                content: Text(
+                                                  'Deleted offline map',
+                                                ),
+                                                behavior:
+                                                    SnackBarBehavior.floating,
+                                              ),
+                                            );
+                                      }
+                                    },
+                                    child: const Text(
+                                      'Delete',
+                                      style: TextStyle(color: Colors.red),
+                                    ),
+                                  ),
+                                TextButton(
+                                  onPressed: () => Navigator.pop(dialogContext),
+                                  child: Text(t.common.cancelBtn),
+                                ),
+                                ElevatedButton(
+                                  onPressed: () async {
+                                    Navigator.pop(dialogContext);
 
-                                // Clear the pause flag
-                                CachedTileProvider.isPaused = false;
-
-                                // Let's get the stations from the transit repository provider
-                                final stations = ref
-                                    .read(transitRepositoryProvider)
-                                    .stations;
-
-                                // Set prefetch state in riverpod
-                                ref
-                                    .read(mapPrefetchProvider.notifier)
-                                    .startPrefetch(6914);
-
-                                // Start downloading
-                                CachedTileProvider.prefetchBangkokTiles(
-                                  stations,
-                                  onStart: (total) {
                                     ref
                                         .read(mapPrefetchProvider.notifier)
-                                        .startPrefetch(total);
-                                  },
-                                  onProgress:
-                                      (current, success, cached, error) {
+                                        .startPrefetch(1034);
+
+                                    OfflineMapService.instance.downloadOrUpdate(
+                                      onProgress: (current, total, progress) {
                                         ref
                                             .read(mapPrefetchProvider.notifier)
                                             .updateProgress(
                                               current: current,
-                                              success: success,
-                                              cached: cached,
-                                              error: error,
+                                              success: current,
+                                              cached: 0,
+                                              error: 0,
                                             );
                                       },
-                                  onFinish: (completed, lostConnection) async {
-                                    if (completed) {
-                                      ref
-                                          .read(mapPrefetchProvider.notifier)
-                                          .finishPrefetch();
-                                      PaintingBinding.instance.imageCache
-                                          .clear();
-                                      PaintingBinding.instance.imageCache
-                                          .clearLiveImages();
-                                      final p =
-                                          await SharedPreferences.getInstance();
-                                      await p.setBool(
-                                        'map_prefetch_completed_v6_greater',
-                                        true,
+                                      onComplete: (success, error) {
+                                        ref
+                                            .read(mapPrefetchProvider.notifier)
+                                            .finishPrefetch();
+                                        ref.invalidate(
+                                          offlineMapStatusProvider,
+                                        );
+                                        if (context.mounted) {
+                                          final message = success
+                                              ? (isInstalled
+                                                  ? 'Bangkok offline map updated successfully!'
+                                                  : 'Bangkok offline map downloaded successfully!')
+                                              : (error == 'No internet connection'
+                                                  ? t.errors.errorNoInternet
+                                                  : 'Download failed: $error');
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                                SnackBar(
+                                                  content: Text(message),
+                                                  behavior:
+                                                      SnackBarBehavior.floating,
+                                                  backgroundColor: success
+                                                      ? null
+                                                      : Colors.redAccent,
+                                                ),
+                                              );
+                                        }
+                                      },
+                                    );
+
+                                    if (context.mounted) {
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            t.settings.downloadStarted,
+                                          ),
+                                          behavior: SnackBarBehavior.floating,
+                                        ),
                                       );
-                                    } else {
-                                      ref
-                                          .read(mapPrefetchProvider.notifier)
-                                          .pausePrefetch();
                                     }
                                   },
-                                );
-
-                                if (context.mounted) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(t.settings.downloadStarted),
-                                      behavior: SnackBarBehavior.floating,
-                                    ),
-                                  );
-                                }
-                              },
-                              child: Text(t.common.download),
+                                  child: Text(
+                                    isInstalled ? 'Update' : t.common.download,
+                                  ),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
+                          );
+                        },
+                      ),
+                    );
+                  },
                 )
               : const SizedBox.shrink(),
           const SizedBox(height: 8),

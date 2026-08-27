@@ -31,6 +31,7 @@ dependencies:
 
   # Map & Location
   flutter_map: ^8.3.0
+  flutter_map_vector_tiles: ^2.8.1
   latlong2: ^0.10.1
   geolocator: ^14.0.3
   permission_handler: ^12.0.3
@@ -69,5 +70,4 @@ flutter:
   assets:
     - assets/data/
     - assets/images/
-    - assets/map_tiles.bundle
     - assets/google_fonts/

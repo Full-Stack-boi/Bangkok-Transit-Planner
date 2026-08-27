@@ -10,8 +10,8 @@ A **Flutter application** for planning your journey across Bangkok's entire rail
 
 [![Flutter](https://img.shields.io/badge/Flutter-3.44.1-02569B?style=for-the-badge&logo=flutter&logoColor=white)](https://flutter.dev)
 [![Dart](https://img.shields.io/badge/Dart-3.12.1-0175C2?style=for-the-badge&logo=dart&logoColor=white)](https://dart.dev)
+[![OpenFreeMap](https://img.shields.io/badge/OpenFreeMap-Vector_Tiles-4A90E2?style=for-the-badge&logo=maplibre&logoColor=white)](https://openfreemap.org)
 [![Supabase](https://img.shields.io/badge/Supabase-Backend-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)](https://supabase.com)
-[![OpenStreetMap](https://img.shields.io/badge/OpenStreetMap-GIS-7F993A?style=for-the-badge&logo=openstreetmap&logoColor=white)](https://www.openstreetmap.org)
 [![Riverpod](https://img.shields.io/badge/Riverpod-State-1A1A24?style=for-the-badge&logo=flutter&logoColor=white)](https://riverpod.dev)
 [![Vercel](https://img.shields.io/badge/Deployed-Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://bangkok-transit-planner-dmta.vercel.app)
 
@@ -52,9 +52,12 @@ No more counting stops. No more guessing transfer gates. Just get on the right t
 - **Transfer surcharges** — includes inter-operator transfer costs and entry fee waivers automatically.
 - **Next train countdown** — estimates the next departure based on each line's official schedule.
 
-### Map & Location
+### Map & Location (OpenFreeMap Vector Tiles)
 
-- **Interactive map** — flutter_map with OpenStreetMap tiles, station markers, line color overlays, and active route path visualization.
+- **Vector Map Rendering** — powered by `flutter_map_vector_tiles` and MapLibre styling with hardware-accelerated Impeller rendering (Vulkan/Metal).
+- **Dual Map Themes** — official OpenFreeMap **Liberty (Light)** and **Dark (Dark)** vector styles with crisp typography, zero watermarks, no API keys, and no rate limits.
+- **Pre-bundled Offline Map (100% Out-of-the-Box Coverage)** — complete Bangkok metropolitan vector tiles (1,388 tiles, zooms 10–14) pre-packaged in a solid Tar+Gzip archive (`assets/data/bangkok_vector_offline.tar.gz`). Automatically extracts into native `DiskCache` on first app launch for zero-download offline usage.
+- **Smart Map Updates** — download map updates directly from OpenFreeMap CDN with automatic skipping of cached tiles and live progress reporting.
 - **Custom location search** — place autocomplete via Photon API (Komoot) and OpenStreetMap POI resolution via Overpass API bounded to Bangkok with local landmark fallbacks.
 - **Walking leg** — calculates walking distance and duration from your origin/destination to nearest stations using OSRM foot routing engine.
 - **Accuracy warnings** — alerts you when a POI coordinate could not be precisely resolved.
@@ -95,7 +98,6 @@ The **Utility** screen displays a service status dashboard for each rail line (N
 
 The **Utility** screen shows a news and service alert feed. The bilingual card layout (EN/TH), date formatting, and line-color accent are all functional, but the articles are currently static mock data. Integration with a real news/alerts endpoint is planned.
 
-
 ### 🚧 Experimental Rail Lines
 
 The **MRT Pink Line** (30 stations), **MRT Pink Line Extension** (2 stations), **SRT Dark Red Line** (10 stations), and **SRT Light Red Line** (4 stations) are fully implemented in the Dijkstra graph, fare tables, and station exit data. They are currently treated as experimental until schedule and exit data verification is finalized across all operators.
@@ -110,19 +112,19 @@ The app uses [`station_exits.json`](assets/data/station_exits.json) to map the c
 
 The app supports **7 main lines** and **4 experimental lines** (11 total lines across Bangkok):
 
-| Line | Stations | Operator | Status | Line Color |
-| :--- | :---: | :---: | :---: | :---: |
-| BTS Sukhumvit | 47 | BTS | Active | <span style="background-color:#74B927; color:#FFFFFF; padding:3px 10px; border-radius:4px; font-weight:bold; font-size:12px;">Light Green</span> |
-| BTS Silom | 14 | BTS | Active | <span style="background-color:#008064; color:#FFFFFF; padding:3px 10px; border-radius:4px; font-weight:bold; font-size:12px;">Deep Green</span> |
-| BTS Gold | 3 | BTS | Active | <span style="background-color:#D4A017; color:#FFFFFF; padding:3px 10px; border-radius:4px; font-weight:bold; font-size:12px;">Gold</span> |
-| MRT Blue | 38 | BEM | Active | <span style="background-color:#1E3A8A; color:#FFFFFF; padding:3px 10px; border-radius:4px; font-weight:bold; font-size:12px;">Blue</span> |
-| MRT Purple | 16 | BEM | Active | <span style="background-color:#6B21A8; color:#FFFFFF; padding:3px 10px; border-radius:4px; font-weight:bold; font-size:12px;">Purple</span> |
-| MRT Yellow | 23 | EBM | Active | <span style="background-color:#EAB308; color:#000000; padding:3px 10px; border-radius:4px; font-weight:bold; font-size:12px;">Yellow</span> |
-| Airport Rail Link | 8 | ERA | Active | <span style="background-color:#DC2626; color:#FFFFFF; padding:3px 10px; border-radius:4px; font-weight:bold; font-size:12px;">Red</span> |
-| MRT Pink | 30 | NBM | Experimental | <span style="background-color:#EC4899; color:#000000; padding:3px 10px; border-radius:4px; font-weight:bold; font-size:12px;">Pink</span> |
-| MRT Pink Extension | 2 | NBM | Experimental | <span style="background-color:#EC4899; color:#000000; padding:3px 10px; border-radius:4px; font-weight:bold; font-size:12px;">Pink</span> |
-| SRT Dark Red Line | 10 | SRT | Experimental | <span style="background-color:#991B1B; color:#FFFFFF; padding:3px 10px; border-radius:4px; font-weight:bold; font-size:12px;">Dark Red</span> |
-| SRT Light Red Line | 4 | SRT | Experimental | <span style="background-color:#B91C1C; color:#FFFFFF; padding:3px 10px; border-radius:4px; font-weight:bold; font-size:12px;">Light Red</span> |
+| Line               | Stations | Operator |    Status    |                                                                    Line Color                                                                    |
+| :----------------- | :------: | :------: | :----------: | :----------------------------------------------------------------------------------------------------------------------------------------------: |
+| BTS Sukhumvit      |    47    |   BTS    |    Active    | <span style="background-color:#74B927; color:#FFFFFF; padding:3px 10px; border-radius:4px; font-weight:bold; font-size:12px;">Light Green</span> |
+| BTS Silom          |    14    |   BTS    |    Active    | <span style="background-color:#008064; color:#FFFFFF; padding:3px 10px; border-radius:4px; font-weight:bold; font-size:12px;">Deep Green</span>  |
+| BTS Gold           |    3     |   BTS    |    Active    |    <span style="background-color:#D4A017; color:#FFFFFF; padding:3px 10px; border-radius:4px; font-weight:bold; font-size:12px;">Gold</span>     |
+| MRT Blue           |    38    |   BEM    |    Active    |    <span style="background-color:#1E3A8A; color:#FFFFFF; padding:3px 10px; border-radius:4px; font-weight:bold; font-size:12px;">Blue</span>     |
+| MRT Purple         |    16    |   BEM    |    Active    |   <span style="background-color:#6B21A8; color:#FFFFFF; padding:3px 10px; border-radius:4px; font-weight:bold; font-size:12px;">Purple</span>    |
+| MRT Yellow         |    23    |   EBM    |    Active    |   <span style="background-color:#EAB308; color:#000000; padding:3px 10px; border-radius:4px; font-weight:bold; font-size:12px;">Yellow</span>    |
+| Airport Rail Link  |    8     |   ERA    |    Active    |     <span style="background-color:#DC2626; color:#FFFFFF; padding:3px 10px; border-radius:4px; font-weight:bold; font-size:12px;">Red</span>     |
+| MRT Pink           |    30    |   NBM    | Experimental |    <span style="background-color:#EC4899; color:#000000; padding:3px 10px; border-radius:4px; font-weight:bold; font-size:12px;">Pink</span>     |
+| MRT Pink Extension |    2     |   NBM    | Experimental |    <span style="background-color:#EC4899; color:#000000; padding:3px 10px; border-radius:4px; font-weight:bold; font-size:12px;">Pink</span>     |
+| SRT Dark Red Line  |    10    |   SRT    | Experimental |  <span style="background-color:#991B1B; color:#FFFFFF; padding:3px 10px; border-radius:4px; font-weight:bold; font-size:12px;">Dark Red</span>   |
+| SRT Light Red Line |    4     |   SRT    | Experimental |  <span style="background-color:#B91C1C; color:#FFFFFF; padding:3px 10px; border-radius:4px; font-weight:bold; font-size:12px;">Light Red</span>  |
 
 ---
 
@@ -144,16 +146,17 @@ flowchart TD
 
     subgraph SVC ["Service / Repository Layer"]
         style SVC fill:#f0fff4,stroke:#1e293b,stroke-width:2px,color:#1e293b
-        SERVICES["Services & Repositories\n• SupabaseService  • OSRMService\n• OverpassService  • PhotonSearchService\n• ScheduleService  • DijkstraPlanner\n• JourneyActivityService  • NotificationService"]
+        SERVICES["Services & Repositories\n• SupabaseService  • OSRMService\n• OverpassService  • PhotonSearchService\n• ScheduleService  • DijkstraPlanner\n• OfflineMapService  • JourneyActivityService\n• NotificationService"]
     end
 
     subgraph DATA ["Data Layer (Models & Assets)"]
         style DATA fill:#fff0f5,stroke:#1e293b,stroke-width:2px,color:#1e293b
-        MODELS["Freezed Models + JSON Assets\n• Station  • RouteResult  • Line\n• Landmark  • CustomLocation  • CrowdReport"]
+        MODELS["Freezed Models + JSON/Vector Assets\n• Station  • RouteResult  • Line\n• Landmark  • CustomLocation  • CrowdReport\n• Solid Vector Offline Bundle (.tar.gz)"]
     end
 
     subgraph EXT ["External Services"]
         style EXT fill:#f5f5f5,stroke:#1e293b,stroke-width:2px,color:#1e293b
+        OFM["OpenFreeMap CDN\n(Vector Tiles & Styles)"]
         SUP["Supabase\n(Auth + DB)"]
         OSRM["OSRM\n(Walking Routes)"]
         OVP["Overpass & Photon\n(POI & Place Search)"]
@@ -175,36 +178,37 @@ lib/
 │   ├── constants/                   # EN & TH translation classes, Color tokens
 │   ├── network/                     # Network configurations and API clients
 │   ├── theme/                       # App theme and styling
-│   └── utils/                       # Shared helper functions
+│   └── utils/                       # Shared helper functions & logger
 │
 ├── features/
 │   ├── auth/                        # Login screen, Google Sign-In flow
 │   ├── home/                        # Home screen, in-app notification banner
 │   ├── search/                      # Station & place search
 │   ├── route_result/                # Route result bottom sheet & timeline
-│   ├── map/                         # Interactive flutter_map screen
+│   ├── map/                         # Interactive OpenFreeMap vector map screen & overlays
 │   ├── favorites/                   # Saved routes & stations
-│   ├── settings/                    # Language, theme, offline map updates
+│   ├── settings/                    # Language, theme, offline map management
 │   └── utility/                     # Journey tracking overlay, shared widgets
 │
 ├── models/                          # Freezed data models (Station, Route, etc.)
 ├── providers/                       # Riverpod state notifiers and global providers
 ├── repositories/                    # Data access layer and local storage
-├── services/                        # Core business logic (OSRM, Dijkstra, etc.)
+├── services/                        # Core business logic (OfflineMapService, Dijkstra, OSRM, etc.)
 └── widgets/                         # Reusable UI components
 
 assets/
 ├── data/
 │   ├── stations.json                 # Full station graph & coordinates
 │   ├── lines.json                    # Line definitions, route bounds & intervals
-│   ├── fares.json                    # Official fare matrices
 │   ├── landmarks.json                # Local landmarks and POI lookup
 │   ├── namtang_stops.json.gz         # Official BKK transit stop dataset (Gzip compressed)
-│   └── station_exits.json            # Station exit coordinate mapping
-└── map_tiles.bundle                  # Pre-fetched offline map tiles (git-ignored)
+│   ├── station_exits.json            # Station exit coordinate mapping
+│   └── bangkok_vector_offline.tar.gz # Pre-bundled Bangkok offline vector map archive
+├── google_fonts/                     # Bundled offline Outfit fonts
+└── images/                           # App logos and UI icons
 
 bin/
-├── generate_bundle.dart              # Dart CLI script to build the offline map tile bundle
+├── generate_bundle.dart              # Dart CLI script to fetch and build solid offline vector bundle
 └── compress_data.dart                # Dart CLI script to compress raw JSON datasets into .json.gz
 
 .github/
@@ -236,12 +240,12 @@ flutter pub get
 Riverpod providers and Freezed models require code generation before the app compiles:
 
 ```bash
-dart run build_runner build --delete-conflicting-outputs
+flutter run build_runner build --delete-conflicting-outputs
 ```
 
-### 3. Build the Offline Map Bundle
+### 3. Build / Update the Offline Vector Map Bundle (Optional)
 
-The map tile bundle is git-ignored and can be generated locally using Dart CLI:
+The pre-bundled offline map archive is included in `assets/data/bangkok_vector_offline.tar.gz`. If you want to rebuild it from live OpenFreeMap endpoints:
 
 ```bash
 dart run bin/generate_bundle.dart
@@ -290,6 +294,10 @@ flutter run --dart-define-from-file=config.json
 
 Inside the result sheet, toggle between **Fastest** and **Cheapest** route to compare options before committing to a path.
 
+### Offline Map Management
+
+Go to **Settings → Offline Map** to view the installed Bangkok vector map status, update map tiles directly from OpenFreeMap CDN, or manage storage space.
+
 ### Saving Favorites
 
 Tap the bookmark icon on any route result to save it. Favorites are synced to your Supabase account and accessible from the **Favorites** tab.
@@ -306,10 +314,9 @@ Every push to `master` triggers an automated build and deploy via GitHub Actions
 
 The workflow:
 
-1. Caches and generates the offline map tile bundle.
-2. Runs `build_runner` to generate Riverpod and Freezed code.
-3. Builds Flutter Web with credentials injected from GitHub Secrets.
-4. Deploys to Vercel via the Vercel CLI.
+1. Runs `build_runner` to generate Riverpod and Freezed code.
+2. Builds Flutter Web with credentials injected from GitHub Secrets.
+3. Deploys to Vercel via the Vercel CLI.
 
 Set the following **GitHub Secrets** under _Repository → Settings → Secrets and variables → Actions_:
 
@@ -327,19 +334,20 @@ Set the following **GitHub Secrets** under _Repository → Settings → Secrets 
 
 ## Tech Stack
 
-| Layer                | Technology                      | Purpose                                    |
-| -------------------- | ------------------------------- | ------------------------------------------ |
-| **UI Framework**     | Flutter 3.44                    | Cross-platform iOS, Android, Web, Windows, and Linux |
-| **State Management** | Riverpod 3 + riverpod_generator | MVVM providers with code generation        |
-| **Backend & Auth**   | Supabase                        | PostgreSQL database + Google OAuth & Email Auth |
-| **Routing Engine**   | Custom Dart (Dijkstra)          | Shortest/cheapest path across 11 lines     |
-| **Map**              | flutter_map + OpenStreetMap     | Interactive station map with route overlay |
-| **Walking Routes**   | OSRM                            | Turn-by-turn pedestrian routing            |
-| **POI & Place Search**| Photon API + Overpass API      | BKK-bounded place search & POI resolution  |
-| **Notifications & Live Activity** | `flutter_local_notifications` + `live_activities` | Lock screen notifications & iOS Live Activities |
-| **Navigation**       | Flutter Navigator               | Standard stack-based routing               |
-| **Models**           | Freezed + json_serializable     | Immutable, type-safe data models           |
-| **CI/CD**            | GitHub Actions + Vercel         | Automated build and deployment pipeline    |
+| Layer                             | Technology                                        | Purpose                                                  |
+| --------------------------------- | ------------------------------------------------- | -------------------------------------------------------- |
+| **UI Framework**                  | Flutter 3.44                                      | Cross-platform iOS, Android, Web, Windows, and Linux     |
+| **State Management**              | Riverpod 3 + riverpod_generator                   | MVVM providers with code generation                      |
+| **Backend & Auth**                | Supabase                                          | PostgreSQL database + Google OAuth & Email Auth          |
+| **Routing Engine**                | Custom Dart (Dijkstra)                            | Shortest/cheapest path across 11 lines                   |
+| **Map Engine**                    | `flutter_map_vector_tiles` + OpenFreeMap          | High-performance vector tiles with Liberty & Dark themes |
+| **Offline Storage**               | Solid Tar+GZip Vector Archive + DiskCache         | Complete Bangkok offline map coverage out-of-the-box     |
+| **Walking Routes**                | OSRM                                              | Turn-by-turn pedestrian routing                          |
+| **POI & Place Search**            | Photon API + Overpass API                         | BKK-bounded place search & POI resolution                |
+| **Notifications & Live Activity** | `flutter_local_notifications` + `live_activities` | Lock screen notifications & iOS Live Activities          |
+| **Navigation**                    | Flutter Navigator                                 | Standard stack-based routing                             |
+| **Models**                        | Freezed + json_serializable                       | Immutable, type-safe data models                         |
+| **CI/CD**                         | GitHub Actions + Vercel                           | Automated build and deployment pipeline                  |
 
 ---
 
@@ -352,10 +360,10 @@ flutter test
 The test suite covers:
 
 - **Unit Tests** — Dijkstra path correctness, fare calculation, multi-line transfer logic across the full 11-line graph.
-- **Widget Tests** — Tab navigation rendering, mock Riverpod provider injection, UI state transitions.
+- **Widget Tests** — Tab navigation rendering, mock Riverpod provider injection, UI state transitions, GPS and compass controls.
 - **Integration Tests** — Station entrance resolution via Overpass API with timeout and fallback handling.
 
-All **45 tests pass** on the current codebase.
+All **40 tests pass** on the current codebase.
 
 ---
 

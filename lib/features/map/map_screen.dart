@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../core/router/route_constants.dart';
 import 'dart:math' as math;
 import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_map_vector_tiles/flutter_map_vector_tiles.dart' as vt;
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -23,8 +24,6 @@ import 'painters/station_marker_painter.dart';
 import 'painters/custom_map_pin.dart';
 import '../route_result/route_result_sheet.dart';
 import '../../providers/route_tracker.dart';
-import 'cached_tile_provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:bkk_transit_planner/core/utils/logger.dart';
 
 class MapScreen extends ConsumerStatefulWidget {
@@ -36,7 +35,9 @@ class MapScreen extends ConsumerStatefulWidget {
 
 class _MapScreenState extends ConsumerState<MapScreen> {
   final MapController _mapController = MapController();
-  final _tileProvider = CachedTileProvider();
+  vt.Style? _lightStyle;
+  vt.Style? _darkStyle;
+  bool _isStylesLoading = true;
   Station? _selectedStation;
   CustomLocation? _customSelectedLocation;
   NamtangStop? _selectedNamtangStop;
@@ -45,7 +46,6 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   bool _isPrefetchExpanded = true;
   final ValueNotifier<double> _currentZoom = ValueNotifier(12.0);
   final ValueNotifier<double> _currentRotation = ValueNotifier(0.0);
-  bool _isOfflineMapInitializing = false;
 
   // Caches for Map Layer Optimization
   List<Polyline> _cachedPolylines = [];
@@ -56,6 +56,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   List<Marker> _cachedBaseMarkers = [];
   RouteResult? _lastRouteResultForMarkers;
   Brightness? _lastBrightnessForMarkers;
+  Brightness? _lastThemeBrightness;
   String? _lastCurrentStationId;
   double? _lastZoomForMarkers;
   DisruptionState? _lastDisruptionStateForMarkers;
@@ -63,14 +64,13 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   @override
   void initState() {
     super.initState();
-    // Clear Flutter's memory image cache to force reloading fresh tiles from disk
+    // Clear Flutter's memory image cache to force reloading fresh tiles
     PaintingBinding.instance.imageCache.clear();
     PaintingBinding.instance.imageCache.clearLiveImages();
     _fetchUserLocation();
-    _initOfflineMap();
+    _loadVectorStyles();
 
     // Trigger Namtang stops loading when map is opened
-    // Added a small delay to ensure UI remains responsive during transition
     Future.delayed(const Duration(milliseconds: 100), () {
       if (mounted) ref.read(transitRepositoryProvider).loadNamtangStops();
     });
@@ -95,81 +95,88 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     });
   }
 
-  Future<void> _initOfflineMap() async {
-    if (kIsWeb) return;
-    if (Platform.environment.containsKey('FLUTTER_TEST')) return;
-    setState(() {
-      _isOfflineMapInitializing = true;
-    });
-    try {
-      await CachedTileProvider.getCachePath();
-    } catch (e) {
-      AppLogger.error('Failed to initialize offline map: $e', error: e);
-    } finally {
+  Future<void> _loadVectorStyles() async {
+    if (!kIsWeb && Platform.environment.containsKey('FLUTTER_TEST')) {
       if (mounted) {
         setState(() {
-          _isOfflineMapInitializing = false;
+          _isStylesLoading = false;
+        });
+      }
+      return;
+    }
+
+    setState(() {
+      _isStylesLoading = true;
+    });
+
+    try {
+      final lightReader = vt.StyleReader(
+        uri: 'https://tiles.openfreemap.org/styles/liberty',
+      );
+      final darkReader = vt.StyleReader(
+        uri: 'https://tiles.openfreemap.org/styles/dark',
+      );
+
+      final loadedLight = await lightReader.read();
+      final loadedDark = await darkReader.read();
+
+      if (mounted) {
+        setState(() {
+          _lightStyle = loadedLight;
+          _darkStyle = loadedDark;
+          _isStylesLoading = false;
+        });
+      }
+    } catch (e) {
+      final isOfflineError = e.toString().contains('SocketException') ||
+          e.toString().contains('Failed host lookup');
+      if (isOfflineError) {
+        AppLogger.info('Vector style loaded from offline cache');
+      } else {
+        AppLogger.error('Failed to load OpenFreeMap vector styles: $e', error: e);
+      }
+      if (mounted) {
+        setState(() {
+          _isStylesLoading = false;
         });
       }
     }
   }
 
   void _startMapPrefetch() {
-    final stations = ref.read(transitRepositoryProvider).stations;
-    CachedTileProvider.prefetchBangkokTiles(
-      stations,
-      onStart: (total) {
-        ref.read(mapPrefetchProvider.notifier).startPrefetch(total);
-      },
-      onProgress: (current, success, cached, error) {
-        ref
-            .read(mapPrefetchProvider.notifier)
-            .updateProgress(
+    ref.read(mapPrefetchProvider.notifier).startPrefetch(1034);
+    OfflineMapService.instance.downloadOrUpdate(
+      onProgress: (current, total, progress) {
+        ref.read(mapPrefetchProvider.notifier).updateProgress(
               current: current,
-              success: success,
-              cached: cached,
-              error: error,
+              success: current,
+              cached: 0,
+              error: 0,
             );
       },
-      onFinish: (completed, lostConnection) async {
-        if (completed) {
-          ref.read(mapPrefetchProvider.notifier).finishPrefetch();
-          PaintingBinding.instance.imageCache.clear();
-          PaintingBinding.instance.imageCache.clearLiveImages();
-          if (mounted) {
-            setState(() {});
-          }
-          try {
-            final prefs = await SharedPreferences.getInstance();
-            await prefs.setBool('map_prefetch_completed_v6_greater', true);
-          } catch (e) {
-            AppLogger.error(
-              'Failed to save prefetching completion status: $e',
-              error: e,
+      onComplete: (success, error) {
+        ref.read(mapPrefetchProvider.notifier).finishPrefetch();
+        ref.invalidate(offlineMapStatusProvider);
+        if (mounted) {
+          setState(() {});
+          if (success) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Bangkok offline map download complete!'),
+                behavior: SnackBarBehavior.floating,
+              ),
             );
-          }
-        } else {
-          ref.read(mapPrefetchProvider.notifier).pausePrefetch();
-          if (lostConnection && mounted) {
+          } else if (error != null) {
             final t = ref.read(translationsProvider);
-            ScaffoldMessenger.of(context).clearSnackBars();
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Row(
-                  children: [
-                    const Icon(Icons.cloud_off_rounded, color: Colors.white),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        t.errors.errorNoInternet,
-                        style: const TextStyle(color: Colors.white),
-                      ),
-                    ),
-                  ],
+                content: Text(
+                  error == 'No internet connection'
+                      ? t.errors.errorNoInternet
+                      : error,
                 ),
                 behavior: SnackBarBehavior.floating,
                 backgroundColor: Colors.redAccent,
-                duration: const Duration(seconds: 4),
               ),
             );
           }
@@ -180,6 +187,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
 
   @override
   void dispose() {
+    _lightStyle?.dispose();
+    _darkStyle?.dispose();
     _mapController.dispose();
     _currentZoom.dispose();
     _currentRotation.dispose();
@@ -320,6 +329,11 @@ class _MapScreenState extends ConsumerState<MapScreen> {
 
     // Build Polylines for transit lines
     final themeBrightness = theme.brightness;
+    if (_lastThemeBrightness != null && _lastThemeBrightness != themeBrightness) {
+      vt.VectorTileLayer.clearMemoryCache();
+    }
+    _lastThemeBrightness = themeBrightness;
+
     if (_lastRouteResultForPolylines != routeResult ||
         _lastBrightnessForPolylines != themeBrightness ||
         _lastDisruptionStateForPolylines != disruptionState) {
@@ -939,6 +953,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         (isRouteActive && !isTrackingActive) ||
         isTrackingActive;
 
+    final currentStyle =
+        themeBrightness == Brightness.dark ? _darkStyle : _lightStyle;
+
     return Scaffold(
       body: Stack(
         children: [
@@ -946,15 +963,15 @@ class _MapScreenState extends ConsumerState<MapScreen> {
           RepaintBoundary(
             child: ColoredBox(
               color: themeBrightness == Brightness.dark
-                  ? const Color(0xFF111111) // Matches CartoDB Dark Matter theme
-                  : const Color(0xFFE4E3DF), // Matches CartoDB Voyager theme
+                  ? const Color(0xFF1A1A2E)
+                  : const Color(0xFFF2EFE9),
               child: ExcludeSemantics(
                 child: FlutterMap(
                   mapController: _mapController,
                   options: MapOptions(
                     backgroundColor: themeBrightness == Brightness.dark
-                        ? const Color(0xFF111111)
-                        : const Color(0xFFE4E3DF),
+                        ? const Color(0xFF1A1A2E)
+                        : const Color(0xFFF2EFE9),
                     initialCenter: const LatLng(13.7563, 100.5018),
                     initialZoom: 12.0,
                     minZoom: 10.5,
@@ -1015,21 +1032,18 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                     },
                   ),
                   children: [
-                    TileLayer(
-                      urlTemplate: theme.brightness == Brightness.dark
-                          ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-                          : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
-                      userAgentPackageName:
-                          'com.bkktransit.bkk_transit_planner',
-                      tileProvider: _tileProvider,
-                      retinaMode: true,
-                      maxNativeZoom: 18,
-                      keepBuffer: 4,
-                      panBuffer: 2,
-                      tileDisplay: const TileDisplay.fadeIn(
-                        duration: Duration(milliseconds: 300),
+                    if (currentStyle != null)
+                      vt.VectorTileLayer(
+                        key: ValueKey('vector_tile_$themeBrightness'),
+                        theme: currentStyle.theme,
+                        tileProviders: currentStyle.providers,
+                        sprites: currentStyle.sprites,
+                        rasterSources: currentStyle.rasterSources,
+                        tileOffset: vt.TileOffset.maplibre,
+                        diskCacheMaximumSizeInBytes: 80 * 1024 * 1024,
+                        diskCacheTtl: const Duration(days: 30),
+                        showLabels: true,
                       ),
-                    ),
                     PolylineLayer(polylines: polylines),
                     MarkerLayer(markers: _cachedBaseMarkers),
                     MarkerLayer(markers: dynamicMarkers),
@@ -1059,7 +1073,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
               localeCode: localeCode,
               isPrefetchExpanded: _isPrefetchExpanded,
               isLocating: _isLocating,
-              isOfflineMapInitializing: _isOfflineMapInitializing,
+              isOfflineMapInitializing: _isStylesLoading,
               isBottomCardVisible: isBottomCardVisible,
               isCalculating: isCalculating,
               isTrackingActive: isTrackingActive,
