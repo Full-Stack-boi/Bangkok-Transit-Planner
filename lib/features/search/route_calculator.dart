@@ -12,20 +12,21 @@ import '../../repositories/transit_repository.dart';
 import '../../services/dijkstra_planner.dart';
 import '../../services/fare_service.dart';
 import '../../services/walking_route_service.dart';
+import '../../models/transit_enums.dart';
 import '../../core/constants/transit_constants.dart';
 import 'package:bkk_transit_planner/core/utils/logger.dart';
 
 class CardStateSnapshot {
-  final String btsCardType;
-  final String mrtCardType;
-  final String arlCardType;
-  final String srtCardType;
+  final TransitCardType btsCardType;
+  final TransitCardType mrtCardType;
+  final TransitCardType arlCardType;
+  final TransitCardType srtCardType;
 
   const CardStateSnapshot({
-    this.btsCardType = 'standard',
-    this.mrtCardType = 'standard',
-    this.arlCardType = 'standard',
-    this.srtCardType = 'standard',
+    this.btsCardType = TransitCardType.standard,
+    this.mrtCardType = TransitCardType.standard,
+    this.arlCardType = TransitCardType.standard,
+    this.srtCardType = TransitCardType.standard,
   });
 }
 

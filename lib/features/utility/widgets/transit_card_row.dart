@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/constants/translation_helper.dart';
+import '../../../models/transit_enums.dart';
 import '../../../providers/providers.dart';
 
 class TransitCardRow extends ConsumerWidget {
@@ -50,7 +51,7 @@ class TransitCardRow extends ConsumerWidget {
               ref: ref,
               theme: theme,
               t: t,
-              networkId: 'BTS',
+              network: TransitNetwork.bts,
               cardName: t.utility.rabbitCardName,
               gradient: LinearGradient(
                 colors: [Colors.green.shade400, Colors.green.shade700],
@@ -60,22 +61,22 @@ class TransitCardRow extends ConsumerWidget {
               activeType: cardState.btsCardType,
               options: [
                 _CardOption(
-                  value: 'standard',
+                  value: TransitCardType.standard,
                   title: t.utility.optionStandardTitle,
                   subtitle: t.utility.optionStandardSubtitle,
                 ),
                 _CardOption(
-                  value: 'student',
+                  value: TransitCardType.student,
                   title: t.utility.optionStudentTitle,
                   subtitle: t.utility.optionStudentBtsSubtitle,
                 ),
                 _CardOption(
-                  value: 'senior',
+                  value: TransitCardType.senior,
                   title: t.utility.optionSeniorTitle,
                   subtitle: t.utility.optionSeniorBtsSubtitle,
                 ),
                 _CardOption(
-                  value: 'trip_package',
+                  value: TransitCardType.tripPackage,
                   title: t.utility.optionTripPackageTitle,
                   subtitle: t.utility.optionTripPackageBtsSubtitle,
                 ),
@@ -86,7 +87,7 @@ class TransitCardRow extends ConsumerWidget {
               ref: ref,
               theme: theme,
               t: t,
-              networkId: 'MRT',
+              network: TransitNetwork.mrt,
               cardName: t.utility.mrtCardName,
               gradient: LinearGradient(
                 colors: [Colors.blue.shade500, Colors.blue.shade800],
@@ -96,17 +97,17 @@ class TransitCardRow extends ConsumerWidget {
               activeType: cardState.mrtCardType,
               options: [
                 _CardOption(
-                  value: 'standard',
+                  value: TransitCardType.standard,
                   title: t.utility.optionStandardTitle,
                   subtitle: t.utility.optionStandardSubtitle,
                 ),
                 _CardOption(
-                  value: 'student',
+                  value: TransitCardType.student,
                   title: t.utility.optionStudentTitle,
                   subtitle: t.utility.optionStudentMrtSubtitle,
                 ),
                 _CardOption(
-                  value: 'senior',
+                  value: TransitCardType.senior,
                   title: t.utility.optionSeniorTitle,
                   subtitle: t.utility.optionSeniorMrtSubtitle,
                 ),
@@ -117,7 +118,7 @@ class TransitCardRow extends ConsumerWidget {
               ref: ref,
               theme: theme,
               t: t,
-              networkId: 'ARL',
+              network: TransitNetwork.arl,
               cardName: t.utility.arlCardName,
               gradient: LinearGradient(
                 colors: [Colors.red.shade400, Colors.red.shade700],
@@ -127,17 +128,17 @@ class TransitCardRow extends ConsumerWidget {
               activeType: cardState.arlCardType,
               options: [
                 _CardOption(
-                  value: 'standard',
+                  value: TransitCardType.standard,
                   title: t.utility.optionStandardTitle,
                   subtitle: t.utility.optionStandardSubtitle,
                 ),
                 _CardOption(
-                  value: 'student',
+                  value: TransitCardType.student,
                   title: t.utility.optionStudentTitle,
                   subtitle: t.utility.optionStudentArlSubtitle,
                 ),
                 _CardOption(
-                  value: 'senior',
+                  value: TransitCardType.senior,
                   title: t.utility.optionSeniorTitle,
                   subtitle: t.utility.optionSeniorArlSubtitle,
                 ),
@@ -148,7 +149,7 @@ class TransitCardRow extends ConsumerWidget {
               ref: ref,
               theme: theme,
               t: t,
-              networkId: 'SRT',
+              network: TransitNetwork.srt,
               cardName: t.utility.srtCardName,
               gradient: LinearGradient(
                 colors: [Colors.red.shade800, Colors.red.shade900],
@@ -158,17 +159,17 @@ class TransitCardRow extends ConsumerWidget {
               activeType: cardState.srtCardType,
               options: [
                 _CardOption(
-                  value: 'standard',
+                  value: TransitCardType.standard,
                   title: t.utility.optionStandardTitle,
                   subtitle: t.utility.optionStandardSubtitle,
                 ),
                 _CardOption(
-                  value: 'student',
+                  value: TransitCardType.student,
                   title: t.utility.optionStudentTitle,
                   subtitle: t.utility.optionStudentSrtSubtitle,
                 ),
                 _CardOption(
-                  value: 'senior',
+                  value: TransitCardType.senior,
                   title: t.utility.optionSeniorTitle,
                   subtitle: t.utility.optionSeniorSrtSubtitle,
                 ),
@@ -185,10 +186,10 @@ class TransitCardRow extends ConsumerWidget {
     required WidgetRef ref,
     required ThemeData theme,
     required AppLocalizations t,
-    required String networkId,
+    required TransitNetwork network,
     required String cardName,
     required Gradient gradient,
-    required String activeType,
+    required TransitCardType activeType,
     required List<_CardOption> options,
   }) {
     final activeOption = options.firstWhere(
@@ -207,7 +208,7 @@ class TransitCardRow extends ConsumerWidget {
             context: context,
             ref: ref,
             theme: theme,
-            networkId: networkId,
+            network: network,
             cardName: cardName,
             gradient: gradient,
             activeType: activeType,
@@ -282,10 +283,10 @@ class TransitCardRow extends ConsumerWidget {
     required BuildContext context,
     required WidgetRef ref,
     required ThemeData theme,
-    required String networkId,
+    required TransitNetwork network,
     required String cardName,
     required Gradient gradient,
-    required String activeType,
+    required TransitCardType activeType,
     required List<_CardOption> options,
   }) {
     showModalBottomSheet(
@@ -298,7 +299,7 @@ class TransitCardRow extends ConsumerWidget {
       builder: (context) {
         return _CardDetailBottomSheetContent(
           theme: theme,
-          networkId: networkId,
+          network: network,
           cardName: cardName,
           gradient: gradient,
           initialActiveType: activeType,
@@ -311,15 +312,15 @@ class TransitCardRow extends ConsumerWidget {
 
 class _CardDetailBottomSheetContent extends ConsumerStatefulWidget {
   final ThemeData theme;
-  final String networkId;
+  final TransitNetwork network;
   final String cardName;
   final Gradient gradient;
-  final String initialActiveType;
+  final TransitCardType initialActiveType;
   final List<_CardOption> options;
 
   const _CardDetailBottomSheetContent({
     required this.theme,
-    required this.networkId,
+    required this.network,
     required this.cardName,
     required this.gradient,
     required this.initialActiveType,
@@ -333,7 +334,7 @@ class _CardDetailBottomSheetContent extends ConsumerStatefulWidget {
 
 class _CardDetailBottomSheetContentState
     extends ConsumerState<_CardDetailBottomSheetContent> {
-  late String _activeType;
+  late TransitCardType _activeType;
 
   @override
   void initState() {
@@ -346,14 +347,14 @@ class _CardDetailBottomSheetContentState
     final theme = widget.theme;
 
     Color networkColor = Colors.green.shade600;
-    if (widget.networkId == 'MRT') networkColor = Colors.blue.shade700;
-    if (widget.networkId == 'ARL') networkColor = Colors.red.shade700;
-    if (widget.networkId == 'SRT') networkColor = Colors.red.shade800;
+    if (widget.network == TransitNetwork.mrt) networkColor = Colors.blue.shade700;
+    if (widget.network == TransitNetwork.arl) networkColor = Colors.red.shade700;
+    if (widget.network == TransitNetwork.srt) networkColor = Colors.red.shade800;
 
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
-        child: RadioGroup<String>(
+        child: RadioGroup<TransitCardType>(
           groupValue: _activeType,
           onChanged: (val) {
             if (val != null) {
@@ -362,7 +363,7 @@ class _CardDetailBottomSheetContentState
               });
               ref
                   .read(userCardsProvider.notifier)
-                  .setCardType(widget.networkId, val);
+                  .setCardType(widget.network, val);
               Future.delayed(const Duration(milliseconds: 150), () {
                 if (context.mounted) {
                   Navigator.pop(context);
@@ -423,7 +424,7 @@ class _CardDetailBottomSheetContentState
                       });
                       ref
                           .read(userCardsProvider.notifier)
-                          .setCardType(widget.networkId, opt.value);
+                          .setCardType(widget.network, opt.value);
                       Future.delayed(const Duration(milliseconds: 150), () {
                         if (context.mounted) {
                           Navigator.pop(context);
@@ -485,7 +486,7 @@ class _CardDetailBottomSheetContentState
                                 });
                                 ref
                                     .read(userCardsProvider.notifier)
-                                    .setCardType(widget.networkId, val);
+                                    .setCardType(widget.network, val);
                                 Future.delayed(
                                   const Duration(milliseconds: 150),
                                   () {
@@ -496,7 +497,7 @@ class _CardDetailBottomSheetContentState
                                 );
                               }
                             },
-                            child: Radio<String>(
+                            child: Radio<TransitCardType>(
                               value: opt.value,
                               activeColor: networkColor,
                             ),
@@ -515,26 +516,8 @@ class _CardDetailBottomSheetContentState
   }
 }
 
-// class RadioGroup<T> extends StatelessWidget {
-//   final T groupValue;
-//   final ValueChanged<T?> onChanged;
-//   final Widget child;
-
-//   const RadioGroup({
-//     super.key,
-//     required this.groupValue,
-//     required this.onChanged,
-//     required this.child,
-//   });
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return child;
-//   }
-// }
-
 class _CardOption {
-  final String value;
+  final TransitCardType value;
   final String title;
   final String subtitle;
 
@@ -544,3 +527,4 @@ class _CardOption {
     required this.subtitle,
   });
 }
+

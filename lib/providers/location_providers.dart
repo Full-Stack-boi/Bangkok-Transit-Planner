@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../core/utils/logger.dart';
 
 part 'location_providers.g.dart';
 
@@ -43,7 +44,9 @@ class MockLocation extends _$MockLocation {
           speedAccuracy: 0.0,
         );
       }
-    } catch (_) {}
+    } catch (e, st) {
+      AppLogger.warning('Failed to load mock location from storage: $e', stackTrace: st);
+    }
   }
 
   Future<void> setMockLocation(double latitude, double longitude) async {
@@ -67,7 +70,9 @@ class MockLocation extends _$MockLocation {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setDouble('mock_latitude', latitude);
       await prefs.setDouble('mock_longitude', longitude);
-    } catch (_) {}
+    } catch (e, st) {
+      AppLogger.warning('Failed to persist mock location: $e', stackTrace: st);
+    }
   }
 
   Future<void> clearMockLocation() async {
@@ -76,6 +81,8 @@ class MockLocation extends _$MockLocation {
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove('mock_latitude');
       await prefs.remove('mock_longitude');
-    } catch (_) {}
+    } catch (e, st) {
+      AppLogger.warning('Failed to clear mock location from storage: $e', stackTrace: st);
+    }
   }
 }

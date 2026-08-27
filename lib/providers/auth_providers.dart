@@ -1,10 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../core/utils/logger.dart';
+import '../models/transit_enums.dart';
 import '../repositories/auth_repository.dart';
 import 'providers.dart';
 import '../features/favorites/favorites_view_model.dart';
-import 'package:bkk_transit_planner/core/utils/logger.dart';
 
 part 'auth_providers.g.dart';
 
@@ -73,10 +74,10 @@ class AuthNotifier extends _$AuthNotifier {
 
         // Sync card preferences from userMetadata
         final userMetadata = user.userMetadata ?? {};
-        final bts = userMetadata['bts_card_type'] as String? ?? 'standard';
-        final mrt = userMetadata['mrt_card_type'] as String? ?? 'standard';
-        final arl = userMetadata['arl_card_type'] as String? ?? 'standard';
-        final srt = userMetadata['srt_card_type'] as String? ?? 'standard';
+        final bts = TransitCardType.fromJson(userMetadata['bts_card_type'] as String?);
+        final mrt = TransitCardType.fromJson(userMetadata['mrt_card_type'] as String?);
+        final arl = TransitCardType.fromJson(userMetadata['arl_card_type'] as String?);
+        final srt = TransitCardType.fromJson(userMetadata['srt_card_type'] as String?);
         ref
             .read(userCardsProvider.notifier)
             .updateFromSync(

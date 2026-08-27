@@ -633,9 +633,9 @@ class EnglishUtility implements BaseUtility {
   String get cardsSubtitle =>
       'Configure your active cards to display customized fares across the map.';
   @override
-  String get rabbitCardName => 'Rabbit Card';
+  String get rabbitCardName => 'Rabbit Card (BTS / Yellow / Pink)';
   @override
-  String get mrtCardName => 'MRT Card';
+  String get mrtCardName => 'MRT Card (Blue / Purple Lines)';
   @override
   String get arlCardName => 'ARL Smart Pass';
   @override

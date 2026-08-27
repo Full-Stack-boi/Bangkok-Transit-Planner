@@ -15,6 +15,7 @@ import '../services/location_service.dart';
 import '../services/notification_service.dart';
 import '../services/transit_news_service.dart';
 import '../services/photon_search_service.dart';
+import '../services/offline_map_service.dart';
 import 'auth_providers.dart';
 import 'package:bkk_transit_planner/core/utils/logger.dart';
 
@@ -23,6 +24,7 @@ export 'location_providers.dart';
 export 'user_cards_provider.dart';
 export 'disruption_provider.dart';
 export '../models/transit_disruption.dart';
+export '../services/offline_map_service.dart';
 
 part 'providers.g.dart';
 
@@ -153,7 +155,9 @@ class AppThemeMode extends _$AppThemeMode {
     try {
       final prefs = ref.read(sharedPreferencesProvider);
       await prefs.setString('theme_mode', mode.name);
-    } catch (_) {}
+    } catch (e, st) {
+      AppLogger.warning('Failed to persist theme mode preference: $e', stackTrace: st);
+    }
   }
 }
 
@@ -173,7 +177,9 @@ class AppLocale extends _$AppLocale {
     try {
       final prefs = ref.read(sharedPreferencesProvider);
       await prefs.setString('language_code', langCode);
-    } catch (_) {}
+    } catch (e, st) {
+      AppLogger.warning('Failed to persist locale preference: $e', stackTrace: st);
+    }
   }
 }
 
@@ -194,6 +200,8 @@ class MapPrefetchProgress {
   final int successCount;
   final int cachedCount;
   final int errorCount;
+  final int totalBytes;
+  final int receivedBytes;
 
   const MapPrefetchProgress({
     this.isPrefetching = false,
@@ -203,9 +211,14 @@ class MapPrefetchProgress {
     this.successCount = 0,
     this.cachedCount = 0,
     this.errorCount = 0,
+    this.totalBytes = 0,
+    this.receivedBytes = 0,
   });
 
-  double get progress => totalTiles > 0 ? currentTile / totalTiles : 0.0;
+  double get progress {
+    if (totalBytes > 0) return (receivedBytes / totalBytes).clamp(0.0, 1.0);
+    return totalTiles > 0 ? (currentTile / totalTiles).clamp(0.0, 1.0) : 0.0;
+  }
 
   MapPrefetchProgress copyWith({
     bool? isPrefetching,
@@ -215,6 +228,8 @@ class MapPrefetchProgress {
     int? successCount,
     int? cachedCount,
     int? errorCount,
+    int? totalBytes,
+    int? receivedBytes,
   }) {
     return MapPrefetchProgress(
       isPrefetching: isPrefetching ?? this.isPrefetching,
@@ -224,6 +239,8 @@ class MapPrefetchProgress {
       successCount: successCount ?? this.successCount,
       cachedCount: cachedCount ?? this.cachedCount,
       errorCount: errorCount ?? this.errorCount,
+      totalBytes: totalBytes ?? this.totalBytes,
+      receivedBytes: receivedBytes ?? this.receivedBytes,
     );
   }
 }
@@ -243,6 +260,14 @@ class MapPrefetch extends _$MapPrefetch {
     );
   }
 
+  void startByteDownload(int totalBytes) {
+    state = MapPrefetchProgress(
+      isPrefetching: true,
+      isPaused: false,
+      totalBytes: totalBytes,
+    );
+  }
+
   void updateProgress({
     required int current,
     required int success,
@@ -257,6 +282,18 @@ class MapPrefetch extends _$MapPrefetch {
     );
   }
 
+  void updateByteProgress({
+    required int receivedBytes,
+    required int totalBytes,
+  }) {
+    state = state.copyWith(
+      receivedBytes: receivedBytes,
+      totalBytes: totalBytes,
+      currentTile: receivedBytes,
+      totalTiles: totalBytes,
+    );
+  }
+
   void pausePrefetch() {
     state = state.copyWith(isPaused: true);
   }
@@ -268,6 +305,11 @@ class MapPrefetch extends _$MapPrefetch {
   void finishPrefetch() {
     state = state.copyWith(isPrefetching: false, isPaused: false);
   }
+}
+
+@riverpod
+Future<OfflineMapStatus> offlineMapStatus(Ref ref) async {
+  return OfflineMapService.instance.getStatus();
 }
 
 // Utility Screen Future Providers

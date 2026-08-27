@@ -26,8 +26,16 @@ class AppLogger {
     _log(message, tag: tag, color: LogColor.green);
   }
 
-  static void warning(String message, {String tag = 'WARN'}) {
-    _log(message, tag: tag, color: LogColor.yellow);
+  static void warning(
+    String message, {
+    String tag = 'WARN',
+    Object? error,
+    StackTrace? stackTrace,
+  }) {
+    final buffer = StringBuffer(message);
+    if (error != null) buffer.write('\nError: $error');
+    if (stackTrace != null) buffer.write('\nStackTrace:\n$stackTrace');
+    _log(buffer.toString(), tag: tag, color: LogColor.yellow);
   }
 
   static void error(

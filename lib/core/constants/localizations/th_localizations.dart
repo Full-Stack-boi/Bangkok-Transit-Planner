@@ -636,9 +636,9 @@ class ThaiUtility implements BaseUtility {
   String get cardsSubtitle =>
       'เลือกสิทธิ์ส่วนลดของคุณเพื่อการแสดงผลราคาในระบบเดินทางอย่างถูกต้อง';
   @override
-  String get rabbitCardName => 'บัตรแรบบิท (Rabbit)';
+  String get rabbitCardName => 'บัตรแรบบิท (BTS / สีเหลือง / สีชมพู)';
   @override
-  String get mrtCardName => 'บัตรเอ็มอาร์ที (MRT)';
+  String get mrtCardName => 'บัตรเอ็มอาร์ที (MRT สีน้ำเงิน / สีม่วง)';
   @override
   String get arlCardName => 'แอร์พอร์ตลิงก์ (ARL)';
   @override

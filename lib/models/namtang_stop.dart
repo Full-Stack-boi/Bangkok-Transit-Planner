@@ -96,22 +96,6 @@ class NamtangStop extends SearchableItem {
     );
   }
 
-  /// Get corresponding asset icon path for search results UI
-  String get iconAssetPath {
-    switch (type) {
-      case 'bus':
-        return 'assets/images/bus-stop.png';
-      case 'boat':
-        return 'assets/images/boat.png';
-      case 'brt':
-        return 'assets/images/brt.png';
-      case 'commuter_train':
-        return 'assets/images/train.png';
-      default:
-        return 'assets/images/bus-stop.png';
-    }
-  }
-
   @override
   bool operator ==(Object other) =>
       identical(this, other) || (other is NamtangStop && id == other.id);
